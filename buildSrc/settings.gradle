@@ -1,0 +1,12 @@
+
+dependencyResolutionManagement {
+	repositories {
+		mavenCentral()
+	}
+
+	versionCatalogs {
+		jdks {
+			version "baseline", "17"
+		}
+	}
+}

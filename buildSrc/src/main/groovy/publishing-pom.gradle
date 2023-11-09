@@ -1,0 +1,83 @@
+plugins {
+	id "java-library"
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// OSSRH publishing
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+publishing {
+	publications {
+		publishedArtifacts( MavenPublication ) {
+			// main publication
+			publishedArtifacts {
+				from components.java
+			}
+		}
+	}
+}
+
+String hibernatePublishUsername = project.hasProperty( 'hibernatePublishUsername' )
+		? project.property( 'hibernatePublishUsername' )
+		: null
+String hibernatePublishPassword = project.hasProperty( 'hibernatePublishPassword' )
+		? project.property( 'hibernatePublishPassword' )
+		: null
+
+nexusPublishing {
+	repositories {
+		sonatype {
+			username = hibernatePublishUsername
+			password = hibernatePublishPassword
+		}
+	}
+}
+
+
+
+publishing {
+	publications {
+		publishedArtifacts( MavenPublication ) {
+			pom {
+				name = "Hibernate Models"
+				description = project.description
+				url = "https://github.com/hibernate/hibernate-models"
+
+				organization {
+					name = 'Hibernate.org'
+					url = 'https://hibernate.org'
+				}
+
+				licenses {
+					license {
+						name = "Apache License Version 2.0"
+						url = "http://www.apache.org/licenses/"
+						distribution = "repo"
+					}
+				}
+
+				scm {
+					url = "https://github.com/hibernate/hibernate-models"
+					connection = "scm:git:https://github.com/hibernate/hibernate-models.git"
+					developerConnection = "scm:git:https://github.com/hibernate/hibernate-models.git"
+				}
+
+				issueManagement {
+					system = "github"
+					url = "https://github.com/hibernate/hibernate-models"
+				}
+
+				developers {
+					developer {
+						id = "hibernate-team"
+						name = "The Hibernate Development Team"
+						organization = "Hibernate.org"
+						organizationUrl = "https://hibernate.org"
+					}
+				}
+
+			}
+
+		}
+	}
+}
