@@ -1,10 +1,10 @@
 :fn-managed: footnote:[The application's domain and related classes]
-:fn-loaded: footnote:[Once a classes is loaded into a ClassLoader, its bytecode cannot be changed]
 == Hibernate models
 
-An abstraction over "reflection" and annotations.
+A de-typed abstraction over "reflection" and annotations (and in the case of Hibernate ORM,
+mapping XML also).
 
-Uses a mix of https://smallrye.io/jandex/[Jandex] and Java reflection to build a de-typed abstraction model of
+Uses a mix of https://smallrye.io/jandex/[Jandex] and Java reflection to build the de-typed abstraction model of
 classes and annotations referenced by an application's managed resources{fn-managed}.
 
 Consumers can then access details from that abstraction model in a unified way, regardless of the underlying
