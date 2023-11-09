@@ -1,4 +1,3 @@
-:fn-reusability: footnote:[This is a nice-to-have, as opposed to a hard goal]
 :fn-managed: footnote:[The application's domain and related classes]
 :fn-loaded: footnote:[Once a classes is loaded into a ClassLoader, its bytecode cannot be changed]
 == Hibernate models
@@ -13,5 +12,5 @@ source (Jandex or reflection).  For classes which we are able to access from a J
 that the classes are not loaded into the ClassLoader; which is important because once a classes is loaded into
 a ClassLoader, its bytecode cannot be changed and run-time bytecode enhancement is not possible.
 
-This work is intended to replace the `hibernate-commons-annotation`[https://github.com/hibernate/hibernate-commons-annotations] (HCANN)
+This work is intended to replace the https://github.com/hibernate/hibernate-commons-annotations[`hibernate-commons-annotation`] (HCANN)
 library, which suffered from a number of shortcomings.
