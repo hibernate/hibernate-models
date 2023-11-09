@@ -1,0 +1,17 @@
+:fn-reusability: footnote:[This is a nice-to-have, as opposed to a hard goal]
+:fn-managed: footnote:[The application's domain and related classes]
+:fn-loaded: footnote:[Once a classes is loaded into a ClassLoader, its bytecode cannot be changed]
+== Hibernate models
+
+An abstraction over "reflection" and annotations.
+
+Uses a mix of https://smallrye.io/jandex/[Jandex] and Java reflection to build a de-typed abstraction model of
+classes and annotations referenced by an application's managed resources{fn-managed}.
+
+Consumers can then access details from that abstraction model in a unified way, regardless of the underlying
+source (Jandex or reflection).  For classes which we are able to access from a Jandex index, this has the benefit
+that the classes are not loaded into the ClassLoader; which is important because once a classes is loaded into
+a ClassLoader, its bytecode cannot be changed and run-time bytecode enhancement is not possible.
+
+This work is intended to replace the `hibernate-commons-annotation`[https://github.com/hibernate/hibernate-commons-annotations] (HCANN)
+library, which suffered from a number of shortcomings.

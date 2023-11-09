@@ -1,0 +1,56 @@
+plugins {
+	id "java-library"
+	id "checkstyle"
+}
+
+group = "org.hibernate.models"
+version = "1.0.0-SNAPSHOT"
+
+
+dependencies {
+	implementation libs.jandex
+	implementation libs.logging
+
+	compileOnly libs.loggingAnnotations
+
+	annotationProcessor libs.loggingProcessor
+	annotationProcessor libs.logging
+	annotationProcessor libs.loggingAnnotations
+
+	testImplementation testLibs.junit5Api
+	testImplementation testLibs.assertjCore
+	testImplementation platform( libs.hibernatePlatform )
+	testImplementation libs.hibernateCore
+
+	testRuntimeOnly testLibs.junit5Engine
+}
+
+java {
+	sourceCompatibility = jdks.versions.baseline.get()
+	targetCompatibility = jdks.versions.baseline.get()
+	toolchain {
+		languageVersion = JavaLanguageVersion.of( jdks.versions.baseline.get() )
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+tasks.withType( JavaCompile ).configureEach {
+	options.encoding = "UTF-8"
+	options.warnings false
+}
+
+// create a single "compile" task
+tasks.register( "compile" ) {compile->
+	compile.dependsOn tasks.named( sourceSets.main.compileJavaTaskName )
+	compile.dependsOn tasks.named( sourceSets.test.compileJavaTaskName )
+}
+
+checkstyle {
+	sourceSets = [ project.sourceSets.main ]
+	showViolations = false
+}
+// only include explicit sources (and thereby exclude generated sources)
+tasks.checkstyleMain.source = 'src/main'
