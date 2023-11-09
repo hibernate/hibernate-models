@@ -65,7 +65,9 @@ tasks.register( "prepareForRelease" ) {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Publish
 //
-// Processes should execute `publishToSonatype`
+// Processes should execute
+// 		- `publishToSonatype`
+// 		- `closeSonatypeStagingRepository`
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -75,14 +77,12 @@ tasks.register( "prepareForRelease" ) {
 //		- commit
 //		- tag
 //
-// Processes should execute `publishToSonatype`
+// Processes should execute `completeRelease`
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def changeToDevelopmentVersionTask = tasks.register( 'changeToDevelopmentVersion' ) {
 	group 'Release'
 	description 'Updates `version.txt` file to the specified development-version'
-
-	dependsOn tasks.named( "publishPublishedArtifactsPublicationsToSonatypeRepository" )
 
 	doFirst {
 		logger.lifecycle( "Updating version-file to development-version : `${project.ext.developmentVersion}`" )
