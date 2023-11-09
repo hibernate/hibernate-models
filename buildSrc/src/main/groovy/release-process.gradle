@@ -1,3 +1,5 @@
+import java.nio.charset.StandardCharsets
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Release processing
 //
@@ -121,4 +123,31 @@ static String determineReleaseTag(String releaseVersion) {
 	return releaseVersion.endsWith( '.Final' )
 			? releaseVersion.replace( ".Final", "" )
 			: releaseVersion;
+}
+static String executeGitCommand(Object ... subcommand){
+	List<Object> command = ['git']
+	Collections.addAll( command, subcommand )
+	def proc = command.execute()
+	def code = proc.waitFor()
+	def stdout = inputStreamToString( proc.getInputStream() )
+	def stderr = inputStreamToString( proc.getErrorStream() )
+	if ( code != 0 ) {
+		throw new GradleException( "An error occurred while executing " + command + "\n\nstdout:\n" + stdout + "\n\nstderr:\n" + stderr )
+	}
+	return stdout
+}
+
+static String inputStreamToString(InputStream inputStream) {
+	inputStream.withCloseable { ins ->
+		new BufferedInputStream(ins).withCloseable { bis ->
+			new ByteArrayOutputStream().withCloseable { buf ->
+				int result = bis.read();
+				while (result != -1) {
+					buf.write((byte) result);
+					result = bis.read();
+				}
+				return buf.toString( StandardCharsets.UTF_8.name());
+			}
+		}
+	}
 }
