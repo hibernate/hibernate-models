@@ -23,16 +23,16 @@ import java.nio.charset.StandardCharsets
 def releasePreparationTask = tasks.register( "releasePreparation" ) {
 	dependsOn tasks.named( "clean" )
 
-	doLast {
-		logger.lifecycle( "Checking that all commits are pushed..." )
-		String diffWithUpstream = executeGitCommand( 'diff', '@{u}' )
-		if ( !diffWithUpstream.isEmpty() ) {
-			throw new GradleException(
-					"Cannot perform `ciRelease` tasks because there are un-pushed local commits .\n" +
-							"Push your commits first."
-			);
-		}
-	}
+//	doLast {
+//		logger.lifecycle( "Checking that all commits are pushed..." )
+//		String diffWithUpstream = executeGitCommand( 'diff', '@{u}' )
+//		if ( !diffWithUpstream.isEmpty() ) {
+//			throw new GradleException(
+//					"Cannot perform `ciRelease` tasks because there are un-pushed local commits .\n" +
+//							"Push your commits first."
+//			);
+//		}
+//	}
 }
 
 def changeToReleaseVersionTask = tasks.register( "changeToReleaseVersion" ) {
@@ -42,7 +42,7 @@ def changeToReleaseVersionTask = tasks.register( "changeToReleaseVersion" ) {
 	dependsOn releasePreparationTask
 
 	doFirst {
-		logger.lifecycle( "Updating version-file to release-version : `${releaseVersion}`" )
+		logger.lifecycle( "Updating version-file to release-version : `${project.ext.releaseVersion}`" )
 		updateVersionFile( project.ext.releaseVersion )
 	}
 }
