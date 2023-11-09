@@ -1,6 +1,21 @@
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Release processing
+//
+// Processes should execute the following tasks in order
+//		- prepareForRelease 				(this script)
+//		- publishToSonatype					(io.github.gradle-nexus.publish-plugin)
+//		- closeSonatypeStagingRepository	(io.github.gradle-nexus.publish-plugin)
+//		- completeRelease 					(this script)
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Release processing - preparation
+//		- clean
+//		- change version in `/version.txt` to the release version
+//		- commit the version change
+//
+// Processes should execute `prepareForRelease`
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def releasePreparationTask = tasks.register( "releasePreparation" ) {
@@ -40,11 +55,34 @@ def gitPreparationForReleaseTask = tasks.register( 'gitPreparationForRelease' ) 
 	}
 }
 
+tasks.register( "prepareForRelease" ) {
+	dependsOn releasePreparationTask
+	dependsOn changeToReleaseVersionTask
+	dependsOn gitPreparationForReleaseTask
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Publish
+//
+// Processes should execute `publishToSonatype`
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Release processing - complete
+//		- change version in `/version.txt` to the dev version
+//		- commit
+//		- tag
+//
+// Processes should execute `publishToSonatype`
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 def changeToDevelopmentVersionTask = tasks.register( 'changeToDevelopmentVersion' ) {
 	group 'Release'
 	description 'Updates `version.txt` file to the specified development-version'
 
-	dependsOn tasks.named( "publishAllPublicationsToSonatypeRepository" )
+	dependsOn tasks.named( "publishPublishedArtifactsPublicationsToSonatypeRepository" )
 
 	doFirst {
 		logger.lifecycle( "Updating version-file to development-version : `${project.ext.developmentVersion}`" )
@@ -68,19 +106,11 @@ def releasePreparePostGitTask = tasks.register( 'gitTasksAfterRelease' ) {
 	}
 }
 
-tasks.named( "publishAllPublicationsToSonatypeRepository" ) {
-	dependsOn changeToReleaseVersionTask
-}
-
-def doReleaseTask = tasks.register( "doRelease" ) {
-	dependsOn releasePreparationTask
-	dependsOn gitPreparationForReleaseTask
-	dependsOn changeToReleaseVersionTask
-	dependsOn tasks.named( "publishAllPublicationsToSonatypeRepository" )
+tasks.register( "completeRelease" ) {
 	dependsOn changeToDevelopmentVersionTask
 	dependsOn releasePreparePostGitTask
-	dependsOn tasks.named( "closeSonatypeStagingRepository" )
 }
+
 
 void updateVersionFile(String version) {
 	logger.lifecycle( "Updating `version.txt` version to `${version}`" )

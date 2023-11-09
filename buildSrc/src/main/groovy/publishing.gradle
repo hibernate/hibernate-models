@@ -1,21 +1,11 @@
 plugins {
 	id "java-library"
+	id 'io.github.gradle-nexus.publish-plugin'
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // OSSRH publishing
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-publishing {
-	publications {
-		publishedArtifacts( MavenPublication ) {
-			// main publication
-			publishedArtifacts {
-				from components.java
-			}
-		}
-	}
-}
 
 String hibernatePublishUsername = project.hasProperty( 'hibernatePublishUsername' )
 		? project.property( 'hibernatePublishUsername' )
@@ -23,17 +13,6 @@ String hibernatePublishUsername = project.hasProperty( 'hibernatePublishUsername
 String hibernatePublishPassword = project.hasProperty( 'hibernatePublishPassword' )
 		? project.property( 'hibernatePublishPassword' )
 		: null
-
-nexusPublishing {
-	repositories {
-		sonatype {
-			username = hibernatePublishUsername
-			password = hibernatePublishPassword
-		}
-	}
-}
-
-
 
 publishing {
 	publications {
@@ -80,4 +59,23 @@ publishing {
 
 		}
 	}
+}
+
+nexusPublishing {
+	repositories {
+		sonatype {
+			username = hibernatePublishUsername
+			password = hibernatePublishPassword
+		}
+	}
+}
+
+def isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+signing {
+	sign publishing.publications.publishedArtifacts
+}
+
+tasks.withType( Sign ).configureEach {
+	onlyIf { isReleaseVersion }
 }
