@@ -1,0 +1,22 @@
+
+group = "org.hibernate.models"
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Version handling
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def versionFile = project.file( "version.txt" )
+def releaseVersion = project.hasProperty('releaseVersion')
+		? project.property('releaseVersion') as String
+		: null
+def developmentVersion = project.hasProperty('developmentVersion')
+		? project.property('developmentVersion') as String
+		: null
+
+ext.versionFile = versionFile
+ext.releaseVersion = releaseVersion
+ext.developmentVersion = developmentVersion
+
+project.version = project.ext.releaseVersion != null
+		? project.ext.releaseVersion
+		: project.ext.versionFile.text

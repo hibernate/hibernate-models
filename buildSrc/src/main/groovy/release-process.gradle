@@ -1,5 +1,9 @@
 import java.nio.charset.StandardCharsets
 
+plugins {
+	id "base-information"
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Release processing
 //
