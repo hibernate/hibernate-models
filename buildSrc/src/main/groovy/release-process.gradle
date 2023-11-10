@@ -34,8 +34,8 @@ def releasePreparationTask = tasks.register( "releasePreparation" ) {
 	dependsOn tasks.named( "clean" )
 	dependsOn tasks.named( "compile" )
 
-//	doFirst {
-//		logger.lifecycle( "Checking that all commits are pushed..." )
+	doFirst {
+		logger.lifecycle( "Checking that all commits are pushed..." )
 //		String diffWithUpstream = executeGitCommand( 'diff', '@{u}' )
 //		if ( !diffWithUpstream.isEmpty() ) {
 //			throw new GradleException(
@@ -43,7 +43,7 @@ def releasePreparationTask = tasks.register( "releasePreparation" ) {
 //							"Push your commits first."
 //			);
 //		}
-//	}
+	}
 }
 
 def changeToReleaseVersionTask = tasks.register( "changeToReleaseVersion" ) {
