@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets
 
 def releasePreparationTask = tasks.register( "releasePreparation" ) {
 	dependsOn tasks.named( "clean" )
+	dependsOn tasks.named( "compile" )
 
 //	doLast {
 //		logger.lifecycle( "Checking that all commits are pushed..." )

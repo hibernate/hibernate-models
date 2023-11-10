@@ -2,8 +2,6 @@ plugins {
 	id "signing"
 }
 
-def isReleaseVersion = !version.endsWith("SNAPSHOT")
-
 var signingKey = resolveSigningKey()
 var signingPassword = findSigningProperty( "signingPassword" )
 

@@ -78,6 +78,29 @@ tasks.withType( JavaCompile ).configureEach {javaCompile->
 	options.warnings false
 }
 
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Javadoc
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+tasks.named( "javadoc", Javadoc ) {
+	configure( options ) {
+		use = true
+		encoding = 'UTF-8'
+
+		addStringOption( 'Xdoclint:none', '-quiet' )
+
+		tags(
+				'todo:X',
+				'apiNote:a:API Note:',
+				'implSpec:a:Implementation Specification:',
+				'implNote:a:Implementation Note:',
+				'settingDefault:f:Default Value:'
+		)
+	}
+}
+
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Checkstyle
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
