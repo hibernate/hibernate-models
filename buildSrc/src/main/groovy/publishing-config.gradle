@@ -17,6 +17,7 @@ String hibernatePublishPassword = project.hasProperty( 'hibernatePublishPassword
 publishing {
 	publications {
 		publishedArtifacts( MavenPublication ) {
+			from components.java
 			pom {
 				name = "Hibernate Models"
 				description = "A de-typed abstraction over reflection and annotations"
