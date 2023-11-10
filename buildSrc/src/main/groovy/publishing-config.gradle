@@ -19,7 +19,7 @@ publishing {
 		publishedArtifacts( MavenPublication ) {
 			pom {
 				name = "Hibernate Models"
-				description = project.description
+				description = "A de-typed abstraction over reflection and annotations"
 				url = "https://github.com/hibernate/hibernate-models"
 
 				organization {
