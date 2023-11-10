@@ -10,12 +10,18 @@ import java.nio.charset.StandardCharsets
 //		- completeRelease 					(this script)
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+def releaseVersion = project.ext.releaseVersion as String
+def developmentVersion = project.ext.developmentVersion as String
+
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Release processing - preparation
-//		- clean
-//		- change version in `/version.txt` to the release version
-//		- commit the version change
+//		- releasePreparation (task)
+//			- check for clean working copy
+//			- clean & compile
+//		- changeToReleaseVersion (task)
+//			- change version in `/version.txt` to the release version
+//			- commit the version change
 //
 // Processes should execute `prepareForRelease`
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,16 +30,16 @@ def releasePreparationTask = tasks.register( "releasePreparation" ) {
 	dependsOn tasks.named( "clean" )
 	dependsOn tasks.named( "compile" )
 
-//	doLast {
-//		logger.lifecycle( "Checking that all commits are pushed..." )
-//		String diffWithUpstream = executeGitCommand( 'diff', '@{u}' )
-//		if ( !diffWithUpstream.isEmpty() ) {
-//			throw new GradleException(
-//					"Cannot perform `ciRelease` tasks because there are un-pushed local commits .\n" +
-//							"Push your commits first."
-//			);
-//		}
-//	}
+	doFirst {
+		logger.lifecycle( "Checking that all commits are pushed..." )
+		String diffWithUpstream = executeGitCommand( 'diff', '@{u}' )
+		if ( !diffWithUpstream.isEmpty() ) {
+			throw new GradleException(
+					"Cannot perform `prepareForRelease` tasks because there are un-pushed local commits .\n" +
+							"Push your commits first."
+			);
+		}
+	}
 }
 
 def changeToReleaseVersionTask = tasks.register( "changeToReleaseVersion" ) {
@@ -43,25 +49,20 @@ def changeToReleaseVersionTask = tasks.register( "changeToReleaseVersion" ) {
 	dependsOn releasePreparationTask
 
 	doFirst {
-		logger.lifecycle( "Updating version-file to release-version : `${project.ext.releaseVersion}`" )
-		updateVersionFile( project.ext.releaseVersion )
+		logger.lifecycle( "Updating version-file to release-version : `${releaseVersion}`" )
+		updateVersionFile( releaseVersion )
 	}
-}
-
-def gitPreparationForReleaseTask = tasks.register( 'gitPreparationForRelease' ) {
-	dependsOn changeToReleaseVersionTask
 
 	doLast {
-		logger.lifecycle( "Performing pre-steps Git commit : `${project.ext.releaseVersion}`" )
+		logger.lifecycle( "Performing pre-steps Git commit : `${releaseVersion}`" )
 		executeGitCommand( 'add', '.' )
-		executeGitCommand( 'commit', '-m', "Pre-steps for release : `${project.ext.releaseVersion}`" )
+		executeGitCommand( 'commit', '-m', "Pre-steps for release : `${releaseVersion}`" )
 	}
 }
 
 tasks.register( "prepareForRelease" ) {
 	dependsOn releasePreparationTask
 	dependsOn changeToReleaseVersionTask
-	dependsOn gitPreparationForReleaseTask
 }
 
 
@@ -76,42 +77,61 @@ tasks.register( "prepareForRelease" ) {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Release processing - complete
-//		- change version in `/version.txt` to the dev version
-//		- commit
-//		- tag
+//		- tagRelease (task)
+//			- tag
+//		- changeToDevelopmentVersion (task)
+//			- change version in `/version.txt` to the dev version
+//			- commit the version change
+//
 //
 // Processes should execute `completeRelease`
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def tagReleaseTask = tasks.register( "tagRelease" ) {
+	onlyIf {
+		tasks.gitPreparationForRelease.didWork
+	}
+
+	doLast {
+		logger.lifecycle( "Tagging release : `${releaseVersion}`..." )
+		executeGitCommand( 'tag', '-a', releaseVersion, '-m', "Release ${releaseVersion}" )
+	}
+}
 
 def changeToDevelopmentVersionTask = tasks.register( 'changeToDevelopmentVersion' ) {
 	group 'Release'
 	description 'Updates `version.txt` file to the specified development-version'
 
+	dependsOn tagReleaseTask
+
 	doFirst {
-		logger.lifecycle( "Updating version-file to development-version : `${project.ext.developmentVersion}`" )
-		updateVersionFile( project.ext.developmentVersion )
+		logger.lifecycle( "Updating version-file to development-version : `${developmentVersion}`" )
+		updateVersionFile( developmentVersion )
+	}
+
+	doLast {
+		logger.lifecycle( "Committing changes to `version.txt` : `${developmentVersion}`" )
+		executeGitCommand( 'add', '.' )
+		executeGitCommand( 'commit', '-m', "Post-steps for release : `${releaseVersion}`" )
 	}
 }
 
-def releasePreparePostGitTask = tasks.register( 'gitTasksAfterRelease' ) {
+def pushToGitTask = tasks.register( 'pushToGit' ) {
 	dependsOn changeToDevelopmentVersionTask
 
-	doLast {
-		def releaseTag = determineReleaseTag(releaseVersion)
-		logger.lifecycle( "Performing pre-steps Git commit : `${releaseVersion}`" )
-		executeGitCommand( 'add', '.' )
-		executeGitCommand( 'commit', '-m', "Post-steps for release : `${releaseVersion}`" )
+	def gitRemote = determineGitRemote( project )
+	def gitBranch = determineGitBranch( project )
 
-		if ( project.createTag ) {
-			logger.lifecycle( "Tagging release : `${releaseTag}`..." )
-			executeGitCommand( 'tag', '-a', releaseTag, '-m', "Release ${releaseVersion}" )
-		}
+	doLast {
+		logger.lifecycle( "Pushing branch and tag to remote `${gitRemote}`..." )
+		executeGitCommand( 'push', '--atomic', gitRemote, gitBranch, releaseVersion )
 	}
 }
 
 tasks.register( "completeRelease" ) {
+	dependsOn tagReleaseTask
 	dependsOn changeToDevelopmentVersionTask
-	dependsOn releasePreparePostGitTask
+	dependsOn pushToGitTask
 }
 
 
@@ -120,11 +140,6 @@ void updateVersionFile(String version) {
 	project.ext.versionFile.text = "${version}"
 }
 
-static String determineReleaseTag(String releaseVersion) {
-	return releaseVersion.endsWith( '.Final' )
-			? releaseVersion.replace( ".Final", "" )
-			: releaseVersion;
-}
 static String executeGitCommand(Object ... subcommand){
 	List<Object> command = ['git']
 	Collections.addAll( command, subcommand )
@@ -138,16 +153,39 @@ static String executeGitCommand(Object ... subcommand){
 	return stdout
 }
 
+static String determineGitRemote(Project project) {
+	if (project.hasProperty('gitRemote')) {
+		return project.property('gitRemote')
+	}
+	else {
+		final String remotes = executeGitCommand( 'remote', 'show' ).trim()
+		final List<String> tokens = remotes.tokenize()
+		if ( tokens.size() != 1 ) {
+			throw new GradleException( "Could not determine `gitRemote` property for `releaseChecks` tasks." )
+		}
+		return tokens.get( 0 )
+	}
+}
+
+static String determineGitBranch(Project project) {
+	if (project.hasProperty('gitBranch')) {
+		return project.property('gitBranch')
+	}
+	else {
+		return executeGitCommand( 'branch', '--show-current' ).trim()
+	}
+}
+
 static String inputStreamToString(InputStream inputStream) {
 	inputStream.withCloseable { ins ->
 		new BufferedInputStream(ins).withCloseable { bis ->
 			new ByteArrayOutputStream().withCloseable { buf ->
-				int result = bis.read();
+				int result = bis.read()
 				while (result != -1) {
-					buf.write((byte) result);
-					result = bis.read();
+					buf.write((byte) result)
+					result = bis.read()
 				}
-				return buf.toString( StandardCharsets.UTF_8.name());
+				return buf.toString( StandardCharsets.UTF_8.name() )
 			}
 		}
 	}
