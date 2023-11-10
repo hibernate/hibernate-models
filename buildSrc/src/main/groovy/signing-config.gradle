@@ -27,19 +27,19 @@ String resolveSigningKey() {
 
 String findSigningProperty(String propName) {
 	if ( System.getProperty( propName ) != null ) {
-		logger.lifecycle "Found `{}` as a system property", propName
+		logger.lifecycle "Found signing property `{}` as a system property", propName
 		return System.getProperty(propName )
 	}
 	else if ( System.getenv().get( propName ) != null ) {
-		logger.lifecycle "Found `{}` as an env-var property", propName
+		logger.lifecycle "Found signing property `{}` as an env-var property", propName
 		return System.getenv().get( propName )
 	}
 	else if ( project.hasProperty( propName ) ) {
-		logger.lifecycle "Found `{}` as a project property", propName
+		logger.lifecycle "Found signing property `{}` as a project property", propName
 		return project.hasProperty( propName )
 	}
 	else {
-		logger.lifecycle "Did not find `{}`", propName
+		logger.lifecycle "Did not find signing property `{}`", propName
 		return null
 	}
 }

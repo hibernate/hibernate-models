@@ -54,8 +54,8 @@ project.version = project.ext.releaseVersion != null
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 java {
-	sourceCompatibility = jdks.versions.baseline.get()
-	targetCompatibility = jdks.versions.baseline.get()
+	sourceCompatibility = jdks.versions.baseline.get() as int
+	targetCompatibility = jdks.versions.baseline.get() as int
 
 	withJavadocJar()
 	withSourcesJar()
