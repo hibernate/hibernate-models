@@ -8,15 +8,15 @@ group = "org.hibernate.models"
 def versionFile = project.file( "version.txt" )
 def releaseVersion = project.hasProperty('releaseVersion')
 		? project.property('releaseVersion') as String
-		: null
+		: versionFile.text
 def developmentVersion = project.hasProperty('developmentVersion')
 		? project.property('developmentVersion') as String
-		: null
+		: versionFile.text
 
 ext.versionFile = versionFile
 ext.releaseVersion = releaseVersion
 ext.developmentVersion = developmentVersion
 
-project.version = project.ext.releaseVersion != null
-		? project.ext.releaseVersion
-		: project.ext.versionFile.text
+project.version = releaseVersion != null
+		? releaseVersion
+		: developmentVersion
