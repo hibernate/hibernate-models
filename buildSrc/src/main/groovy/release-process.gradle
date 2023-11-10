@@ -126,11 +126,14 @@ def changeToDevelopmentVersionTask = tasks.register( 'changeToDevelopmentVersion
 def pushToGitTask = tasks.register( 'pushToGit' ) {
 	dependsOn changeToDevelopmentVersionTask
 
-	def gitRemote = determineGitRemote( project )
-	def gitBranch = determineGitBranch( project )
-
 	doLast {
-		logger.lifecycle( "Pushing branch and tag to remote `${gitRemote}`..." )
+		def gitRemote = determineGitRemote( project )
+		def gitBranch = determineGitBranch( project )
+
+		logger.lifecycle "Pushing branch and tag to Git : ", gitRemote
+		logger.lifecycle "    > branch : ", gitBranch
+		logger.lifecycle "    > tag    : ", releaseVersion
+
 		executeGitCommand( 'push', '--atomic', gitRemote, gitBranch, releaseVersion )
 	}
 }
@@ -150,10 +153,10 @@ void updateVersionFile(String version) {
 static String executeGitCommand(Object ... subcommand){
 	List<Object> command = ['git']
 	Collections.addAll( command, subcommand )
-	def proc = command.execute()
-	def code = proc.waitFor()
-	def stdout = inputStreamToString( proc.getInputStream() )
-	def stderr = inputStreamToString( proc.getErrorStream() )
+	def process = command.execute()
+	def code = process.waitFor()
+	def stdout = inputStreamToString( process.getInputStream() )
+	def stderr = inputStreamToString( process.getErrorStream() )
 	if ( code != 0 ) {
 		throw new GradleException( "An error occurred while executing " + command + "\n\nstdout:\n" + stdout + "\n\nstderr:\n" + stderr )
 	}
@@ -161,11 +164,13 @@ static String executeGitCommand(Object ... subcommand){
 }
 
 static String determineGitRemote(Project project) {
+	final String remotes = executeGitCommand( 'remote', 'show' ).trim()
+	project.logger.lifecycle( "    > Git remotes : ", remotes )
+
 	if (project.hasProperty('gitRemote')) {
 		return project.property('gitRemote')
 	}
 	else {
-		final String remotes = executeGitCommand( 'remote', 'show' ).trim()
 		final List<String> tokens = remotes.tokenize()
 		if ( tokens.size() != 1 ) {
 			throw new GradleException( "Could not determine `gitRemote` property for `releaseChecks` tasks." )
