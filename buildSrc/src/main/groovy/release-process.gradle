@@ -130,9 +130,9 @@ def pushToGitTask = tasks.register( 'pushToGit' ) {
 		def gitRemote = determineGitRemote( project )
 		def gitBranch = determineGitBranch( project )
 
-		logger.lifecycle "Pushing branch and tag to Git : ", gitRemote
-		logger.lifecycle "    > branch : ", gitBranch
-		logger.lifecycle "    > tag    : ", releaseVersion
+		logger.lifecycle "Pushing branch and tag to Git : {}", gitRemote
+		logger.lifecycle "    > branch : {}", gitBranch
+		logger.lifecycle "    > tag    : {}", releaseVersion
 
 		executeGitCommand( 'push', '--atomic', gitRemote, gitBranch, releaseVersion )
 	}
@@ -165,26 +165,34 @@ static String executeGitCommand(Object ... subcommand){
 
 static String determineGitRemote(Project project) {
 	final String remotes = executeGitCommand( 'remote', 'show' ).trim()
-	project.logger.lifecycle( "    > Git remotes : ", remotes )
+	project.logger.lifecycle( "    > Git remotes : {}", remotes )
 
 	if (project.hasProperty('gitRemote')) {
-		return project.property('gitRemote')
+		def gitRemote = project.property('gitRemote')
+		project.logger.lifecycle( "Found gitRemote property : {}", gitRemote )
+		return gitRemote
 	}
 	else {
 		final List<String> tokens = remotes.tokenize()
 		if ( tokens.size() != 1 ) {
 			throw new GradleException( "Could not determine `gitRemote` property for `releaseChecks` tasks." )
 		}
+		def gitRemote = tokens.get( 0 )
+		project.logger.lifecycle( "Determined gitRemote : {}", gitRemote )
 		return tokens.get( 0 )
 	}
 }
 
 static String determineGitBranch(Project project) {
 	if (project.hasProperty('gitBranch')) {
-		return project.property('gitBranch')
+		def gitBranch =  project.property('gitBranch')
+		project.logger.lifecycle( "Found gitBranch property : {}", gitBranch )
+		return gitBranch
 	}
 	else {
-		return executeGitCommand( 'branch', '--show-current' ).trim()
+		def gitBranch = executeGitCommand( 'branch', '--show-current' ).trim()
+		project.logger.lifecycle( "Determined gitBranch : {}", gitBranch )
+		return gitBranch
 	}
 }
 
