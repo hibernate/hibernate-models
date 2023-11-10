@@ -51,6 +51,9 @@ def changeToReleaseVersionTask = tasks.register( "changeToReleaseVersion" ) {
 	description 'Updates `version.txt` file to the specified release-version'
 
 	dependsOn releasePreparationTask
+	onlyIf {
+		releasePreparationTask.get().didWork
+	}
 
 	doFirst {
 		logger.lifecycle( "Updating version-file to release-version : `${releaseVersion}`" )
@@ -93,7 +96,7 @@ tasks.register( "prepareForRelease" ) {
 
 def tagReleaseTask = tasks.register( "tagRelease" ) {
 	onlyIf {
-		tasks.gitPreparationForRelease.didWork
+		changeToReleaseVersionTask.get().didWork
 	}
 
 	doLast {
