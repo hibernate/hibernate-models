@@ -19,7 +19,6 @@ def developmentVersion = project.ext.developmentVersion as String
 def gitRemote = determineGitRemote( project )
 def gitBranch = determineGitBranch( project )
 
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Release processing - preparation
 //		- releasePreparation (task)
@@ -37,6 +36,9 @@ def releasePreparationTask = tasks.register( "releasePreparation" ) {
 	dependsOn tasks.named( "compile" )
 
 	doFirst {
+		logger.lifecycle "Release version : {}", releaseVersion
+		logger.lifecycle "Development version : {}", developmentVersion
+
 		logger.lifecycle "Switching to branch {}", gitBranch
 		executeGitCommand('checkout', gitBranch)
 	}
