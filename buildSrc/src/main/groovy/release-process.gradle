@@ -16,6 +16,8 @@ plugins {
 
 def releaseVersion = project.ext.releaseVersion as String
 def developmentVersion = project.ext.developmentVersion as String
+def gitRemote = determineGitRemote( project )
+def gitBranch = determineGitBranch( project )
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -35,7 +37,12 @@ def releasePreparationTask = tasks.register( "releasePreparation" ) {
 	dependsOn tasks.named( "compile" )
 
 	doFirst {
-		logger.lifecycle( "Checking that all commits are pushed..." )
+		logger.lifecycle "Switching to branch {}", gitBranch
+		executeGitCommand('checkout', gitBranch)
+	}
+
+//	doLast {
+//		logger.lifecycle( "Checking that all commits are pushed..." )
 //		String diffWithUpstream = executeGitCommand( 'diff', '@{u}' )
 //		if ( !diffWithUpstream.isEmpty() ) {
 //			throw new GradleException(
@@ -43,7 +50,7 @@ def releasePreparationTask = tasks.register( "releasePreparation" ) {
 //							"Push your commits first."
 //			);
 //		}
-	}
+//	}
 }
 
 def changeToReleaseVersionTask = tasks.register( "changeToReleaseVersion" ) {
@@ -127,9 +134,6 @@ def pushToGitTask = tasks.register( 'pushToGit' ) {
 	dependsOn changeToDevelopmentVersionTask
 
 	doLast {
-		def gitRemote = determineGitRemote( project )
-		def gitBranch = determineGitBranch( project )
-
 		logger.lifecycle "Pushing branch and tag to Git : {}", gitRemote
 		logger.lifecycle "    > branch : {}", gitBranch
 		logger.lifecycle "    > tag    : {}", releaseVersion
