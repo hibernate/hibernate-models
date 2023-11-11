@@ -1,5 +1,8 @@
 package org.hibernate.models.annotations;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
@@ -15,6 +18,7 @@ import org.jboss.jandex.Index;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.NamedQuery;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.models.SourceModelTestHelper.buildJandexIndex;
@@ -70,5 +74,22 @@ public class AnnotationUsageTests {
 		assertThat( columnAnn.getString( "table" ) ).isEqualTo( "" );
 		assertThat( columnAnn.getBoolean( "nullable" ) ).isFalse();
 		assertThat( columnAnn.<Boolean>getAttributeValue( "unique" ) ).isTrue();
+	}
+
+	@Test
+	void testNamedAnnotationAccess() {
+		final Index index = buildJandexIndex( SimpleEntity.class );
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final AnnotationDescriptorRegistry descriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final ClassDetails entityClassDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+
+		final List<AnnotationUsage<NamedQuery>> namedQueryAnns = entityClassDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		assertThat( namedQueryAnns ).hasSize( 2 );
+
+		final AnnotationUsage<NamedQuery> abcAnn = entityClassDetails.getNamedAnnotationUsage( NamedQuery.class, "abc" );
+		assertThat( abcAnn ).isNotNull();
+		assertThat( abcAnn.getString( "query" ) ).isEqualTo( "select me" );
 	}
 }

@@ -33,24 +33,4 @@ public class ClassDetailsHelper {
 		return false;
 	}
 
-	public static boolean isImplementor(ClassDetails checkType, ClassDetails classDetails) {
-		if ( classDetails.getClassName().equals( checkType.getClassName() ) ) {
-			return true;
-		}
-
-		if ( classDetails.getSuperType() != null  ) {
-			if ( classDetails.getSuperType().isImplementor( checkType ) ) {
-				return true;
-			}
-		}
-
-		for ( int i = 0; i < classDetails.getImplementedInterfaceTypes().size(); i++ ) {
-			final ClassDetails interfaceDetails = classDetails.getImplementedInterfaceTypes().get( i );
-			if ( interfaceDetails.isImplementor( checkType ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
 }

@@ -127,14 +127,6 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	}
 
 	@Override
-	public boolean isImplementor(ClassDetails checkType) {
-		if ( checkType instanceof JdkClassDetails ) {
-			return isImplementor( ( (JdkClassDetails) checkType ).managedClass );
-		}
-		return ClassDetailsSupport.super.isImplementor( checkType );
-	}
-
-	@Override
 	public List<FieldDetails> getFields() {
 		if ( fields == null ) {
 			final Field[] reflectionFields = managedClass.getDeclaredFields();

@@ -65,13 +65,6 @@ public interface ClassDetails extends AnnotationTarget {
 	}
 
 	/**
-	 * Whether the described class is an implementor of the given {@code checkType}.
-	 */
-	default boolean isImplementor(ClassDetails checkType) {
-		return ClassDetailsHelper.isImplementor( checkType, this );
-	}
-
-	/**
 	 * Get the fields for this class
 	 */
 	List<FieldDetails> getFields();

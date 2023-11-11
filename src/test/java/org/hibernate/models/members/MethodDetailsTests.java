@@ -45,6 +45,7 @@ public class MethodDetailsTests {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
 				assertThat( method.getType() ).isSameAs( method.getReturnType() );
 				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.resolveAttributeName() ).isEqualTo( "property" );
 			}
 			else if ( method.getName().equals( "setProperty" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.SETTER );

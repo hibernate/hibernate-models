@@ -1,5 +1,8 @@
 package org.hibernate.models.classes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassDetails;
@@ -125,6 +128,72 @@ public class InheritanceTests {
 		assertThat( leafClassDetails.getAnnotationUsage( MemberMarker.class ) ).isNull();
 	}
 
+	@Test
+	void testIsImplementor() {
+		final Index index = SourceModelTestHelper.buildJandexIndex(
+				Intf.class,
+				RootClass.class,
+				TrunkClass.class,
+				BranchClass.class,
+				LeafClass.class
+		);
+		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
+				index,
+				RootClass.class,
+				TrunkClass.class,
+				BranchClass.class,
+				LeafClass.class
+		);
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final ClassDetails rootClassDetails = classDetailsRegistry.getClassDetails( RootClass.class.getName() );
+		assertThat( rootClassDetails.isImplementor( Intf.class ) ).isFalse();
+
+		final ClassDetails branchClassDetails = classDetailsRegistry.getClassDetails( BranchClass.class.getName() );
+		assertThat( branchClassDetails.isImplementor( Intf.class ) ).isTrue();
+
+		final ClassDetails leafClassDetails = classDetailsRegistry.getClassDetails( LeafClass.class.getName() );
+		assertThat( leafClassDetails.isImplementor( Intf.class ) ).isTrue();
+	}
+
+//	@Test
+//	void testForEachDirectSubType() {
+//		final Index index = SourceModelTestHelper.buildJandexIndex(
+//				Intf.class,
+//				RootClass.class,
+//				TrunkClass.class,
+//				BranchClass.class,
+//				LeafClass.class
+//		);
+//		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
+//				index,
+//				RootClass.class,
+//				TrunkClass.class,
+//				BranchClass.class,
+//				LeafClass.class
+//		);
+//		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+//
+//		final List<ClassDetails> subTypes = new ArrayList<>();
+//		classDetailsRegistry.forEachDirectSubType( RootClass.class.getName(), subTypes::add );
+//		assertThat( subTypes ).hasSize( 1 );
+//		subTypes.clear();
+//
+//		classDetailsRegistry.forEachDirectSubType( TrunkClass.class.getName(), subTypes::add );
+//		assertThat( subTypes ).hasSize( 1 );
+//		subTypes.clear();
+//
+//		classDetailsRegistry.forEachDirectSubType( BranchClass.class.getName(), subTypes::add );
+//		assertThat( subTypes ).hasSize( 1 );
+//		subTypes.clear();
+//
+//		classDetailsRegistry.forEachDirectSubType( LeafClass.class.getName(), subTypes::add );
+//		assertThat( subTypes ).hasSize( 0 );
+//	}
+
+	interface Intf {
+	}
+
 	@ClassMarker
 	@SubclassableMarker
 	public static class RootClass {
@@ -143,7 +212,7 @@ public class InheritanceTests {
 	}
 
 	@ClassMarker
-	public static class BranchClass extends TrunkClass {
+	public static class BranchClass extends TrunkClass implements Intf {
 		@MemberMarker
 		private Integer value5;
 		@Transient
