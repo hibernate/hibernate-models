@@ -51,7 +51,7 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 		if ( descriptor == null ) {
 			descriptor = context
 					.getAnnotationDescriptorRegistry()
-					.resolveDescriptor( annotationType, (t) -> new AnnotationDescriptorImpl<>( annotationType ) );
+					.resolveDescriptor( annotationType, (t) -> new AnnotationDescriptorImpl<>( annotationType, context ) );
 		}
 		return descriptor;
 	}

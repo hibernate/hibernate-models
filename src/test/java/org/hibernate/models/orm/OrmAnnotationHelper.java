@@ -6,6 +6,7 @@
  */
 package org.hibernate.models.orm;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -23,7 +24,7 @@ public class OrmAnnotationHelper {
 		HibernateAnnotations.forEachAnnotation( consumer );
 	}
 
-	public static void forEachOrmAnnotation(Class<?> declarer, Consumer<AnnotationDescriptor<?>> consumer) {
+	public static void forEachOrmAnnotation(Class<?> declarer, Consumer<AnnotationDescriptor<? extends Annotation>> consumer) {
 		for ( Field field : declarer.getFields() ) {
 			if ( AnnotationDescriptor.class.equals( field.getType() ) ) {
 				try {

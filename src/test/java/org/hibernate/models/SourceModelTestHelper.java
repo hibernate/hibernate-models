@@ -63,11 +63,6 @@ public class SourceModelTestHelper {
 
 		if ( jandexIndex != null ) {
 			for ( ClassInfo knownClass : jandexIndex.getKnownClasses() ) {
-//			if ( knownClass.simpleName().endsWith( "package-info" ) ) {
-//				new PackageDetailsImpl( knownClass, buildingContext );
-//				continue;
-//			}
-
 				classDetailsRegistry.resolveClassDetails(
 						knownClass.name().toString(),
 						JandexBuilders.DEFAULT_BUILDER
@@ -107,16 +102,14 @@ public class SourceModelTestHelper {
 		JpaAnnotations.forEachAnnotation( (descriptor) -> JandexIndexerHelper.apply( descriptor.getAnnotationType(), indexer, classLoadingAccess ) );
 		HibernateAnnotations.forEachAnnotation( (descriptor) -> JandexIndexerHelper.apply( descriptor.getAnnotationType(), indexer, classLoadingAccess ) );
 
-		if ( CollectionHelper.isEmpty( modelClasses ) ) {
-			return null;
-		}
-
-		for ( Class<?> modelClass : modelClasses ) {
-			try {
-				indexer.indexClass( modelClass );
-			}
-			catch (IOException e) {
-				throw new RuntimeException( e );
+		if ( CollectionHelper.isNotEmpty( modelClasses ) ) {
+			for ( Class<?> modelClass : modelClasses ) {
+				try {
+					indexer.indexClass( modelClass );
+				}
+				catch (IOException e) {
+					throw new RuntimeException( e );
+				}
 			}
 		}
 

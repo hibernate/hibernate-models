@@ -9,21 +9,23 @@ package org.hibernate.models.internal.jdk;
 import java.lang.annotation.Annotation;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.AttributeDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import static org.hibernate.models.internal.jdk.JdkBuilders.extractAttributeDescriptors;
 
 /**
- * AnnotationDescriptor built from the Annotation's Class reference
+ * AnnotationDescriptor for cases where we do not want to deal with ANNOTATION_TYPE annotations,
+ * most notably, Jakarta and Hibernate annotations
  *
  * @author Steve Ebersole
  */
-public class AnnotationDescriptorImpl<A extends Annotation> extends AbstractAnnotationTarget implements AnnotationDescriptor<A> {
+public class AnnotationDescriptorOrmImpl<A extends Annotation> implements AnnotationDescriptor<A> {
 	private final Class<A> annotationType;
 	private final EnumSet<Kind> allowableTargets;
 
@@ -32,18 +34,11 @@ public class AnnotationDescriptorImpl<A extends Annotation> extends AbstractAnno
 
 	private final List<AttributeDescriptor<?>> attributeDescriptors;
 
-	public AnnotationDescriptorImpl(
-			Class<A> annotationType,
-			SourceModelBuildingContext context) {
-		this( annotationType, null, context );
+	public AnnotationDescriptorOrmImpl(Class<A> annotationType) {
+		this( annotationType, null );
 	}
 
-	public AnnotationDescriptorImpl(
-			Class<A> annotationType,
-			AnnotationDescriptor<?> repeatableContainer,
-			SourceModelBuildingContext context) {
-		super( annotationType::getAnnotations, context );
-
+	public AnnotationDescriptorOrmImpl(Class<A> annotationType, AnnotationDescriptor<?> repeatableContainer) {
 		this.annotationType = annotationType;
 		this.repeatableContainer = repeatableContainer;
 
@@ -93,5 +88,64 @@ public class AnnotationDescriptorImpl<A extends Annotation> extends AbstractAnno
 	@Override
 	public String getName() {
 		return annotationType.getName();
+	}
+
+	@Override
+	public <X extends Annotation> AnnotationUsage<X> getAnnotationUsage(AnnotationDescriptor<X> descriptor) {
+		// there are none
+		return null;
+	}
+
+	@Override
+	public <X extends Annotation> AnnotationUsage<X> getAnnotationUsage(Class<X> type) {
+		// there are none
+		return null;
+	}
+
+	@Override
+	public <X extends Annotation> List<AnnotationUsage<X>> getRepeatedAnnotationUsages(AnnotationDescriptor<X> type) {
+		// there are none
+		return null;
+	}
+
+	@Override
+	public <X extends Annotation> List<AnnotationUsage<X>> getRepeatedAnnotationUsages(Class<X> type) {
+		// there are none
+		return null;
+	}
+
+	@Override
+	public <X extends Annotation> void forEachAnnotationUsage(
+			AnnotationDescriptor<X> type,
+			Consumer<AnnotationUsage<X>> consumer) {
+		// there are none
+	}
+
+	@Override
+	public <X extends Annotation> void forEachAnnotationUsage(Class<X> type, Consumer<AnnotationUsage<X>> consumer) {
+		// there are none
+	}
+
+	@Override
+	public <X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
+			AnnotationDescriptor<X> type,
+			String matchName,
+			String attributeToMatch) {
+		// there are none
+		return null;
+	}
+
+	@Override
+	public <X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
+			Class<X> type,
+			String matchName,
+			String attributeToMatch) {
+		// there are none
+		return null;
+	}
+
+	@Override
+	public String toString() {
+		return "AnnotationDescriptor(" + annotationType + ")";
 	}
 }

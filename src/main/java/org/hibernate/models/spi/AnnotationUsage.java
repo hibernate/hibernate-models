@@ -136,7 +136,15 @@ public interface AnnotationUsage<A extends Annotation> {
 		return getAttributeValue( name );
 	}
 
+	default <E extends Enum<E>> E getEnum(String name, Class<E> type) {
+		return getAttributeValue( name );
+	}
+
 	default <E extends Enum<E>> E getEnum(String name, E defaultValue) {
+		return getAttributeValue( name, defaultValue );
+	}
+
+	default <E extends Enum<E>> E getEnum(String name, E defaultValue, Class<E> type) {
 		return getAttributeValue( name, defaultValue );
 	}
 

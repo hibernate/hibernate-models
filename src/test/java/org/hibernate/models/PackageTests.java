@@ -1,6 +1,5 @@
 package org.hibernate.models;
 
-import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.orm.HibernateAnnotations;
 import org.hibernate.models.spi.ClassDetails;
@@ -19,7 +18,7 @@ public class PackageTests {
 
 	@Test
 	void testExactReference() {
-		final SourceModelBuildingContext buildingContext = createBuildingContext( null );
+		final SourceModelBuildingContext buildingContext = createBuildingContext();
 		final String packageInfoName = PACKAGE_NAME + ".package-info";
 		final ClassDetails classDetails = buildingContext
 				.getClassDetailsRegistry()
@@ -31,7 +30,7 @@ public class PackageTests {
 
 	@Test
 	void testPackageReference() {
-		final SourceModelBuildingContext buildingContext = createBuildingContext( null );
+		final SourceModelBuildingContext buildingContext = createBuildingContext();
 		final ClassDetails classDetails = buildingContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( PACKAGE_NAME );

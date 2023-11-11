@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models;
+package org.hibernate.models.members;
 
+import org.hibernate.models.MixedSourcesTests;
+import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -18,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
+ * Tests for modeling methods
+ *
  * @author Steve Ebersole
  */
 public class MethodDetailsTests {

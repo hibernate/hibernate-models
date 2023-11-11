@@ -130,7 +130,7 @@ public class JdkBuilders implements ClassDetailsBuilder {
 		return type == void.class || type == Void.class;
 	}
 
-	public static <A extends Annotation> AnnotationDescriptorImpl<A> buildAnnotationDescriptor(
+	public static <A extends Annotation> AnnotationDescriptorOrmImpl<A> buildAnnotationDescriptor(
 			Class<A> annotationType,
 			AnnotationDescriptorRegistry descriptorRegistry) {
 		return buildAnnotationDescriptor(
@@ -152,10 +152,10 @@ public class JdkBuilders implements ClassDetailsBuilder {
 		return containerDescriptor;
 	}
 
-	public static <A extends Annotation> AnnotationDescriptorImpl<A> buildAnnotationDescriptor(
+	public static <A extends Annotation> AnnotationDescriptorOrmImpl<A> buildAnnotationDescriptor(
 			Class<A> annotationType,
 			AnnotationDescriptor<?> repeatableContainer) {
-		return new AnnotationDescriptorImpl<>( annotationType, repeatableContainer );
+		return new AnnotationDescriptorOrmImpl<>( annotationType, repeatableContainer );
 	}
 
 	public static <A extends Annotation> List<AttributeDescriptor<?>> extractAttributeDescriptors(

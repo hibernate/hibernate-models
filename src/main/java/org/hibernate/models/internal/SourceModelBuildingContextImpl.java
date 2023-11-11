@@ -43,7 +43,7 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 		this.classLoadingAccess = classLoadingAccess;
 		this.jandexIndex = jandexIndex;
 
-		this.descriptorRegistry = new AnnotationDescriptorRegistryStandard();
+		this.descriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
 		this.classDetailsRegistry = new ClassDetailsRegistryStandard( this );
 
 		primeRegistries( registryPrimer );

@@ -11,7 +11,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Target;
 import java.util.EnumSet;
 
-import org.hibernate.models.internal.jdk.AnnotationDescriptorImpl;
+import org.hibernate.models.internal.jdk.AnnotationDescriptorOrmImpl;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
 
@@ -41,6 +41,6 @@ public class AnnotationHelper {
 			Class<A> javaType,
 			AnnotationDescriptor<?> repeatableContainer) {
 		assert javaType != null;
-		return new AnnotationDescriptorImpl<>( javaType, repeatableContainer );
+		return new AnnotationDescriptorOrmImpl<>( javaType, repeatableContainer );
 	}
 }

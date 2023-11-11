@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.models.internal.SourceModelLogging;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.spi.ClassDetails;
@@ -153,9 +154,19 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		getMethods().add( methodDetails );
 	}
 
+	private Class<?> javaClass;
+
 	@Override
 	public <X> Class<X> toJavaClass() {
-		throw new UnsupportedOperationException( "Not supported" );
+		if ( javaClass == null ) {
+			if ( getClassName() == null ) {
+				throw new UnsupportedOperationException( "Not supported" );
+			}
+			SourceModelLogging.SOURCE_MODEL_LOGGER.debugf( "Loading `%s` on to classloader from Jandex ClassDetails" );
+			javaClass = getBuildingContext().getClassLoading().classForName( getClassName() );
+		}
+		//noinspection unchecked
+		return (Class<X>) javaClass;
 	}
 
 	@Override

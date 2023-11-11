@@ -24,6 +24,8 @@ import jakarta.persistence.Table;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
+ * Tests mixing Jandex and JDK references
+ *
  * @author Steve Ebersole
  */
 public class MixedSourcesTests {

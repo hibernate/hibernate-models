@@ -19,7 +19,10 @@ import org.hibernate.models.spi.AnnotationDescriptorRegistry;
  * @author Steve Ebersole
  */
 public class AnnotationDescriptorRegistryStandard extends AbstractAnnotationDescriptorRegistry {
-	public AnnotationDescriptorRegistryStandard() {
+	private final SourceModelBuildingContextImpl modelBuildingContext;
+
+	public AnnotationDescriptorRegistryStandard(SourceModelBuildingContextImpl modelBuildingContext) {
+		this.modelBuildingContext = modelBuildingContext;
 	}
 
 	public void register(AnnotationDescriptor<?> descriptor) {
@@ -61,7 +64,11 @@ public class AnnotationDescriptorRegistryStandard extends AbstractAnnotationDesc
 			containerDescriptor = null;
 		}
 
-		final AnnotationDescriptorImpl<A> descriptor = new AnnotationDescriptorImpl<>( javaType, containerDescriptor );
+		final AnnotationDescriptorImpl<A> descriptor = new AnnotationDescriptorImpl<>(
+				javaType,
+				containerDescriptor,
+				modelBuildingContext
+		);
 		descriptorMap.put( javaType, descriptor );
 		return descriptor;
 	}
