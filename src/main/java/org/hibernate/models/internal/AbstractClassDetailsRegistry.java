@@ -64,7 +64,9 @@ public abstract class AbstractClassDetailsRegistry implements ClassDetailsRegist
 
 	@Override
 	public ClassDetails resolveClassDetails(String name, ClassDetailsBuilder creator) {
-		assert name != null;
+		if ( name == null ) {
+			throw new IllegalArgumentException( "`name` cannot be null" );
+		}
 
 		if ( "void".equals( name ) ) {
 			return null;
@@ -83,7 +85,13 @@ public abstract class AbstractClassDetailsRegistry implements ClassDetailsRegist
 	@Override public ClassDetails resolveClassDetails(
 			String name,
 			ClassDetailsCreator creator) {
-		assert name != null;
+		if ( name == null ) {
+			throw new IllegalArgumentException( "`name` cannot be null" );
+		}
+
+		if ( "void".equals( name ) ) {
+			return null;
+		}
 
 		final ClassDetails existing = classDetailsMap.get( name );
 		if ( existing != null ) {

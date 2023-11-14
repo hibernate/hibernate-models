@@ -13,6 +13,8 @@ import org.hibernate.models.internal.jdk.AnnotationDescriptorImpl;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 
+import static org.hibernate.models.internal.ModelsAnnotationLogging.MODELS_ANNOTATION_LOGGER;
+
 /**
  * Access to AnnotationDescriptor instances based on a number of look-ups
  *
@@ -26,9 +28,11 @@ public class AnnotationDescriptorRegistryStandard extends AbstractAnnotationDesc
 	}
 
 	public void register(AnnotationDescriptor<?> descriptor) {
+		MODELS_ANNOTATION_LOGGER.tracef( "Registering AnnotationDescriptor - %s", descriptor );
 		descriptorMap.put( descriptor.getAnnotationType(), descriptor );
 		if ( descriptor.getRepeatableContainer() != null ) {
 			// the descriptor is repeatable - register it under its container
+			MODELS_ANNOTATION_LOGGER.tracef( "Registering repeatable AnnotationDescriptor - %s", descriptor.getRepeatableContainer() );
 			repeatableByContainerMap.put( descriptor.getRepeatableContainer(), descriptor );
 		}
 	}

@@ -13,6 +13,8 @@ import org.hibernate.models.ModelsException;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 
+import static org.hibernate.models.internal.ModelsAnnotationLogging.MODELS_ANNOTATION_LOGGER;
+
 /**
  * @author Steve Ebersole
  */
@@ -21,6 +23,7 @@ public class AnnotationDescriptorRegistryImmutable extends AbstractAnnotationDes
 			Map<Class<? extends Annotation>, AnnotationDescriptor<?>> descriptorMap,
 			Map<AnnotationDescriptor<?>, AnnotationDescriptor<?>> repeatableByContainerMap) {
 		super( descriptorMap, repeatableByContainerMap );
+		MODELS_ANNOTATION_LOGGER.debugf( "Created immutable AnnotationDescriptorRegistry" );
 	}
 
 	@Override

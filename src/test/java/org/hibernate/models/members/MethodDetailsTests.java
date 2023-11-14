@@ -6,9 +6,12 @@
  */
 package org.hibernate.models.members;
 
-import org.hibernate.models.MixedSourcesTests;
+import java.lang.reflect.Array;
+
 import org.hibernate.models.SourceModelTestHelper;
+import org.hibernate.models.internal.ModelsLogging;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
+import org.hibernate.models.internal.jdk.JdkMethodDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MethodDetails;
 
@@ -26,19 +29,26 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class MethodDetailsTests {
 	@Test
-	void testMethodDetails() {
-		final Index index = SourceModelTestHelper.buildJandexIndex( RandomClass.class );
+	void testWithJandex() {
+		verify( SourceModelTestHelper.buildJandexIndex( RandomClass.class ) );
+
+	}
+
+	@Test
+	void testWithoutJandex() {
+		verify( null );
+	}
+
+	void verify(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
-				MixedSourcesTests.Entity1.class,
-				MixedSourcesTests.Embeddable1.class
+				RandomClass.class
 		);
 
 		final ClassDetails classDetails = buildingContext
 				.getClassDetailsRegistry()
 				.findClassDetails( RandomClass.class.getName() );
 		assertThat( classDetails ).isNotNull();
-		assertThat( classDetails.getMethods() ).hasSize( 4 );
 
 		classDetails.forEachMethod( (pos, method) -> {
 			if ( method.getName().equals( "getProperty" ) ) {
@@ -46,6 +56,7 @@ public class MethodDetailsTests {
 				assertThat( method.getType() ).isSameAs( method.getReturnType() );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "property" );
+				assertThat( method.isPersistable() ).isTrue();
 			}
 			else if ( method.getName().equals( "setProperty" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.SETTER );
@@ -65,16 +76,95 @@ public class MethodDetailsTests {
 				assertThat( method.getType() ).isNull();
 				assertThat( method.getArgumentTypes() ).hasSize( 1 );
 			}
+			else if ( method.getName().equals( "isActive" ) ) {
+				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
+				assertThat( method.getType().toJavaClass() ).isEqualTo( boolean.class );
+				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.resolveAttributeName() ).isEqualTo( "active" );
+				assertThat( method.isPersistable() ).isTrue();
+			}
+			else if ( method.getName().equals( "getByteValue" ) ) {
+				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
+				assertThat( method.getType().toJavaClass() ).isEqualTo( byte.class );
+				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.resolveAttributeName() ).isEqualTo( "byteValue" );
+				assertThat( method.isPersistable() ).isTrue();
+			}
+			else if ( method.getName().equals( "getShortValue" ) ) {
+				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
+				assertThat( method.getType().toJavaClass() ).isEqualTo( short.class );
+				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.resolveAttributeName() ).isEqualTo( "shortValue" );
+				assertThat( method.isPersistable() ).isTrue();
+			}
+			else if ( method.getName().equals( "getIntValue" ) ) {
+				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
+				assertThat( method.getType().toJavaClass() ).isEqualTo( int.class );
+				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.resolveAttributeName() ).isEqualTo( "intValue" );
+				assertThat( method.isPersistable() ).isTrue();
+			}
+			else if ( method.getName().equals( "getLongValue" ) ) {
+				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
+				assertThat( method.getType().toJavaClass() ).isEqualTo( long.class );
+				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.resolveAttributeName() ).isEqualTo( "longValue" );
+				assertThat( method.isPersistable() ).isTrue();
+			}
+			else if ( method.getName().equals( "getDoubleValue" ) ) {
+				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
+				assertThat( method.getType().toJavaClass() ).isEqualTo( double.class );
+				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.resolveAttributeName() ).isEqualTo( "doubleValue" );
+				assertThat( method.isPersistable() ).isTrue();
+			}
+			else if ( method.getName().equals( "getFloatValue" ) ) {
+				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
+				assertThat( method.getType().toJavaClass() ).isEqualTo( float.class );
+				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.resolveAttributeName() ).isEqualTo( "floatValue" );
+				assertThat( method.isPersistable() ).isTrue();
+			}
+			else if ( method.getName().equals( "getIntArrayValue" ) ) {
+				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
+				assertThat( method.getType().toJavaClass() ).isEqualTo( int[].class );
+				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.resolveAttributeName() ).isEqualTo( "intArrayValue" );
+				assertThat( method.isPersistable() ).isTrue();
+			}
 			else {
-				fail();
+				if ( ( (JdkMethodDetails) method ).getMethod().isSynthetic() ) {
+					// ignore it
+				}
+				else {
+					fail();
+				}
 			}
 		} );
 	}
 
 
+	@SuppressWarnings("unused")
 	public static class RandomClass {
 		public Integer getProperty() { return null; }
 		public void setProperty(Integer id) {}
+
+		public boolean isActive() { return true; }
+		public byte getByteValue() { return 0; }
+		public short getShortValue() { return 0; }
+		public int getIntValue() { return 0; }
+		public long getLongValue() { return 0; }
+		public double getDoubleValue() { return 0; }
+		public float getFloatValue() { return 0; }
+		public int[] getIntArrayValue() { return null; }
 
 		public void nothing() {}
 		public void something(Object stuff) {}

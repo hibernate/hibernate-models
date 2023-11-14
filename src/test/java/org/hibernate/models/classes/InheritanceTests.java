@@ -23,13 +23,22 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class InheritanceTests {
 	@Test
-	void basicRootTest() {
+	void basicRootTestWithJandex() {
 		final Index index = SourceModelTestHelper.buildJandexIndex(
 				RootClass.class,
 				TrunkClass.class,
 				BranchClass.class,
 				LeafClass.class
 		);
+		basicRootTest( index );
+	}
+
+	@Test
+	void basicRootTestWithoutJandex() {
+		basicRootTest( null );
+	}
+
+	private void basicRootTest(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
 				RootClass.class,
@@ -61,13 +70,22 @@ public class InheritanceTests {
 	}
 
 	@Test
-	void basicTrunkTest() {
+	void basicTrunkTestWithJandex() {
 		final Index index = SourceModelTestHelper.buildJandexIndex(
 				RootClass.class,
 				TrunkClass.class,
 				BranchClass.class,
 				LeafClass.class
 		);
+		basicTrunkTest( index );
+	}
+
+	@Test
+	void basicTrunkTestWithoutJandex() {
+		basicTrunkTest( null );
+	}
+
+	private void basicTrunkTest(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
 				RootClass.class,
@@ -100,13 +118,22 @@ public class InheritanceTests {
 	}
 
 	@Test
-	void basicLeafTest() {
+	void basicLeafTestWithJandex() {
 		final Index index = SourceModelTestHelper.buildJandexIndex(
 				RootClass.class,
 				TrunkClass.class,
 				BranchClass.class,
 				LeafClass.class
 		);
+		basicLeafTest( index );
+	}
+
+	@Test
+	void basicLeafTestWithoutJandex() {
+		basicLeafTest( null );
+	}
+
+	private void basicLeafTest(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
 				RootClass.class,
@@ -129,7 +156,7 @@ public class InheritanceTests {
 	}
 
 	@Test
-	void testIsImplementor() {
+	void testIsImplementorWithJandex() {
 		final Index index = SourceModelTestHelper.buildJandexIndex(
 				Intf.class,
 				RootClass.class,
@@ -137,6 +164,15 @@ public class InheritanceTests {
 				BranchClass.class,
 				LeafClass.class
 		);
+		testIsImplementor( index );
+	}
+
+	@Test
+	void testIsImplementorWithoutJandex() {
+		testIsImplementor( null );
+	}
+
+	private void testIsImplementor(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
 				RootClass.class,
@@ -156,74 +192,48 @@ public class InheritanceTests {
 		assertThat( leafClassDetails.isImplementor( Intf.class ) ).isTrue();
 	}
 
-//	@Test
-//	void testForEachDirectSubType() {
-//		final Index index = SourceModelTestHelper.buildJandexIndex(
-//				Intf.class,
-//				RootClass.class,
-//				TrunkClass.class,
-//				BranchClass.class,
-//				LeafClass.class
-//		);
-//		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
-//				index,
-//				RootClass.class,
-//				TrunkClass.class,
-//				BranchClass.class,
-//				LeafClass.class
-//		);
-//		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
-//
-//		final List<ClassDetails> subTypes = new ArrayList<>();
-//		classDetailsRegistry.forEachDirectSubType( RootClass.class.getName(), subTypes::add );
-//		assertThat( subTypes ).hasSize( 1 );
-//		subTypes.clear();
-//
-//		classDetailsRegistry.forEachDirectSubType( TrunkClass.class.getName(), subTypes::add );
-//		assertThat( subTypes ).hasSize( 1 );
-//		subTypes.clear();
-//
-//		classDetailsRegistry.forEachDirectSubType( BranchClass.class.getName(), subTypes::add );
-//		assertThat( subTypes ).hasSize( 1 );
-//		subTypes.clear();
-//
-//		classDetailsRegistry.forEachDirectSubType( LeafClass.class.getName(), subTypes::add );
-//		assertThat( subTypes ).hasSize( 0 );
-//	}
-
-	interface Intf {
+	@Test
+	void testForEachDirectSubTypeWithJandex() {
+		final Index index = SourceModelTestHelper.buildJandexIndex(
+				Intf.class,
+				RootClass.class,
+				TrunkClass.class,
+				BranchClass.class,
+				LeafClass.class
+		);
+		testForEachDirectSubType( index );
 	}
 
-	@ClassMarker
-	@SubclassableMarker
-	public static class RootClass {
-		@MemberMarker
-		private Integer value1;
-		@Transient
-		private Integer value2;
+	@Test
+	void testForEachDirectSubTypeWithoutJandex() {
+		testForEachDirectSubType( null );
 	}
 
-	@ClassMarker
-	public static class TrunkClass extends RootClass {
-		@MemberMarker
-		private Integer value3;
-		@Transient
-		private Integer value4;
+	private void testForEachDirectSubType(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
+				index,
+				RootClass.class,
+				TrunkClass.class,
+				BranchClass.class,
+				LeafClass.class
+		);
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final List<ClassDetails> subTypes = new ArrayList<>();
+		classDetailsRegistry.forEachDirectSubType( RootClass.class.getName(), subTypes::add );
+		assertThat( subTypes ).hasSize( 1 );
+		subTypes.clear();
+
+		classDetailsRegistry.forEachDirectSubType( TrunkClass.class.getName(), subTypes::add );
+		assertThat( subTypes ).hasSize( 1 );
+		subTypes.clear();
+
+		classDetailsRegistry.forEachDirectSubType( BranchClass.class.getName(), subTypes::add );
+		assertThat( subTypes ).hasSize( 1 );
+		subTypes.clear();
+
+		classDetailsRegistry.forEachDirectSubType( LeafClass.class.getName(), subTypes::add );
+		assertThat( subTypes ).hasSize( 0 );
 	}
 
-	@ClassMarker
-	public static class BranchClass extends TrunkClass implements Intf {
-		@MemberMarker
-		private Integer value5;
-		@Transient
-		private Integer value6;
-	}
-
-	@ClassMarker
-	public static class LeafClass extends BranchClass {
-		@MemberMarker
-		private Integer value7;
-		@Transient
-		private Integer value8;
-	}
 }

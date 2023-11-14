@@ -26,4 +26,13 @@ public class StringHelper {
 	public static String classNameToResourceName(String className) {
 		return className.replace( '.', '/' ) + ".class";
 	}
+
+	public static int countArrayDimensions(String name) {
+		final int lastIndex = name.lastIndexOf( '[' );
+		return lastIndex + 1;
+	}
+
+	public static char lastCharacter(String text) {
+		return text.charAt( text.length() - 1 );
+	}
 }

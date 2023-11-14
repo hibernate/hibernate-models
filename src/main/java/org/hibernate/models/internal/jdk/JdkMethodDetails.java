@@ -55,6 +55,10 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 		}
 	}
 
+	public Method getMethod() {
+		return method;
+	}
+
 	@Override
 	public String getName() {
 		return method.getName();

@@ -34,11 +34,11 @@ import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOAD
  */
 public class SourceModelTestHelper {
 
-	public static SourceModelBuildingContext createBuildingContext(Class<?>... modelClasses) {
+	public static SourceModelBuildingContextImpl createBuildingContext(Class<?>... modelClasses) {
 		return createBuildingContext( SIMPLE_CLASS_LOADING, modelClasses );
 	}
 
-	public static SourceModelBuildingContext createBuildingContext(ClassLoading classLoadingAccess, Class<?>... modelClasses) {
+	public static SourceModelBuildingContextImpl createBuildingContext(ClassLoading classLoadingAccess, Class<?>... modelClasses) {
 		final Index jandexIndex = buildJandexIndex( classLoadingAccess, modelClasses );
 		return createBuildingContext( jandexIndex, modelClasses );
 	}

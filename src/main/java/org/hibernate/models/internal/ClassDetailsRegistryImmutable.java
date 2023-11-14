@@ -14,6 +14,8 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 
+import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
+
 /**
  * @author Steve Ebersole
  */
@@ -22,6 +24,7 @@ public class ClassDetailsRegistryImmutable extends AbstractClassDetailsRegistry 
 			Map<String, ClassDetails> classDetailsMap,
 			Map<String, List<ClassDetails>> subTypeClassDetailsMap) {
 		super( classDetailsMap, subTypeClassDetailsMap );
+		MODELS_CLASS_LOGGER.debugf( "Created immutable ClassDetailsRegistry" );
 	}
 
 	@Override

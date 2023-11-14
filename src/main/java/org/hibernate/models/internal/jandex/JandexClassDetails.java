@@ -11,9 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.models.internal.SourceModelLogging;
-import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.internal.ClassDetailsSupport;
+import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
@@ -25,6 +24,8 @@ import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.MethodInfo;
+
+import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
 
 /**
  * @author Steve Ebersole
@@ -44,8 +45,6 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 		this.superType = determineSuperType( classInfo, buildingContext );
 		this.implementedInterfaces = determineInterfaces( classInfo, buildingContext );
-
-		buildingContext.getClassDetailsRegistry().addClassDetails( this );
 	}
 
 	private static ClassDetails determineSuperType(
@@ -162,7 +161,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 			if ( getClassName() == null ) {
 				throw new UnsupportedOperationException( "Not supported" );
 			}
-			SourceModelLogging.SOURCE_MODEL_LOGGER.debugf( "Loading `%s` on to classloader from Jandex ClassDetails" );
+			MODELS_CLASS_LOGGER.debugf( "Loading `%s` on to classloader from Jandex ClassDetails" );
 			javaClass = getBuildingContext().getClassLoading().classForName( getClassName() );
 		}
 		//noinspection unchecked

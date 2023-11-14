@@ -6,9 +6,9 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.jdk.JdkBuilders;
+import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.MethodDetails;

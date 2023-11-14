@@ -8,6 +8,8 @@ package org.hibernate.models.internal;
 
 import java.lang.reflect.Modifier;
 
+import org.hibernate.models.spi.MemberDetails;
+
 /**
  * Fills-in non-public aspects of the {@link Modifier} class
  *
@@ -61,7 +63,13 @@ public class ModifierUtils {
 	}
 
 	/**
-	 * Determine if the modifier flags from a field indicate persistability
+	 * Determine if the modifier flags from a field indicate persist-ability.
+	 *
+	 * @apiNote This is NOT the same as determining whether a field is actually a
+	 * persistent attribute.  It is simply checking high-level red-flags (static,
+	 * transient, etc.) that indicate it cannot be.
+	 *
+	 * @see MemberDetails#isPersistable()
 	 */
 	public static boolean isPersistableField(int modifierFlags) {
 		if ( isTransient( modifierFlags ) ) {
@@ -76,7 +84,13 @@ public class ModifierUtils {
 	}
 
 	/**
-	 * Determine if the modifier flags from a method indicate persistability
+	 * Determine if the modifier flags from a method indicate persist-ability.
+	 *
+	 * @apiNote This is NOT the same as determining whether a method is actually a
+	 * persistent attribute.  It is simply checking high-level red-flags (static,
+	 * transient, etc.) that indicate it cannot be.
+	 *
+	 * @see MemberDetails#isPersistable()
 	 */
 	public static boolean isPersistableMethod(int modifierFlags) {
 		if ( ModifierUtils.isStatic( modifierFlags ) ) {

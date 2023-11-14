@@ -171,11 +171,9 @@ static String executeGitCommand(Object ... subcommand){
 
 static String determineGitRemote(Project project) {
 	final String remotes = executeGitCommand( 'remote', 'show' ).trim()
-	project.logger.lifecycle( "    > Git remotes : {}", remotes )
 
 	if (project.hasProperty('gitRemote')) {
 		def gitRemote = project.property('gitRemote')
-		project.logger.lifecycle( "Found gitRemote property : {}", gitRemote )
 		return gitRemote
 	}
 	else {
@@ -184,20 +182,17 @@ static String determineGitRemote(Project project) {
 			throw new GradleException( "Could not determine `gitRemote` property for `releaseChecks` tasks." )
 		}
 		def gitRemote = tokens.get( 0 )
-		project.logger.lifecycle( "Determined gitRemote : {}", gitRemote )
-		return tokens.get( 0 )
+		return gitRemote
 	}
 }
 
 static String determineGitBranch(Project project) {
 	if (project.hasProperty('gitBranch')) {
 		def gitBranch =  project.property('gitBranch')
-		project.logger.lifecycle( "Found gitBranch property : {}", gitBranch )
 		return gitBranch
 	}
 	else {
 		def gitBranch = executeGitCommand( 'branch', '--show-current' ).trim()
-		project.logger.lifecycle( "Determined gitBranch : {}", gitBranch )
 		return gitBranch
 	}
 }

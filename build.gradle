@@ -29,6 +29,7 @@ dependencies {
 	testImplementation libs.hibernateCore
 
 	testRuntimeOnly testLibs.junit5Engine
+	testRuntimeOnly testLibs.log4j
 }
 
 
@@ -95,7 +96,7 @@ checkstyle {
 // JaCoCo
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-tasks.named( "jacocoTestReport" ) {
+def jacocoReportTask = tasks.named( "jacocoTestReport" ) {
 	dependsOn tasks.named( "test" )
 }
 
@@ -105,4 +106,8 @@ jacocoTestReport {
 		csv.required = false
 		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
 	}
+}
+
+tasks.named( "check" ) {
+	dependsOn jacocoReportTask
 }

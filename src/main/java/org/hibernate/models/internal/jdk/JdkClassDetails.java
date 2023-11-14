@@ -65,8 +65,6 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 					(n) -> JdkBuilders.buildClassDetailsStatic( superclass, buildingContext )
 			);
 		}
-
-		classDetailsRegistry.addClassDetails( this );
 	}
 
 	@Override

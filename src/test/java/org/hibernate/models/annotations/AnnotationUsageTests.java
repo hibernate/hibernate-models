@@ -1,6 +1,5 @@
 package org.hibernate.models.annotations;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 
 import org.hibernate.annotations.Cache;

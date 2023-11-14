@@ -13,11 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
+import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.TypeDescriptors;
+import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
+import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
@@ -60,10 +64,71 @@ public class JdkBuilders implements ClassDetailsBuilder {
 		if ( double.class.getName().equals( name ) ) {
 			return buildClassDetailsStatic( double.class, buildingContext );
 		}
+		if ( name.startsWith( "[" ) ) {
+			return buildArrayClassDetails( name, buildingContext );
+		}
 		return buildClassDetailsStatic(
 				buildingContext.getClassLoading().classForName( name ),
 				buildingContext
 		);
+	}
+
+	private static JdkClassDetails buildArrayClassDetails(String name, SourceModelBuildingContext buildingContext) {
+		assert name.startsWith( "[" );
+		final int dimensionCount = StringHelper.countArrayDimensions( name );
+		assert dimensionCount > 0;
+
+		final String componentTypeName = name.substring( 1 );
+		final ClassDetails componentTypeDetails = resolveArrayComponentType( componentTypeName, buildingContext );
+
+		final Class<?> javaClass = componentTypeDetails.toJavaClass();
+		final Class<?> arrayType = javaClass.arrayType();
+		return new JdkClassDetails( arrayType, buildingContext );
+	}
+
+	private static ClassDetails resolveArrayComponentType(String componentTypeName, SourceModelBuildingContext buildingContext) {
+		if ( componentTypeName.startsWith( "[" ) ) {
+			return buildArrayClassDetails( componentTypeName, buildingContext );
+		}
+
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		if ( componentTypeName.length() == 1 ) {
+			// this is a primitive array...
+			switch ( componentTypeName ) {
+				case "Z" -> {
+					return classDetailsRegistry.resolveClassDetails( "boolean" );
+				}
+				case "B" -> {
+					return classDetailsRegistry.resolveClassDetails( "byte" );
+				}
+				case "C" -> {
+					return classDetailsRegistry.resolveClassDetails( "char" );
+				}
+				case "S" -> {
+					return classDetailsRegistry.resolveClassDetails( "short" );
+				}
+				case "I" -> {
+					return classDetailsRegistry.resolveClassDetails( "int" );
+				}
+				case "J" -> {
+					return classDetailsRegistry.resolveClassDetails( "long" );
+				}
+				case "D" -> {
+					return classDetailsRegistry.resolveClassDetails( "double" );
+				}
+				case "F" -> {
+					return classDetailsRegistry.resolveClassDetails( "float" );
+				}
+			}
+		}
+		else {
+			assert componentTypeName.startsWith( "L" );
+			assert componentTypeName.endsWith( ";" );
+			final String objectComponentTypeName = componentTypeName.substring( 1, componentTypeName.length() - 1 );
+			return classDetailsRegistry.resolveClassDetails( objectComponentTypeName );
+		}
+
+		throw new UnsupportedOperationException( "Support for non-primitive arrays not yet implemented" );
 	}
 
 	public static JdkClassDetails buildClassDetailsStatic(Class<?> javaClass, SourceModelBuildingContext buildingContext) {
@@ -74,14 +139,13 @@ public class JdkBuilders implements ClassDetailsBuilder {
 		if ( method.getParameterCount() == 0 ) {
 			// could be a getter
 			final Class<?> returnType = method.getReturnType();
-			if ( !isVoid( returnType ) ) {
+			if ( !isVoid( returnType )
+					&& !ModifierUtils.isStatic( method.getModifiers() ) ) {
 				final String methodName = method.getName();
 				if ( methodName.startsWith( "get" ) ) {
 					return buildGetterDetails( method, returnType, buildingContext );
 				}
-				else if ( isBoolean( returnType ) && ( methodName.startsWith( "is" )
-						|| methodName.startsWith( "has" )
-						|| methodName.startsWith( "was" ) ) ) {
+				else if ( isBoolean( returnType ) && methodName.startsWith( "is" ) ) {
 					return buildGetterDetails( method, returnType, buildingContext );
 				}
 			}
@@ -89,6 +153,7 @@ public class JdkBuilders implements ClassDetailsBuilder {
 
 		if ( method.getParameterCount() == 1
 				&& isVoid( method.getReturnType() )
+				&& !ModifierUtils.isStatic( method.getModifiers() )
 				&& method.getName().startsWith( "set" ) ) {
 			return buildSetterDetails( method, method.getParameterTypes()[0], buildingContext );
 		}

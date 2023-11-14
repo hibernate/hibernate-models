@@ -93,8 +93,8 @@ public interface ClassDetailsRegistry {
 	/**
 	 * Create a CLass Details
 	 */
-	@FunctionalInterface
-	interface ClassDetailsCreator {
+	@ FunctionalInterface
+	interface  ClassDetailsCreator {
 		/**
 		 * @throws UnknownClassException
 		 */

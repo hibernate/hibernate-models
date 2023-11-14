@@ -19,6 +19,8 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.IndexView;
 
+import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
+
 /**
  * Standard ClassDetailsRegistry implementation.
  *
@@ -101,10 +103,18 @@ public class ClassDetailsRegistryStandard extends AbstractClassDetailsRegistry {
 		public StandardClassDetailsBuilder(ClassDetailsBuilder fallbackClassDetailsBuilder, IndexView jandexIndex) {
 			this.fallbackClassDetailsBuilder = fallbackClassDetailsBuilder;
 			this.tryJandex = jandexIndex != null;
+
+			if ( tryJandex ) {
+				MODELS_CLASS_LOGGER.debug( "Starting StandardClassDetailsBuilder with Jandex support" );
+			}
+			else {
+				MODELS_CLASS_LOGGER.debug( "Starting StandardClassDetailsBuilder without Jandex support" );
+			}
 		}
 
 		@Override
 		public ClassDetails buildClassDetails(String name, SourceModelBuildingContext buildingContext) {
+			MODELS_CLASS_LOGGER.tracef( "Building ClassDetails - %s", name );
 			if ( tryJandex ) {
 				try {
 					return JandexBuilders.buildClassDetailsStatic( name, buildingContext );

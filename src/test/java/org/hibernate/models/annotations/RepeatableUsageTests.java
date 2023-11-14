@@ -1,0 +1,137 @@
+package org.hibernate.models.annotations;
+
+import java.util.List;
+
+import org.hibernate.models.AnnotationAccessException;
+import org.hibernate.models.internal.SourceModelBuildingContextImpl;
+import org.hibernate.models.spi.AnnotationUsage;
+import org.hibernate.models.spi.ClassDetails;
+
+import org.junit.jupiter.api.Test;
+
+import org.jboss.jandex.Index;
+
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
+import static org.hibernate.models.SourceModelTestHelper.buildJandexIndex;
+import static org.hibernate.models.SourceModelTestHelper.createBuildingContext;
+
+/**
+ * @author Steve Ebersole
+ */
+public class RepeatableUsageTests {
+	@Test
+	void baseline() {
+		final NamedQuery query = Thing4.class.getAnnotation( NamedQuery.class );
+		final NamedQueries queries = Thing4.class.getAnnotation( NamedQueries.class );
+		assertThat( query ).isNotNull();
+		assertThat( queries ).isNotNull();
+		assertThat( queries.value() ).hasSize( 2 );
+	}
+
+	@Test
+	void testWithJandex() {
+		verify( buildJandexIndex( Thing1.class, Thing2.class, Thing3.class, Thing4.class ) );
+	}
+
+	@Test
+	void testWithoutJandex() {
+		verify( null );
+	}
+
+	private void verify(Index jandexIndex) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext(
+				jandexIndex,
+				Thing1.class,
+				Thing2.class,
+				Thing3.class,
+				Thing4.class
+		);
+
+		verifyThing1( buildingContext );
+		verifyThing2( buildingContext );
+		verifyThing3( buildingContext );
+		verifyThing4( buildingContext );
+	}
+
+	private void verifyThing1(SourceModelBuildingContextImpl buildingContext) {
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing1.class.getName() );
+
+		try {
+			classDetails.getAnnotationUsage( NamedQuery.class );
+			fail( "Expecting failure" );
+		}
+		catch (AnnotationAccessException expected) {
+		}
+
+		final List<AnnotationUsage<NamedQuery>> usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		assertThat( usages ).hasSize( 2 );
+
+		final AnnotationUsage<NamedQueries> containerUsage = classDetails.getAnnotationUsage( NamedQueries.class );
+		assertThat( containerUsage ).isNotNull();
+	}
+
+	private void verifyThing2(SourceModelBuildingContextImpl buildingContext) {
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing2.class.getName() );
+
+		try {
+			classDetails.getAnnotationUsage( NamedQuery.class );
+			fail( "Expecting failure" );
+		}
+		catch (AnnotationAccessException expected) {
+		}
+
+		final List<AnnotationUsage<NamedQuery>> usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		assertThat( usages ).hasSize( 2 );
+
+		final AnnotationUsage<NamedQueries> containerUsage = classDetails.getAnnotationUsage( NamedQueries.class );
+		assertThat( containerUsage ).isNotNull();
+	}
+
+	private void verifyThing3(SourceModelBuildingContextImpl buildingContext) {
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing3.class.getName() );
+
+		assertThat( classDetails.getAnnotationUsage( NamedQuery.class ) ).isNull();
+		assertThat( classDetails.getAnnotationUsage( NamedQueries.class ) ).isNull();
+	}
+
+	private void verifyThing4(SourceModelBuildingContextImpl buildingContext) {
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing4.class.getName() );
+
+		// NOTE : this works like the JDK call, though we may want to make this more sane
+		final AnnotationUsage<NamedQuery> usage = classDetails.getAnnotationUsage( NamedQuery.class );
+		assertThat( usage ).isNotNull();
+
+		final List<AnnotationUsage<NamedQuery>> usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		assertThat( usages ).hasSize( 3 );
+
+		final AnnotationUsage<NamedQueries> containerUsage = classDetails.getAnnotationUsage( NamedQueries.class );
+		assertThat( containerUsage ).isNotNull();
+	}
+
+	@NamedQuery(name="qry1", query = "from Thing")
+	@NamedQuery(name="qry2", query = "from Thing")
+	public static class Thing1 {
+	}
+
+	@NamedQueries({
+			@NamedQuery(name = "qry1", query = "from Thing"),
+			@NamedQuery(name = "qry2", query = "from Thing")
+	})
+	public static class Thing2 {
+	}
+
+	public static class Thing3 {
+	}
+
+	@NamedQueries({
+			@NamedQuery(name = "qry1", query = "from Thing"),
+			@NamedQuery(name = "qry2", query = "from Thing")
+	})
+	@NamedQuery(name="qry3", query = "from Thing")
+	public static class Thing4 {
+	}
+}

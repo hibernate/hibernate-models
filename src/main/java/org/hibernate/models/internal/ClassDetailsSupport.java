@@ -9,6 +9,7 @@ package org.hibernate.models.internal;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -47,7 +48,7 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 
 	@Override
 	default <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> type) {
-		final AnnotationUsage<A> localUsage = AnnotationTargetSupport.super.getAnnotationUsage( type );
+		final AnnotationUsage<A> localUsage = AnnotationUsageHelper.getUsage( type, getUsageMap() );
 		if ( localUsage != null ) {
 			return localUsage;
 		}
