@@ -4,10 +4,10 @@ plugins {
 	id "base-information"
 
 	id "checkstyle"
-	id 'jacoco'
+	id "jacoco"
 
 	id "maven-publish"
-	id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+	id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 	id "publishing-config"
 	id "signing-config"
 	id "release-process"
@@ -67,16 +67,15 @@ tasks.withType( JavaCompile ).configureEach {javaCompile->
 tasks.named( "javadoc", Javadoc ) {
 	configure( options ) {
 		use = true
-		encoding = 'UTF-8'
+		encoding = "UTF-8"
 
-		addStringOption( 'Xdoclint:none', '-quiet' )
+		addStringOption( "Xdoclint:none", "-quiet" )
 
 		tags(
-				'todo:X',
-				'apiNote:a:API Note:',
-				'implSpec:a:Implementation Specification:',
-				'implNote:a:Implementation Note:',
-				'settingDefault:f:Default Value:'
+				"todo:X",
+				"apiNote:a:API Note:",
+				"implSpec:a:Implementation Specification:",
+				"implNote:a:Implementation Note:"
 		)
 	}
 }
@@ -104,7 +103,7 @@ jacocoTestReport {
 	reports {
 		xml.required = false
 		csv.required = false
-		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+		html.outputLocation = layout.buildDirectory.dir( "jacocoHtml" )
 	}
 }
 

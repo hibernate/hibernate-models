@@ -18,7 +18,6 @@ import org.hibernate.models.spi.MemberDetails;
 public class ModifierUtils {
 
 	private static final int BRIDGE    = 0x00000040;
-	private static final int ENUM      = 0x00004000;
 	private static final int SYNTHETIC = 0x00001000;
 
 	/**
@@ -27,30 +26,35 @@ public class ModifierUtils {
 	private ModifierUtils() {
 	}
 
+	public static MemberDetails.Visibility resolveVisibility(int modifierFlags) {
+		if ( Modifier.isPublic( modifierFlags ) ) {
+			return MemberDetails.Visibility.PUBLIC;
+		}
+		if ( Modifier.isProtected( modifierFlags ) ) {
+			return MemberDetails.Visibility.PROTECTED;
+		}
+		if ( Modifier.isPrivate( modifierFlags ) ) {
+			return MemberDetails.Visibility.PRIVATE;
+		}
+		return MemberDetails.Visibility.PACKAGE;
+	}
+
 	public static boolean isTransient(int modifierFlags) {
 		return Modifier.isTransient( modifierFlags );
 	}
 
+	/**
+	 * Whether the {@code modifierFlags} indicates the member is {@linkplain Modifier#isStatic static}
+	 */
 	public static boolean isStatic(int modifierFlags) {
 		return Modifier.isStatic( modifierFlags );
 	}
 
 	/**
-	 * Determine if a method is a bridge based on its modifier flags.
-	 *
-	 * @return {@code true} if the modifier flags indicate a bridge; {@code false} otherwise.
+	 * Whether the {@code modifierFlags} indicates the member is {@linkplain Modifier#isFinal final}
 	 */
-	public static boolean isBridge(int modifierFlags) {
-		return (modifierFlags & BRIDGE) != 0;
-	}
-
-	/**
-	 * Determine if a Java type is an enum based on its modifier flags.
-	 *
-	 * @return {@code true} if the flags indicate an enum; {@code false} otherwise.
-	 */
-	public static boolean isEnum(int modifierFlags) {
-		return (modifierFlags & ENUM) != 0;
+	public static boolean isFinal(int modifierFlags) {
+		return Modifier.isFinal( modifierFlags );
 	}
 
 	/**
@@ -60,6 +64,15 @@ public class ModifierUtils {
 	 */
 	public static boolean isSynthetic(int modifierFlags) {
 		return (modifierFlags & SYNTHETIC) != 0;
+	}
+
+	/**
+	 * Determine if a method is a bridge based on its modifier flags.
+	 *
+	 * @return {@code true} if the modifier flags indicate a bridge; {@code false} otherwise.
+	 */
+	public static boolean isBridge(int modifierFlags) {
+		return (modifierFlags & BRIDGE) != 0;
 	}
 
 	/**

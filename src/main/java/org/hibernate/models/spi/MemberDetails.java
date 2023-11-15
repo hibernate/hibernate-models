@@ -8,6 +8,8 @@ package org.hibernate.models.spi;
 
 import java.lang.reflect.Member;
 
+import org.hibernate.models.internal.ModifierUtils;
+
 /**
  * Details about a "{@linkplain Member member}" while processing annotations.
  *
@@ -24,13 +26,45 @@ public interface MemberDetails extends AnnotationTarget {
 
 	/**
 	 * @return Returns one of:<ul>
-	 *     <li>For a field, the field type</li>
-	 *     <li>For a getter method, the return type</li>
-	 *     <li>For a setter method, the argument type</li>
-	 *     <li>{@code null}</li>
+	 *     <li>for a field, the field type</li>
+	 *     <li>for a getter method, the return type</li>
+	 *     <li>for a setter method, the argument type</li>
+	 *     <li>otherwise, {@code null}</li>
 	 * </ul>
 	 */
 	ClassDetails getType();
+
+	/**
+	 * Access to the member modifier flags.
+	 *
+	 * @see Member#getModifiers()
+	 */
+	int getModifiers();
+
+	/**
+	 * Get the member's visibility
+	 */
+	default Visibility getVisibility() {
+		return ModifierUtils.resolveVisibility( getModifiers() );
+	}
+
+	/**
+	 * Whether the member is {@linkplain ModifierUtils#isStatic static}
+	 */
+	default boolean isStatic() {
+		return ModifierUtils.isStatic( getModifiers() );
+	}
+
+	/**
+	 * Whether the member is {@linkplain ModifierUtils#isSynthetic synthetic}
+	 */
+	default boolean isSynthetic() {
+		return ModifierUtils.isSynthetic( getModifiers() );
+	}
+
+	default boolean isFinal() {
+		return ModifierUtils.isFinal( getModifiers() );
+	}
 
 	/**
 	 * Whether the member is a field.
@@ -50,4 +84,11 @@ public interface MemberDetails extends AnnotationTarget {
 	 * For members representing attributes, determine the attribute name
 	 */
 	String resolveAttributeName();
+
+	enum Visibility {
+		PUBLIC,
+		PROTECTED,
+		PACKAGE,
+		PRIVATE
+	}
 }

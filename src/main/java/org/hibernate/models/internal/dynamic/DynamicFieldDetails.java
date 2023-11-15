@@ -6,6 +6,7 @@
  */
 package org.hibernate.models.internal.dynamic;
 
+import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
@@ -17,21 +18,17 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 public class DynamicFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final String name;
 	private final ClassDetails type;
-	private final boolean isPersistable;
-
-	public DynamicFieldDetails(String name, ClassDetails type, SourceModelBuildingContext buildingContext) {
-		this( name, type, true, buildingContext );
-	}
+	private final int modifierFlags;
 
 	public DynamicFieldDetails(
 			String name,
 			ClassDetails type,
-			boolean isPersistable,
+			int modifierFlags,
 			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.name = name;
 		this.type = type;
-		this.isPersistable = isPersistable;
+		this.modifierFlags = modifierFlags;
 	}
 
 	@Override
@@ -45,7 +42,7 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	}
 
 	@Override
-	public boolean isPersistable() {
-		return isPersistable;
+	public int getModifiers() {
+		return modifierFlags;
 	}
 }

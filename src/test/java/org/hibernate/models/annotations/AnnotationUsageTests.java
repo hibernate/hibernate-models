@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.models.UnknownAnnotationAttributeException;
+import org.hibernate.models.internal.MutableAnnotationUsage;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
@@ -20,6 +22,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.NamedQuery;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.models.SourceModelTestHelper.buildJandexIndex;
 import static org.hibernate.models.SourceModelTestHelper.createBuildingContext;
 
@@ -32,8 +35,16 @@ import static org.hibernate.models.SourceModelTestHelper.createBuildingContext;
  */
 public class AnnotationUsageTests {
 	@Test
-	void basicUsageTest() {
-		final Index index = buildJandexIndex( SimpleEntity.class );
+	void testBasicUsageWithJandex() {
+		basicUsageChecks( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testBasicUsageWithoutJandex() {
+		basicUsageChecks( null );
+	}
+
+	void basicUsageChecks(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
 		final AnnotationDescriptorRegistry descriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
 
@@ -47,8 +58,34 @@ public class AnnotationUsageTests {
 	}
 
 	@Test
-	void baseline() {
-		final Index index = buildJandexIndex( SimpleEntity.class );
+	void testUsageMutationWithJandex() {
+		usageMutationChecks( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testUsageMutationWithoutJandex() {
+		usageMutationChecks( null );
+	}
+
+	private void usageMutationChecks(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+		final MutableAnnotationUsage<Entity> entityAnn = (MutableAnnotationUsage<Entity>) classDetails.getAnnotationUsage( Entity.class );
+		entityAnn.setAttributeValue( "name", "SimpleEntity" );
+	}
+
+	@Test
+	void testBaselineWithJandex() {
+		baselineChecks( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testBaselineWithoutJandex() {
+		baselineChecks( null );
+	}
+
+	void baselineChecks(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
 		final AnnotationDescriptorRegistry descriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
@@ -76,10 +113,17 @@ public class AnnotationUsageTests {
 	}
 
 	@Test
-	void testNamedAnnotationAccess() {
-		final Index index = buildJandexIndex( SimpleEntity.class );
+	void testNamedAnnotationAccessWithJandex() {
+		namedAnnotationAccessChecks( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testNamedAnnotationAccessWithoutJandex() {
+		namedAnnotationAccessChecks( null );
+	}
+
+	void namedAnnotationAccessChecks(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
-		final AnnotationDescriptorRegistry descriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
 		final ClassDetails entityClassDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
@@ -90,5 +134,38 @@ public class AnnotationUsageTests {
 		final AnnotationUsage<NamedQuery> abcAnn = entityClassDetails.getNamedAnnotationUsage( NamedQuery.class, "abc" );
 		assertThat( abcAnn ).isNotNull();
 		assertThat( abcAnn.getString( "query" ) ).isEqualTo( "select me" );
+	}
+
+	@Test
+	void testBadAttributeNamesWithJandex() {
+		badAttributeNamesChecks( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testBadAttributeNamesWithoutJandex() {
+		badAttributeNamesChecks( null );
+	}
+
+	void badAttributeNamesChecks(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final ClassDetails entityClassDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+		final MutableAnnotationUsage<Entity> entityAnn = (MutableAnnotationUsage<Entity>) entityClassDetails.getAnnotationUsage( Entity.class );
+		assertThat( entityAnn ).isNotNull();
+
+		try {
+			entityAnn.getAttributeValue( "doesNotExist" );
+			fail( "Expecting an exception" );
+		}
+		catch (UnknownAnnotationAttributeException expected) {
+		}
+
+		try {
+			entityAnn.setAttributeValue( "doesNotExist", "stuff" );
+			fail( "Expecting an exception" );
+		}
+		catch (UnknownAnnotationAttributeException expected) {
+		}
 	}
 }

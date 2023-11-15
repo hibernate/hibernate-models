@@ -19,7 +19,7 @@ public class UnknownAnnotationAttributeException extends ModelsException {
 		this(
 				String.format(
 						Locale.ROOT,
-						"Unable to locate attribute named `%s` on annotation (%s)",
+						"Unable to locate attribute named `%s` on annotation `%s`",
 						attributeName,
 						annotationType.getName()
 				)

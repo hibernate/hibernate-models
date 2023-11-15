@@ -161,7 +161,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 			if ( getClassName() == null ) {
 				throw new UnsupportedOperationException( "Not supported" );
 			}
-			MODELS_CLASS_LOGGER.debugf( "Loading `%s` on to classloader from Jandex ClassDetails" );
+			MODELS_CLASS_LOGGER.debugf( "Loading `%s` on to classloader from Jandex ClassDetails", getClassName() );
 			javaClass = getBuildingContext().getClassLoading().classForName( getClassName() );
 		}
 		//noinspection unchecked

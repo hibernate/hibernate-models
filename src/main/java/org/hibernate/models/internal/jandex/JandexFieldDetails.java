@@ -47,7 +47,7 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 	}
 
 	@Override
-	public boolean isPersistable() {
-		return isPersistableField( fieldInfo.flags() );
+	public int getModifiers() {
+		return fieldInfo.flags();
 	}
 }

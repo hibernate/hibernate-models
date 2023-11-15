@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.spi;
 
+import org.hibernate.models.internal.ModifierUtils;
+
 /**
  * Models a "{@linkplain java.lang.reflect.Field field}" in a {@link ClassDetails}
  *
@@ -20,5 +22,10 @@ public interface FieldDetails extends MemberDetails {
 	@Override
 	default String resolveAttributeName() {
 		return getName();
+	}
+
+	@Override
+	default boolean isPersistable() {
+		return ModifierUtils.isPersistableField( getModifiers() );
 	}
 }

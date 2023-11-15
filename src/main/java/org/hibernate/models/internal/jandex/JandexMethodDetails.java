@@ -75,6 +75,11 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	}
 
 	@Override
+	public int getModifiers() {
+		return methodInfo.flags();
+	}
+
+	@Override
 	public ClassDetails getReturnType() {
 		return returnType;
 	}
@@ -82,18 +87,5 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	@Override
 	public List<ClassDetails> getArgumentTypes() {
 		return argumentTypes;
-	}
-
-	@Override
-	public boolean isPersistable() {
-		if ( methodInfo.parametersCount() > 0 ) {
-			return false;
-		}
-
-		if ( "void".equals( type.getName() ) || "Void".equals( type.getName() ) ) {
-			return false;
-		}
-
-		return ModifierUtils.isPersistableMethod( methodInfo.flags() );
 	}
 }

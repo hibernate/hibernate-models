@@ -8,6 +8,7 @@ package org.hibernate.models.internal.dynamic;
 
 import java.util.List;
 
+import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -20,7 +21,7 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	private final String name;
 	private final ClassDetails type;
 	private final MethodKind methodKind;
-	private final boolean isPersistable;
+	private final int modifierFlags;
 
 	private final ClassDetails returnType;
 	private final List<ClassDetails> argumentTypes;
@@ -29,7 +30,7 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 			String name,
 			ClassDetails type,
 			MethodKind methodKind,
-			boolean isPersistable,
+			int modifierFlags,
 			ClassDetails returnType,
 			List<ClassDetails> argumentTypes,
 			SourceModelBuildingContext buildingContext) {
@@ -37,7 +38,7 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 		this.name = name;
 		this.type = type;
 		this.methodKind = methodKind;
-		this.isPersistable = isPersistable;
+		this.modifierFlags = modifierFlags;
 		this.returnType = returnType;
 		this.argumentTypes = argumentTypes;
 	}
@@ -58,6 +59,11 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	}
 
 	@Override
+	public int getModifiers() {
+		return modifierFlags;
+	}
+
+	@Override
 	public ClassDetails getReturnType() {
 		return returnType;
 	}
@@ -65,10 +71,5 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	@Override
 	public List<ClassDetails> getArgumentTypes() {
 		return argumentTypes;
-	}
-
-	@Override
-	public boolean isPersistable() {
-		return isPersistable;
 	}
 }

@@ -190,6 +190,9 @@ public class InheritanceTests {
 
 		final ClassDetails leafClassDetails = classDetailsRegistry.getClassDetails( LeafClass.class.getName() );
 		assertThat( leafClassDetails.isImplementor( Intf.class ) ).isTrue();
+
+		final ClassDetails intfDetails = classDetailsRegistry.resolveClassDetails( Intf.class.getName() );
+		assertThat( branchClassDetails.getImplementedInterfaceTypes() ).contains( intfDetails );
 	}
 
 	@Test

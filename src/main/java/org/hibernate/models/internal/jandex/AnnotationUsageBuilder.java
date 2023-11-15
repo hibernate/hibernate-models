@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 import org.hibernate.models.internal.util.CollectionHelper;
@@ -115,16 +116,7 @@ public class AnnotationUsageBuilder {
 			return Collections.emptyMap();
 		}
 
-		if ( annotationDescriptor.getAttributes().size() == 1 ) {
-			final AttributeDescriptor attributeDescriptor = annotationDescriptor.getAttributes().get( 0 );
-			final ValueExtractor<AnnotationInstance, ?> extractor = attributeDescriptor
-					.getTypeDescriptor()
-					.createJandexExtractor( buildingContext );
-			final Object attributeValue = extractor.extractValue( annotationInstance, attributeDescriptor, target, buildingContext );
-			return Collections.singletonMap( attributeDescriptor.getName(), attributeValue );
-		}
-
-		final Map<String,Object> valueMap = new HashMap<>();
+		final ConcurrentHashMap<String, Object> valueMap = new ConcurrentHashMap<>();
 		for ( int i = 0; i < annotationDescriptor.getAttributes().size(); i++ ) {
 			final AttributeDescriptor attributeDescriptor = annotationDescriptor.getAttributes().get( i );
 			final ValueExtractor<AnnotationInstance, ?> extractor = attributeDescriptor

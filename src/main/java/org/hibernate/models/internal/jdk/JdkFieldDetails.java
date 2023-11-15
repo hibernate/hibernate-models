@@ -42,7 +42,7 @@ public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDe
 	}
 
 	@Override
-	public boolean isPersistable() {
-		return ModifierUtils.isPersistableField( field.getModifiers() );
+	public int getModifiers() {
+		return field.getModifiers();
 	}
 }

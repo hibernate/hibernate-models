@@ -10,6 +10,9 @@ import java.beans.Introspector;
 import java.util.List;
 
 import org.hibernate.models.ModelsException;
+import org.hibernate.models.internal.ModifierUtils;
+
+import static org.hibernate.models.internal.ModifierUtils.isPersistableMethod;
 
 /**
  * Models a "{@linkplain java.lang.reflect.Method method}" in a {@link ClassDetails}
@@ -31,7 +34,25 @@ public interface MethodDetails extends MemberDetails {
 	}
 
 	ClassDetails getReturnType();
+
 	List<ClassDetails> getArgumentTypes();
+
+	@Override
+	default boolean isPersistable() {
+		if ( !getArgumentTypes().isEmpty() ) {
+			// should be the getter
+			return false;
+		}
+
+		if ( getReturnType() == null
+				|| "void".equals( getReturnType().getName() )
+				|| "Void".equals( getReturnType().getName() ) ) {
+			// again, should be the getter
+			return false;
+		}
+
+		return isPersistableMethod( getModifiers() );
+	}
 
 	@Override
 	default String resolveAttributeName() {
@@ -39,9 +60,6 @@ public interface MethodDetails extends MemberDetails {
 
 		if ( methodName.startsWith( "is" ) ) {
 			return Introspector.decapitalize( methodName.substring( 2 ) );
-		}
-		else if ( methodName.startsWith( "has" ) ) {
-			return Introspector.decapitalize( methodName.substring( 3 ) );
 		}
 		else if ( methodName.startsWith( "get" ) ) {
 			return Introspector.decapitalize( methodName.substring( 3 ) );

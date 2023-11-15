@@ -43,6 +43,9 @@ public class JdkBuilders implements ClassDetailsBuilder {
 	}
 
 	public static JdkClassDetails buildClassDetailsStatic(String name, SourceModelBuildingContext buildingContext) {
+		if ( char.class.getName().equals( name ) ) {
+			return buildClassDetailsStatic( char.class, buildingContext );
+		}
 		if ( byte.class.getName().equals( name ) ) {
 			return buildClassDetailsStatic( byte.class, buildingContext );
 		}
@@ -122,7 +125,7 @@ public class JdkBuilders implements ClassDetailsBuilder {
 			}
 		}
 		else {
-			assert componentTypeName.startsWith( "L" );
+			assert componentTypeName.startsWith( "L" ) : "Unexpected array component type prefix - " + componentTypeName;
 			assert componentTypeName.endsWith( ";" );
 			final String objectComponentTypeName = componentTypeName.substring( 1, componentTypeName.length() - 1 );
 			return classDetailsRegistry.resolveClassDetails( objectComponentTypeName );

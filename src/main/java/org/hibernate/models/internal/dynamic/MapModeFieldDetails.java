@@ -19,11 +19,13 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 public class MapModeFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final String name;
 	private final ClassDetails type;
+	private final int modifierFlags;
 
-	public MapModeFieldDetails(String name, ClassDetails type, SourceModelBuildingContext buildingContext) {
+	public MapModeFieldDetails(String name, ClassDetails type, int modifierFlags, SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.name = name;
 		this.type = type;
+		this.modifierFlags = modifierFlags;
 	}
 
 	@Override
@@ -34,6 +36,11 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public int getModifiers() {
+		return modifierFlags;
 	}
 
 	@Override

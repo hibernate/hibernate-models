@@ -17,8 +17,6 @@ import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
-import static org.hibernate.models.internal.ModifierUtils.isPersistableMethod;
-
 /**
  * @author Steve Ebersole
  */
@@ -75,6 +73,11 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	}
 
 	@Override
+	public int getModifiers() {
+		return method.getModifiers();
+	}
+
+	@Override
 	public ClassDetails getReturnType() {
 		return returnType;
 	}
@@ -82,21 +85,6 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	@Override
 	public List<ClassDetails> getArgumentTypes() {
 		return argumentTypes;
-	}
-
-	@Override
-	public boolean isPersistable() {
-		if ( method.getParameterCount() > 0 ) {
-			// should be the getter
-			return false;
-		}
-
-		if ( "void".equals( type.getName() ) || "Void".equals( type.getName() ) ) {
-			// again, should be the getter
-			return false;
-		}
-
-		return isPersistableMethod( method.getModifiers() );
 	}
 
 	@Override

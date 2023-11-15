@@ -13,6 +13,7 @@ import org.hibernate.models.internal.ModelsLogging;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.internal.jdk.JdkMethodDetails;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;
 
 import org.junit.jupiter.api.Test;
@@ -56,6 +57,7 @@ public class MethodDetailsTests {
 				assertThat( method.getType() ).isSameAs( method.getReturnType() );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "property" );
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 				assertThat( method.isPersistable() ).isTrue();
 			}
 			else if ( method.getName().equals( "setProperty" ) ) {
@@ -63,18 +65,24 @@ public class MethodDetailsTests {
 				assertThat( method.getReturnType() ).isNull();
 				assertThat( method.getArgumentTypes() ).hasSize( 1 );
 				assertThat( method.getType() ).isSameAs( method.getArgumentTypes().get(0) );
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
+				assertThat( method.isPersistable() ).isFalse();
 			}
 			else if ( method.getName().equals( "nothing" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.OTHER );
 				assertThat( method.getReturnType() ).isNull();
 				assertThat( method.getType() ).isNull();
 				assertThat( method.getArgumentTypes() ).isEmpty();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
+				assertThat( method.isPersistable() ).isFalse();
 			}
 			else if ( method.getName().equals( "something" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.OTHER );
 				assertThat( method.getReturnType() ).isNull();
 				assertThat( method.getType() ).isNull();
 				assertThat( method.getArgumentTypes() ).hasSize( 1 );
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
+				assertThat( method.isPersistable() ).isFalse();
 			}
 			else if ( method.getName().equals( "isActive" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
@@ -83,6 +91,7 @@ public class MethodDetailsTests {
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "active" );
 				assertThat( method.isPersistable() ).isTrue();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PRIVATE );
 			}
 			else if ( method.getName().equals( "getByteValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
@@ -91,6 +100,7 @@ public class MethodDetailsTests {
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "byteValue" );
 				assertThat( method.isPersistable() ).isTrue();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PROTECTED );
 			}
 			else if ( method.getName().equals( "getShortValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
@@ -99,6 +109,7 @@ public class MethodDetailsTests {
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "shortValue" );
 				assertThat( method.isPersistable() ).isTrue();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PACKAGE );
 			}
 			else if ( method.getName().equals( "getIntValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
@@ -107,6 +118,7 @@ public class MethodDetailsTests {
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "intValue" );
 				assertThat( method.isPersistable() ).isTrue();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 			}
 			else if ( method.getName().equals( "getLongValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
@@ -115,6 +127,7 @@ public class MethodDetailsTests {
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "longValue" );
 				assertThat( method.isPersistable() ).isTrue();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 			}
 			else if ( method.getName().equals( "getDoubleValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
@@ -123,6 +136,7 @@ public class MethodDetailsTests {
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "doubleValue" );
 				assertThat( method.isPersistable() ).isTrue();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 			}
 			else if ( method.getName().equals( "getFloatValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
@@ -131,6 +145,7 @@ public class MethodDetailsTests {
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "floatValue" );
 				assertThat( method.isPersistable() ).isTrue();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 			}
 			else if ( method.getName().equals( "getIntArrayValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
@@ -139,6 +154,7 @@ public class MethodDetailsTests {
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "intArrayValue" );
 				assertThat( method.isPersistable() ).isTrue();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 			}
 			else {
 				if ( ( (JdkMethodDetails) method ).getMethod().isSynthetic() ) {
@@ -157,9 +173,9 @@ public class MethodDetailsTests {
 		public Integer getProperty() { return null; }
 		public void setProperty(Integer id) {}
 
-		public boolean isActive() { return true; }
-		public byte getByteValue() { return 0; }
-		public short getShortValue() { return 0; }
+		private boolean isActive() { return true; }
+		protected byte getByteValue() { return 0; }
+		short getShortValue() { return 0; }
 		public int getIntValue() { return 0; }
 		public long getLongValue() { return 0; }
 		public double getDoubleValue() { return 0; }
