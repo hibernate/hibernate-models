@@ -55,6 +55,7 @@ public class AnnotationUsageHelper {
 					if ( nestedUsages.size() > 1 ) {
 						throw new AnnotationAccessException( "Found more than one usage of " + type.getAnnotationType().getName() );
 					}
+					return nestedUsages.get( 0 );
 				}
 			}
 		}

@@ -48,13 +48,15 @@ public class RepeatableUsageTests {
 				Thing1.class,
 				Thing2.class,
 				Thing3.class,
-				Thing4.class
+				Thing4.class,
+				Thing5.class
 		);
 
 		verifyThing1( buildingContext );
 		verifyThing2( buildingContext );
 		verifyThing3( buildingContext );
 		verifyThing4( buildingContext );
+		verifyThing5( buildingContext );
 	}
 
 	private void verifyThing1(SourceModelBuildingContextImpl buildingContext) {
@@ -112,6 +114,19 @@ public class RepeatableUsageTests {
 		assertThat( containerUsage ).isNotNull();
 	}
 
+	private void verifyThing5(SourceModelBuildingContextImpl buildingContext) {
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing5.class.getName() );
+
+		final AnnotationUsage<NamedQueries> containerUsage = classDetails.getAnnotationUsage( NamedQueries.class );
+		assertThat( containerUsage ).isNotNull();
+
+		final AnnotationUsage<NamedQuery> usage = classDetails.getAnnotationUsage( NamedQuery.class );
+		assertThat( usage ).isNotNull();
+
+		final List<AnnotationUsage<NamedQuery>> usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		assertThat( usages ).hasSize( 1 );
+	}
+
 	@NamedQuery(name="qry1", query = "from Thing")
 	@NamedQuery(name="qry2", query = "from Thing")
 	public static class Thing1 {
@@ -133,5 +148,11 @@ public class RepeatableUsageTests {
 	})
 	@NamedQuery(name="qry3", query = "from Thing")
 	public static class Thing4 {
+	}
+
+	@NamedQueries({
+			@NamedQuery(name = "qry1", query = "from Thing")
+	})
+	public static class Thing5 {
 	}
 }
