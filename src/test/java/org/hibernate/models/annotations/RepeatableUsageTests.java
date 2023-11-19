@@ -1,5 +1,6 @@
 package org.hibernate.models.annotations;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import org.hibernate.models.AnnotationAccessException;
@@ -23,6 +24,14 @@ import static org.hibernate.models.SourceModelTestHelper.createBuildingContext;
  * @author Steve Ebersole
  */
 public class RepeatableUsageTests {
+	@Test
+	void testModifiers() {
+		int fieldModifiers = Modifier.fieldModifiers();
+		assertThat( Modifier.isAbstract( fieldModifiers ) ).isFalse();
+		fieldModifiers |= Modifier.ABSTRACT;
+		assertThat( Modifier.isAbstract( fieldModifiers ) ).isTrue();
+	}
+
 	@Test
 	void baseline() {
 		final NamedQuery query = Thing4.class.getAnnotation( NamedQuery.class );

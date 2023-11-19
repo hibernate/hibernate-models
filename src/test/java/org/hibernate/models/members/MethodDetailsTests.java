@@ -12,6 +12,7 @@ import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.internal.ModelsLogging;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.internal.jdk.JdkMethodDetails;
+import org.hibernate.models.internal.jdk.VoidClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -62,7 +63,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "setProperty" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.SETTER );
-				assertThat( method.getReturnType() ).isNull();
+				assertThat( method.getReturnType() ).isEqualTo( VoidClassDetails.VOID_CLASS_DETAILS );
 				assertThat( method.getArgumentTypes() ).hasSize( 1 );
 				assertThat( method.getType() ).isSameAs( method.getArgumentTypes().get(0) );
 				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
@@ -70,7 +71,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "nothing" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.OTHER );
-				assertThat( method.getReturnType() ).isNull();
+				assertThat( method.getReturnType() ).isEqualTo( VoidClassDetails.VOID_CLASS_DETAILS );
 				assertThat( method.getType() ).isNull();
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
@@ -78,7 +79,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "something" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.OTHER );
-				assertThat( method.getReturnType() ).isNull();
+				assertThat( method.getReturnType() ).isEqualTo( VoidClassDetails.VOID_CLASS_DETAILS );
 				assertThat( method.getType() ).isNull();
 				assertThat( method.getArgumentTypes() ).hasSize( 1 );
 				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );

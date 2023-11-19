@@ -40,12 +40,7 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
-		if ( void.class.equals( method.getReturnType() ) ) {
-			returnType = null;
-		}
-		else {
-			returnType = classDetailsRegistry.resolveClassDetails( method.getReturnType().getName() );
-		}
+		this.returnType = classDetailsRegistry.resolveClassDetails( method.getReturnType().getName() );
 
 		this.argumentTypes = new ArrayList<>( method.getParameterCount() );
 		for ( int i = 0; i < method.getParameterTypes().length; i++ ) {

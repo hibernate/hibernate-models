@@ -68,10 +68,6 @@ public abstract class AbstractClassDetailsRegistry implements ClassDetailsRegist
 			throw new IllegalArgumentException( "`name` cannot be null" );
 		}
 
-		if ( "void".equals( name ) ) {
-			return null;
-		}
-
 		final ClassDetails existing = classDetailsMap.get( name );
 		if ( existing != null ) {
 			return existing;

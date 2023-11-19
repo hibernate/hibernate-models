@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.MutableMemberDetails;
+import org.hibernate.models.internal.jdk.VoidClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
@@ -42,13 +43,9 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 		this.type = type;
 
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
-		if ( methodInfo.returnType().kind() == Type.Kind.VOID ) {
-			returnType = null;
-		}
-		else {
-			returnType = classDetailsRegistry.resolveClassDetails( methodInfo.returnType().name().toString() );
-		}
-		argumentTypes = new ArrayList<>( methodInfo.parametersCount() );
+		this.returnType = classDetailsRegistry.resolveClassDetails( methodInfo.returnType().name().toString() );
+
+		this.argumentTypes = new ArrayList<>( methodInfo.parametersCount() );
 		for ( int i = 0; i < methodInfo.parametersCount(); i++ ) {
 			argumentTypes.add( classDetailsRegistry.resolveClassDetails( methodInfo.parameterType( i ).name().toString() ) );
 		}

@@ -60,17 +60,17 @@ public class ClassRegistryTests {
 		);
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
-		final ClassDetails rootClassDetails = classDetailsRegistry.resolveClassDetails(
-				"void",
+		final ClassDetails voidClassDetails = classDetailsRegistry.resolveClassDetails(
+				void.class.getName(),
 				(name, ctx) -> {throw new IllegalStateException();}
 		);
-		assertThat( rootClassDetails ).isNull();
+		assertThat( voidClassDetails ).isNotNull();
 
-		final ClassDetails trunkClassDetails = classDetailsRegistry.resolveClassDetails(
-				"void",
+		final ClassDetails bigVoidClassDetails = classDetailsRegistry.resolveClassDetails(
+				Void.class.getName(),
 				(name) -> {throw new IllegalStateException();}
 		);
-		assertThat( trunkClassDetails ).isNull();
+		assertThat( bigVoidClassDetails ).isNotNull();
 	}
 
 	@Test
