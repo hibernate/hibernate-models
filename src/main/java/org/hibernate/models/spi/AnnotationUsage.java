@@ -38,9 +38,16 @@ import java.util.List;
  */
 public interface AnnotationUsage<A extends Annotation> {
 	/**
+	 * Descriptor for the type of the used annotation
+	 */
+	AnnotationDescriptor<A> getAnnotationDescriptor();
+
+	/**
 	 * Type of the used annotation
 	 */
-	Class<A> getAnnotationType();
+	default Class<A> getAnnotationType() {
+		return getAnnotationDescriptor().getAnnotationType();
+	}
 
 	/**
 	 * The target where this usage occurs

@@ -7,10 +7,8 @@
 package org.hibernate.models.internal.jdk;
 
 import java.lang.annotation.Annotation;
-import java.util.Locale;
 import java.util.Map;
 
-import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.MutableAnnotationUsage;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
@@ -37,8 +35,8 @@ public class JdkAnnotationUsage<A extends Annotation> implements MutableAnnotati
 	}
 
 	@Override
-	public Class<A> getAnnotationType() {
-		return annotationDescriptor.getAnnotationType();
+	public AnnotationDescriptor<A> getAnnotationDescriptor() {
+		return annotationDescriptor;
 	}
 
 	@Override

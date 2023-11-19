@@ -35,8 +35,8 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 	}
 
 	@Override
-	public Class<A> getAnnotationType() {
-		return annotationDescriptor.getAnnotationType();
+	public AnnotationDescriptor<A> getAnnotationDescriptor() {
+		return annotationDescriptor;
 	}
 
 	@Override
