@@ -45,4 +45,9 @@ public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDe
 	public int getModifiers() {
 		return field.getModifiers();
 	}
+
+	@Override
+	public String toString() {
+		return "JdkFieldDetails(" + getName() + ")";
+	}
 }

@@ -8,6 +8,7 @@ package org.hibernate.models.internal.jandex;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.MutableMemberDetails;
@@ -84,5 +85,15 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	@Override
 	public List<ClassDetails> getArgumentTypes() {
 		return argumentTypes;
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+				Locale.ROOT,
+				"JandexMethodDetails( [%s] %s )",
+				methodKind.name(),
+				methodInfo.toString()
+		);
 	}
 }

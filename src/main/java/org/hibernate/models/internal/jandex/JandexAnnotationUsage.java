@@ -81,4 +81,9 @@ public class JandexAnnotationUsage<A extends Annotation> implements MutableAnnot
 		//noinspection unchecked
 		return (V) ( (Map<String,Object>) attributeValueMap ).put( name, value );
 	}
+
+	@Override
+	public String toString() {
+		return "JandexAnnotationUsage(" + annotationDescriptor.getAnnotationType().getName() + ")";
+	}
 }

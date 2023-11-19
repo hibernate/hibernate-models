@@ -50,4 +50,9 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 	public int getModifiers() {
 		return fieldInfo.flags();
 	}
+
+	@Override
+	public String toString() {
+		return "JandexFieldDetails(" + getName() + ")";
+	}
 }

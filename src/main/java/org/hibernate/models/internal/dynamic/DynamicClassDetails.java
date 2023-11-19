@@ -120,4 +120,9 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 		//noinspection unchecked
 		return (Class<X>) javaType;
 	}
+
+	@Override
+	public String toString() {
+		return "DynamicClassDetails(" + name + " (" + className + "))";
+	}
 }

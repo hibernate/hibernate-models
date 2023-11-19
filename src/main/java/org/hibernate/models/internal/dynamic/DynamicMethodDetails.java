@@ -72,4 +72,9 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	public List<ClassDetails> getArgumentTypes() {
 		return argumentTypes;
 	}
+
+	@Override
+	public String toString() {
+		return "DynamicMethodDetails(" + name + ")";
+	}
 }

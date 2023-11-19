@@ -47,4 +47,9 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 	public boolean isPersistable() {
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "MapModeFieldDetails(" + name + ")";
+	}
 }

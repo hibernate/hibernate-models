@@ -57,6 +57,11 @@ public class VoidClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public String toString() {
+		return "ClassDetails(void)";
+	}
+
+	@Override
 	public boolean isAbstract() {
 		return false;
 	}
