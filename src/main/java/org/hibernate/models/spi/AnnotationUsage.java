@@ -8,6 +8,7 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Describes the usage of an annotation.  That is, not the
@@ -71,6 +72,18 @@ public interface AnnotationUsage<A extends Annotation> {
 		return (V) attributeValue;
 	}
 
+	/**
+	 * The value of the named annotation attribute
+	 */
+	default <V> V getAttributeValue(String name, Supplier<V> defaultValueSupplier) {
+		final Object attributeValue = getAttributeValue( name );
+		if ( attributeValue == null ) {
+			return defaultValueSupplier.get();
+		}
+		//noinspection unchecked
+		return (V) attributeValue;
+	}
+
 	default <V> V getAttributeValue(AttributeDescriptor<V> attributeDescriptor) {
 		return getAttributeValue( attributeDescriptor.getName() );
 	}
@@ -83,12 +96,20 @@ public interface AnnotationUsage<A extends Annotation> {
 		return getAttributeValue( name, defaultValue );
 	}
 
+	default String getString(String name, Supplier<String> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
+	}
+
 	default Boolean getBoolean(String name) {
 		return getAttributeValue( name );
 	}
 
 	default Boolean getBoolean(String name, boolean defaultValue) {
 		return getAttributeValue( name, defaultValue );
+	}
+
+	default Boolean getBoolean(String name, Supplier<Boolean> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
 	}
 
 	default Byte getByte(String name) {
@@ -99,12 +120,20 @@ public interface AnnotationUsage<A extends Annotation> {
 		return getAttributeValue( name, defaultValue );
 	}
 
+	default Byte getByte(String name, Supplier<Byte> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
+	}
+
 	default Short getShort(String name) {
 		return getAttributeValue( name );
 	}
 
 	default Short getShort(String name, Short defaultValue) {
 		return getAttributeValue( name, defaultValue );
+	}
+
+	default Short getShort(String name, Supplier<Short> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
 	}
 
 	default Integer getInteger(String name) {
@@ -115,12 +144,20 @@ public interface AnnotationUsage<A extends Annotation> {
 		return getAttributeValue( name, defaultValue );
 	}
 
+	default Integer getInteger(String name, Supplier<Integer> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
+	}
+
 	default Long getLong(String name) {
 		return getAttributeValue( name );
 	}
 
 	default Long getLong(String name, Long defaultValue) {
 		return getAttributeValue( name, defaultValue );
+	}
+
+	default Long getLong(String name, Supplier<Long> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
 	}
 
 	default Float getFloat(String name) {
@@ -131,12 +168,20 @@ public interface AnnotationUsage<A extends Annotation> {
 		return getAttributeValue( name, defaultValue );
 	}
 
+	default Float getFloat(String name, Supplier<Float> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
+	}
+
 	default Double getDouble(String name) {
 		return getAttributeValue( name );
 	}
 
 	default Double getDouble(String name, Double defaultValue) {
 		return getAttributeValue( name, defaultValue );
+	}
+
+	default Double getDouble(String name, Supplier<Double> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
 	}
 
 	default <E extends Enum<E>> E getEnum(String name) {
@@ -151,8 +196,16 @@ public interface AnnotationUsage<A extends Annotation> {
 		return getAttributeValue( name, defaultValue );
 	}
 
+	default <E extends Enum<E>> E getEnum(String name, Supplier<E> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
+	}
+
 	default <E extends Enum<E>> E getEnum(String name, E defaultValue, Class<E> type) {
 		return getAttributeValue( name, defaultValue );
+	}
+
+	default <E extends Enum<E>> E getEnum(String name, Supplier<E> defaultValueSupplier, Class<E> type) {
+		return getAttributeValue( name, defaultValueSupplier );
 	}
 
 	default ClassDetails getClassDetails(String name) {
@@ -163,11 +216,31 @@ public interface AnnotationUsage<A extends Annotation> {
 		return getAttributeValue( name, defaultValue );
 	}
 
+	default ClassDetails getClassDetails(String name, Supplier<ClassDetails> defaultValue) {
+		return getAttributeValue( name, defaultValue );
+	}
+
 	default <X extends Annotation> AnnotationUsage<X> getNestedUsage(String name) {
 		return getAttributeValue( name );
 	}
 
+	default <X extends Annotation> AnnotationUsage<X> getNestedUsage(String name, AnnotationUsage<X> defaultValue) {
+		return getAttributeValue( name, defaultValue );
+	}
+
+	default <X extends Annotation> AnnotationUsage<X> getNestedUsage(String name, Supplier<AnnotationUsage<X>> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
+	}
+
 	default <E> List<E> getList(String name) {
 		return getAttributeValue( name );
+	}
+
+	default <E> List<E> getList(String name, List<E> defaultValue) {
+		return getAttributeValue( name, defaultValue );
+	}
+
+	default <E> List<E> getList(String name, Supplier<List<E>> defaultValueSupplier) {
+		return getAttributeValue( name, defaultValueSupplier );
 	}
 }
