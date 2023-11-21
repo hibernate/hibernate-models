@@ -11,6 +11,8 @@ import java.lang.annotation.Repeatable;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.hibernate.models.UnknownAnnotationAttributeException;
+
 /**
  * Describes an annotation type (the Class)
  *
@@ -56,7 +58,24 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	List<AttributeDescriptor<?>> getAttributes();
 
 	/**
-	 * Get an attribute descriptor by name
+	 * Get an attribute descriptor by name.
+	 *
+	 * @throws UnknownAnnotationAttributeException if the name is not an
+	 * attribute of the described annotation.
 	 */
-	<V> AttributeDescriptor<V> getAttribute(String name);
+	<V> AttributeDescriptor<V> findAttribute(String name);
+
+	/**
+	 * Get an attribute descriptor by name, returning {@code null} if the name
+	 * is not an attribute of the described annotation.
+	 */
+	default <V> AttributeDescriptor<V> getAttribute(String name) {
+		final AttributeDescriptor<Object> attribute = findAttribute( name );
+		if ( attribute != null ) {
+			//noinspection unchecked
+			return (AttributeDescriptor<V>) attribute;
+		}
+
+		throw new UnknownAnnotationAttributeException( getAnnotationType(), name );
+	}
 }

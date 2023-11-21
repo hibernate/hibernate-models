@@ -57,23 +57,15 @@ public class JandexAnnotationUsage<A extends Annotation> implements MutableAnnot
 	}
 
 	@Override
-	public <W> W getAttributeValue(String name) {
+	public <W> W findAttributeValue(String name) {
 		//noinspection unchecked
-		final W value = (W) attributeValueMap.get( name );
-		if ( value == null ) {
-			// this is unusual.  make sure the attribute exists.
-			//		NOTE : the call to #getAttribute throws the exception if it does not
-			annotationDescriptor.getAttribute( name );
-		}
-		return value;
+		return (W) attributeValueMap.get( name );
 	}
 
 	@Override
 	public <V> V setAttributeValue(String name, V value) {
 		// for set, we need to check up front
 		//		NOTE : the call to #getAttribute throws the exception if it does not
-		// todo : do we want to add a distinction for a checked versus unchecked set?
-		//		- i.e. setAttributeValueSafely
 		annotationDescriptor.getAttribute( name );
 
 		//noinspection unchecked

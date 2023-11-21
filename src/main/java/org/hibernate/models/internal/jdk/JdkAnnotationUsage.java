@@ -45,15 +45,9 @@ public class JdkAnnotationUsage<A extends Annotation> implements MutableAnnotati
 	}
 
 	@Override
-	public <W> W getAttributeValue(String name) {
+	public <W> W findAttributeValue(String name) {
 		//noinspection unchecked
-		final W value = (W) valueMap.get( name );
-		if ( value == null ) {
-			// this is unusual.  make sure the attribute exists.
-			//		NOTE : the call to #getAttribute throws the exception if it does not
-			annotationDescriptor.getAttribute( name );
-		}
-		return value;
+		return (W) valueMap.get( name );
 	}
 
 	@Override

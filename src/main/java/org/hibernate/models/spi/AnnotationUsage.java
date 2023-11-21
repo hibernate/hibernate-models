@@ -58,7 +58,21 @@ public interface AnnotationUsage<A extends Annotation> {
 	/**
 	 * The value of the named annotation attribute
 	 */
-	<V> V getAttributeValue(String name);
+	<V> V findAttributeValue(String name);
+
+	/**
+	 * The value of the named annotation attribute
+	 */
+	default <V> V getAttributeValue(String name) {
+		final Object value = findAttributeValue( name );
+		if ( value == null ) {
+			// this is unusual.  make sure the attribute exists.
+			//		NOTE : the call to #getAttribute throws the exception if it does not
+			getAnnotationDescriptor().getAttribute( name );
+		}
+		//noinspection unchecked
+		return (V) value;
+	}
 
 	/**
 	 * The value of the named annotation attribute

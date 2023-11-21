@@ -45,27 +45,13 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 	}
 
 	@Override
-	public <V> V getAttributeValue(String name) {
-		if ( values == null ) {
-			return null;
+	public <V> V findAttributeValue(String name) {
+		if ( values != null ) {
+			//noinspection unchecked
+			return (V) values.get( name );
 		}
 
-		//noinspection unchecked
-		final V value = (V) values.get( name );
-		if ( value == null ) {
-			// this is unusual...
-			if ( annotationDescriptor.getAttribute( name ) == null ) {
-				throw new UnknownAnnotationAttributeException(
-						String.format(
-								Locale.ROOT,
-								"Unknown attribute `%s` for annotation `%s`",
-								name,
-								getAnnotationType().getName()
-						)
-				);
-			}
-		}
-		return value;
+		return null;
 	}
 
 	@Override

@@ -79,7 +79,7 @@ public class AnnotationDescriptorImpl<A extends Annotation> extends AbstractAnno
 	}
 
 	@Override
-	public <V> AttributeDescriptor<V> getAttribute(String name) {
+	public <V> AttributeDescriptor<V> findAttribute(String name) {
 		for ( int i = 0; i < attributeDescriptors.size(); i++ ) {
 			final AttributeDescriptor<?> attributeDescriptor = attributeDescriptors.get( i );
 			if ( attributeDescriptor.getName().equals( name ) ) {
@@ -87,7 +87,7 @@ public class AnnotationDescriptorImpl<A extends Annotation> extends AbstractAnno
 				return (AttributeDescriptor<V>) attributeDescriptor;
 			}
 		}
-		throw new UnknownAnnotationAttributeException( annotationType, name );
+		return null;
 	}
 
 	@Override
