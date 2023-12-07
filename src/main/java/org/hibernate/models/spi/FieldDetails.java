@@ -9,7 +9,7 @@ package org.hibernate.models.spi;
 import org.hibernate.models.internal.ModifierUtils;
 
 /**
- * Models a "{@linkplain java.lang.reflect.Field field}" in a {@link ClassDetails}
+ * Models a {@linkplain java.lang.reflect.Field field} in a {@linkplain ClassDetails class}
  *
  * @author Steve Ebersole
  */

@@ -11,6 +11,9 @@ import java.util.Locale;
 
 /**
  * Indicates an attempt to access a non-existent annotation attribute
+ * 
+ * @see org.hibernate.models.spi.AnnotationDescriptor#getAttribute 
+ * @see org.hibernate.models.spi.AnnotationUsage#getAttributeValue 
  *
  * @author Steve Ebersole
  */

@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Describes the usage of an annotation.  That is, not the
- * {@linkplain AnnotationDescriptor annotation class} itself, but
- * rather a particular usage of the annotation on one of its
+ * Describes the usage of an {@linkplain AnnotationDescriptor annotation class} on one of its
  * allowable {@linkplain AnnotationTarget targets}.
  * <p/>
  * The standard way to access values is using {@linkplain #getAttributeValue}.  Convenience

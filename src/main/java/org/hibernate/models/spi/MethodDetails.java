@@ -10,12 +10,11 @@ import java.beans.Introspector;
 import java.util.List;
 
 import org.hibernate.models.ModelsException;
-import org.hibernate.models.internal.ModifierUtils;
 
 import static org.hibernate.models.internal.ModifierUtils.isPersistableMethod;
 
 /**
- * Models a "{@linkplain java.lang.reflect.Method method}" in a {@link ClassDetails}
+ * Models a {@linkplain java.lang.reflect.Method method} in a {@linkplain ClassDetails class}.
  *
  * @author Steve Ebersole
  */

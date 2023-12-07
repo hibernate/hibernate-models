@@ -7,6 +7,11 @@
 package org.hibernate.models;
 
 /**
+ * Indicates an attempt to access an unknown class by name
+ *
+ * @see org.hibernate.models.spi.ClassDetailsRegistry#getClassDetails
+ * @see org.hibernate.models.spi.ClassLoading#classForName
+ *
  * @author Steve Ebersole
  */
 public class UnknownClassException extends ModelsException {

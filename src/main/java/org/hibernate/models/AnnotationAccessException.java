@@ -6,8 +6,12 @@
  */
 package org.hibernate.models;
 
+import org.hibernate.models.spi.AnnotationTarget;
+
 /**
- * Indicates a problem accessing annotation details from the domain model sources
+ * Indicates a problem accessing annotation details from the domain model sources.
+ *
+ * @see AnnotationTarget#getAnnotationUsage
  *
  * @author Steve Ebersole
  */

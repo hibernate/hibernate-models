@@ -19,7 +19,7 @@ public interface AnnotationDescriptorRegistry {
 	 */
 	<A extends Annotation> AnnotationDescriptor<A> getDescriptor(Class<A> javaType);
 	/**
-	 * Get the descriptor for the given annotation {@code type}, creating on via the creator if needed.
+	 * Get the descriptor for the given annotation {@code type}, creating one via the creator if needed.
 	 */
 	<A extends Annotation> AnnotationDescriptor<A> resolveDescriptor(Class<A> javaType, DescriptorCreator<A> creator);
 

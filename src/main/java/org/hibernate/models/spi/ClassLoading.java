@@ -10,6 +10,7 @@ package org.hibernate.models.spi;
 import java.net.URL;
 
 import org.hibernate.models.Incubating;
+import org.hibernate.models.UnknownClassException;
 
 /**
  * Access to load resources from a ClassLoader
@@ -23,6 +24,8 @@ public interface ClassLoading {
 	 *
 	 * @param name The name of the class
 	 * @return The {@code Class} object with the given name
+	 *
+	 * @throws UnknownClassException If no registration is found with the given {@code name}
 	 */
 	<T> Class<T> classForName(String name);
 

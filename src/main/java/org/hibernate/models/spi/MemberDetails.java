@@ -11,10 +11,10 @@ import java.lang.reflect.Member;
 import org.hibernate.models.internal.ModifierUtils;
 
 /**
- * Details about a "{@linkplain Member member}" while processing annotations.
+ * Models a {@linkplain Member member} in a {@linkplain ClassDetails class} while processing annotations.
  *
- * @apiNote This can be a virtual member, meaning there is no physical
- * member in the declaring type (which itself might be virtual)
+ * @apiNote This can be a virtual member, meaning there is no physical member in the declaring type
+ * (which itself might be virtual)
  *
  * @author Steve Ebersole
  */
