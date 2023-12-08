@@ -64,6 +64,6 @@ public interface MethodDetails extends MemberDetails {
 			return Introspector.decapitalize( methodName.substring( 3 ) );
 		}
 
-		throw new ModelsException( "Could not determine attribute name from method - " + methodName );
+		return null;
 	}
 }

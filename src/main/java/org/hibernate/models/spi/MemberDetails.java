@@ -81,7 +81,14 @@ public interface MemberDetails extends AnnotationTarget {
 	boolean isPersistable();
 
 	/**
-	 * For members representing attributes, determine the attribute name
+	 * For members potentially representing attributes based on naming patterns, determine the attribute name.
+	 * Return {@code null} if the name does not match the pattern for an attribute name.
+	 *
+	 * @return The potential attribute name, or {@code null}.
+	 *
+	 * @apiNote For a {@linkplain Kind#FIELD field}, this will be the name of the field;
+	 * for a {@linkplain Kind#METHOD method}, this will be the name as determined by the
+	 * Java Bean naming pattern.
 	 */
 	String resolveAttributeName();
 
