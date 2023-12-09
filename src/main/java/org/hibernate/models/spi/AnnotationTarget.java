@@ -33,6 +33,11 @@ public interface AnnotationTarget {
 	String getName();
 
 	/**
+	 * Whether the given annotation is used on this target
+	 */
+	<A extends Annotation> boolean hasAnnotationUsage(Class<A> type);
+
+	/**
 	 * Get the usage of the given annotation on this target.
 	 * <p/>
 	 * For {@linkplain Repeatable repeatable} annotation types (e.g. {@code @NamedQuery}), this method will either-<ul>

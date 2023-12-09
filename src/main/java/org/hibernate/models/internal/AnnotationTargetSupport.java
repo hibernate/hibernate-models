@@ -23,6 +23,11 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> getUsageMap();
 
 	@Override
+	default <A extends Annotation> boolean hasAnnotationUsage(Class<A> type) {
+		return getUsageMap().containsKey( type );
+	}
+
+	@Override
 	default <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> descriptor) {
 		return AnnotationUsageHelper.getUsage( descriptor, getUsageMap() );
 	}

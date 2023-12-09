@@ -94,6 +94,10 @@ public class VoidClassDetails implements ClassDetails {
 	public void forEachMethod(IndexedConsumer<MethodDetails> consumer) {
 	}
 
+	@Override
+	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type) {
+		return false;
+	}
 
 	@Override
 	public <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> descriptor) {

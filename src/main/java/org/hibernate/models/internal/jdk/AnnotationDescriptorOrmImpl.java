@@ -91,6 +91,11 @@ public class AnnotationDescriptorOrmImpl<A extends Annotation> implements Annota
 	}
 
 	@Override
+	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type) {
+		return false;
+	}
+
+	@Override
 	public <X extends Annotation> AnnotationUsage<X> getAnnotationUsage(AnnotationDescriptor<X> descriptor) {
 		// there are none
 		return null;

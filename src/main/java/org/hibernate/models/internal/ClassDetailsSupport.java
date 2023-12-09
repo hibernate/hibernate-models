@@ -9,7 +9,6 @@ package org.hibernate.models.internal;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.spi.AnnotationDescriptor;
