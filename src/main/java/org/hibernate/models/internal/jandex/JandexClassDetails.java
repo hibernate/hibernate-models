@@ -17,6 +17,7 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationTarget;
@@ -24,6 +25,7 @@ import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.MethodInfo;
+import org.jboss.jandex.RecordComponentInfo;
 
 import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
 
@@ -38,6 +40,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
+	private List<RecordComponentDetails> recordComponents;
 
 	public JandexClassDetails(ClassInfo classInfo, SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
@@ -97,6 +100,11 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
+	public boolean isRecord() {
+		return classInfo.isRecord();
+	}
+
+	@Override
 	public ClassDetails getSuperType() {
 		return superType;
 	}
@@ -126,6 +134,23 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	@Override
 	public void addField(FieldDetails fieldDetails) {
 		getFields().add( fieldDetails );
+	}
+
+	@Override
+	public List<RecordComponentDetails> getRecordComponents() {
+		if ( recordComponents == null ) {
+			recordComponents = resolveRecordComponents();
+		}
+		return recordComponents;
+	}
+
+	private List<RecordComponentDetails> resolveRecordComponents() {
+		final List<RecordComponentInfo> componentInfoList = classInfo.recordComponents();
+		final List<RecordComponentDetails> result = CollectionHelper.arrayList( componentInfoList.size() );
+		for ( RecordComponentInfo componentInfo : componentInfoList ) {
+			result.add( new JandexRecordComponentDetails( componentInfo, getBuildingContext() ) );
+		}
+		return result;
 	}
 
 	@Override

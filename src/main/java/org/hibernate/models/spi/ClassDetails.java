@@ -48,6 +48,11 @@ public interface ClassDetails extends AnnotationTarget {
 	boolean isAbstract();
 
 	/**
+	 * Where the class is a Java record
+	 */
+	boolean isRecord();
+
+	/**
 	 * Details for the class that is the super type for this class.
 	 */
 	ClassDetails getSuperType();
@@ -105,6 +110,33 @@ public interface ClassDetails extends AnnotationTarget {
 	 * Visit each method
 	 */
 	void forEachMethod(IndexedConsumer<MethodDetails> consumer);
+
+	/**
+	 * Get the record components for this class
+	 */
+	List<RecordComponentDetails> getRecordComponents();
+
+	/**
+	 * Find a record component by check
+	 */
+	default RecordComponentDetails findRecordComponent(Predicate<RecordComponentDetails> check) {
+		final List<RecordComponentDetails> components = getRecordComponents();
+		for ( int i = 0; i < components.size(); i++ ) {
+			final RecordComponentDetails component = components.get( i );
+			if ( check.test( component ) ) {
+				return component;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Find a record component by name
+	 */
+	default RecordComponentDetails findRecordComponentByName(String name) {
+		assert name != null;
+		return findRecordComponent( component -> name.equals( component.getName() ) );
+	}
 
 	/**
 	 * Know what you are doing before calling this method

@@ -9,6 +9,7 @@ package org.hibernate.models.internal.jdk;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import static org.hibernate.models.internal.jdk.JdkBuilders.buildMethodDetails;
@@ -38,6 +40,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
+	private List<RecordComponentDetails> recordComponents;
 
 	public JdkClassDetails(
 			Class<?> managedClass,
@@ -86,6 +89,11 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	@Override
 	public boolean isAbstract() {
 		return Modifier.isAbstract( managedClass.getModifiers() );
+	}
+
+	@Override
+	public boolean isRecord() {
+		return managedClass.isRecord();
 	}
 
 	@Override
@@ -157,6 +165,21 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	@Override
 	public void addMethod(MethodDetails methodDetails) {
 		getMethods().add( methodDetails );
+	}
+
+	@Override
+	public List<RecordComponentDetails> getRecordComponents() {
+		if ( !isRecord() ) {
+			return Collections.emptyList();
+		}
+		if ( recordComponents == null ) {
+			final RecordComponent[] jdkRecordComponents = managedClass.getRecordComponents();
+			recordComponents = CollectionHelper.arrayList( jdkRecordComponents.length );
+			for ( int i = 0; i < jdkRecordComponents.length; i++ ) {
+				recordComponents.add( new JdkRecordComponentDetails( jdkRecordComponents[i], getBuildingContext() ) );
+			}
+		}
+		return recordComponents;
 	}
 
 	@Override

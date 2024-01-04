@@ -17,6 +17,7 @@ import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 
 /**
  * Specialization of ClassDetails to model both {@code void} and {@code Void}
@@ -67,6 +68,11 @@ public class VoidClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public boolean isRecord() {
+		return false;
+	}
+
+	@Override
 	public ClassDetails getSuperType() {
 		return null;
 	}
@@ -92,6 +98,11 @@ public class VoidClassDetails implements ClassDetails {
 
 	@Override
 	public void forEachMethod(IndexedConsumer<MethodDetails> consumer) {
+	}
+
+	@Override
+	public List<RecordComponentDetails> getRecordComponents() {
+		return Collections.emptyList();
 	}
 
 	@Override

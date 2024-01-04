@@ -14,6 +14,7 @@ import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
@@ -67,6 +68,11 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
+	public boolean isRecord() {
+		return false;
+	}
+
+	@Override
 	public ClassDetails getSuperType() {
 		return superType;
 	}
@@ -101,6 +107,11 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 		}
 
 		return methods;
+	}
+
+	@Override
+	public List<RecordComponentDetails> getRecordComponents() {
+		return Collections.emptyList();
 	}
 
 	public void addMethod(MethodDetails methodDetails) {

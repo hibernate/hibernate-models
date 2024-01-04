@@ -165,6 +165,7 @@ public interface AnnotationTarget {
 		CLASS( ElementType.TYPE ),
 		FIELD( ElementType.FIELD ),
 		METHOD( ElementType.METHOD ),
+		RECORD_COMPONENT( ElementType.RECORD_COMPONENT ),
 		PACKAGE( ElementType.PACKAGE );
 
 		private final ElementType elementType;

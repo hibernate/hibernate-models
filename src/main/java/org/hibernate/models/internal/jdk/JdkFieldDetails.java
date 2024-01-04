@@ -8,7 +8,6 @@ package org.hibernate.models.internal.jdk;
 
 import java.lang.reflect.Field;
 
-import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;

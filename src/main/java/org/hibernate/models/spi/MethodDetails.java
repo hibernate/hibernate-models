@@ -9,8 +9,6 @@ package org.hibernate.models.spi;
 import java.beans.Introspector;
 import java.util.List;
 
-import org.hibernate.models.ModelsException;
-
 import static org.hibernate.models.internal.ModifierUtils.isPersistableMethod;
 
 /**
