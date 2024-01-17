@@ -17,6 +17,7 @@ import java.util.List;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.util.ArrayHelper;
 import org.hibernate.models.internal.util.CollectionHelper;
+import org.hibernate.models.internal.util.TypeHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
@@ -78,6 +79,11 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	@Override
 	public String getClassName() {
 		return managedClass.getName();
+	}
+
+	@Override
+	public boolean isResolved() {
+		return TypeHelper.isResolved( managedClass );
 	}
 
 	@Override

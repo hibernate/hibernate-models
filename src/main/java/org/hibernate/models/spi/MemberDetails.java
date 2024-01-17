@@ -35,6 +35,20 @@ public interface MemberDetails extends AnnotationTarget {
 	ClassDetails getType();
 
 	/**
+	 * Whether the {@linkplain #getType() type} of this member, if one, is
+	 * considered {@linkplain ClassDetails#isResolved() resolved}.
+	 *
+	 * @return {@code true} when there is a type for this member, and that type is resolved; {@code false} otherwise.
+	 */
+	default boolean isTypeResolved() {
+		final ClassDetails type = getType();
+		if ( type == null ) {
+			return false;
+		}
+		return type.isResolved();
+	}
+
+	/**
 	 * Access to the member modifier flags.
 	 *
 	 * @see Member#getModifiers()

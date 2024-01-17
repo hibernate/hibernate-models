@@ -12,6 +12,8 @@ import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.spi.ClassLoading;
 
 /**
+ * ClassLoading which simply uses our ClassLoader directly
+ *
  * @author Steve Ebersole
  */
 public class SimpleClassLoading implements ClassLoading {

@@ -52,6 +52,11 @@ public class VoidClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public boolean isResolved() {
+		return true;
+	}
+
+	@Override
 	public <X> Class<X> toJavaClass() {
 		//noinspection unchecked
 		return (Class<X>) voidType;

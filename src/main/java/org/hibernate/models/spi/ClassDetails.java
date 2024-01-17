@@ -43,6 +43,14 @@ public interface ClassDetails extends AnnotationTarget {
 	}
 
 	/**
+	 * Whether the {@linkplain Class}, if one, represented by this ClassDetails is
+	 * already loaded on the {@linkplain ClassLoader} used for {@linkplain ClassLoading loading}.
+	 *
+	 * @return {@code true} when there is a physical backing class, and it is loaded; {@code false} otherwise.
+	 */
+	boolean isResolved();
+
+	/**
 	 * Whether the class should be considered abstract.
 	 */
 	boolean isAbstract();

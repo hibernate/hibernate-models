@@ -95,6 +95,11 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
+	public boolean isResolved() {
+		return false;
+	}
+
+	@Override
 	public boolean isAbstract() {
 		return Modifier.isAbstract( classInfo.flags() );
 	}
