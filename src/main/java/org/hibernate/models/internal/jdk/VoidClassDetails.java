@@ -132,6 +132,11 @@ public class VoidClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public <A extends Annotation> AnnotationUsage<A> locateAnnotationUsage(Class<A> type) {
+		return null;
+	}
+
+	@Override
 	public <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(AnnotationDescriptor<A> type) {
 		return null;
 	}

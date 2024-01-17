@@ -123,6 +123,29 @@ public class AnnotationUsageTests {
 	}
 
 	@Test
+	void testCompositionsWithJandex() {
+		compositionChecks( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testCompositionsWithoutJandex() {
+		compositionChecks( null );
+	}
+
+	private void compositionChecks(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final AnnotationDescriptorRegistry descriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+
+		assertThat( classDetails.hasAnnotationUsage( CustomMetaAnnotation.class ) ).isFalse();
+		assertThat( classDetails.getAnnotationUsage( CustomMetaAnnotation.class ) ).isNull();
+		assertThat( classDetails.locateAnnotationUsage( CustomMetaAnnotation.class ) ).isNotNull();
+	}
+
+
+	@Test
 	void testNamedAnnotationAccessWithJandex() {
 		namedAnnotationAccessChecks( buildJandexIndex( SimpleEntity.class ) );
 	}

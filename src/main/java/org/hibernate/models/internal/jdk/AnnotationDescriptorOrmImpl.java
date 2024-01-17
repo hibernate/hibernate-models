@@ -111,6 +111,12 @@ public class AnnotationDescriptorOrmImpl<A extends Annotation> implements Annota
 	}
 
 	@Override
+	public <X extends Annotation> AnnotationUsage<X> locateAnnotationUsage(Class<X> type) {
+		// there are none
+		return null;
+	}
+
+	@Override
 	public <X extends Annotation> List<AnnotationUsage<X>> getRepeatedAnnotationUsages(AnnotationDescriptor<X> type) {
 		// there are none
 		return null;
