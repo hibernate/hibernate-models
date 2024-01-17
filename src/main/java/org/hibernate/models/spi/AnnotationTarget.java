@@ -81,26 +81,6 @@ public interface AnnotationTarget {
 	/**
 	 * Form of {@linkplain #getAnnotationUsage} which also considers meta-annotations -
 	 * annotations on the classes of each {@linkplain #getAllAnnotationUsages() local annotation}.
-	 *
-	 * E.g., given
-	 *
-	 * ```java
-	 * @Nationalized
-	 * @interface SpecialBasic {
-	 *     ..
-	 * }
-	 *
-	 * @Entity
-	 * class Book {
-	 *     ...
-	 *     @Basic(..)
-	 *     @SpecialBasic(..)
-	 *     String isbn;
-	 * }
-	 * ```
-	 *
-	 * - getAnnotationUsage(Nationalized.class) -> null
-	 * - locateAnnotationUsage(Nationalized.class) -> the one from its @SpecialBasic
 	 */
 	<A extends Annotation> AnnotationUsage<A> locateAnnotationUsage(Class<A> type);
 
