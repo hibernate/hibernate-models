@@ -7,6 +7,7 @@
 package org.hibernate.models.internal.jdk;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -107,6 +108,11 @@ public class VoidClassDetails implements ClassDetails {
 
 	@Override
 	public List<RecordComponentDetails> getRecordComponents() {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public Collection<AnnotationUsage<?>> getAllAnnotationUsages() {
 		return Collections.emptyList();
 	}
 

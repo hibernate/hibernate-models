@@ -7,6 +7,8 @@
 package org.hibernate.models.internal.jdk;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,10 +35,6 @@ public class AnnotationDescriptorOrmImpl<A extends Annotation> implements Annota
 	private final AnnotationDescriptor<?> repeatableContainer;
 
 	private final List<AttributeDescriptor<?>> attributeDescriptors;
-
-	public AnnotationDescriptorOrmImpl(Class<A> annotationType) {
-		this( annotationType, null );
-	}
 
 	public AnnotationDescriptorOrmImpl(Class<A> annotationType, AnnotationDescriptor<?> repeatableContainer) {
 		this.annotationType = annotationType;
@@ -91,7 +89,12 @@ public class AnnotationDescriptorOrmImpl<A extends Annotation> implements Annota
 	}
 
 	@Override
-	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type) {
+	public Collection<AnnotationUsage<?>> getAllAnnotationUsages() {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public <X extends Annotation> boolean hasAnnotationUsage(Class<X> type) {
 		return false;
 	}
 

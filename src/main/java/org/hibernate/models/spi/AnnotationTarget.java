@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Target;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
@@ -31,6 +32,15 @@ public interface AnnotationTarget {
 	 * A descriptive name for the target used mostly for logging
 	 */
 	String getName();
+
+	/**
+	 * Access to all the annotations used on this target.
+	 */
+	Collection<AnnotationUsage<?>> getAllAnnotationUsages();
+
+	default void forAllAnnotationUsages(Consumer<AnnotationUsage<?>> consumer) {
+		getAllAnnotationUsages().forEach( consumer );
+	}
 
 	/**
 	 * Whether the given annotation is used on this target

@@ -7,6 +7,7 @@
 package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -21,6 +22,11 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	SourceModelBuildingContext getBuildingContext();
 	Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> getUsageMap();
+
+	@Override
+	default Collection<AnnotationUsage<?>> getAllAnnotationUsages() {
+		return getUsageMap().values();
+	}
 
 	@Override
 	default <A extends Annotation> boolean hasAnnotationUsage(Class<A> type) {

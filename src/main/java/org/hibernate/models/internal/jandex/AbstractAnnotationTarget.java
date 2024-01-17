@@ -7,6 +7,7 @@
 package org.hibernate.models.internal.jandex;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationTargetSupport;

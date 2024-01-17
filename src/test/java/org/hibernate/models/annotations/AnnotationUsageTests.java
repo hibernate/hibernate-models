@@ -55,6 +55,14 @@ public class AnnotationUsageTests {
 
 		final AnnotationUsage<CustomMetaAnnotation> metaUsage = descriptor.getAnnotationUsage( metaDescriptor );
 		assertThat( metaUsage ).isNotNull();
+
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
+		// NOTE : the 2 @NamedQuery refs get bundled into 1 @NamedQueries
+		assertThat( classDetails.getAllAnnotationUsages() ).hasSize( 7 );
+
+		assertThat( classDetails.findFieldByName( "id" ).getAllAnnotationUsages() ).hasSize( 3 );
+		assertThat( classDetails.findFieldByName( "name" ).getAllAnnotationUsages() ).hasSize( 3 );
+		assertThat( classDetails.findFieldByName( "name2" ).getAllAnnotationUsages() ).hasSize( 2 );
 	}
 
 	@Test
@@ -99,9 +107,11 @@ public class AnnotationUsageTests {
 		assertThat( customMetaAnnotationUsage ).isNotNull();
 		assertThat( customMetaAnnotationUsage.getString( "someValue" ) ).isEqualTo( "abc" );
 
+		assertThat( classDetails.hasAnnotationUsage( Entity.class ) ).isTrue();
 		final AnnotationUsage<Entity> entityAnn = classDetails.getAnnotationUsage( Entity.class );
 		assertThat( entityAnn.getString( "name" ) ).isEqualTo( "SimpleColumnEntity" );
 
+		assertThat( classDetails.hasAnnotationUsage( Cache.class ) ).isTrue();
 		final AnnotationUsage<Cache> cacheAnn = classDetails.getAnnotationUsage( Cache.class );
 		assertThat( cacheAnn.getEnum( "usage", CacheConcurrencyStrategy.class ) ).isEqualTo( CacheConcurrencyStrategy.READ_ONLY );
 
