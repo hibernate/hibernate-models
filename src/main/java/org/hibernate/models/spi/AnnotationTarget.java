@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -130,6 +131,20 @@ public interface AnnotationTarget {
 	 * Helper form of {@link #forEachAnnotationUsage(AnnotationDescriptor, Consumer)}
 	 */
 	<X extends Annotation> void forEachAnnotationUsage(Class<X> type, Consumer<AnnotationUsage<X>> consumer);
+
+	/**
+	 * Returns all annotations on this target where the annotation class is annotated with `metaAnnotationType`.
+	 */
+	default List<AnnotationUsage<?>> getMetaAnnotated(Class<? extends Annotation> metaAnnotationType) {
+		final List<AnnotationUsage<?>> usages = new ArrayList<>();
+		forAllAnnotationUsages( (usage) -> {
+			final AnnotationUsage<? extends Annotation> metaUsage = usage.getAnnotationDescriptor().getAnnotationUsage( metaAnnotationType );
+			if ( metaUsage != null ) {
+				usages.add( usage );
+			}
+		} );
+		return usages;
+	}
 
 	/**
 	 * Get a usage of the given annotation {@code type} whose {@code attributeToMatch} attribute value

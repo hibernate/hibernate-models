@@ -142,6 +142,9 @@ public class AnnotationUsageTests {
 		assertThat( classDetails.hasAnnotationUsage( CustomMetaAnnotation.class ) ).isFalse();
 		assertThat( classDetails.getAnnotationUsage( CustomMetaAnnotation.class ) ).isNull();
 		assertThat( classDetails.locateAnnotationUsage( CustomMetaAnnotation.class ) ).isNotNull();
+
+		assertThat( classDetails.getMetaAnnotated( CustomMetaAnnotation.class ) ).hasSize( 1 );
+		assertThat( classDetails.getMetaAnnotated( CustomAnnotation.class ) ).isEmpty();
 	}
 
 
