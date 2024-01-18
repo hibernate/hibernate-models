@@ -10,8 +10,10 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.models.UnknownAnnotationAttributeException;
+import org.hibernate.models.internal.dynamic.DynamicAnnotationUsage;
 
 /**
  * Describes an annotation type (the Class)
@@ -77,5 +79,33 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 		}
 
 		throw new UnknownAnnotationAttributeException( getAnnotationType(), name );
+	}
+
+	/**
+	 * Create a usage of this annotation with all attribute values defaulted.
+	 *
+	 * @param target The target of the annotation being created.  May generally be {@code null}.
+	 * @param context Access to needed services
+	 */
+	default AnnotationUsage<A> createUsage(AnnotationTarget target, SourceModelBuildingContext context) {
+		final DynamicAnnotationUsage<A> usage = new DynamicAnnotationUsage<>( this, target );
+		getAttributes().forEach( (attr) -> {
+			final Object value = attr.getTypeDescriptor().createValue( attr, target, context );
+			usage.setAttributeValue( attr.getName(), value );
+		} );
+		return usage;
+	}
+
+	/**
+	 * Create a usage of this annotation with all attribute values defaulted, allowing customization prior to return.
+	 *
+	 * @param target The target of the annotation being created.  May generally be {@code null}.
+	 * @param adjuster Callback to allow adjusting the created usage prior to return.
+	 * @param context Access to needed services
+	 */
+	default AnnotationUsage<A> createUsage(AnnotationTarget target, Consumer<AnnotationUsage<A>> adjuster, SourceModelBuildingContext context) {
+		final AnnotationUsage<A> usage = createUsage( target, context );
+		adjuster.accept( usage );
+		return usage;
 	}
 }

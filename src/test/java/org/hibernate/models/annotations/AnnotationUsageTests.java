@@ -7,6 +7,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.MutableAnnotationUsage;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
+import org.hibernate.models.orm.JpaAnnotations;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AnnotationUsage;
@@ -147,6 +148,25 @@ public class AnnotationUsageTests {
 		assertThat( classDetails.getMetaAnnotated( CustomAnnotation.class ) ).isEmpty();
 	}
 
+	@Test
+	void testDynamicAttributeCreation() {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( (Index) null, SimpleEntity.class );
+		final AnnotationUsage<Column> usage = JpaAnnotations.COLUMN.createUsage( null, buildingContext );
+		// check the attribute defaults
+		assertThat( usage.getString( "name" ) ).isEqualTo( "" );
+		assertThat( usage.getString( "table" ) ).isEqualTo( "" );
+		assertThat( usage.getBoolean( "unique" ) ).isFalse();
+		assertThat( usage.getBoolean( "nullable" ) ).isTrue();
+		assertThat( usage.getBoolean( "insertable" ) ).isTrue();
+		assertThat( usage.getBoolean( "updatable" ) ).isTrue();
+		assertThat( usage.getString( "columnDefinition" ) ).isEqualTo( "" );
+		assertThat( usage.getString( "options" ) ).isEqualTo( "" );
+		assertThat( usage.getString( "comment" ) ).isEqualTo( "" );
+		assertThat( usage.getInteger( "length" ) ).isEqualTo( 255 );
+		assertThat( usage.getInteger( "precision" ) ).isEqualTo( 0 );
+		assertThat( usage.getInteger( "scale" ) ).isEqualTo( 0 );
+		assertThat( usage.getList( "check" ) ).isEmpty();
+	}
 
 	@Test
 	void testNamedAnnotationAccessWithJandex() {

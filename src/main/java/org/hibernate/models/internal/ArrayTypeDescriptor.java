@@ -7,11 +7,14 @@
 package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.models.internal.jandex.ArrayValueExtractor;
 import org.hibernate.models.internal.jandex.ArrayValueWrapper;
+import org.hibernate.models.internal.util.ArrayHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueExtractor;
@@ -44,6 +47,19 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 	public Class<List<V>> getWrappedValueType() {
 		//noinspection unchecked,rawtypes
 		return (Class) List.class;
+	}
+
+	@Override
+	public List<V> createValue(
+			AttributeDescriptor<?> attributeDescriptor,
+			AnnotationTarget target,
+			SourceModelBuildingContext context) {
+		final Object[] defaultValue = (Object[]) attributeDescriptor.getAttributeMethod().getDefaultValue();
+		if ( ArrayHelper.isEmpty( defaultValue ) ) {
+			return Collections.emptyList();
+		}
+
+		return jdkValueWrapper.wrap( defaultValue, target, context );
 	}
 
 	@Override

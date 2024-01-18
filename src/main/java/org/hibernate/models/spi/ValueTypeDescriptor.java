@@ -24,6 +24,11 @@ public interface ValueTypeDescriptor<V> {
 	Class<V> getWrappedValueType();
 
 	/**
+	 * Creates a properly typed default attribute value.  Generally used in creating dynamic annotations.
+	 */
+	V createValue(AttributeDescriptor<?> attributeDescriptor, AnnotationTarget target, SourceModelBuildingContext context);
+
+	/**
 	 * Factory for creating typed {@linkplain AttributeDescriptor} references
 	 */
 	AttributeDescriptor<V> createAttributeDescriptor(AnnotationDescriptor<?> annotationDescriptor, String attributeName);
