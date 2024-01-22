@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.members;
 
+import java.lang.reflect.Field;
+
 import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.internal.jdk.JdkClassDetails;
@@ -49,6 +51,8 @@ public class FieldDetailsTests {
 		assertThat( classDetails.getFields() ).hasSize( 10 );
 
 		final FieldDetails propertyField = classDetails.findFieldByName( "property" );
+		assertThat( propertyField.toJavaMember() ).isInstanceOf( Field.class );
+		assertThat( propertyField.toJavaMember().getName() ).isEqualTo( "property" );
 		assertThat( propertyField.resolveAttributeName() ).isEqualTo( "property" );
 		assertThat( propertyField.getType().toJavaClass() ).isEqualTo( Integer.class );
 		assertThat( propertyField.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );

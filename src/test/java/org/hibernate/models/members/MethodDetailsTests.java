@@ -6,6 +6,9 @@
  */
 package org.hibernate.models.members;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.internal.jdk.JdkMethodDetails;
@@ -54,6 +57,8 @@ public class MethodDetailsTests {
 
 			if ( method.getName().equals( "getProperty" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
+				assertThat( method.toJavaMember() ).isInstanceOf( Method.class );
+				assertThat( method.toJavaMember().getName() ).isEqualTo( "getProperty" );
 				assertThat( method.getType() ).isSameAs( method.getReturnType() );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "property" );

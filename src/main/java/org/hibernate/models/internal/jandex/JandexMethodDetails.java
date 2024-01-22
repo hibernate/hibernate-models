@@ -6,6 +6,7 @@
  */
 package org.hibernate.models.internal.jandex;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -18,6 +19,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.MethodInfo;
+import org.jboss.jandex.Type;
 
 /**
  * @author Steve Ebersole
@@ -81,6 +83,47 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	public int getModifiers() {
 		return methodInfo.flags();
 	}
+
+	private Method underlyingMethod;
+
+	@Override
+	public Method toJavaMember() {
+		if ( underlyingMethod == null ) {
+			underlyingMethod = resolveJavaMember();
+		}
+		return underlyingMethod;
+	}
+
+	private Method resolveJavaMember() {
+		final Class<?> declaringTypeClass = declaringType.toJavaClass();
+		methods: for ( Method method : declaringTypeClass.getDeclaredMethods() ) {
+			if ( !method.getName().equals( methodInfo.name() ) ) {
+				continue;
+			}
+
+			if ( method.getParameterCount() != methodInfo.parametersCount() ) {
+				continue;
+			}
+
+			for ( int i = 0; i < method.getParameterTypes().length; i++ ) {
+				final Class<?> methodParameterType = method.getParameterTypes()[i];
+				final Type expectedType = methodInfo.parameterType( i );
+				if ( !methodParameterType.getName().equals( expectedType.name().toString() ) ) {
+					continue methods;
+				}
+			}
+
+			// if we get here, we've found it
+			return method;
+		}
+
+		throw new RuntimeException(
+				String.format(
+						"Jandex FieldInfo had no corresponding Field : %s.%s",
+						declaringType.getName(),
+						methodInfo.name()
+				)
+		);	}
 
 	@Override
 	public ClassDetails getReturnType() {

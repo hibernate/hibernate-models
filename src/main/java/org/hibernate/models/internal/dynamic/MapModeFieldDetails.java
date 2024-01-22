@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.internal.dynamic;
 
+import java.lang.reflect.Member;
+
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
@@ -58,6 +60,11 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 	@Override
 	public boolean isPersistable() {
 		return true;
+	}
+
+	@Override
+	public Member toJavaMember() {
+		return null;
 	}
 
 	@Override

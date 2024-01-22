@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.internal.jandex;
 
+import java.lang.reflect.Member;
+
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
@@ -55,6 +57,12 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 	@Override
 	public int getModifiers() {
 		return recordComponentInfo.accessor().flags();
+	}
+
+	@Override
+	public Member toJavaMember() {
+		// we could maybe resolve the corresponding method...
+		return null;
 	}
 
 	@Override

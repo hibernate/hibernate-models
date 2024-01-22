@@ -6,6 +6,7 @@
  */
 package org.hibernate.models.internal.jdk;
 
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +74,11 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public Method toJavaMember() {
+		return method;
 	}
 
 	@Override

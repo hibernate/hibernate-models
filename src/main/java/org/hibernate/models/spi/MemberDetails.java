@@ -113,6 +113,15 @@ public interface MemberDetails extends AnnotationTarget {
 	 */
 	String resolveAttributeName();
 
+	/**
+	 * Access to the underlying {@linkplain Member}.  May return {@code null}.  May throw an exception.
+	 *
+	 * @return The underlying member, or {@code null} if there is no underlying member.
+	 *
+	 * @throws RuntimeException If there is expected to be a member, but it cannot be located.
+	 */
+	Member toJavaMember();
+
 	enum Visibility {
 		PUBLIC,
 		PROTECTED,

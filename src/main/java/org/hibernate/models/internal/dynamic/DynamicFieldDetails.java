@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.internal.dynamic;
 
+import java.lang.reflect.Member;
+
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
@@ -51,6 +53,11 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	@Override
 	public int getModifiers() {
 		return modifierFlags;
+	}
+
+	@Override
+	public Member toJavaMember() {
+		return null;
 	}
 
 	@Override

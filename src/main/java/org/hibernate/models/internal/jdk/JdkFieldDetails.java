@@ -7,6 +7,7 @@
 package org.hibernate.models.internal.jdk;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -45,6 +46,11 @@ public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDe
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public Field toJavaMember() {
+		return field;
 	}
 
 	@Override

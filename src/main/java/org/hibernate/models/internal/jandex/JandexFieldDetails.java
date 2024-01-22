@@ -6,6 +6,9 @@
  */
 package org.hibernate.models.internal.jandex;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
@@ -55,6 +58,33 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 	@Override
 	public int getModifiers() {
 		return fieldInfo.flags();
+	}
+
+	private Member underlyingMember;
+
+	@Override
+	public Member toJavaMember() {
+		if ( underlyingMember == null ) {
+			underlyingMember = resolveJavaMember();
+		}
+		return underlyingMember;
+	}
+
+	private Field resolveJavaMember() {
+		final Class<?> declaringJavaClass = declaringType.toJavaClass();
+		try {
+			return declaringJavaClass.getField( fieldInfo.name() );
+		}
+		catch (NoSuchFieldException e) {
+			throw new RuntimeException(
+					String.format(
+							"Jandex FieldInfo had no corresponding Field : %s.%s",
+							declaringType.getName(),
+							fieldInfo.name()
+					),
+					e
+			);
+		}
 	}
 
 	@Override

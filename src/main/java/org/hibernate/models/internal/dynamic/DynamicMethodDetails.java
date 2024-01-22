@@ -6,6 +6,7 @@
  */
 package org.hibernate.models.internal.dynamic;
 
+import java.lang.reflect.Member;
 import java.util.List;
 
 import org.hibernate.models.internal.ModifierUtils;
@@ -69,6 +70,11 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	@Override
 	public int getModifiers() {
 		return modifierFlags;
+	}
+
+	@Override
+	public Member toJavaMember() {
+		return null;
 	}
 
 	@Override

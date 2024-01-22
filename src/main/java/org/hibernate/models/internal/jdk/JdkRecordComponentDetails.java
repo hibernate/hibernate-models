@@ -7,6 +7,7 @@
 
 package org.hibernate.models.internal.jdk;
 
+import java.lang.reflect.Member;
 import java.lang.reflect.RecordComponent;
 
 import org.hibernate.models.internal.MutableMemberDetails;
@@ -48,6 +49,12 @@ public class JdkRecordComponentDetails extends AbstractAnnotationTarget implemen
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public Member toJavaMember() {
+		// we could maybe resolve the corresponding method...
+		return null;
 	}
 
 	@Override
