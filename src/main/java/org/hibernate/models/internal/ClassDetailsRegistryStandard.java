@@ -12,7 +12,8 @@ import java.util.List;
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.jandex.JandexBuilders;
 import org.hibernate.models.internal.jdk.JdkBuilders;
-import org.hibernate.models.internal.jdk.VoidClassDetails;
+import org.hibernate.models.spi.ObjectClassDetails;
+import org.hibernate.models.spi.VoidClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -37,6 +38,7 @@ public class ClassDetailsRegistryStandard extends AbstractClassDetailsRegistry {
 
 		classDetailsMap.put( VoidClassDetails.VOID_CLASS_DETAILS.getClassName(), VoidClassDetails.VOID_CLASS_DETAILS );
 		classDetailsMap.put( VoidClassDetails.VOID_OBJECT_CLASS_DETAILS.getClassName(), VoidClassDetails.VOID_OBJECT_CLASS_DETAILS );
+		classDetailsMap.put( ObjectClassDetails.OBJECT_CLASS_DETAILS.getClassName(), ObjectClassDetails.OBJECT_CLASS_DETAILS );
 	}
 
 	@Override

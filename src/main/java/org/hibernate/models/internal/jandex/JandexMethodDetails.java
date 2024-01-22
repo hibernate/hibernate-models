@@ -10,9 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.MutableMemberDetails;
-import org.hibernate.models.internal.jdk.VoidClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
@@ -20,7 +18,6 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.MethodInfo;
-import org.jboss.jandex.Type;
 
 /**
  * @author Steve Ebersole

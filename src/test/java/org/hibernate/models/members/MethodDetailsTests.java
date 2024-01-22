@@ -6,13 +6,10 @@
  */
 package org.hibernate.models.members;
 
-import java.lang.reflect.Array;
-
 import org.hibernate.models.SourceModelTestHelper;
-import org.hibernate.models.internal.ModelsLogging;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.internal.jdk.JdkMethodDetails;
-import org.hibernate.models.internal.jdk.VoidClassDetails;
+import org.hibernate.models.spi.VoidClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;

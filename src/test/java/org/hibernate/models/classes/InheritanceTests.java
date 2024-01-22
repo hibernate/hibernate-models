@@ -8,6 +8,7 @@ import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.ObjectClassDetails;
 
 import org.junit.jupiter.api.Test;
 
@@ -184,6 +185,7 @@ public class InheritanceTests {
 
 		final ClassDetails rootClassDetails = classDetailsRegistry.getClassDetails( RootClass.class.getName() );
 		assertThat( rootClassDetails.isImplementor( Intf.class ) ).isFalse();
+		assertThat( rootClassDetails.getSuperType() ).isSameAs( ObjectClassDetails.OBJECT_CLASS_DETAILS );
 
 		final ClassDetails branchClassDetails = classDetailsRegistry.getClassDetails( BranchClass.class.getName() );
 		assertThat( branchClassDetails.isImplementor( Intf.class ) ).isTrue();

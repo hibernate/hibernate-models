@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.internal.jdk;
+package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -13,15 +13,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.models.internal.util.IndexedConsumer;
-import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationUsage;
-import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.RecordComponentDetails;
 
 /**
- * Specialization of ClassDetails to model both {@code void} and {@code Void}
+ * Specialization of ClassDetails to model both {@linkplain #VOID_CLASS_DETAILS void} and {@linkplain #VOID_OBJECT_CLASS_DETAILS Void}
  *
  * @author Steve Ebersole
  */
@@ -32,7 +26,7 @@ public class VoidClassDetails implements ClassDetails {
 	public static VoidClassDetails VOID_CLASS_DETAILS = new VoidClassDetails( void.class );
 
 	/**
-	 * Models {@code Void}
+	 * Models {@linkplain Void}
 	 */
 	public static VoidClassDetails VOID_OBJECT_CLASS_DETAILS = new VoidClassDetails( Void.class );
 
