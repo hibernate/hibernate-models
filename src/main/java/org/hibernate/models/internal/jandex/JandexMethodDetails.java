@@ -26,6 +26,7 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	private final MethodInfo methodInfo;
 	private final MethodKind methodKind;
 	private final ClassDetails type;
+	private final ClassDetails declaringType;
 
 	private final ClassDetails returnType;
 	private final List<ClassDetails> argumentTypes;
@@ -34,11 +35,13 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 			MethodInfo methodInfo,
 			MethodKind methodKind,
 			ClassDetails type,
+			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.methodInfo = methodInfo;
 		this.methodKind = methodKind;
 		this.type = type;
+		this.declaringType = declaringType;
 
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 		this.returnType = classDetailsRegistry.resolveClassDetails( methodInfo.returnType().name().toString() );
@@ -67,6 +70,11 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override

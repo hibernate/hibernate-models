@@ -50,6 +50,8 @@ public class MethodDetailsTests {
 		assertThat( classDetails ).isNotNull();
 
 		classDetails.forEachMethod( (pos, method) -> {
+			assertThat( method.getDeclaringType() ).isSameAs( classDetails );
+
 			if ( method.getName().equals( "getProperty" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
 				assertThat( method.getType() ).isSameAs( method.getReturnType() );

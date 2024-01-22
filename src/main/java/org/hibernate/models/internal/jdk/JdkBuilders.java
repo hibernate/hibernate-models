@@ -138,7 +138,10 @@ public class JdkBuilders implements ClassDetailsBuilder {
 		return new JdkClassDetails( javaClass, buildingContext );
 	}
 
-	public static JdkMethodDetails buildMethodDetails(Method method, SourceModelBuildingContext buildingContext) {
+	public static JdkMethodDetails buildMethodDetails(
+			Method method,
+			ClassDetails declaringType,
+			SourceModelBuildingContext buildingContext) {
 		if ( method.getParameterCount() == 0 ) {
 			// could be a getter
 			final Class<?> returnType = method.getReturnType();
@@ -146,10 +149,10 @@ public class JdkBuilders implements ClassDetailsBuilder {
 					&& !ModifierUtils.isStatic( method.getModifiers() ) ) {
 				final String methodName = method.getName();
 				if ( methodName.startsWith( "get" ) ) {
-					return buildGetterDetails( method, returnType, buildingContext );
+					return buildGetterDetails( method, returnType, declaringType, buildingContext );
 				}
 				else if ( isBoolean( returnType ) && methodName.startsWith( "is" ) ) {
-					return buildGetterDetails( method, returnType, buildingContext );
+					return buildGetterDetails( method, returnType, declaringType, buildingContext );
 				}
 			}
 		}
@@ -158,21 +161,23 @@ public class JdkBuilders implements ClassDetailsBuilder {
 				&& isVoid( method.getReturnType() )
 				&& !ModifierUtils.isStatic( method.getModifiers() )
 				&& method.getName().startsWith( "set" ) ) {
-			return buildSetterDetails( method, method.getParameterTypes()[0], buildingContext );
+			return buildSetterDetails( method, method.getParameterTypes()[0], declaringType, buildingContext );
 		}
 
-		return new JdkMethodDetails( method, MethodDetails.MethodKind.OTHER, null, buildingContext );
+		return new JdkMethodDetails( method, MethodDetails.MethodKind.OTHER, null, declaringType, buildingContext );
 	}
 
 	public static JdkMethodDetails buildGetterDetails(
 			Method method,
 			Class<?> type,
+			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
 		assert type != null;
 		return new JdkMethodDetails(
 				method,
 				MethodDetails.MethodKind.GETTER,
 				buildingContext.getClassDetailsRegistry().resolveClassDetails( type.getName() ),
+				declaringType,
 				buildingContext
 		);
 	}
@@ -180,12 +185,14 @@ public class JdkBuilders implements ClassDetailsBuilder {
 	public static JdkMethodDetails buildSetterDetails(
 			Method method,
 			Class<?> type,
+			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
 		assert type != null;
 		return new JdkMethodDetails(
 				method,
 				MethodDetails.MethodKind.SETTER,
 				buildingContext.getClassDetailsRegistry().resolveClassDetails( type.getName() ),
+				declaringType,
 				buildingContext
 		);
 	}

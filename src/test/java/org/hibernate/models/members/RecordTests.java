@@ -10,6 +10,7 @@ package org.hibernate.models.members;
 import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +45,10 @@ public class RecordTests {
 		assertThat( classDetails ).isNotNull();
 		assertThat( classDetails.getFields() ).hasSize( 2 );
 		assertThat( classDetails.getRecordComponents() ).hasSize( 2 );
+
+		for ( RecordComponentDetails recordComponent : classDetails.getRecordComponents() ) {
+			assertThat( recordComponent.getDeclaringType() ).isSameAs( classDetails );
+		}
 	}
 
 	public record Data(Integer key, String name) {

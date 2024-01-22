@@ -17,16 +17,19 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 public class DynamicFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final String name;
 	private final ClassDetails type;
+	private final ClassDetails declaringType;
 	private final int modifierFlags;
 
 	public DynamicFieldDetails(
 			String name,
 			ClassDetails type,
+			ClassDetails declaringType,
 			int modifierFlags,
 			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.name = name;
 		this.type = type;
+		this.declaringType = declaringType;
 		this.modifierFlags = modifierFlags;
 	}
 
@@ -38,6 +41,11 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override

@@ -20,12 +20,15 @@ import org.jboss.jandex.RecordComponentInfo;
 public class JandexRecordComponentDetails extends AbstractAnnotationTarget implements RecordComponentDetails, MutableMemberDetails {
 	private final RecordComponentInfo recordComponentInfo;
 	private final ClassDetails type;
+	private final ClassDetails declaringType;
 
 	public JandexRecordComponentDetails(
 			RecordComponentInfo recordComponentInfo,
+			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.recordComponentInfo = recordComponentInfo;
+		this.declaringType = declaringType;
 		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails( recordComponentInfo.type().name().toString() );
 	}
 
@@ -42,6 +45,11 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override

@@ -19,11 +19,13 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  */
 public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final Field field;
+	private final JdkClassDetails declaringType;
 	private final ClassDetails type;
 
-	public JdkFieldDetails(Field field, SourceModelBuildingContext buildingContext) {
+	public JdkFieldDetails(Field field, JdkClassDetails declaringType, SourceModelBuildingContext buildingContext) {
 		super( field::getAnnotations, buildingContext );
 		this.field = field;
+		this.declaringType = declaringType;
 		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails(
 				field.getType().getName(),
 				(n) -> JdkBuilders.buildClassDetailsStatic( field.getType(), getBuildingContext() )
@@ -38,6 +40,11 @@ public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDe
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override

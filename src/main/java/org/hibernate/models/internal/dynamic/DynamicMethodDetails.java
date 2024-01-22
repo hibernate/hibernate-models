@@ -20,6 +20,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 public class DynamicMethodDetails extends AbstractAnnotationTarget implements MethodDetails, MutableMemberDetails {
 	private final String name;
 	private final ClassDetails type;
+	private final ClassDetails declaringType;
 	private final MethodKind methodKind;
 	private final int modifierFlags;
 
@@ -29,6 +30,7 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	public DynamicMethodDetails(
 			String name,
 			ClassDetails type,
+			ClassDetails declaringType,
 			MethodKind methodKind,
 			int modifierFlags,
 			ClassDetails returnType,
@@ -37,6 +39,7 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 		super( buildingContext );
 		this.name = name;
 		this.type = type;
+		this.declaringType = declaringType;
 		this.methodKind = methodKind;
 		this.modifierFlags = modifierFlags;
 		this.returnType = returnType;
@@ -56,6 +59,11 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override

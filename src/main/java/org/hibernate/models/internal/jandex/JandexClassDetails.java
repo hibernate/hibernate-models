@@ -131,7 +131,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		final List<FieldInfo> fieldsInfoList = classInfo.fields();
 		final List<FieldDetails> result = new ArrayList<>( fieldsInfoList.size() );
 		for ( FieldInfo fieldInfo : fieldsInfoList ) {
-			result.add( new JandexFieldDetails( fieldInfo, getBuildingContext() ) );
+			result.add( new JandexFieldDetails( fieldInfo, this, getBuildingContext() ) );
 		}
 		return result;
 	}
@@ -153,7 +153,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		final List<RecordComponentInfo> componentInfoList = classInfo.recordComponents();
 		final List<RecordComponentDetails> result = CollectionHelper.arrayList( componentInfoList.size() );
 		for ( RecordComponentInfo componentInfo : componentInfoList ) {
-			result.add( new JandexRecordComponentDetails( componentInfo, getBuildingContext() ) );
+			result.add( new JandexRecordComponentDetails( componentInfo, this, getBuildingContext() ) );
 		}
 		return result;
 	}
@@ -173,7 +173,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 			if ( methodInfo.isConstructor() || "<clinit>".equals( methodInfo.name() ) ) {
 				continue;
 			}
-			result.add( JandexBuilders.buildMethodDetails( methodInfo, getBuildingContext() ) );
+			result.add( JandexBuilders.buildMethodDetails( methodInfo, this, getBuildingContext() ) );
 		}
 		return result;
 	}

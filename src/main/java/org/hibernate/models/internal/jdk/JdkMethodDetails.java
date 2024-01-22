@@ -24,6 +24,7 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	private final Method method;
 	private final MethodKind methodKind;
 	private final ClassDetails type;
+	private final ClassDetails declaringType;
 
 	private final ClassDetails returnType;
 	private final List<ClassDetails> argumentTypes;
@@ -32,11 +33,13 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 			Method method,
 			MethodKind methodKind,
 			ClassDetails type,
+			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
 		super( method::getAnnotations, buildingContext );
 		this.method = method;
 		this.methodKind = methodKind;
 		this.type = type;
+		this.declaringType = declaringType;
 
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
@@ -65,6 +68,11 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override

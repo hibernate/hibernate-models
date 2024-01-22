@@ -25,6 +25,8 @@ public interface MemberDetails extends AnnotationTarget {
 	String getName();
 
 	/**
+	 * The member type.  May be {@code null}
+	 *
 	 * @return Returns one of:<ul>
 	 *     <li>for a field, the field type</li>
 	 *     <li>for a getter method, the return type</li>
@@ -33,6 +35,11 @@ public interface MemberDetails extends AnnotationTarget {
 	 * </ul>
 	 */
 	ClassDetails getType();
+
+	/**
+	 * The class which declares this member
+	 */
+	ClassDetails getDeclaringType();
 
 	/**
 	 * Whether the {@linkplain #getType() type} of this member, if one, is

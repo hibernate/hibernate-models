@@ -14,20 +14,21 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.FieldInfo;
 
-import static org.hibernate.models.internal.ModifierUtils.isPersistableField;
-
 /**
  * @author Steve Ebersole
  */
 public class JandexFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final FieldInfo fieldInfo;
 	private final ClassDetails type;
+	private final ClassDetails declaringType;
 
 	public JandexFieldDetails(
 			FieldInfo fieldInfo,
+			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.fieldInfo = fieldInfo;
+		this.declaringType = declaringType;
 		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails( fieldInfo.type().name().toString() );
 	}
 
@@ -44,6 +45,11 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override

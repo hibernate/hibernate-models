@@ -123,8 +123,8 @@ public class JandexBuilders implements ClassDetailsBuilder {
 
 	public static JandexMethodDetails buildMethodDetails(
 			MethodInfo method,
+			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
-
 		if ( method.parametersCount() == 0 ) {
 			// could be a getter
 			final Type returnType = method.returnType();
@@ -135,6 +135,7 @@ public class JandexBuilders implements ClassDetailsBuilder {
 							method,
 							MethodDetails.MethodKind.GETTER,
 							buildingContext.getClassDetailsRegistry().resolveClassDetails( returnType.name().toString() ),
+							declaringType,
 							buildingContext
 					);
 				}
@@ -145,6 +146,7 @@ public class JandexBuilders implements ClassDetailsBuilder {
 							method,
 							MethodDetails.MethodKind.GETTER,
 							buildingContext.getClassDetailsRegistry().resolveClassDetails( returnType.name().toString() ),
+							declaringType,
 							buildingContext
 					);
 				}
@@ -158,6 +160,7 @@ public class JandexBuilders implements ClassDetailsBuilder {
 					method,
 					MethodDetails.MethodKind.SETTER,
 					buildingContext.getClassDetailsRegistry().resolveClassDetails( method.parameterType( 0 ).name().toString() ),
+					declaringType,
 					buildingContext
 			);
 		}
@@ -166,6 +169,7 @@ public class JandexBuilders implements ClassDetailsBuilder {
 				method,
 				MethodDetails.MethodKind.OTHER,
 				null,
+				declaringType,
 				buildingContext
 		);
 	}

@@ -20,10 +20,15 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 public class JdkRecordComponentDetails extends AbstractAnnotationTarget implements RecordComponentDetails, MutableMemberDetails {
 	private final RecordComponent recordComponent;
 	private final ClassDetails type;
+	private final ClassDetails declaringType;
 
-	public JdkRecordComponentDetails(RecordComponent recordComponent, SourceModelBuildingContext buildingContext) {
+	public JdkRecordComponentDetails(
+			RecordComponent recordComponent,
+			ClassDetails declaringType,
+			SourceModelBuildingContext buildingContext) {
 		super( recordComponent::getAnnotations, buildingContext );
 		this.recordComponent = recordComponent;
+		this.declaringType = declaringType;
 		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails(
 				recordComponent.getType().getName(),
 				(n) -> JdkBuilders.buildClassDetailsStatic( recordComponent.getType(), getBuildingContext() )
@@ -38,6 +43,11 @@ public class JdkRecordComponentDetails extends AbstractAnnotationTarget implemen
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override

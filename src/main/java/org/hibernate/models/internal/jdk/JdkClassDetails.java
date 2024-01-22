@@ -145,7 +145,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 			this.fields = CollectionHelper.arrayList( reflectionFields.length );
 			for ( int i = 0; i < reflectionFields.length; i++ ) {
 				final Field reflectionField = reflectionFields[i];
-				fields.add( new JdkFieldDetails( reflectionField, getBuildingContext() ) );
+				fields.add( new JdkFieldDetails( reflectionField, this, getBuildingContext() ) );
 			}
 		}
 		return fields;
@@ -162,7 +162,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 			final Method[] reflectionMethods = managedClass.getDeclaredMethods();
 			this.methods = CollectionHelper.arrayList( reflectionMethods.length );
 			for ( int i = 0; i < reflectionMethods.length; i++ ) {
-				this.methods.add( buildMethodDetails( reflectionMethods[i], getBuildingContext() ) );
+				this.methods.add( buildMethodDetails( reflectionMethods[i], this, getBuildingContext() ) );
 			}
 		}
 		return methods;
@@ -182,7 +182,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 			final RecordComponent[] jdkRecordComponents = managedClass.getRecordComponents();
 			recordComponents = CollectionHelper.arrayList( jdkRecordComponents.length );
 			for ( int i = 0; i < jdkRecordComponents.length; i++ ) {
-				recordComponents.add( new JdkRecordComponentDetails( jdkRecordComponents[i], getBuildingContext() ) );
+				recordComponents.add( new JdkRecordComponentDetails( jdkRecordComponents[i], this, getBuildingContext() ) );
 			}
 		}
 		return recordComponents;

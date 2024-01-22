@@ -20,12 +20,19 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 	private final String name;
 	private final ClassDetails type;
 	private final int modifierFlags;
+	private final ClassDetails declaringType;
 
-	public MapModeFieldDetails(String name, ClassDetails type, int modifierFlags, SourceModelBuildingContext buildingContext) {
+	public MapModeFieldDetails(
+			String name,
+			ClassDetails type,
+			int modifierFlags,
+			ClassDetails declaringType,
+			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.name = name;
 		this.type = type;
 		this.modifierFlags = modifierFlags;
+		this.declaringType = declaringType;
 	}
 
 	@Override
@@ -36,6 +43,11 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 	@Override
 	public ClassDetails getType() {
 		return type;
+	}
+
+	@Override
+	public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override
