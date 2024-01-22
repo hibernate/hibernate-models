@@ -97,6 +97,11 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 		return resolveJdkExtractor( buildingContext );
 	}
 
+	@Override
+	public Object unwrap(AnnotationUsage<A> value) {
+		return value.toAnnotation();
+	}
+
 	public ValueExtractor<Annotation, AnnotationUsage<A>> resolveJdkExtractor(SourceModelBuildingContext buildingContext) {
 		if ( jdkExtractor == null ) {
 			jdkExtractor = new org.hibernate.models.internal.jdk.NestedValueExtractor<>( resolveJdkWrapper( buildingContext ) );

@@ -54,4 +54,9 @@ public class DoubleTypeDescriptor extends AbstractTypeDescriptor<Double> {
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(Double value) {
+		return value;
+	}
 }

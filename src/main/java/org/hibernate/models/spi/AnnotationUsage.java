@@ -54,6 +54,11 @@ public interface AnnotationUsage<A extends Annotation> {
 	AnnotationTarget getAnnotationTarget();
 
 	/**
+	 * Create the Annotation representation of this usage
+	 */
+	A toAnnotation();
+
+	/**
 	 * The value of the named annotation attribute
 	 */
 	<V> V findAttributeValue(String name);

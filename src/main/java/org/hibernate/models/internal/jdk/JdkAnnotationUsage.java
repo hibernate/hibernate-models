@@ -18,6 +18,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  * @author Steve Ebersole
  */
 public class JdkAnnotationUsage<A extends Annotation> implements MutableAnnotationUsage<A> {
+	private final A annotation;
 	private final AnnotationDescriptor<A> annotationDescriptor;
 	private final AnnotationTarget location;
 
@@ -28,6 +29,7 @@ public class JdkAnnotationUsage<A extends Annotation> implements MutableAnnotati
 			AnnotationDescriptor<A> annotationDescriptor,
 			AnnotationTarget location,
 			SourceModelBuildingContext buildingContext) {
+		this.annotation = annotation;
 		this.annotationDescriptor = annotationDescriptor;
 		this.location = location;
 
@@ -42,6 +44,11 @@ public class JdkAnnotationUsage<A extends Annotation> implements MutableAnnotati
 	@Override
 	public AnnotationTarget getAnnotationTarget() {
 		return location;
+	}
+
+	@Override
+	public A toAnnotation() {
+		return annotation;
 	}
 
 	@Override

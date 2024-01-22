@@ -54,4 +54,9 @@ public class IntegerTypeDescriptor extends AbstractTypeDescriptor<Integer> {
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(Integer value) {
+		return value;
+	}
 }

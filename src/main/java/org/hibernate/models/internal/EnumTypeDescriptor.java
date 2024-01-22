@@ -63,4 +63,9 @@ public class EnumTypeDescriptor<E extends Enum<E>> extends AbstractTypeDescripto
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(E value) {
+		return value;
+	}
 }

@@ -54,4 +54,9 @@ public class ShortTypeDescriptor extends AbstractTypeDescriptor<Short> {
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(Short value) {
+		return value;
+	}
 }

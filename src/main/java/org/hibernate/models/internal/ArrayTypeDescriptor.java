@@ -120,4 +120,13 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 		}
 		return jdkValueWrapper;
 	}
+
+	@Override
+	public Object unwrap(List<V> value) {
+		final Object[] result = new Object[value.size()];
+		for ( int i = 0; i < value.size(); i++ ) {
+			result[i] = elementTypeDescriptor.unwrap( value.get(i) );
+		}
+		return result;
+	}
 }

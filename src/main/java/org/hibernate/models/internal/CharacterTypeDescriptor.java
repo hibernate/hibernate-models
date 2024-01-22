@@ -54,4 +54,9 @@ public class CharacterTypeDescriptor extends AbstractTypeDescriptor<Character> {
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(Character value) {
+		return value;
+	}
 }

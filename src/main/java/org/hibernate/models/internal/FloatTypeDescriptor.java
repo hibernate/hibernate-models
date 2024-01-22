@@ -54,4 +54,9 @@ public class FloatTypeDescriptor extends AbstractTypeDescriptor<Float> {
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(Float value) {
+		return value;
+	}
 }

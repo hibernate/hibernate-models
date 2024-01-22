@@ -54,4 +54,9 @@ public class ByteTypeDescriptor extends AbstractTypeDescriptor<Byte> {
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(Byte value) {
+		return value;
+	}
 }

@@ -50,4 +50,9 @@ public class ClassTypeDescriptor extends AbstractTypeDescriptor<ClassDetails> {
 	public ValueExtractor<Annotation, ClassDetails> createJdkExtractor(SourceModelBuildingContext buildingContext) {
 		return org.hibernate.models.internal.jdk.ClassValueExtractor.JDK_CLASS_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(ClassDetails value) {
+		return value.toJavaClass();
+	}
 }

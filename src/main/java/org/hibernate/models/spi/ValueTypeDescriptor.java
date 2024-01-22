@@ -40,4 +40,6 @@ public interface ValueTypeDescriptor<V> {
 	ValueWrapper<V,?> createJdkWrapper(SourceModelBuildingContext buildingContext);
 
 	ValueExtractor<Annotation,V> createJdkExtractor(SourceModelBuildingContext buildingContext);
+
+	Object unwrap(V value);
 }

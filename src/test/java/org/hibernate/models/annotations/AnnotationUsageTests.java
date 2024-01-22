@@ -224,4 +224,42 @@ public class AnnotationUsageTests {
 		catch (UnknownAnnotationAttributeException expected) {
 		}
 	}
+
+	@Test
+	void testToAnnotationJandex() {
+		toAnnotationChecks( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testToAnnotationWithoutJandex() {
+		toAnnotationChecks( null );
+	}
+
+	private void toAnnotationChecks(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+
+		{
+			final AnnotationUsage<CustomAnnotation> annotationUsage = classDetails.getAnnotationUsage( CustomAnnotation.class );
+			final CustomAnnotation annotation = annotationUsage.toAnnotation();
+			assertThat( annotation ).isNotNull();
+		}
+
+		{
+			final AnnotationUsage<Entity> annotationUsage = classDetails.getAnnotationUsage( Entity.class );
+			final Entity annotation = annotationUsage.toAnnotation();
+			assertThat( annotation.name() ).isEqualTo( "SimpleColumnEntity" );
+		}
+
+		{
+			final AnnotationUsage<Column> annotationUsage = classDetails.findFieldByName( "name" ).getAnnotationUsage( Column.class );
+			final Column annotation = annotationUsage.toAnnotation();
+			assertThat( annotation.name() ).isEqualTo( "description" );
+			assertThat( annotation.table() ).isEqualTo( "" );
+			assertThat( annotation.nullable() ).isFalse();
+			assertThat( annotation.unique() ).isTrue();
+		}
+	}
 }

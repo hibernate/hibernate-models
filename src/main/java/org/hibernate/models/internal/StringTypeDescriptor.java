@@ -54,4 +54,9 @@ public class StringTypeDescriptor extends AbstractTypeDescriptor<String> {
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(String value) {
+		return value;
+	}
 }

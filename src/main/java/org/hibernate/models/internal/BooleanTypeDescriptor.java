@@ -54,4 +54,9 @@ public class BooleanTypeDescriptor extends AbstractTypeDescriptor<Boolean> {
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(Boolean value) {
+		return value;
+	}
 }

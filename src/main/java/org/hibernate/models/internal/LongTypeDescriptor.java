@@ -54,4 +54,9 @@ public class LongTypeDescriptor extends AbstractTypeDescriptor<Long> {
 		//noinspection unchecked
 		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
+
+	@Override
+	public Object unwrap(Long value) {
+		return value;
+	}
 }

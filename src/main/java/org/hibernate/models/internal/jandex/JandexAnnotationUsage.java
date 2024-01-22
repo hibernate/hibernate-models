@@ -9,6 +9,7 @@ package org.hibernate.models.internal.jandex;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+import org.hibernate.models.internal.AnnotationProxy;
 import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
@@ -54,6 +55,11 @@ public class JandexAnnotationUsage<A extends Annotation> implements MutableAnnot
 	@Override
 	public AnnotationTarget getAnnotationTarget() {
 		return annotationTarget;
+	}
+
+	@Override
+	public A toAnnotation() {
+		return AnnotationProxy.makeProxy( annotationDescriptor, attributeValueMap );
 	}
 
 	@Override
