@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.hibernate.models.UnknownAnnotationAttributeException;
-import org.hibernate.models.internal.MutableAnnotationUsage;
+import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
 

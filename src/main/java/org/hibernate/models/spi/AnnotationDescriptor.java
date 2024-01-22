@@ -87,7 +87,7 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * @param target The target of the annotation being created.  May generally be {@code null}.
 	 * @param context Access to needed services
 	 */
-	default AnnotationUsage<A> createUsage(AnnotationTarget target, SourceModelBuildingContext context) {
+	default MutableAnnotationUsage<A> createUsage(AnnotationTarget target, SourceModelBuildingContext context) {
 		final DynamicAnnotationUsage<A> usage = new DynamicAnnotationUsage<>( this, target );
 		getAttributes().forEach( (attr) -> {
 			final Object value = attr.getTypeDescriptor().createValue( attr, target, context );
@@ -103,8 +103,8 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * @param adjuster Callback to allow adjusting the created usage prior to return.
 	 * @param context Access to needed services
 	 */
-	default AnnotationUsage<A> createUsage(AnnotationTarget target, Consumer<AnnotationUsage<A>> adjuster, SourceModelBuildingContext context) {
-		final AnnotationUsage<A> usage = createUsage( target, context );
+	default MutableAnnotationUsage<A> createUsage(AnnotationTarget target, Consumer<MutableAnnotationUsage<A>> adjuster, SourceModelBuildingContext context) {
+		final MutableAnnotationUsage<A> usage = createUsage( target, context );
 		adjuster.accept( usage );
 		return usage;
 	}

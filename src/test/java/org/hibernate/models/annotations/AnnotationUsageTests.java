@@ -5,7 +5,7 @@ import java.util.List;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.models.UnknownAnnotationAttributeException;
-import org.hibernate.models.internal.MutableAnnotationUsage;
+import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.orm.JpaAnnotations;
 import org.hibernate.models.spi.AnnotationDescriptor;
