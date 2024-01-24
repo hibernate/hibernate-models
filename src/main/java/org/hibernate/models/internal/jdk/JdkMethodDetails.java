@@ -19,6 +19,8 @@ import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
+import org.jboss.jandex.Type;
+
 /**
  * @author Steve Ebersole
  */
@@ -55,15 +57,21 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 			argumentTypes.add( classDetailsRegistry.resolveClassDetails( method.getParameterTypes()[i].getName() ) );
 		}
 
-		if ( type != null ) {
-			this.isArray = method.getReturnType().isArray();
-			this.isPlural = isArray
-					|| Collection.class.isAssignableFrom( method.getReturnType() )
-					|| Map.class.isAssignableFrom( method.getReturnType() );
-		}
-		else {
-			this.isArray = false;
-			this.isPlural = false;
+
+		switch ( methodKind ) {
+			case GETTER -> {
+				this.isArray = method.getReturnType().isArray();
+				this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
+			}
+			case SETTER -> {
+				assert method.getParameterCount() == 1;
+				this.isArray = method.getParameterTypes()[0].isArray();
+				this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
+			}
+			default -> {
+				this.isArray = false;
+				this.isPlural = false;
+			}
 		}
 	}
 

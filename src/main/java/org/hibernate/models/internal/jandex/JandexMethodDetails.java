@@ -58,13 +58,20 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 			argumentTypes.add( classDetailsRegistry.resolveClassDetails( methodInfo.parameterType( i ).name().toString() ) );
 		}
 
-		if ( type != null ) {
-			this.isArray = methodInfo.returnType().kind() == Type.Kind.ARRAY;
-			this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
-		}
-		else {
-			this.isArray = false;
-			this.isPlural = false;
+		switch ( methodKind ) {
+			case GETTER -> {
+				this.isArray = methodInfo.returnType().kind() == Type.Kind.ARRAY;
+				this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
+			}
+			case SETTER -> {
+				assert methodInfo.parametersCount() == 1;
+				this.isArray = methodInfo.parameterType( 0 ).kind() == Type.Kind.ARRAY;
+				this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
+			}
+			default -> {
+				this.isArray = false;
+				this.isPlural = false;
+			}
 		}
 	}
 
