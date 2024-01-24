@@ -34,6 +34,11 @@ public class ObjectClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public String toString() {
+		return "ClassDetails(java.lang.Object)";
+	}
+
+	@Override
 	public boolean isResolved() {
 		return true;
 	}
