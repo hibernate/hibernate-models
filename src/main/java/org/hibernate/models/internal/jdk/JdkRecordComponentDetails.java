@@ -9,6 +9,8 @@ package org.hibernate.models.internal.jdk;
 
 import java.lang.reflect.Member;
 import java.lang.reflect.RecordComponent;
+import java.util.Collection;
+import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -23,6 +25,9 @@ public class JdkRecordComponentDetails extends AbstractAnnotationTarget implemen
 	private final ClassDetails type;
 	private final ClassDetails declaringType;
 
+	private final boolean isArray;
+	private final boolean isPlural;
+
 	public JdkRecordComponentDetails(
 			RecordComponent recordComponent,
 			ClassDetails declaringType,
@@ -34,6 +39,11 @@ public class JdkRecordComponentDetails extends AbstractAnnotationTarget implemen
 				recordComponent.getType().getName(),
 				(n) -> JdkBuilders.buildClassDetailsStatic( recordComponent.getType(), getBuildingContext() )
 		);
+
+		this.isArray = recordComponent.getType().isArray();
+		this.isPlural = isArray
+				|| Collection.class.isAssignableFrom( recordComponent.getType() )
+				|| Map.class.isAssignableFrom( recordComponent.getType() );
 	}
 
 	@Override
@@ -49,6 +59,16 @@ public class JdkRecordComponentDetails extends AbstractAnnotationTarget implemen
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public boolean isPlural() {
+		return isPlural;
+	}
+
+	@Override
+	public boolean isArray() {
+		return isArray;
 	}
 
 	@Override

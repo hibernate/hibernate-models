@@ -7,6 +7,8 @@
 package org.hibernate.models.internal.dynamic;
 
 import java.lang.reflect.Member;
+import java.util.Collection;
+import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -22,6 +24,9 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	private final ClassDetails declaringType;
 	private final int modifierFlags;
 
+	private final boolean isArray;
+	private final boolean isPlural;
+
 	public DynamicFieldDetails(
 			String name,
 			ClassDetails type,
@@ -33,6 +38,15 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 		this.type = type;
 		this.declaringType = declaringType;
 		this.modifierFlags = modifierFlags;
+
+		if ( type != null ) {
+			this.isArray = type.getName().startsWith( "[" );
+			this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
+		}
+		else {
+			this.isArray = false;
+			this.isPlural = false;
+		}
 	}
 
 	@Override
@@ -48,6 +62,16 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public boolean isPlural() {
+		return isPlural;
+	}
+
+	@Override
+	public boolean isArray() {
+		return isArray;
 	}
 
 	@Override

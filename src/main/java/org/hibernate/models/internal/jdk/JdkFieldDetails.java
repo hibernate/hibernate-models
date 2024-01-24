@@ -7,7 +7,8 @@
 package org.hibernate.models.internal.jdk;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
+import java.util.Collection;
+import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -23,6 +24,9 @@ public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDe
 	private final JdkClassDetails declaringType;
 	private final ClassDetails type;
 
+	private final boolean isArray;
+	private final boolean isPlural;
+
 	public JdkFieldDetails(Field field, JdkClassDetails declaringType, SourceModelBuildingContext buildingContext) {
 		super( field::getAnnotations, buildingContext );
 		this.field = field;
@@ -31,6 +35,11 @@ public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDe
 				field.getType().getName(),
 				(n) -> JdkBuilders.buildClassDetailsStatic( field.getType(), getBuildingContext() )
 		);
+
+		this.isArray = field.getType().isArray();
+		this.isPlural = isArray
+				|| Collection.class.isAssignableFrom( field.getType() )
+				|| Map.class.isAssignableFrom( field.getType() );
 	}
 
 	@Override
@@ -51,6 +60,16 @@ public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDe
 	@Override
 	public Field toJavaMember() {
 		return field;
+	}
+
+	@Override
+	public boolean isPlural() {
+		return isPlural;
+	}
+
+	@Override
+	public boolean isArray() {
+		return isArray;
 	}
 
 	@Override

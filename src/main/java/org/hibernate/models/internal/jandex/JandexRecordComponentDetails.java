@@ -7,6 +7,8 @@
 package org.hibernate.models.internal.jandex;
 
 import java.lang.reflect.Member;
+import java.util.Collection;
+import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -15,6 +17,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.RecordComponentInfo;
+import org.jboss.jandex.Type;
 
 /**
  * @author Steve Ebersole
@@ -24,6 +27,9 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 	private final ClassDetails type;
 	private final ClassDetails declaringType;
 
+	private final boolean isArray;
+	private final boolean isPlural;
+
 	public JandexRecordComponentDetails(
 			RecordComponentInfo recordComponentInfo,
 			ClassDetails declaringType,
@@ -32,6 +38,9 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 		this.recordComponentInfo = recordComponentInfo;
 		this.declaringType = declaringType;
 		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails( recordComponentInfo.type().name().toString() );
+
+		this.isArray = recordComponentInfo.type().kind() == Type.Kind.ARRAY;
+		this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
 	}
 
 	@Override
@@ -52,6 +61,16 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public boolean isPlural() {
+		return isPlural;
+	}
+
+	@Override
+	public boolean isArray() {
+		return isArray;
 	}
 
 	@Override

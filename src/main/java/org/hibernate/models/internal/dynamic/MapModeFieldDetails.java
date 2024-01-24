@@ -7,6 +7,8 @@
 package org.hibernate.models.internal.dynamic;
 
 import java.lang.reflect.Member;
+import java.util.Collection;
+import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -24,6 +26,9 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 	private final int modifierFlags;
 	private final ClassDetails declaringType;
 
+	private final boolean isArray;
+	private final boolean isPlural;
+
 	public MapModeFieldDetails(
 			String name,
 			ClassDetails type,
@@ -35,6 +40,15 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 		this.type = type;
 		this.modifierFlags = modifierFlags;
 		this.declaringType = declaringType;
+
+		if ( type != null ) {
+			this.isArray = type.getName().startsWith( "[" );
+			this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
+		}
+		else {
+			this.isArray = false;
+			this.isPlural = false;
+		}
 	}
 
 	@Override
@@ -50,6 +64,16 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public boolean isPlural() {
+		return isPlural;
+	}
+
+	@Override
+	public boolean isArray() {
+		return isArray;
 	}
 
 	@Override

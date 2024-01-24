@@ -8,8 +8,10 @@ package org.hibernate.models.internal.jandex;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -33,6 +35,9 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	private final ClassDetails returnType;
 	private final List<ClassDetails> argumentTypes;
 
+	private final boolean isArray;
+	private final boolean isPlural;
+
 	public JandexMethodDetails(
 			MethodInfo methodInfo,
 			MethodKind methodKind,
@@ -51,6 +56,15 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 		this.argumentTypes = new ArrayList<>( methodInfo.parametersCount() );
 		for ( int i = 0; i < methodInfo.parametersCount(); i++ ) {
 			argumentTypes.add( classDetailsRegistry.resolveClassDetails( methodInfo.parameterType( i ).name().toString() ) );
+		}
+
+		if ( type != null ) {
+			this.isArray = methodInfo.returnType().kind() == Type.Kind.ARRAY;
+			this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
+		}
+		else {
+			this.isArray = false;
+			this.isPlural = false;
 		}
 	}
 
@@ -77,6 +91,16 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public boolean isPlural() {
+		return isPlural;
+	}
+
+	@Override
+	public boolean isArray() {
+		return isArray;
 	}
 
 	@Override

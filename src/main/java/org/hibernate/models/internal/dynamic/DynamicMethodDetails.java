@@ -7,9 +7,10 @@
 package org.hibernate.models.internal.dynamic;
 
 import java.lang.reflect.Member;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -28,6 +29,9 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	private final ClassDetails returnType;
 	private final List<ClassDetails> argumentTypes;
 
+	private final boolean isArray;
+	private final boolean isPlural;
+
 	public DynamicMethodDetails(
 			String name,
 			ClassDetails type,
@@ -45,6 +49,15 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 		this.modifierFlags = modifierFlags;
 		this.returnType = returnType;
 		this.argumentTypes = argumentTypes;
+
+		if ( type != null ) {
+			this.isArray = type.getName().startsWith( "[" );
+			this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
+		}
+		else {
+			this.isArray = false;
+			this.isPlural = false;
+		}
 	}
 
 	@Override
@@ -65,6 +78,16 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public boolean isPlural() {
+		return isPlural;
+	}
+
+	@Override
+	public boolean isArray() {
+		return isArray;
 	}
 
 	@Override

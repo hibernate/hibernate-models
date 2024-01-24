@@ -56,6 +56,15 @@ public interface MemberDetails extends AnnotationTarget {
 	}
 
 	/**
+	 * For member's with an associated {@linkplain #getType() type}, whether that type considered plural.
+	 *
+	 * @return {@code true} When the member has a type and that type is an array or a Map or Collection inheritor
+	 */
+	boolean isPlural();
+
+	boolean isArray();
+
+	/**
 	 * Access to the member modifier flags.
 	 *
 	 * @see Member#getModifiers()

@@ -6,11 +6,12 @@
  */
 package org.hibernate.models.internal.jdk;
 
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -29,6 +30,9 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 
 	private final ClassDetails returnType;
 	private final List<ClassDetails> argumentTypes;
+
+	private final boolean isArray;
+	private final boolean isPlural;
 
 	public JdkMethodDetails(
 			Method method,
@@ -49,6 +53,17 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 		this.argumentTypes = new ArrayList<>( method.getParameterCount() );
 		for ( int i = 0; i < method.getParameterTypes().length; i++ ) {
 			argumentTypes.add( classDetailsRegistry.resolveClassDetails( method.getParameterTypes()[i].getName() ) );
+		}
+
+		if ( type != null ) {
+			this.isArray = method.getReturnType().isArray();
+			this.isPlural = isArray
+					|| Collection.class.isAssignableFrom( method.getReturnType() )
+					|| Map.class.isAssignableFrom( method.getReturnType() );
+		}
+		else {
+			this.isArray = false;
+			this.isPlural = false;
 		}
 	}
 
@@ -74,6 +89,16 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public boolean isPlural() {
+		return isPlural;
+	}
+
+	@Override
+	public boolean isArray() {
+		return isArray;
 	}
 
 	@Override

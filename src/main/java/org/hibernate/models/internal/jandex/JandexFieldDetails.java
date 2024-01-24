@@ -8,6 +8,8 @@ package org.hibernate.models.internal.jandex;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.util.Collection;
+import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -16,6 +18,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.FieldInfo;
+import org.jboss.jandex.Type;
 
 /**
  * @author Steve Ebersole
@@ -25,6 +28,9 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 	private final ClassDetails type;
 	private final ClassDetails declaringType;
 
+	private final boolean isArray;
+	private final boolean isPlural;
+
 	public JandexFieldDetails(
 			FieldInfo fieldInfo,
 			ClassDetails declaringType,
@@ -33,6 +39,9 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 		this.fieldInfo = fieldInfo;
 		this.declaringType = declaringType;
 		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails( fieldInfo.type().name().toString() );
+
+		this.isArray = fieldInfo.type().kind() == Type.Kind.ARRAY;
+		this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
 	}
 
 	@Override
@@ -53,6 +62,16 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
+	}
+
+	@Override
+	public boolean isPlural() {
+		return isPlural;
+	}
+
+	@Override
+	public boolean isArray() {
+		return isArray;
 	}
 
 	@Override
