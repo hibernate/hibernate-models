@@ -16,6 +16,7 @@ import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 /**
  * @author Steve Ebersole
@@ -83,9 +84,14 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
-	public List<ClassDetails> getImplementedInterfaceTypes() {
+	public List<TypeDetails> getImplementedInterfaceTypes() {
 		// todo : do we need these for dynamic classes?
 		return null;
+	}
+
+	@Override
+	public boolean isImplementor(Class<?> checkType) {
+		return checkType.isAssignableFrom( javaType );
 	}
 
 	@Override

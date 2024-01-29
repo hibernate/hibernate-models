@@ -15,17 +15,21 @@ import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.Type;
+
+import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.TYPE_SWITCH_STANDARD;
+import static org.hibernate.models.internal.jandex.JandexTypeSwitcher.switchType;
 
 /**
  * @author Steve Ebersole
  */
 public class JandexFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final FieldInfo fieldInfo;
-	private final ClassDetails type;
+	private final TypeDetails type;
 	private final ClassDetails declaringType;
 
 	private final boolean isArray;
@@ -38,7 +42,7 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 		super( buildingContext );
 		this.fieldInfo = fieldInfo;
 		this.declaringType = declaringType;
-		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails( fieldInfo.type().name().toString() );
+		this.type = switchType( fieldInfo.type(), TYPE_SWITCH_STANDARD, buildingContext );
 
 		this.isArray = fieldInfo.type().kind() == Type.Kind.ARRAY;
 		this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
@@ -55,7 +59,7 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 	}
 
 	@Override
-	public ClassDetails getType() {
+	public TypeDetails getType() {
 		return type;
 	}
 

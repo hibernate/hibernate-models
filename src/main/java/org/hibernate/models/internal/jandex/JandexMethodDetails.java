@@ -18,6 +18,7 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.MethodInfo;
@@ -29,7 +30,7 @@ import org.jboss.jandex.Type;
 public class JandexMethodDetails extends AbstractAnnotationTarget implements MethodDetails, MutableMemberDetails {
 	private final MethodInfo methodInfo;
 	private final MethodKind methodKind;
-	private final ClassDetails type;
+	private final TypeDetails type;
 	private final ClassDetails declaringType;
 
 	private final ClassDetails returnType;
@@ -41,7 +42,7 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	public JandexMethodDetails(
 			MethodInfo methodInfo,
 			MethodKind methodKind,
-			ClassDetails type,
+			TypeDetails type,
 			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
@@ -91,7 +92,7 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	}
 
 	@Override
-	public ClassDetails getType() {
+	public TypeDetails getType() {
 		return type;
 	}
 

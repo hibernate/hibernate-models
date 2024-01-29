@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;

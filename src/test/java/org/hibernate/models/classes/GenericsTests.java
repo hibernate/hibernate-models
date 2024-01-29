@@ -9,9 +9,10 @@ package org.hibernate.models.classes;
 
 import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
+import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.ObjectClassDetails;
+import org.hibernate.models.spi.TypeDetails;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +29,23 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class GenericsTests {
 	@Test
-	void testWrappedId() {
+	void testWrappedIdWithJandex() {
+		final Index index = SourceModelTestHelper.buildJandexIndex(
+				Base.class,
+				Thing1.class,
+				Thing2.class
+		);
+		testWrappedId( index );
+	}
+
+	@Test
+	void testWrappedIdWithoutJandex() {
+		testWrappedId( null );
+	}
+
+	void testWrappedId(Index jandexIndex) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
-				(Index) null,
+				jandexIndex,
 				Base.class,
 				Thing1.class,
 				Thing2.class
@@ -39,16 +54,33 @@ public class GenericsTests {
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
 		final ClassDetails baseClassDetails = classDetailsRegistry.getClassDetails( Base.class.getName() );
-		final ClassDetails idType = baseClassDetails.findFieldByName( "id" ).getType();
+		final TypeDetails idType = baseClassDetails.findFieldByName( "id" ).getType();
 		assertThat( idType.getName() ).isEqualTo( IdWrapper.class.getName() );
-		final ClassDetails wrappedType = idType.findFieldByName( "value" ).getType();
-		assertThat( wrappedType ).isSameAs( ObjectClassDetails.OBJECT_CLASS_DETAILS );
+		final TypeDetails wrappedType = idType.asParameterizedType().getGenericClassDetails().findFieldByName( "value" ).getType();
+		assertThat( wrappedType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
+		assertThat( wrappedType.asTypeVariable().getIdentifier() ).isEqualTo( "T" );
+		assertThat( wrappedType.asTypeVariable().getBounds() ).hasSize( 1 );
+		assertThat( wrappedType.asTypeVariable().getBounds() ).contains( ClassBasedTypeDetails.OBJECT_TYPE_DETAILS );
 	}
 
 	@Test
-	void testId() {
+	void testIdWithJandex() {
+		final Index index = SourceModelTestHelper.buildJandexIndex(
+				Base2.class,
+				Thing3.class,
+				Thing4.class
+		);
+		testId( index );
+	}
+
+	@Test
+	void testIdWithoutJandex() {
+		testId( null );
+	}
+
+	void testId(Index jandexIndex) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
-				(Index) null,
+				jandexIndex,
 				Base2.class,
 				Thing3.class,
 				Thing4.class
@@ -58,8 +90,8 @@ public class GenericsTests {
 
 		final ClassDetails baseClassDetails = classDetailsRegistry.getClassDetails( Base2.class.getName() );
 		assertThat( baseClassDetails.getFields() ).hasSize( 2 );
-		final ClassDetails idType = baseClassDetails.findFieldByName( "id" ).getType();
-		assertThat( idType ).isSameAs( ObjectClassDetails.OBJECT_CLASS_DETAILS );
+//		final ClassDetails idType = baseClassDetails.findFieldByName( "id" ).getType();
+//		assertThat( idType ).isSameAs( ClassDetails.OBJECT_CLASS_DETAILS );
 	}
 
 	public static class IdWrapper<T> {

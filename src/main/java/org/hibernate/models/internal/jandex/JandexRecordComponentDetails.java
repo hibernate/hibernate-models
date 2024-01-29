@@ -14,17 +14,21 @@ import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.RecordComponentInfo;
 import org.jboss.jandex.Type;
+
+import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.TYPE_SWITCH_STANDARD;
+import static org.hibernate.models.internal.jandex.JandexTypeSwitcher.switchType;
 
 /**
  * @author Steve Ebersole
  */
 public class JandexRecordComponentDetails extends AbstractAnnotationTarget implements RecordComponentDetails, MutableMemberDetails {
 	private final RecordComponentInfo recordComponentInfo;
-	private final ClassDetails type;
+	private final TypeDetails type;
 	private final ClassDetails declaringType;
 
 	private final boolean isArray;
@@ -37,7 +41,7 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 		super( buildingContext );
 		this.recordComponentInfo = recordComponentInfo;
 		this.declaringType = declaringType;
-		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails( recordComponentInfo.type().name().toString() );
+		this.type = switchType( recordComponentInfo.type(), TYPE_SWITCH_STANDARD, buildingContext );
 
 		this.isArray = recordComponentInfo.type().kind() == Type.Kind.ARRAY;
 		this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
@@ -54,7 +58,7 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 	}
 
 	@Override
-	public ClassDetails getType() {
+	public TypeDetails getType() {
 		return type;
 	}
 

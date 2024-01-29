@@ -18,8 +18,7 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-
-import org.jboss.jandex.Type;
+import org.hibernate.models.spi.TypeDetails;
 
 /**
  * @author Steve Ebersole
@@ -27,7 +26,7 @@ import org.jboss.jandex.Type;
 public class JdkMethodDetails extends AbstractAnnotationTarget implements MethodDetails, MutableMemberDetails {
 	private final Method method;
 	private final MethodKind methodKind;
-	private final ClassDetails type;
+	private final TypeDetails type;
 	private final ClassDetails declaringType;
 
 	private final ClassDetails returnType;
@@ -39,7 +38,7 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	public JdkMethodDetails(
 			Method method,
 			MethodKind methodKind,
-			ClassDetails type,
+			TypeDetails type,
 			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
 		super( method::getAnnotations, buildingContext );
@@ -73,6 +72,11 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 				this.isPlural = false;
 			}
 		}
+
+//		final TypeVariable<Method>[] typeParameters = method.getTypeParameters();
+//		for ( TypeVariable<Method> typeParameter : typeParameters ) {
+//			typeParameter.
+//		}
 	}
 
 	public Method getMethod() {
@@ -90,7 +94,7 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	}
 
 	@Override
-	public ClassDetails getType() {
+	public TypeDetails getType() {
 		return type;
 	}
 

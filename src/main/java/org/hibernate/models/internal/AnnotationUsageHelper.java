@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.AnnotationAccessException;
+import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationUsage;
 

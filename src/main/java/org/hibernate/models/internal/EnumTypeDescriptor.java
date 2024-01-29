@@ -11,8 +11,8 @@ import java.lang.annotation.Annotation;
 import org.hibernate.models.internal.jandex.EnumValueExtractor;
 import org.hibernate.models.internal.jandex.EnumValueWrapper;
 import org.hibernate.models.internal.jdk.PassThruExtractor;
-import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.ValueWrapper;
 
 import org.jboss.jandex.AnnotationInstance;

@@ -17,6 +17,7 @@ import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MethodDetails;
 
 import org.junit.jupiter.api.Test;
 
@@ -82,8 +83,29 @@ public class PluralMemberTests {
 			assertThat( field.isPlural() ).isTrue();
 			assertThat( field.isArray() ).isFalse();
 		}
+
+		{
+			final MethodDetails method = findMethodByName( classDetails, "randomMethod" );
+			assertThat( method.getName() ).isEqualTo( "randomMethod" );
+			// these are only valid for fields, getters and setters
+			assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.OTHER );
+			assertThat( method.isPlural() ).isFalse();
+			assertThat( method.isArray() ).isFalse();
+		}
 	}
 
+	private MethodDetails findMethodByName(
+			ClassDetails classDetails,
+			@SuppressWarnings("SameParameterValue") String methodName) {
+		for ( MethodDetails method : classDetails.getMethods() ) {
+			if ( method.getName().equals( methodName ) ) {
+				return method;
+			}
+		}
+		throw new RuntimeException( "Could not find method named " + methodName );
+	}
+
+	@SuppressWarnings({ "unused", "FieldCanBeLocal" })
 	@Entity
 	public static class SimpleEntity {
 		@Id
@@ -116,48 +138,7 @@ public class PluralMemberTests {
 			this.name = name;
 		}
 
-		public Integer getId() {
-			return id;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public Collection<String> getBagOfStrings() {
-			return bagOfStrings;
-		}
-
-		public void setBagOfStrings(Collection<String> bagOfStrings) {
-			this.bagOfStrings = bagOfStrings;
-		}
-
-		public List<String> getListOfStrings() {
-			return listOfStrings;
-		}
-
-		public void setListOfStrings(List<String> listOfStrings) {
-			this.listOfStrings = listOfStrings;
-		}
-
-		public Set<String> getSetOfStrings() {
-			return setOfStrings;
-		}
-
-		public void setSetOfStrings(Set<String> setOfStrings) {
-			this.setOfStrings = setOfStrings;
-		}
-
-		public Map<String, String> getMapOfStrings() {
-			return mapOfStrings;
-		}
-
-		public void setMapOfStrings(Map<String, String> mapOfStrings) {
-			this.mapOfStrings = mapOfStrings;
+		public void randomMethod(String[] stuff) {
 		}
 	}
 }

@@ -24,8 +24,8 @@ import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.AttributeDescriptor;
-import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ValueExtractor;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.DotName;

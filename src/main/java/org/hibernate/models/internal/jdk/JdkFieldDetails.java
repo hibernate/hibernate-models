@@ -14,6 +14,7 @@ import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 
 /**
@@ -22,7 +23,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final Field field;
 	private final JdkClassDetails declaringType;
-	private final ClassDetails type;
+	private final TypeDetails type;
 
 	private final boolean isArray;
 	private final boolean isPlural;
@@ -31,10 +32,7 @@ public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDe
 		super( field::getAnnotations, buildingContext );
 		this.field = field;
 		this.declaringType = declaringType;
-		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails(
-				field.getType().getName(),
-				(n) -> JdkBuilders.buildClassDetailsStatic( field.getType(), getBuildingContext() )
-		);
+		this.type = new JdkTrackingTypeSwitcher( buildingContext ).switchType( field.getGenericType() );
 
 		this.isArray = field.getType().isArray();
 		this.isPlural = isArray
@@ -48,7 +46,7 @@ public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDe
 	}
 
 	@Override
-	public ClassDetails getType() {
+	public TypeDetails getType() {
 		return type;
 	}
 

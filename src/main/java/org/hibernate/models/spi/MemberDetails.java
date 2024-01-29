@@ -28,32 +28,18 @@ public interface MemberDetails extends AnnotationTarget {
 	 * The member type.  May be {@code null}
 	 *
 	 * @return Returns one of:<ul>
-	 *     <li>for a field, the field type</li>
-	 *     <li>for a getter method, the return type</li>
-	 *     <li>for a setter method, the argument type</li>
-	 *     <li>otherwise, {@code null}</li>
+	 * <li>for a field, the field type</li>
+	 * <li>for a getter method, the return type</li>
+	 * <li>for a setter method, the argument type</li>
+	 * <li>otherwise, {@code null}</li>
 	 * </ul>
 	 */
-	ClassDetails getType();
+	TypeDetails getType();
 
 	/**
 	 * The class which declares this member
 	 */
 	ClassDetails getDeclaringType();
-
-	/**
-	 * Whether the {@linkplain #getType() type} of this member, if one, is
-	 * considered {@linkplain ClassDetails#isResolved() resolved}.
-	 *
-	 * @return {@code true} when there is a type for this member, and that type is resolved; {@code false} otherwise.
-	 */
-	default boolean isTypeResolved() {
-		final ClassDetails type = getType();
-		if ( type == null ) {
-			return false;
-		}
-		return type.isResolved();
-	}
 
 	/**
 	 * For member's with an associated {@linkplain #getType() type}, whether that type considered plural.

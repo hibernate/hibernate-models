@@ -13,9 +13,9 @@ import java.util.Map;
 
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
-import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
+import org.hibernate.models.spi.MutableAnnotationUsage;
 
 /**
  * @author Steve Ebersole

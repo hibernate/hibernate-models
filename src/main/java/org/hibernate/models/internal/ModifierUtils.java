@@ -10,6 +10,8 @@ import java.lang.reflect.Modifier;
 
 import org.hibernate.models.spi.MemberDetails;
 
+import static java.lang.reflect.Modifier.ABSTRACT;
+
 /**
  * Fills-in non-public aspects of the {@link Modifier} class
  *
@@ -73,6 +75,10 @@ public class ModifierUtils {
 	 */
 	public static boolean isBridge(int modifierFlags) {
 		return (modifierFlags & BRIDGE) != 0;
+	}
+
+	public static boolean isAbstract(int modifierFlags) {
+		return (modifierFlags & ABSTRACT) != 0;
 	}
 
 	/**

@@ -16,9 +16,9 @@ import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ClassLoading;
 
 import org.jboss.jandex.IndexView;
 

@@ -10,9 +10,9 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationProxy;
-import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
+import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationInstance;

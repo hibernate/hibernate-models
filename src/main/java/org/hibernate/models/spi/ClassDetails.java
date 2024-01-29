@@ -9,8 +9,8 @@ package org.hibernate.models.spi;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
-import org.hibernate.models.internal.ClassDetailsHelper;
 
 /**
  * Abstraction for what Hibernate understands about a "class", generally before it has access to
@@ -21,6 +21,26 @@ import org.hibernate.models.internal.ClassDetailsHelper;
  * @author Steve Ebersole
  */
 public interface ClassDetails extends AnnotationTarget {
+	/**
+	 * Details for {@code Object.class}
+	 */
+	ClassDetails OBJECT_CLASS_DETAILS = new SimpleClassDetails( Object.class );
+
+	/**
+	 * Details for {@code Class.class}
+	 */
+	ClassDetails CLASS_CLASS_DETAILS = new SimpleClassDetails( Class.class );
+
+	/**
+	 * Details for {@code void.class}
+	 */
+	ClassDetails VOID_CLASS_DETAILS = new SimpleClassDetails( void.class );
+
+	/**
+	 * Details for {@code Void.class}
+	 */
+	ClassDetails VOID_OBJECT_CLASS_DETAILS = new SimpleClassDetails( Void.class );
+
 	/**
 	 * The name of the class.
 	 * <p/>
@@ -68,14 +88,17 @@ public interface ClassDetails extends AnnotationTarget {
 	/**
 	 * Details for the interfaces this class implements.
 	 */
-	List<ClassDetails> getImplementedInterfaceTypes();
+	List<TypeDetails> getImplementedInterfaceTypes();
+
+//	/**
+//	 * Access to the type parameters (generics) for this class.
+//	 */
+//	List<TypeDetails> getTypeParameters();
 
 	/**
 	 * Whether the described class is an implementor of the given {@code checkType}.
 	 */
-	default boolean isImplementor(Class<?> checkType) {
-		return ClassDetailsHelper.isImplementor( checkType, this );
-	}
+	boolean isImplementor(Class<?> checkType);
 
 	/**
 	 * Get the fields for this class

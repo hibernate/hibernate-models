@@ -8,26 +8,28 @@ package org.hibernate.models.internal.jandex;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
-import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;
-import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.RecordComponentInfo;
+import org.jboss.jandex.Type;
 
+import static java.util.Collections.emptyList;
 import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
+import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.TYPE_SWITCH_STANDARD;
+import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
+import static org.hibernate.models.internal.util.CollectionHelper.isEmpty;
 
 /**
  * @author Steve Ebersole
@@ -36,7 +38,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	private final ClassInfo classInfo;
 
 	private final ClassDetails superType;
-	private final List<ClassDetails> implementedInterfaces;
+	private final List<TypeDetails> implementedInterfaces;
 
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
@@ -62,19 +64,22 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 				.resolveClassDetails( classInfo.superClassType().name().toString() );
 	}
 
-	private static List<ClassDetails> determineInterfaces(
+	private static List<TypeDetails> determineInterfaces(
 			ClassInfo classInfo,
 			SourceModelBuildingContext buildingContext) {
-		final List<DotName> interfaceNames = classInfo.interfaceNames();
-		if ( CollectionHelper.isEmpty( interfaceNames ) ) {
-			return Collections.emptyList();
+		final List<Type> interfaceTypes = classInfo.interfaceTypes();
+		if ( isEmpty( interfaceTypes ) ) {
+			return emptyList();
 		}
 
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
-		final List<ClassDetails> result = new ArrayList<>( interfaceNames.size() );
-		for ( DotName interfaceName : interfaceNames ) {
-			final ClassDetails interfaceDetails = classDetailsRegistry.resolveClassDetails( interfaceName.toString() );
-			result.add( interfaceDetails );
+		final List<TypeDetails> result = arrayList( interfaceTypes.size() );
+		for ( Type interfaceType : interfaceTypes ) {
+			final TypeDetails switchedType = JandexTypeSwitcher.switchType(
+					interfaceType,
+					TYPE_SWITCH_STANDARD,
+					buildingContext
+			);
+			result.add( switchedType );
 		}
 		return result;
 	}
@@ -115,8 +120,27 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
-	public List<ClassDetails> getImplementedInterfaceTypes() {
+	public List<TypeDetails> getImplementedInterfaceTypes() {
 		return implementedInterfaces;
+	}
+
+	@Override
+	public boolean isImplementor(Class<?> checkType) {
+		if ( getClassName().equals( checkType.getName() ) ) {
+			return true;
+		}
+
+		if ( superType != null && superType.isImplementor( checkType ) ) {
+			return true;
+		}
+
+		for ( TypeDetails intf : implementedInterfaces ) {
+			if ( intf.isImplementor( checkType ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
@@ -151,7 +175,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 	private List<RecordComponentDetails> resolveRecordComponents() {
 		final List<RecordComponentInfo> componentInfoList = classInfo.recordComponents();
-		final List<RecordComponentDetails> result = CollectionHelper.arrayList( componentInfoList.size() );
+		final List<RecordComponentDetails> result = arrayList( componentInfoList.size() );
 		for ( RecordComponentInfo componentInfo : componentInfoList ) {
 			result.add( new JandexRecordComponentDetails( componentInfo, this, getBuildingContext() ) );
 		}

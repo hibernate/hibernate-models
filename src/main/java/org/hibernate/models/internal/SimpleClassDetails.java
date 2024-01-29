@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.spi;
+
+package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -13,27 +14,28 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.models.internal.util.IndexedConsumer;
+import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.AnnotationUsage;
+import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
+import org.hibernate.models.spi.TypeDetails;
 
 /**
- * Specialization of ClassDetails to model both {@linkplain #VOID_CLASS_DETAILS void} and {@linkplain #VOID_OBJECT_CLASS_DETAILS Void}
- *
  * @author Steve Ebersole
  */
-public class VoidClassDetails implements ClassDetails {
-	/**
-	 * Models {@code void}
-	 */
-	public static VoidClassDetails VOID_CLASS_DETAILS = new VoidClassDetails( void.class );
+public class SimpleClassDetails implements ClassDetails {
+	private final Class<?> clazz;
+	private final ClassDetails superTypeDetails;
 
-	/**
-	 * Models {@linkplain Void}
-	 */
-	public static VoidClassDetails VOID_OBJECT_CLASS_DETAILS = new VoidClassDetails( Void.class );
+	public SimpleClassDetails(Class<?> clazz) {
+		this( clazz, ClassDetails.OBJECT_CLASS_DETAILS );
+	}
 
-	private final Class<?> voidType;
-
-	private VoidClassDetails(Class<?> voidType) {
-		this.voidType = voidType;
+	public SimpleClassDetails(Class<?> clazz, ClassDetails superTypeDetails) {
+		this.clazz = clazz;
+		this.superTypeDetails = superTypeDetails;
 	}
 
 	@Override
@@ -43,7 +45,23 @@ public class VoidClassDetails implements ClassDetails {
 
 	@Override
 	public String getClassName() {
-		return voidType.getName();
+		return clazz.getName();
+	}
+
+	@Override
+	public ClassDetails getSuperType() {
+		return superTypeDetails;
+	}
+
+	@Override
+	public <X> Class<X> toJavaClass() {
+		//noinspection unchecked
+		return (Class<X>) clazz;
+	}
+
+	@Override
+	public String toString() {
+		return "ClassDetails(" + clazz.getName() + ")";
 	}
 
 	@Override
@@ -52,38 +70,32 @@ public class VoidClassDetails implements ClassDetails {
 	}
 
 	@Override
-	public <X> Class<X> toJavaClass() {
-		//noinspection unchecked
-		return (Class<X>) voidType;
-	}
-
-	@Override
-	public String toString() {
-		return "ClassDetails(void)";
-	}
-
-	@Override
 	public boolean isAbstract() {
-		return false;
+		return ModifierUtils.isAbstract( clazz.getModifiers() );
 	}
 
 	@Override
 	public boolean isRecord() {
-		return false;
+		return clazz.isRecord();
 	}
 
 	@Override
-	public ClassDetails getSuperType() {
-		return null;
-	}
-
-	@Override
-	public List<ClassDetails> getImplementedInterfaceTypes() {
+	public List<TypeDetails> getImplementedInterfaceTypes() {
 		return Collections.emptyList();
 	}
 
 	@Override
+	public boolean isImplementor(Class<?> checkType) {
+		return checkType.isAssignableFrom( clazz );
+	}
+
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// we do not care about the fields, methods nor record components of these simple types
+
+	@Override
 	public List<FieldDetails> getFields() {
+		// filter out Object's fields
 		return Collections.emptyList();
 	}
 
@@ -93,6 +105,7 @@ public class VoidClassDetails implements ClassDetails {
 
 	@Override
 	public List<MethodDetails> getMethods() {
+		// filter out Object's methods
 		return Collections.emptyList();
 	}
 
@@ -104,6 +117,10 @@ public class VoidClassDetails implements ClassDetails {
 	public List<RecordComponentDetails> getRecordComponents() {
 		return Collections.emptyList();
 	}
+
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// nor do we care about its annotations
 
 	@Override
 	public Collection<AnnotationUsage<?>> getAllAnnotationUsages() {
@@ -132,12 +149,12 @@ public class VoidClassDetails implements ClassDetails {
 
 	@Override
 	public <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(AnnotationDescriptor<A> type) {
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
 	public <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(Class<A> type) {
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override

@@ -9,11 +9,13 @@ package org.hibernate.models.internal.jdk;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
 import org.hibernate.models.internal.ModifierUtils;
+import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.TypeDescriptors;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -24,6 +26,7 @@ import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 /**
@@ -97,41 +100,19 @@ public class JdkBuilders implements ClassDetailsBuilder {
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 		if ( componentTypeName.length() == 1 ) {
 			// this is a primitive array...
-			switch ( componentTypeName ) {
-				case "Z" -> {
-					return classDetailsRegistry.resolveClassDetails( "boolean" );
-				}
-				case "B" -> {
-					return classDetailsRegistry.resolveClassDetails( "byte" );
-				}
-				case "C" -> {
-					return classDetailsRegistry.resolveClassDetails( "char" );
-				}
-				case "S" -> {
-					return classDetailsRegistry.resolveClassDetails( "short" );
-				}
-				case "I" -> {
-					return classDetailsRegistry.resolveClassDetails( "int" );
-				}
-				case "J" -> {
-					return classDetailsRegistry.resolveClassDetails( "long" );
-				}
-				case "D" -> {
-					return classDetailsRegistry.resolveClassDetails( "double" );
-				}
-				case "F" -> {
-					return classDetailsRegistry.resolveClassDetails( "float" );
-				}
-			}
+			final PrimitiveKind primitiveKind = PrimitiveKind.resolveFromTypeChar( componentTypeName.charAt( 0 ) );
+			return classDetailsRegistry.resolveClassDetails( primitiveKind.getTypeName() );
 		}
 		else {
-			assert componentTypeName.startsWith( "L" ) : "Unexpected array component type prefix - " + componentTypeName;
-			assert componentTypeName.endsWith( ";" );
+			if ( !componentTypeName.startsWith( "L" ) ) {
+				throw new AssertionError( "Unexpected array component type prefix - " + componentTypeName );
+			}
+			if ( !componentTypeName.endsWith( ";" ) ) {
+				throw new AssertionError( "Unexpected array component type format : no semi-colon - " + componentTypeName );
+			}
 			final String objectComponentTypeName = componentTypeName.substring( 1, componentTypeName.length() - 1 );
-			return classDetailsRegistry.resolveClassDetails( objectComponentTypeName );
+			return classDetailsRegistry.resolveClassDetails( objectComponentTypeName.replace( '/', '.' ) );
 		}
-
-		throw new UnsupportedOperationException( "Support for non-primitive arrays not yet implemented" );
 	}
 
 	public static JdkClassDetails buildClassDetailsStatic(Class<?> javaClass, SourceModelBuildingContext buildingContext) {
@@ -149,10 +130,10 @@ public class JdkBuilders implements ClassDetailsBuilder {
 					&& !ModifierUtils.isStatic( method.getModifiers() ) ) {
 				final String methodName = method.getName();
 				if ( methodName.startsWith( "get" ) ) {
-					return buildGetterDetails( method, returnType, declaringType, buildingContext );
+					return buildGetterDetails( method, declaringType, buildingContext );
 				}
 				else if ( isBoolean( returnType ) && methodName.startsWith( "is" ) ) {
-					return buildGetterDetails( method, returnType, declaringType, buildingContext );
+					return buildGetterDetails( method, declaringType, buildingContext );
 				}
 			}
 		}
@@ -161,7 +142,7 @@ public class JdkBuilders implements ClassDetailsBuilder {
 				&& isVoid( method.getReturnType() )
 				&& !ModifierUtils.isStatic( method.getModifiers() )
 				&& method.getName().startsWith( "set" ) ) {
-			return buildSetterDetails( method, method.getParameterTypes()[0], declaringType, buildingContext );
+			return buildSetterDetails( method, declaringType, buildingContext );
 		}
 
 		return new JdkMethodDetails( method, MethodDetails.MethodKind.OTHER, null, declaringType, buildingContext );
@@ -169,39 +150,39 @@ public class JdkBuilders implements ClassDetailsBuilder {
 
 	public static JdkMethodDetails buildGetterDetails(
 			Method method,
-			Class<?> type,
 			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
-		assert type != null;
 		return new JdkMethodDetails(
 				method,
 				MethodDetails.MethodKind.GETTER,
-				buildingContext.getClassDetailsRegistry().resolveClassDetails( type.getName() ),
+				toTypeDetails( method.getGenericReturnType(), buildingContext ),
 				declaringType,
 				buildingContext
 		);
+	}
+
+	private static TypeDetails toTypeDetails(Type genericType, SourceModelBuildingContext buildingContext) {
+		return new JdkTrackingTypeSwitcher( buildingContext ).switchType( genericType );
 	}
 
 	public static JdkMethodDetails buildSetterDetails(
 			Method method,
-			Class<?> type,
 			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
-		assert type != null;
 		return new JdkMethodDetails(
 				method,
 				MethodDetails.MethodKind.SETTER,
-				buildingContext.getClassDetailsRegistry().resolveClassDetails( type.getName() ),
+				toTypeDetails( method.getGenericParameterTypes()[0], buildingContext ),
 				declaringType,
 				buildingContext
 		);
 	}
 
-	private static boolean isBoolean(Class<?> type) {
+	public static boolean isBoolean(Class<?> type) {
 		return type == boolean.class || type == Boolean.class;
 	}
 
-	private static boolean isVoid(Class<?> type) {
+	public static boolean isVoid(Class<?> type) {
 		return type == void.class || type == Void.class;
 	}
 

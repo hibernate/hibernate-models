@@ -14,6 +14,7 @@ import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 /**
  * Member used to represent map key access for dynamic models ("MAP mode")
@@ -22,7 +23,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  */
 public class MapModeFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final String name;
-	private final ClassDetails type;
+	private final TypeDetails type;
 	private final int modifierFlags;
 	private final ClassDetails declaringType;
 
@@ -31,7 +32,7 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 
 	public MapModeFieldDetails(
 			String name,
-			ClassDetails type,
+			TypeDetails type,
 			int modifierFlags,
 			ClassDetails declaringType,
 			SourceModelBuildingContext buildingContext) {
@@ -57,7 +58,7 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 	}
 
 	@Override
-	public ClassDetails getType() {
+	public TypeDetails getType() {
 		return type;
 	}
 

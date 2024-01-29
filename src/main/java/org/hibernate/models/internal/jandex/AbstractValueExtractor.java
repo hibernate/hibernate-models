@@ -7,8 +7,8 @@
 package org.hibernate.models.internal.jandex;
 
 import org.hibernate.models.spi.AnnotationTarget;
-import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ValueExtractor;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationValue;

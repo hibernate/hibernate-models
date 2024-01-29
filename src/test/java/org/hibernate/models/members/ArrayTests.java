@@ -40,103 +40,103 @@ public class ArrayTests {
 		{
 			final FieldDetails field = classDetails.findFieldByName( "intArray" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( int[].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( int[].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "intArray2" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( int[][].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( int[][].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "intArray3" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( int[][][].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( int[][][].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "charArray" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( char[].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( char[].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "charArray2" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( char[][].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( char[][].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "byteArray" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( byte[].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( byte[].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "byteArray2" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( byte[][].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( byte[][].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "booleanArray" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( boolean[].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( boolean[].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "booleanArray2" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( boolean[][].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( boolean[][].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "shortArray" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( short[].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( short[].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "shortArray2" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( short[][].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( short[][].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "longArray" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( long[].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( long[].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "longArray2" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( long[][].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( long[][].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "doubleArray" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( double[].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( double[].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "doubleArray2" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( double[][].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( double[][].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "floatArray" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( float[].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( float[].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "floatArray2" );
 			assertThat( field.isPersistable() ).isTrue();
-			assertThat( field.getType().toJavaClass() ).isEqualTo( float[][].class );
+			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( float[][].class );
 		}
 
 		assertThat( classDetailsRegistry.resolveClassDetails( "[I" ).toJavaClass() ).isEqualTo( int[].class );

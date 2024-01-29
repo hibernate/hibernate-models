@@ -16,13 +16,14 @@ import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 /**
  * @author Steve Ebersole
  */
 public class JdkRecordComponentDetails extends AbstractAnnotationTarget implements RecordComponentDetails, MutableMemberDetails {
 	private final RecordComponent recordComponent;
-	private final ClassDetails type;
+	private final TypeDetails type;
 	private final ClassDetails declaringType;
 
 	private final boolean isArray;
@@ -35,10 +36,7 @@ public class JdkRecordComponentDetails extends AbstractAnnotationTarget implemen
 		super( recordComponent::getAnnotations, buildingContext );
 		this.recordComponent = recordComponent;
 		this.declaringType = declaringType;
-		this.type = buildingContext.getClassDetailsRegistry().resolveClassDetails(
-				recordComponent.getType().getName(),
-				(n) -> JdkBuilders.buildClassDetailsStatic( recordComponent.getType(), getBuildingContext() )
-		);
+		this.type = JdkTrackingTypeSwitcher.standardSwitchType( recordComponent.getGenericType(), buildingContext );
 
 		this.isArray = recordComponent.getType().isArray();
 		this.isPlural = isArray
@@ -52,7 +50,7 @@ public class JdkRecordComponentDetails extends AbstractAnnotationTarget implemen
 	}
 
 	@Override
-	public ClassDetails getType() {
+	public TypeDetails getType() {
 		return type;
 	}
 

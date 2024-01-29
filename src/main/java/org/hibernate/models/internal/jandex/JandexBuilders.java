@@ -19,6 +19,9 @@ import org.jboss.jandex.IndexView;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.Type;
 
+import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.TYPE_SWITCH_STANDARD;
+import static org.hibernate.models.internal.jandex.JandexTypeSwitcher.switchType;
+
 /**
  * Jandex based ClassDetailsBuilder
  *
@@ -134,7 +137,7 @@ public class JandexBuilders implements ClassDetailsBuilder {
 					return new JandexMethodDetails(
 							method,
 							MethodDetails.MethodKind.GETTER,
-							buildingContext.getClassDetailsRegistry().resolveClassDetails( returnType.name().toString() ),
+							switchType( returnType, TYPE_SWITCH_STANDARD, buildingContext ),
 							declaringType,
 							buildingContext
 					);
@@ -145,7 +148,7 @@ public class JandexBuilders implements ClassDetailsBuilder {
 					return new JandexMethodDetails(
 							method,
 							MethodDetails.MethodKind.GETTER,
-							buildingContext.getClassDetailsRegistry().resolveClassDetails( returnType.name().toString() ),
+							switchType( returnType, TYPE_SWITCH_STANDARD, buildingContext ),
 							declaringType,
 							buildingContext
 					);
@@ -159,7 +162,7 @@ public class JandexBuilders implements ClassDetailsBuilder {
 			return new JandexMethodDetails(
 					method,
 					MethodDetails.MethodKind.SETTER,
-					buildingContext.getClassDetailsRegistry().resolveClassDetails( method.parameterType( 0 ).name().toString() ),
+					switchType( method.parameterType( 0 ), TYPE_SWITCH_STANDARD, buildingContext ),
 					declaringType,
 					buildingContext
 			);

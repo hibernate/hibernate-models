@@ -14,13 +14,14 @@ import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 /**
  * @author Steve Ebersole
  */
 public class DynamicFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final String name;
-	private final ClassDetails type;
+	private final TypeDetails type;
 	private final ClassDetails declaringType;
 	private final int modifierFlags;
 
@@ -29,7 +30,7 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 
 	public DynamicFieldDetails(
 			String name,
-			ClassDetails type,
+			TypeDetails type,
 			ClassDetails declaringType,
 			int modifierFlags,
 			SourceModelBuildingContext buildingContext) {
@@ -55,7 +56,7 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	}
 
 	@Override
-	public ClassDetails getType() {
+	public TypeDetails getType() {
 		return type;
 	}
 

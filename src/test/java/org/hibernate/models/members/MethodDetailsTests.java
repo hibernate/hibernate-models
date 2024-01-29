@@ -6,13 +6,11 @@
  */
 package org.hibernate.models.members;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.internal.jdk.JdkMethodDetails;
-import org.hibernate.models.spi.VoidClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -59,7 +57,6 @@ public class MethodDetailsTests {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
 				assertThat( method.toJavaMember() ).isInstanceOf( Method.class );
 				assertThat( method.toJavaMember().getName() ).isEqualTo( "getProperty" );
-				assertThat( method.getType() ).isSameAs( method.getReturnType() );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "property" );
 				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
@@ -67,15 +64,14 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "setProperty" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.SETTER );
-				assertThat( method.getReturnType() ).isEqualTo( VoidClassDetails.VOID_CLASS_DETAILS );
+				assertThat( method.getReturnType() ).isEqualTo( ClassDetails.VOID_CLASS_DETAILS );
 				assertThat( method.getArgumentTypes() ).hasSize( 1 );
-				assertThat( method.getType() ).isSameAs( method.getArgumentTypes().get(0) );
 				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 				assertThat( method.isPersistable() ).isFalse();
 			}
 			else if ( method.getName().equals( "nothing" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.OTHER );
-				assertThat( method.getReturnType() ).isEqualTo( VoidClassDetails.VOID_CLASS_DETAILS );
+				assertThat( method.getReturnType() ).isEqualTo( ClassDetails.VOID_CLASS_DETAILS );
 				assertThat( method.getType() ).isNull();
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
@@ -83,7 +79,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "something" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.OTHER );
-				assertThat( method.getReturnType() ).isEqualTo( VoidClassDetails.VOID_CLASS_DETAILS );
+				assertThat( method.getReturnType() ).isEqualTo( ClassDetails.VOID_CLASS_DETAILS );
 				assertThat( method.getType() ).isNull();
 				assertThat( method.getArgumentTypes() ).hasSize( 1 );
 				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
@@ -91,8 +87,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "isActive" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
-				assertThat( method.getType().toJavaClass() ).isEqualTo( boolean.class );
-				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getType().asPrimitiveType().getClassDetails().toJavaClass() ).isEqualTo( boolean.class );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "active" );
 				assertThat( method.isPersistable() ).isTrue();
@@ -100,8 +95,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "getByteValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
-				assertThat( method.getType().toJavaClass() ).isEqualTo( byte.class );
-				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getType().asPrimitiveType().getClassDetails().toJavaClass() ).isEqualTo( byte.class );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "byteValue" );
 				assertThat( method.isPersistable() ).isTrue();
@@ -109,8 +103,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "getShortValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
-				assertThat( method.getType().toJavaClass() ).isEqualTo( short.class );
-				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getType().asPrimitiveType().getClassDetails().toJavaClass() ).isEqualTo( short.class );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "shortValue" );
 				assertThat( method.isPersistable() ).isTrue();
@@ -118,8 +111,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "getIntValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
-				assertThat( method.getType().toJavaClass() ).isEqualTo( int.class );
-				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getType().asPrimitiveType().getClassDetails().toJavaClass() ).isEqualTo( int.class );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "intValue" );
 				assertThat( method.isPersistable() ).isTrue();
@@ -127,8 +119,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "getLongValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
-				assertThat( method.getType().toJavaClass() ).isEqualTo( long.class );
-				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getType().asPrimitiveType().getClassDetails().toJavaClass() ).isEqualTo( long.class );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "longValue" );
 				assertThat( method.isPersistable() ).isTrue();
@@ -136,8 +127,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "getDoubleValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
-				assertThat( method.getType().toJavaClass() ).isEqualTo( double.class );
-				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getType().asPrimitiveType().getClassDetails().toJavaClass() ).isEqualTo( double.class );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "doubleValue" );
 				assertThat( method.isPersistable() ).isTrue();
@@ -145,8 +135,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "getFloatValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
-				assertThat( method.getType().toJavaClass() ).isEqualTo( float.class );
-				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getType().asPrimitiveType().getClassDetails().toJavaClass() ).isEqualTo( float.class );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "floatValue" );
 				assertThat( method.isPersistable() ).isTrue();
@@ -154,8 +143,7 @@ public class MethodDetailsTests {
 			}
 			else if ( method.getName().equals( "getIntArrayValue" ) ) {
 				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.GETTER );
-				assertThat( method.getType().toJavaClass() ).isEqualTo( int[].class );
-				assertThat( method.getType() ).isSameAs( method.getReturnType() );
+				assertThat( method.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( int[].class );
 				assertThat( method.getArgumentTypes() ).isEmpty();
 				assertThat( method.resolveAttributeName() ).isEqualTo( "intArrayValue" );
 				assertThat( method.isPersistable() ).isTrue();

@@ -15,13 +15,14 @@ import org.hibernate.models.internal.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
 
 /**
  * @author Steve Ebersole
  */
 public class DynamicMethodDetails extends AbstractAnnotationTarget implements MethodDetails, MutableMemberDetails {
 	private final String name;
-	private final ClassDetails type;
+	private final TypeDetails type;
 	private final ClassDetails declaringType;
 	private final MethodKind methodKind;
 	private final int modifierFlags;
@@ -34,7 +35,7 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 
 	public DynamicMethodDetails(
 			String name,
-			ClassDetails type,
+			TypeDetails type,
 			ClassDetails declaringType,
 			MethodKind methodKind,
 			int modifierFlags,
@@ -71,7 +72,7 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	}
 
 	@Override
-	public ClassDetails getType() {
+	public TypeDetails getType() {
 		return type;
 	}
 

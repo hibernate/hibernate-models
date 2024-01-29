@@ -9,9 +9,9 @@ package org.hibernate.models.internal.jdk;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
+import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**

@@ -8,8 +8,6 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.spi.AnnotationUsage;
-
 /**
  * Specialization of AnnotationUsage allowing mutation of its attribute values
  *
