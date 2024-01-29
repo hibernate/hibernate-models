@@ -18,7 +18,7 @@ package org.hibernate.models.spi;
  * <p/>
  * For example,
  * <pre class="brush:java">
- * T extends Comparable<T>
+ * {@code T extends Comparable<T>}
  * </pre>
  * In this case, we have uses of the 2 type variable {@code T}.  The initial one
  * is modeled as a {@linkplain TypeVariableDetails}.  The second one (as part of
