@@ -7,12 +7,20 @@
 
 package org.hibernate.models.generics;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.hibernate.models.SourceModelTestHelper;
+import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
 
 import org.junit.jupiter.api.Test;
 
@@ -57,17 +65,17 @@ public class GenericsSmokeTest {
 	}
 
 	@Test
-	void testSimple2ClassWithJandex() {
+	void testParameterizedClassWithJandex() {
 		final Index index = SourceModelTestHelper.buildJandexIndex( Simple2.class );
-		testSimple2Class( index );
+		testParameterizedClass( index );
 	}
 
 	@Test
-	void testSimple2ClassWithoutJandex() {
-		testSimple2Class( null );
+	void testParameterizedClassWithoutJandex() {
+		testParameterizedClass( null );
 	}
 
-	void testSimple2Class(Index index) {
+	void testParameterizedClass(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
 				Simple2.class
@@ -81,20 +89,23 @@ public class GenericsSmokeTest {
 		assertThat( idFieldType.isImplementor( Number.class ) ).isTrue();
 		assertThat( idFieldType.isImplementor( Object.class ) ).isTrue();
 		assertThat( idFieldType.isImplementor( String.class ) ).isFalse();
+
+		final ClassTypeDetailsImpl classTypeDetails = new ClassTypeDetailsImpl( classDetails, TypeDetails.Kind.CLASS );
+		assertThat( classTypeDetails.getClassDetails() ).isSameAs( classDetails );
 	}
 
 	@Test
-	void testSimple3ClassWithJandex() {
+	void testTypeVariableReferenceJandex() {
 		final Index index = SourceModelTestHelper.buildJandexIndex( Simple3.class );
-		testSimple3Class( index );
+		testTypeVariableReference( index );
 	}
 
 	@Test
-	void testSimple3ClassWithoutJandex() {
-		testSimple3Class( null );
+	void testTypeVariableReferenceWithoutJandex() {
+		testTypeVariableReference( null );
 	}
 
-	void testSimple3Class(Index index) {
+	void testTypeVariableReference(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
 				Simple3.class
@@ -112,21 +123,21 @@ public class GenericsSmokeTest {
 	}
 
 	@Test
-	void testParameterizedClassWithJandex() {
+	void testParameterizedHierarchyWithJandex() {
 		final Index index = SourceModelTestHelper.buildJandexIndex(
 				Root.class,
 				Base1.class,
 				Base2.class
 		);
-		testParameterizedClass( index );
+		testParameterizedHierarchy( index );
 	}
 
 	@Test
-	void testParameterizedClass() {
-		testParameterizedClass( null );
+	void testParameterizedHierarchyWithoutJandex() {
+		testParameterizedHierarchy( null );
 	}
 
-	void testParameterizedClass(Index index) {
+	void testParameterizedHierarchy(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
 				Root.class,
@@ -173,18 +184,122 @@ public class GenericsSmokeTest {
 		assertThat( intArrayFieldType.isImplementor( String.class ) ).isFalse();
 	}
 
+	@Test
+	void testCollectionsWithJandex() {
+		final Index index = SourceModelTestHelper.buildJandexIndex( ClassOfCollections.class );
+		testCollections( index );
+	}
+
+	@Test
+	void testCollectionsWithoutJandex() {
+		testCollections( null );
+	}
+
+	void testCollections(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
+				index,
+				ClassOfCollections.class
+		);
+
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( ClassOfCollections.class.getName() );
+
+		{
+			final FieldDetails listOfString = classDetails.findFieldByName( "listOfString" );
+
+			assertThat( listOfString.getType() ).isInstanceOf( ParameterizedTypeDetails.class );
+			final ParameterizedTypeDetails type = (ParameterizedTypeDetails) listOfString.getType();
+			assertThat( type.isImplementor( Collection.class ) ).isTrue();
+			assertThat( type.isImplementor( List.class ) ).isTrue();
+			assertThat( type.isImplementor( Set.class ) ).isFalse();
+			assertThat( type.isImplementor( Map.class ) ).isFalse();
+
+			assertThat( type.getArguments() ).hasSize( 1 );
+			assertThat( type.getArguments().get(0) ).isInstanceOf( ClassTypeDetails.class );
+			final ClassTypeDetails elementType = (ClassTypeDetails) type.getArguments().get( 0);
+			assertThat( elementType.isImplementor( String.class ) ).isTrue();
+		}
+
+		{
+			final FieldDetails listOfT = classDetails.findFieldByName( "listOfT" );
+
+			assertThat( listOfT.getType() ).isInstanceOf( ParameterizedTypeDetails.class );
+			final ParameterizedTypeDetails type = (ParameterizedTypeDetails) listOfT.getType();
+			assertThat( type.isImplementor( Collection.class ) ).isTrue();
+			assertThat( type.isImplementor( List.class ) ).isTrue();
+			assertThat( type.isImplementor( Set.class ) ).isFalse();
+			assertThat( type.isImplementor( Map.class ) ).isFalse();
+
+			assertThat( type.getArguments() ).hasSize( 1 );
+			assertThat( type.getArguments().get(0) ).isInstanceOf( TypeVariableDetails.class );
+			final TypeVariableDetails elementType = (TypeVariableDetails) type.getArguments().get( 0);
+			assertThat( elementType.isImplementor( String.class ) ).isFalse();
+			assertThat( elementType.getIdentifier() ).isEqualTo( "T" );
+		}
+
+		{
+			final FieldDetails mapOfString = classDetails.findFieldByName( "mapOfString" );
+
+			assertThat( mapOfString.getType() ).isInstanceOf( ParameterizedTypeDetails.class );
+			final ParameterizedTypeDetails type = (ParameterizedTypeDetails) mapOfString.getType();
+			assertThat( type.isImplementor( Collection.class ) ).isFalse();
+			assertThat( type.isImplementor( List.class ) ).isFalse();
+			assertThat( type.isImplementor( Set.class ) ).isFalse();
+			assertThat( type.isImplementor( Map.class ) ).isTrue();
+
+			assertThat( type.getArguments() ).hasSize( 2 );
+
+			// key
+			assertThat( type.getArguments().get(0) ).isInstanceOf( ClassTypeDetails.class );
+			final ClassTypeDetails keyType = (ClassTypeDetails) type.getArguments().get( 0);
+			assertThat( keyType.isImplementor( String.class ) ).isTrue();
+
+			// value
+			assertThat( type.getArguments().get(1) ).isInstanceOf( ClassTypeDetails.class );
+			final ClassTypeDetails valueType = (ClassTypeDetails) type.getArguments().get( 0);
+			assertThat( valueType.isImplementor( String.class ) ).isTrue();
+		}
+
+		{
+			final FieldDetails mapOfT = classDetails.findFieldByName( "mapOfT" );
+
+			assertThat( mapOfT.getType() ).isInstanceOf( ParameterizedTypeDetails.class );
+			final ParameterizedTypeDetails type = (ParameterizedTypeDetails) mapOfT.getType();
+			assertThat( type.isImplementor( Collection.class ) ).isFalse();
+			assertThat( type.isImplementor( List.class ) ).isFalse();
+			assertThat( type.isImplementor( Set.class ) ).isFalse();
+			assertThat( type.isImplementor( Map.class ) ).isTrue();
+
+			assertThat( type.getArguments() ).hasSize( 2 );
+
+			// key
+			assertThat( type.getArguments().get(0) ).isInstanceOf( ClassTypeDetails.class );
+			final ClassTypeDetails keyType = (ClassTypeDetails) type.getArguments().get(0);
+			assertThat( keyType.isImplementor( String.class ) ).isTrue();
+
+			// value
+			assertThat( type.getArguments().get(1) ).isInstanceOf( TypeVariableDetails.class );
+			final TypeVariableDetails valueType = (TypeVariableDetails) type.getArguments().get(1);
+			assertThat( valueType.isImplementor( String.class ) ).isFalse();
+			assertThat( valueType.getIdentifier() ).isEqualTo( "T" );
+		}
+	}
+
+	@SuppressWarnings("unused")
 	static class Simple {
 		Integer id;
 	}
 
+	@SuppressWarnings("unused")
 	static class Simple2<I extends Number> {
 		I id;
 	}
 
+	@SuppressWarnings("unused")
 	static class Simple3<I extends Comparable<I>> {
 		I id;
 	}
 
+	@SuppressWarnings("unused")
 	static class Root<I> {
 		I id;
 	}
@@ -195,10 +310,23 @@ public class GenericsSmokeTest {
 	static class Base2 extends Root<String> {
 	}
 
+	@SuppressWarnings("unused")
 	static class ClassOfArrays<T> {
 		int[] intArray;
 		int[][] int2Array;
 
 		T[] tArray;
+	}
+
+	@SuppressWarnings("unused")
+	static class ClassOfCollections<T> {
+		List<String> listOfString;
+		List<T> listOfT;
+
+		Set<String> setOfString;
+		Set<T> setOfT;
+
+		Map<String,String> mapOfString;
+		Map<String,T> mapOfT;
 	}
 }
