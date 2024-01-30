@@ -13,7 +13,7 @@ package org.hibernate.models.spi;
  *
  * @author Steve Ebersole
  */
-public interface TypeDetails {
+public interface TypeDetails extends TypeVariableScope {
 	String getName();
 
 	Kind getTypeKind();
@@ -22,11 +22,6 @@ public interface TypeDetails {
 	 * Whether the described class is an implementor of the given {@code checkType}.
 	 */
 	boolean isImplementor(Class<?> checkType);
-
-//	/**
-//	 * Find the identified ({@code identifier}) type variable for this type.
-//	 */
-//	TypeVariableDetails findTypeVariableDetails(String identifier);
 
 	/**
 	 * Cast this TypeDetails as a ClassTypeDetails, throwing an exception
@@ -91,8 +86,6 @@ public interface TypeDetails {
 	default WildcardTypeDetails asWildcardType() {
 		throw new IllegalArgumentException( "Not a wildcard type - " + this );
 	}
-
-	TypeDetails resolveTypeVariable(String identifier);
 
 	enum Kind {
 

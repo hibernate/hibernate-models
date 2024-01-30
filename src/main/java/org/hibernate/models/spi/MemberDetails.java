@@ -152,10 +152,19 @@ public interface MemberDetails extends AnnotationTarget {
 		return TypeDetailsHelper.resolveRelativeType( getType(), container );
 	}
 
+	/**
+	 * Determine the concrete class of the member relative to the given {@code container} type.
+	 * <p/>
+	 * Similar to {@linkplain #resolveRelativeType(TypeDetails)}, but fully resolving the result
+	 * into the concrete class.
+	 */
 	default ClassBasedTypeDetails resolveRelativeClassType(TypeDetails container) {
 		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
 	}
 
+	/**
+	 * @see #resolveRelativeClassType(TypeDetails)
+	 */
 	default ClassBasedTypeDetails resolveRelativeClassType(ClassDetails container) {
 		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
 	}
