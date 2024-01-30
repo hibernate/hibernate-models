@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
-import org.hibernate.models.internal.util.ArrayHelper;
+import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.internal.util.TypeHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -131,7 +131,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 
 	private List<TypeDetails> collectInterfaces() {
 		final Type[] jdkInterfaces = managedClass.getGenericInterfaces();
-		if ( ArrayHelper.isEmpty( jdkInterfaces ) ) {
+		if ( CollectionHelper.isEmpty( jdkInterfaces ) ) {
 			return Collections.emptyList();
 		}
 
@@ -154,7 +154,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 
 	private List<TypeVariableDetails> collectTypeParameters() {
 		final TypeVariable<? extends Class<?>>[] jdkTypeParameters = managedClass.getTypeParameters();
-		if ( ArrayHelper.isEmpty( jdkTypeParameters ) ) {
+		if ( CollectionHelper.isEmpty( jdkTypeParameters ) ) {
 			return Collections.emptyList();
 		}
 

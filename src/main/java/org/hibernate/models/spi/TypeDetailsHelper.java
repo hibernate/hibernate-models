@@ -9,6 +9,8 @@ package org.hibernate.models.spi;
 
 import java.util.List;
 
+import org.hibernate.models.internal.ArrayTypeDetailsImpl;
+import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.util.CollectionHelper;
 
 /**
@@ -102,7 +104,7 @@ public class TypeDetailsHelper {
 				}
 				else if ( typeDetails.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ) {
 					final TypeVariableDetails resolvedTypeVariable = typeDetails.asTypeVariable();
-					if ( CollectionHelper.isNotEmpty( resolvedTypeVariable.getBounds() ) ) {
+					if ( CollectionHelper.size( resolvedTypeVariable.getBounds() ) == 1 ) {
 						// and assume the bound is a class
 						return resolvedTypeVariable.getBounds().get( 0 ).asClassType();
 					}
@@ -111,7 +113,7 @@ public class TypeDetailsHelper {
 				else {
 					// assume parameterized
 					final ParameterizedTypeDetails parameterizedType = typeDetails.asParameterizedType();
-					if ( CollectionHelper.isNotEmpty( parameterizedType.getArguments() ) ) {
+					if ( CollectionHelper.size( parameterizedType.getArguments() ) == 1 ) {
 						// and assume the bound is a class
 						return parameterizedType.getArguments().get( 0 ).asClassType();
 					}
@@ -146,7 +148,7 @@ public class TypeDetailsHelper {
 				}
 				else if ( typeDetails.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ) {
 					final TypeVariableDetails resolvedTypeVariable = typeDetails.asTypeVariable();
-					if ( CollectionHelper.isNotEmpty( resolvedTypeVariable.getBounds() ) ) {
+					if ( CollectionHelper.size( resolvedTypeVariable.getBounds() ) == 1 ) {
 						// and assume the bound is a class
 						return resolvedTypeVariable.getBounds().get( 0 ).asClassType();
 					}
@@ -155,7 +157,7 @@ public class TypeDetailsHelper {
 				else {
 					// assume parameterized
 					final ParameterizedTypeDetails parameterizedType = typeDetails.asParameterizedType();
-					if ( CollectionHelper.isNotEmpty( parameterizedType.getArguments() ) ) {
+					if ( CollectionHelper.size( parameterizedType.getArguments() ) == 1 ) {
 						// and assume the bound is a class
 						return parameterizedType.getArguments().get( 0 ).asClassType();
 					}
@@ -175,5 +177,51 @@ public class TypeDetailsHelper {
 				throw new UnsupportedOperationException( "Unknown TypeDetails kind - " + memberType.getTypeKind() );
 			}
 		}
+	}
+
+	public static ClassDetails resolveRawClass(
+			TypeDetails typeDetails,
+			SourceModelBuildingContext buildingContext) {
+		switch ( typeDetails.getTypeKind() ) {
+			case CLASS, PRIMITIVE, VOID, ARRAY -> {
+				return ( (ClassBasedTypeDetails) typeDetails ).getClassDetails();
+			}
+			case TYPE_VARIABLE -> {
+				final TypeVariableDetails resolvedTypeVariable = typeDetails.asTypeVariable();
+				if ( CollectionHelper.size( resolvedTypeVariable.getBounds() ) == 1 ) {
+					// and assume the bound is a class
+					return resolvedTypeVariable.getBounds().get( 0 ).asClassType().getClassDetails();
+				}
+				return ClassDetails.OBJECT_CLASS_DETAILS;
+			}
+			case PARAMETERIZED_TYPE -> {
+				final ParameterizedTypeDetails parameterizedType = typeDetails.asParameterizedType();
+				if ( CollectionHelper.size( parameterizedType.getArguments() ) == 1 ) {
+					// and assume the bound is a class
+					return parameterizedType.getArguments().get( 0 ).asClassType().getClassDetails();
+				}
+				return ClassDetails.OBJECT_CLASS_DETAILS;
+			}
+		}
+		return ClassDetails.OBJECT_CLASS_DETAILS;
+	}
+
+	public static ArrayTypeDetails arrayOf(TypeDetails constituentType, SourceModelBuildingContext buildingContext) {
+		final ClassDetails arrayClassDetails;
+		if ( constituentType.getTypeKind() == TypeDetails.Kind.PRIMITIVE ) {
+			final PrimitiveTypeDetails primitiveType = constituentType.asPrimitiveType();
+			final PrimitiveKind primitiveKind = primitiveType.getPrimitiveKind();
+			arrayClassDetails = buildingContext
+					.getClassDetailsRegistry()
+					.resolveClassDetails( "[" + primitiveKind.getJavaTypeChar() );
+		}
+		else {
+			final ClassDetails rawComponentType = TypeDetailsHelper.resolveRawClass( constituentType, buildingContext );
+			final String arrayClassName = "[L" + rawComponentType.getName().replace( '.', '/' ) + ";";
+			arrayClassDetails = buildingContext
+					.getClassDetailsRegistry()
+					.resolveClassDetails( arrayClassName );
+		}
+		return new ArrayTypeDetailsImpl( arrayClassDetails, constituentType );
 	}
 }

@@ -18,10 +18,12 @@ import org.hibernate.models.internal.PrimitiveTypeDetailsImpl;
 import org.hibernate.models.internal.TypeVariableDetailsImpl;
 import org.hibernate.models.internal.TypeVariableReferenceDetailsImpl;
 import org.hibernate.models.internal.VoidTypeDetailsImpl;
+import org.hibernate.models.internal.jdk.JdkTrackingTypeSwitch;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeDetailsHelper;
 
 import org.jboss.jandex.ArrayType;
 import org.jboss.jandex.ClassType;
@@ -103,14 +105,8 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 
 	@Override
 	public TypeDetails caseArrayType(ArrayType arrayType, SourceModelBuildingContext buildingContext) {
-		final ClassDetails arrayClassDetails = buildingContext
-				.getClassDetailsRegistry()
-				.resolveClassDetails( arrayType.name().toString() );
-		return new ArrayTypeDetailsImpl(
-				arrayClassDetails,
-				JandexTypeSwitcher.switchType( arrayType.componentType(), this, buildingContext )
-		);
-
+		final TypeDetails componentTypeDetails = switchType( arrayType.componentType(), this, buildingContext );
+		return TypeDetailsHelper.arrayOf( componentTypeDetails, buildingContext );
 	}
 
 	@Override

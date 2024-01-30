@@ -18,26 +18,20 @@ import java.util.Map;
  */
 public class CollectionHelper {
 	public static final int DEFAULT_LIST_CAPACITY = 10;
-	public static final int MINIMUM_INITIAL_CAPACITY = 16;
-	public static final float LOAD_FACTOR = 0.75f;
 
-	@SuppressWarnings("rawtypes")
-	public static boolean isEmpty(Collection collection) {
+	public static boolean isEmpty(@SuppressWarnings("rawtypes") Collection collection) {
 		return collection == null || collection.isEmpty();
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static boolean isNotEmpty(Collection collection) {
+	public static boolean isNotEmpty(@SuppressWarnings("rawtypes") Collection collection) {
 		return !isEmpty( collection );
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static boolean isEmpty(Map map) {
+	public static boolean isEmpty(@SuppressWarnings("rawtypes") Map map) {
 		return map == null || map.isEmpty();
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static boolean isNotEmpty(Map map) {
+	public static boolean isNotEmpty(@SuppressWarnings("rawtypes") Map map) {
 		return !isEmpty( map );
 	}
 
@@ -49,6 +43,24 @@ public class CollectionHelper {
 		return objects != null && objects.length > 0;
 	}
 
+	public static int size(@SuppressWarnings("rawtypes") Collection collection) {
+		return collection == null
+				? 0
+				: collection.size();
+	}
+
+	public static int size(@SuppressWarnings("rawtypes") Map map) {
+		return map == null
+				? 0
+				: map.size();
+	}
+
+	public static int length(Object[] array) {
+		return array == null
+				? 0
+				: array.length;
+	}
+
 	public static <T> ArrayList<T> arrayList(int expectedNumberOfElements) {
 		return new ArrayList<>( Math.max( expectedNumberOfElements + 1, DEFAULT_LIST_CAPACITY ) );
 	}
@@ -58,38 +70,6 @@ public class CollectionHelper {
 				+ ( second == null ? 0 : second.size() );
 		if ( totalCount == 0 ) {
 			return Collections.emptyList();
-		}
-		final ArrayList<E> joined = new ArrayList<>( totalCount );
-		if ( first != null ) {
-			joined.addAll( first );
-		}
-		if ( second != null ) {
-			joined.addAll( second );
-		}
-		return joined;
-	}
-
-	public static <E> List<E> join(Collection<E> first, Collection<E> second) {
-		final int totalCount = ( first == null ? 0 : first.size() )
-				+ ( second == null ? 0 : second.size() );
-		if ( totalCount == 0 ) {
-			return Collections.emptyList();
-		}
-		final ArrayList<E> joined = new ArrayList<>( totalCount );
-		if ( first != null ) {
-			joined.addAll( first );
-		}
-		if ( second != null ) {
-			joined.addAll( second );
-		}
-		return joined;
-	}
-
-	public static <E> List<E> mutableJoin(Collection<E> first, Collection<E> second) {
-		final int totalCount = ( first == null ? 0 : first.size() )
-				+ ( second == null ? 0 : second.size() );
-		if ( totalCount == 0 ) {
-			return new ArrayList<>();
 		}
 		final ArrayList<E> joined = new ArrayList<>( totalCount );
 		if ( first != null ) {

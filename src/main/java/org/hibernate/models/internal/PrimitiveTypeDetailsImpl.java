@@ -20,6 +20,7 @@ public record PrimitiveTypeDetailsImpl(ClassDetails classDetails) implements Pri
 		return Kind.PRIMITIVE;
 	}
 
+	@Override
 	public PrimitiveKind getPrimitiveKind() {
 		return PrimitiveKind.resolveFromClassDetails( classDetails() );
 	}

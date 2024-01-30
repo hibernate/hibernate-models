@@ -7,6 +7,8 @@
 
 package org.hibernate.models.spi;
 
+import org.hibernate.models.internal.PrimitiveKind;
+
 /**
  * Models a primitive type
  *
@@ -22,6 +24,8 @@ public interface PrimitiveTypeDetails extends ClassBasedTypeDetails {
 
 	@Override
 	Kind getTypeKind();
+
+	PrimitiveKind getPrimitiveKind();
 
 	@Override
 	PrimitiveTypeDetails asPrimitiveType();

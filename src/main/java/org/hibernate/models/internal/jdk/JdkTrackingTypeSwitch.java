@@ -22,13 +22,14 @@ import org.hibernate.models.internal.ParameterizedTypeDetailsImpl;
 import org.hibernate.models.internal.PrimitiveTypeDetailsImpl;
 import org.hibernate.models.internal.TypeVariableDetailsImpl;
 import org.hibernate.models.internal.VoidTypeDetailsImpl;
-import org.hibernate.models.internal.util.ArrayHelper;
+import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ArrayTypeDetails;
 import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
@@ -88,37 +89,7 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 
 	public TypeDetails caseGenericArrayType(GenericArrayType genericArrayType) {
 		final TypeDetails componentType = switcher.switchType( genericArrayType.getGenericComponentType() );
-
-		final ClassDetails arrayClassDetails;
-		switch ( componentType.getTypeKind() ) {
-			case CLASS, PRIMITIVE -> {
-				arrayClassDetails = buildingContext
-						.getClassDetailsRegistry()
-						.resolveClassDetails( genericArrayType.getTypeName() );
-			}
-			case ARRAY -> {
-				final ClassDetails componentArrayClass = componentType.asArrayType().getArrayClassDetails();
-				arrayClassDetails = buildingContext
-						.getClassDetailsRegistry()
-						.resolveClassDetails( "[" + componentArrayClass.getName() );
-			}
-			case TYPE_VARIABLE -> {
-				final TypeVariableDetails typeVariable = componentType.asTypeVariable();
-				if ( !typeVariable.getBounds().isEmpty() ) {
-					final String arrayTypeName = "[L" + typeVariable.getName().replace( '.', '/' ) + ";";
-					arrayClassDetails = buildingContext
-							.getClassDetailsRegistry()
-							.resolveClassDetails( arrayTypeName );
-				}
-				else {
-					arrayClassDetails = ClassDetails.OBJECT_CLASS_DETAILS;
-				}
-			}
-			default -> {
-				throw new UnsupportedOperationException( "Not yet implemented - " + componentType );
-			}
-		}
-		return new ArrayTypeDetailsImpl( arrayClassDetails, componentType );
+		return TypeDetailsHelper.arrayOf( componentType, buildingContext );
 	}
 
 	public TypeDetails defaultCase(Type type) {
@@ -141,7 +112,7 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 	}
 
 	public List<TypeDetails> resolveTypes(Type[] types) {
-		if ( ArrayHelper.isEmpty( types ) ) {
+		if ( CollectionHelper.isEmpty( types ) ) {
 			return Collections.emptyList();
 		}
 
