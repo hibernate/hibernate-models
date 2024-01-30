@@ -57,6 +57,11 @@ public class TypeVariableDetailsImpl implements TypeVariableDetails {
 	}
 
 	@Override
+	public TypeDetails resolveTypeVariable(String identifier) {
+		return this.identifier.equals( identifier ) ? this : null;
+	}
+
+	@Override
 	public String toString() {
 		return "TypeVariableDetails(" + identifier + " : " + name + ")";
 	}

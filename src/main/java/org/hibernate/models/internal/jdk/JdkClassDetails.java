@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.RecordComponent;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
 
 import static org.hibernate.models.internal.jdk.JdkBuilders.buildMethodDetails;
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
@@ -39,7 +41,9 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	private final Class<?> managedClass;
 
 	private final ClassDetails superType;
+	private TypeDetails genericSuperType;
 	private List<TypeDetails> interfaces;
+	private List<TypeVariableDetails> typeParameters;
 
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
@@ -110,6 +114,14 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	}
 
 	@Override
+	public TypeDetails getGenericSuperType() {
+		if ( genericSuperType == null && managedClass.getGenericSuperclass() != null ) {
+			genericSuperType = new JdkTrackingTypeSwitcher( getBuildingContext() ).switchType( managedClass.getGenericSuperclass() );
+		}
+		return genericSuperType;
+	}
+
+	@Override
 	public List<TypeDetails> getImplementedInterfaceTypes() {
 		if ( interfaces == null ) {
 			interfaces = collectInterfaces();
@@ -124,9 +136,32 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 		}
 
 		final ArrayList<TypeDetails> result = arrayList( jdkInterfaces.length );
+		final JdkTrackingTypeSwitcher typeSwitcher = new JdkTrackingTypeSwitcher( getBuildingContext() );
 		for ( Type jdkInterface : jdkInterfaces ) {
-			final TypeDetails switchedInterfaceType = new JdkTrackingTypeSwitcher( getBuildingContext() ).switchType( jdkInterface );
+			final TypeDetails switchedInterfaceType = typeSwitcher.switchType( jdkInterface );
 			result.add( switchedInterfaceType );
+		}
+		return result;
+	}
+
+	@Override
+	public List<TypeVariableDetails> getTypeParameters() {
+		if ( typeParameters == null ) {
+			typeParameters = collectTypeParameters();
+		}
+		return typeParameters;
+	}
+
+	private List<TypeVariableDetails> collectTypeParameters() {
+		final TypeVariable<? extends Class<?>>[] jdkTypeParameters = managedClass.getTypeParameters();
+		if ( ArrayHelper.isEmpty( jdkTypeParameters ) ) {
+			return Collections.emptyList();
+		}
+
+		final ArrayList<TypeVariableDetails> result = arrayList( jdkTypeParameters.length );
+		final JdkTrackingTypeSwitcher typeSwitcher = new JdkTrackingTypeSwitcher( getBuildingContext() );
+		for ( TypeVariable<? extends Class<?>> jdkTypeParameter : jdkTypeParameters ) {
+			result.add( (TypeVariableDetails) typeSwitcher.switchType( jdkTypeParameter ) );
 		}
 		return result;
 	}

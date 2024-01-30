@@ -14,11 +14,16 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
+import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeDetailsHelper;
+
+import static org.hibernate.models.spi.MethodDetails.MethodKind.GETTER;
+import static org.hibernate.models.spi.MethodDetails.MethodKind.SETTER;
 
 /**
  * @author Steve Ebersole
@@ -116,6 +121,40 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	@Override
 	public Method toJavaMember() {
 		return method;
+	}
+
+	@Override
+	public TypeDetails resolveRelativeType(TypeDetails container) {
+		if ( methodKind == GETTER || methodKind == SETTER ) {
+			return TypeDetailsHelper.resolveRelativeType( type, container );
+		}
+
+		throw new IllegalStateException( "Method does not have a type - " + this );
+	}
+
+	@Override
+	public TypeDetails resolveRelativeType(ClassDetails container) {
+		if ( methodKind == GETTER || methodKind == SETTER ) {
+			return TypeDetailsHelper.resolveRelativeType( type, container );
+		}
+
+		throw new IllegalStateException( "Method does not have a type - " + this );
+	}
+
+	@Override
+	public ClassBasedTypeDetails resolveRelativeClassType(TypeDetails container) {
+		if ( methodKind == GETTER || methodKind == SETTER ) {
+			return TypeDetailsHelper.resolveRelativeClassType( type, container );
+		}
+		throw new IllegalStateException( "Method does not have a type - " + this );
+	}
+
+	@Override
+	public ClassBasedTypeDetails resolveRelativeClassType(ClassDetails container) {
+		if ( methodKind == GETTER || methodKind == SETTER ) {
+			return TypeDetailsHelper.resolveRelativeClassType( type, container );
+		}
+		throw new IllegalStateException( "Method does not have a type - " + this );
 	}
 
 	@Override

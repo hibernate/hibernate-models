@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
+import org.hibernate.models.spi.TypeDetails;
 
 /**
  * @author Steve Ebersole
@@ -38,6 +39,11 @@ public class ClassTypeDetailsImpl implements ClassTypeDetails {
 	@Override
 	public Kind getTypeKind() {
 		return kind;
+	}
+
+	@Override
+	public TypeDetails resolveTypeVariable(String identifier) {
+		return getClassDetails().resolveTypeVariable( identifier );
 	}
 
 	@Override

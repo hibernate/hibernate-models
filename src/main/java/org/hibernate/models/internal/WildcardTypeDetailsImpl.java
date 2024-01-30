@@ -72,4 +72,9 @@ public record WildcardTypeDetailsImpl(TypeDetails bound, boolean isExtends) impl
 		}
 		return getExtendsBound().isImplementor( checkType );
 	}
+
+	@Override
+	public TypeDetails resolveTypeVariable(String identifier) {
+		return null;
+	}
 }

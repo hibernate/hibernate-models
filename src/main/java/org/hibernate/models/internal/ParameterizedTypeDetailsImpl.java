@@ -12,6 +12,8 @@ import java.util.List;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeDetailsHelper;
+import org.hibernate.models.spi.TypeVariableDetails;
 
 /**
  * @author Steve Ebersole
@@ -28,7 +30,7 @@ public class ParameterizedTypeDetailsImpl implements ParameterizedTypeDetails {
 	}
 
 	@Override
-	public ClassDetails getGenericClassDetails() {
+	public ClassDetails getRawClassDetails() {
 		return genericClassDetails;
 	}
 
@@ -40,5 +42,19 @@ public class ParameterizedTypeDetailsImpl implements ParameterizedTypeDetails {
 	@Override
 	public TypeDetails getOwner() {
 		return owner;
+	}
+
+	@Override
+	public TypeDetails resolveTypeVariable(String identifier) {
+		final List<TypeVariableDetails> typeParameters = genericClassDetails.getTypeParameters();
+		assert typeParameters.size() == arguments.size();
+
+		for ( int i = 0; i < typeParameters.size(); i++ ) {
+			if ( typeParameters.get( i ).getIdentifier().equals( identifier ) ) {
+				return arguments.get( i );
+			}
+		}
+
+		return null;
 	}
 }

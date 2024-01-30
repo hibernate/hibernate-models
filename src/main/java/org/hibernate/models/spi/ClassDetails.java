@@ -20,7 +20,7 @@ import org.hibernate.models.internal.util.IndexedConsumer;
  *
  * @author Steve Ebersole
  */
-public interface ClassDetails extends AnnotationTarget {
+public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Details for {@code Object.class}
 	 */
@@ -85,15 +85,67 @@ public interface ClassDetails extends AnnotationTarget {
 	 */
 	ClassDetails getSuperType();
 
+	TypeDetails getGenericSuperType();
+
 	/**
 	 * Details for the interfaces this class implements.
 	 */
 	List<TypeDetails> getImplementedInterfaceTypes();
 
-//	/**
-//	 * Access to the type parameters (generics) for this class.
-//	 */
-//	List<TypeDetails> getTypeParameters();
+	/**
+	 * Access to the type parameters associated with this class.
+	 */
+	List<TypeVariableDetails> getTypeParameters();
+
+	@Override
+	default TypeDetails resolveTypeVariable(String identifier) {
+		final TypeVariableDetails local = TypeDetailsHelper.findTypeVariableDetails(
+				identifier,
+				getTypeParameters()
+		);
+		if ( local != null ) {
+			return local;
+		}
+
+		if ( getGenericSuperType() != null ) {
+			if ( getGenericSuperType().getTypeKind() == TypeDetails.Kind.CLASS ) {
+				final TypeVariableDetails genericSuperVar = TypeDetailsHelper.findTypeVariableDetails(
+						identifier,
+						getGenericSuperType().asClassType().getClassDetails().getTypeParameters()
+				);
+				if ( genericSuperVar != null ) {
+					return genericSuperVar;
+				}
+			}
+			else {
+				// assume parameterized
+				final List<TypeVariableDetails> typeParameters = getSuperType().getTypeParameters();
+				final List<TypeDetails> typeArguments = getGenericSuperType().asParameterizedType().getArguments();
+				assert typeParameters.size() == typeArguments.size();
+
+				for ( int i = 0; i < typeParameters.size(); i++ ) {
+					final TypeVariableDetails typeVariableDetails = typeParameters.get( i );
+					if ( typeVariableDetails.getIdentifier().equals( identifier ) ) {
+						// we found the parameter, use the matching argument
+						return typeArguments.get( i );
+					}
+				}
+				final TypeVariableDetails genericSuperVar = TypeDetailsHelper.findTypeVariableDetails2(
+						identifier,
+						typeArguments
+				);
+				if ( genericSuperVar != null ) {
+					return genericSuperVar;
+				}
+			}
+		}
+
+		if ( getSuperType() != null ) {
+			return getSuperType().resolveTypeVariable( identifier );
+		}
+
+		return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+	}
 
 	/**
 	 * Whether the described class is an implementor of the given {@code checkType}.

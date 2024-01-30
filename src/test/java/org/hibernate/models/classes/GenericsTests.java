@@ -56,7 +56,7 @@ public class GenericsTests {
 		final ClassDetails baseClassDetails = classDetailsRegistry.getClassDetails( Base.class.getName() );
 		final TypeDetails idType = baseClassDetails.findFieldByName( "id" ).getType();
 		assertThat( idType.getName() ).isEqualTo( IdWrapper.class.getName() );
-		final TypeDetails wrappedType = idType.asParameterizedType().getGenericClassDetails().findFieldByName( "value" ).getType();
+		final TypeDetails wrappedType = idType.asParameterizedType().getRawClassDetails().findFieldByName( "value" ).getType();
 		assertThat( wrappedType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
 		assertThat( wrappedType.asTypeVariable().getIdentifier() ).isEqualTo( "T" );
 		assertThat( wrappedType.asTypeVariable().getBounds() ).hasSize( 1 );

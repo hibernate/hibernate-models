@@ -11,10 +11,12 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.models.internal.MutableMemberDetails;
+import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeDetailsHelper;
 
 /**
  * Member used to represent map key access for dynamic models ("MAP mode")
@@ -90,6 +92,16 @@ public class MapModeFieldDetails extends AbstractAnnotationTarget implements Fie
 	@Override
 	public Member toJavaMember() {
 		return null;
+	}
+
+	@Override
+	public TypeDetails resolveRelativeType(TypeDetails container) {
+		return type;
+	}
+
+	@Override
+	public TypeDetails resolveRelativeType(ClassDetails container) {
+		return type;
 	}
 
 	@Override

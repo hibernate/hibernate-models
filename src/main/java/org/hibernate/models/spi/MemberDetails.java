@@ -117,6 +117,49 @@ public interface MemberDetails extends AnnotationTarget {
 	 */
 	Member toJavaMember();
 
+	/**
+	 * Determine the type of the member relative to the given {@code container} type.
+	 * <p/>
+	 * For example, given
+	 * <pre class="brush:java">
+	 * {@code class Thing<T extends Number>} {
+	 *     T id;
+	 * }
+	 * {@code class SubThing extends Thing<Integer>} {
+	 *     ...
+	 * }
+	 * </pre>
+	 * Accessing the {@code id} member relative to {@code Thing} simply returns the
+	 * {@linkplain TypeVariableDetails type variable} {@code T}.  However, asking the
+	 * {@code id} member for its type relative to {@code SubThing} will report
+	 * {@code Integer}.
+	 *
+	 * @throws IllegalStateException If called on a member other than a field,
+	 * getter, setter or record component.
+	 * @apiNote It is only valid to call this on members which have a type, i.e. fields,
+	 * getters, setters and record components.
+	 */
+	default TypeDetails resolveRelativeType(TypeDetails container) {
+		return TypeDetailsHelper.resolveRelativeType( getType(), container );
+	}
+
+	/**
+	 * Determine the type of the member relative to the given {@code container} class.
+	 *
+	 * @see #resolveRelativeType(TypeDetails)
+	 */
+	default TypeDetails resolveRelativeType(ClassDetails container) {
+		return TypeDetailsHelper.resolveRelativeType( getType(), container );
+	}
+
+	default ClassBasedTypeDetails resolveRelativeClassType(TypeDetails container) {
+		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
+	}
+
+	default ClassBasedTypeDetails resolveRelativeClassType(ClassDetails container) {
+		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
+	}
+
 	enum Visibility {
 		PUBLIC,
 		PROTECTED,

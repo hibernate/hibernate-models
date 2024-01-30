@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
+import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
 
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;
@@ -24,6 +26,7 @@ import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.RecordComponentInfo;
 import org.jboss.jandex.Type;
+import org.jboss.jandex.TypeVariable;
 
 import static java.util.Collections.emptyList;
 import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
@@ -38,7 +41,9 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	private final ClassInfo classInfo;
 
 	private final ClassDetails superType;
+	private final TypeDetails genericSuperType;
 	private final List<TypeDetails> implementedInterfaces;
+	private final List<TypeVariableDetails> typeParameters;
 
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
@@ -49,7 +54,9 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		this.classInfo = classInfo;
 
 		this.superType = determineSuperType( classInfo, buildingContext );
+		this.genericSuperType = determineGenericSuperType( classInfo, buildingContext );
 		this.implementedInterfaces = determineInterfaces( classInfo, buildingContext );
+		this.typeParameters = determineTypeParameters( classInfo, buildingContext );
 	}
 
 	private static ClassDetails determineSuperType(
@@ -62,6 +69,14 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		return buildingContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( classInfo.superClassType().name().toString() );
+	}
+
+	private TypeDetails determineGenericSuperType(ClassInfo classInfo, SourceModelBuildingContext buildingContext) {
+		if ( classInfo.superClassType() == null ) {
+			return null;
+		}
+
+		return JandexTypeSwitcher.switchType( classInfo.superClassType(), TYPE_SWITCH_STANDARD, buildingContext );
 	}
 
 	private static List<TypeDetails> determineInterfaces(
@@ -80,6 +95,19 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 					buildingContext
 			);
 			result.add( switchedType );
+		}
+		return result;
+	}
+
+	private List<TypeVariableDetails> determineTypeParameters(ClassInfo classInfo, SourceModelBuildingContext buildingContext) {
+		final List<TypeVariable> jandexTypeVariables = classInfo.typeParameters();
+		if ( CollectionHelper.isEmpty( jandexTypeVariables ) ) {
+			return emptyList();
+		}
+
+		final ArrayList<TypeVariableDetails> result = arrayList( jandexTypeVariables.size() );
+		for ( TypeVariable jandexTypeVariable : jandexTypeVariables ) {
+			result.add( (TypeVariableDetails) JandexTypeSwitcher.switchType( jandexTypeVariable, TYPE_SWITCH_STANDARD, buildingContext ) );
 		}
 		return result;
 	}
@@ -120,8 +148,18 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
+	public TypeDetails getGenericSuperType() {
+		return genericSuperType;
+	}
+
+	@Override
 	public List<TypeDetails> getImplementedInterfaceTypes() {
 		return implementedInterfaces;
+	}
+
+	@Override
+	public List<TypeVariableDetails> getTypeParameters() {
+		return typeParameters;
 	}
 
 	@Override

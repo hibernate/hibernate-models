@@ -23,6 +23,11 @@ public interface TypeDetails {
 	 */
 	boolean isImplementor(Class<?> checkType);
 
+//	/**
+//	 * Find the identified ({@code identifier}) type variable for this type.
+//	 */
+//	TypeVariableDetails findTypeVariableDetails(String identifier);
+
 	/**
 	 * Cast this TypeDetails as a ClassTypeDetails, throwing an exception
 	 * if it cannot be.
@@ -86,6 +91,8 @@ public interface TypeDetails {
 	default WildcardTypeDetails asWildcardType() {
 		throw new IllegalArgumentException( "Not a wildcard type - " + this );
 	}
+
+	TypeDetails resolveTypeVariable(String identifier);
 
 	enum Kind {
 

@@ -17,6 +17,7 @@ import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
 
 /**
  * @author Steve Ebersole
@@ -26,6 +27,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	private final String className;
 	private final boolean isAbstract;
 	private final ClassDetails superType;
+	private final TypeDetails genericSuperType;
 
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
@@ -33,11 +35,11 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	private Class<?> javaType;
 
 	public DynamicClassDetails(String name, SourceModelBuildingContext buildingContext) {
-		this( name, null, buildingContext );
+		this( name, null, null, buildingContext );
 	}
 
-	public DynamicClassDetails(String name, ClassDetails superType, SourceModelBuildingContext buildingContext) {
-		this( name, null, false, superType, buildingContext );
+	public DynamicClassDetails(String name, ClassDetails superType, TypeDetails genericSuperType, SourceModelBuildingContext buildingContext) {
+		this( name, null, false, superType, genericSuperType, buildingContext );
 	}
 
 	public DynamicClassDetails(
@@ -45,12 +47,14 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 			String className,
 			boolean isAbstract,
 			ClassDetails superType,
+			TypeDetails genericSuperType,
 			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.name = name;
 		this.className = className;
 		this.isAbstract = isAbstract;
 		this.superType = superType;
+		this.genericSuperType = genericSuperType;
 	}
 
 	@Override
@@ -84,9 +88,19 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
+	public TypeDetails getGenericSuperType() {
+		return genericSuperType;
+	}
+
+	@Override
 	public List<TypeDetails> getImplementedInterfaceTypes() {
 		// todo : do we need these for dynamic classes?
 		return null;
+	}
+
+	@Override
+	public List<TypeVariableDetails> getTypeParameters() {
+		return Collections.emptyList();
 	}
 
 	@Override

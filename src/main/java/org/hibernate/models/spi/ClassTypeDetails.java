@@ -21,4 +21,5 @@ public interface ClassTypeDetails extends ClassBasedTypeDetails {
 	default ClassTypeDetails asClassType() {
 		return this;
 	}
+
 }

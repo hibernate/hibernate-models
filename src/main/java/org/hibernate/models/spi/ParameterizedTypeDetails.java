@@ -13,7 +13,7 @@ import java.util.List;
  * Models a parameterized type.
  * <p/>
  * Given the parameterized type {@code Map<String, Integer>} we'd have<ol>
- *     <li>the {@linkplain #getGenericClassDetails() generic class} {@code Map}
+ *     <li>the {@linkplain #getRawClassDetails() raw class} {@code Map}
  *     <li>2 {@linkplain #getArguments arguments} - {@code ClassTypeDetails(String)}, {@code ClassTypeDetails(Integer)}.
  * </ol>
  *
@@ -22,12 +22,17 @@ import java.util.List;
  *
  * @author Steve Ebersole
  */
-public interface ParameterizedTypeDetails extends TypeDetails {
-	ClassDetails getGenericClassDetails();
+public interface ParameterizedTypeDetails extends ClassBasedTypeDetails {
+	ClassDetails getRawClassDetails();
 
 	List<TypeDetails> getArguments();
 
 	TypeDetails getOwner();
+
+	@Override
+	default ClassDetails getClassDetails() {
+		return getRawClassDetails();
+	}
 
 	@Override
 	default Kind getTypeKind() {
@@ -41,11 +46,11 @@ public interface ParameterizedTypeDetails extends TypeDetails {
 
 	@Override
 	default String getName() {
-		return getGenericClassDetails().getName();
+		return getRawClassDetails().getName();
 	}
 
 	@Override
 	default boolean isImplementor(Class<?> checkType) {
-		return getGenericClassDetails().isImplementor( checkType );
+		return getRawClassDetails().isImplementor( checkType );
 	}
 }

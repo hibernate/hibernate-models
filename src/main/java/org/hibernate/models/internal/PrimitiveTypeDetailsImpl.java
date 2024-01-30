@@ -9,6 +9,7 @@ package org.hibernate.models.internal;
 
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.PrimitiveTypeDetails;
+import org.hibernate.models.spi.TypeDetails;
 
 /**
  * @author Steve Ebersole
@@ -25,6 +26,11 @@ public record PrimitiveTypeDetailsImpl(ClassDetails classDetails) implements Pri
 
 	@Override
 	public PrimitiveTypeDetails asPrimitiveType() {
+		return this;
+	}
+
+	@Override
+	public TypeDetails resolveTypeVariable(String identifier) {
 		return this;
 	}
 
