@@ -108,7 +108,7 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 	}
 
 	public TypeDetails defaultCase(Type type) {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		throw new UnsupportedOperationException( "Unexpected Type kind - " + type );
 	}
 
 	private ArrayTypeDetails asArrayType(Class<?> arrayClass) {

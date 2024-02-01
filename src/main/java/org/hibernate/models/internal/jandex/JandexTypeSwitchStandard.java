@@ -120,8 +120,8 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 	}
 
 	@Override
-	public TypeDetails defaultCase(Type t, SourceModelBuildingContext buildingContext) {
-		throw new UnsupportedOperationException( "Not yet implemented - " + this );
+	public TypeDetails defaultCase(Type type, SourceModelBuildingContext buildingContext) {
+		throw new UnsupportedOperationException( "Unexpected Type kind - " + type );
 	}
 
 	private static List<TypeDetails> extractTypeParameters(
