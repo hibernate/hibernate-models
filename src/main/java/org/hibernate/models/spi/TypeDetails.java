@@ -11,6 +11,8 @@ package org.hibernate.models.spi;
  * Abstraction for what Hibernate understands about a "type", generally before it has access to
  * the actual {@link java.lang.reflect.Type} reference.
  *
+ * @see org.jboss.jandex.Type
+ *
  * @author Steve Ebersole
  */
 public interface TypeDetails extends TypeVariableScope {

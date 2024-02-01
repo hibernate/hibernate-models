@@ -8,7 +8,7 @@
 package org.hibernate.models.spi;
 
 /**
- * Models Java's void (or {@linkplain Void}) type
+ * Models Java's {@code void} (or {@linkplain Void}) type
  *
  * @author Steve Ebersole
  */

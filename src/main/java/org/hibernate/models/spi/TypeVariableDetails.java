@@ -22,8 +22,8 @@ import java.util.List;
  * </pre>
  * In this case, the identifier is {@code T}, while the name is {@code java.lang.Number}.
  *
- * @see org.jboss.jandex.TypeVariable
  * @see java.lang.reflect.TypeVariable
+ * @see org.jboss.jandex.TypeVariable
  *
  * @author Steve Ebersole
  */

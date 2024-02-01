@@ -21,6 +21,7 @@ import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
+import org.hibernate.models.spi.WildcardTypeDetails;
 
 import org.junit.jupiter.api.Test;
 
@@ -177,6 +178,59 @@ public class CollectionTests {
 		}
 	}
 
+	@Test
+	void testWildcardWithJandex() {
+		testWildcard( SourceModelTestHelper.buildJandexIndex( Stuff.class, Things.class ) );
+	}
+
+	@Test
+	void testWildcardWithoutJandex() {
+		testWildcard( null );
+	}
+
+	void testWildcard(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
+				index,
+				Things.class
+		);
+
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Things.class.getName() );
+
+		final FieldDetails extendsStuffField = classDetails.findFieldByName( "extendsStuff" );
+		final TypeDetails extendsStuffFieldType = extendsStuffField.getType();
+		assertThat( extendsStuffFieldType.isImplementor( Collection.class ) ).isTrue();
+		assertThat( extendsStuffFieldType.isImplementor( List.class ) ).isTrue();
+		assertThat( extendsStuffFieldType.isImplementor( Set.class ) ).isFalse();
+		assertThat( extendsStuffFieldType.isImplementor( Map.class ) ).isFalse();
+		assertThat( extendsStuffFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.PARAMETERIZED_TYPE );
+		assertThat( extendsStuffFieldType.asParameterizedType().getArguments() ).hasSize( 1 );
+		assertThat( extendsStuffFieldType.asParameterizedType().getArguments().get( 0 ).getTypeKind() ).isEqualTo( TypeDetails.Kind.WILDCARD_TYPE );
+		final WildcardTypeDetails extendsStuffFieldWildcardType = extendsStuffFieldType.asParameterizedType()
+				.getArguments()
+				.get( 0 )
+				.asWildcardType();
+		assertThat( extendsStuffFieldWildcardType.isExtends() ).isTrue();
+		assertThat( extendsStuffFieldWildcardType.getBound().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
+		assertThat( extendsStuffFieldWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
+
+		final FieldDetails superStuffField = classDetails.findFieldByName( "superStuff" );
+		final TypeDetails superStuffFieldType = superStuffField.getType();
+		assertThat( superStuffFieldType.isImplementor( Collection.class ) ).isTrue();
+		assertThat( superStuffFieldType.isImplementor( List.class ) ).isTrue();
+		assertThat( superStuffFieldType.isImplementor( Set.class ) ).isFalse();
+		assertThat( superStuffFieldType.isImplementor( Map.class ) ).isFalse();
+		assertThat( superStuffFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.PARAMETERIZED_TYPE );
+		assertThat( superStuffFieldType.asParameterizedType().getArguments() ).hasSize( 1 );
+		assertThat( superStuffFieldType.asParameterizedType().getArguments().get( 0 ).getTypeKind() ).isEqualTo( TypeDetails.Kind.WILDCARD_TYPE );
+		final WildcardTypeDetails superStuffFieldWildcardType = superStuffFieldType.asParameterizedType()
+				.getArguments()
+				.get( 0 )
+				.asWildcardType();
+		assertThat( superStuffFieldWildcardType.isExtends() ).isFalse();
+		assertThat( superStuffFieldWildcardType.getBound().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
+		assertThat( superStuffFieldWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
+	}
+
 	@SuppressWarnings("unused")
 	static class ClassOfCollections<T> {
 		List<String> listOfString;
@@ -195,5 +249,22 @@ public class CollectionTests {
 		int[][] int2Array;
 
 		T[] tArray;
+	}
+
+	static class Item {
+	}
+
+	static class Stuff extends Item {
+	}
+
+	static class Coat extends Stuff {
+	}
+
+	static class Hat extends Stuff {
+	}
+
+	static class Things {
+		List<? extends Stuff> extendsStuff;
+		List<? super Stuff> superStuff;
 	}
 }

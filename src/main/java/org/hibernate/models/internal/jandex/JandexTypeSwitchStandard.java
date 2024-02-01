@@ -7,6 +7,8 @@
 
 package org.hibernate.models.internal.jandex;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.hibernate.models.internal.PrimitiveTypeDetailsImpl;
 import org.hibernate.models.internal.TypeVariableDetailsImpl;
 import org.hibernate.models.internal.TypeVariableReferenceDetailsImpl;
 import org.hibernate.models.internal.VoidTypeDetailsImpl;
+import org.hibernate.models.internal.WildcardTypeDetailsImpl;
 import org.hibernate.models.internal.jdk.JdkTrackingTypeSwitch;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
@@ -85,7 +88,14 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 
 	@Override
 	public TypeDetails caseWildcardType(WildcardType wildcardType, SourceModelBuildingContext buildingContext) {
-		throw new UnsupportedOperationException( "Not yet implemented - " + this );
+		try {
+			final Type bound = (Type) BOUND_METHOD.invoke( wildcardType );
+			final boolean isExtends = (boolean) IS_EXTENDS_METHOD.invoke( wildcardType );
+			return new WildcardTypeDetailsImpl( switchType( bound, TYPE_SWITCH_STANDARD, buildingContext ), isExtends );
+		}
+		catch (IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException( e );
+		}
 	}
 
 	@Override
@@ -145,5 +155,21 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 			result.add( switchedType );
 		}
 		return result;
+	}
+
+	private static final Method BOUND_METHOD;
+	private static final Method IS_EXTENDS_METHOD;
+
+	static {
+		try {
+			BOUND_METHOD = WildcardType.class.getDeclaredMethod( "bound" );
+			IS_EXTENDS_METHOD = WildcardType.class.getDeclaredMethod( "isExtends" );
+
+			BOUND_METHOD.trySetAccessible();
+			IS_EXTENDS_METHOD.trySetAccessible();
+		}
+		catch (NoSuchMethodException e) {
+			throw new RuntimeException( e );
+		}
 	}
 }
