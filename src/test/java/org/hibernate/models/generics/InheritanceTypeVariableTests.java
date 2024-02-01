@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Steve Ebersole
  */
-public class ParameterizedHierarchyTests {
+public class InheritanceTypeVariableTests {
 
 	@Test
 	void testParameterizedHierarchyWithJandex() {

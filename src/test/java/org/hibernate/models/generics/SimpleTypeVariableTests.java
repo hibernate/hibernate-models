@@ -8,7 +8,6 @@
 package org.hibernate.models.generics;
 
 import org.hibernate.models.SourceModelTestHelper;
-import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -26,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Steve Ebersole
  */
-public class GenericTypeTests {
+public class SimpleTypeVariableTests {
 
 	@Test
 	void testParameterizedClassWithJandex() {

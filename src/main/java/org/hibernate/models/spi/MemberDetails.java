@@ -7,6 +7,8 @@
 package org.hibernate.models.spi;
 
 import java.lang.reflect.Member;
+import java.util.Collection;
+import java.util.Map;
 
 import org.hibernate.models.internal.ModifierUtils;
 
@@ -35,6 +37,91 @@ public interface MemberDetails extends AnnotationTarget {
 	 * </ul>
 	 */
 	TypeDetails getType();
+
+	/**
+	 * Get the plural element type for this member.  If the member does not have a type or the
+	 * member is not plural, a {@code null} is returned.
+	 * <p/>
+	 * For arrays, lists and sets the element type is returned.
+	 * <p/>
+	 * For maps, the value type is returned.
+	 */
+	default TypeDetails getElementType() {
+		final TypeDetails memberType = getType();
+		if ( memberType == null ) {
+			return null;
+		}
+
+		if ( memberType.getTypeKind() == TypeDetails.Kind.ARRAY ) {
+			return memberType.asArrayType().getConstituentType();
+		}
+
+		if ( memberType.isImplementor( Collection.class ) ) {
+			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
+				// raw use
+				return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+			}
+			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
+				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
+				assert parameterizedType.getArguments().size() == 1;
+				return parameterizedType.getArguments().get( 0 );
+			}
+			if ( memberType.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ) {
+				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
+				assert typeVariable.getBounds().size() == 1;
+				return typeVariable.getBounds().get( 0 );
+			}
+		}
+
+		if ( memberType.isImplementor( Map.class ) ) {
+			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
+				// raw use
+				return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+			}
+			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
+				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
+				assert parameterizedType.getArguments().size() == 2;
+				return parameterizedType.getArguments().get( 1 );
+			}
+			if ( memberType.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ) {
+				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
+				assert typeVariable.getBounds().size() == 2;
+				return typeVariable.getBounds().get( 1 );
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get the map key type for this member.  If the member does not have a type or the
+	 * member is not a map, a {@code null} is returned.
+	 */
+	default TypeDetails getMapKeyType() {
+		final TypeDetails memberType = getType();
+		if ( memberType == null ) {
+			return null;
+		}
+
+		if ( memberType.isImplementor( Map.class ) ) {
+			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
+				// raw use
+				return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+			}
+			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
+				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
+				assert parameterizedType.getArguments().size() == 2;
+				return parameterizedType.getArguments().get( 0 );
+			}
+			if ( memberType.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ) {
+				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
+				assert typeVariable.getBounds().size() == 2;
+				return typeVariable.getBounds().get( 0 );
+			}
+		}
+
+		return null;
+	}
 
 	/**
 	 * The class which declares this member

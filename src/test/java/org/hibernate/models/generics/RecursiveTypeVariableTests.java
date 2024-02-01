@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Steve Ebersole
  */
-public class TypeVariableReferenceTests {
+public class RecursiveTypeVariableTests {
 
 	@Test
 	void testTypeVariableReferenceJandex() {

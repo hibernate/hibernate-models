@@ -212,6 +212,7 @@ public class CollectionTests {
 		assertThat( extendsStuffFieldWildcardType.isExtends() ).isTrue();
 		assertThat( extendsStuffFieldWildcardType.getBound().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
 		assertThat( extendsStuffFieldWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
+		assertThat( extendsStuffField.getElementType() ).isSameAs( extendsStuffFieldWildcardType );
 
 		final FieldDetails superStuffField = classDetails.findFieldByName( "superStuff" );
 		final TypeDetails superStuffFieldType = superStuffField.getType();
@@ -229,6 +230,7 @@ public class CollectionTests {
 		assertThat( superStuffFieldWildcardType.isExtends() ).isFalse();
 		assertThat( superStuffFieldWildcardType.getBound().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
 		assertThat( superStuffFieldWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
+		assertThat( superStuffField.getElementType() ).isSameAs( superStuffFieldWildcardType );
 
 		final FieldDetails namedStuffField = classDetails.findFieldByName( "namedStuff" );
 		final TypeDetails namedStuffFieldType = namedStuffField.getType();
@@ -248,6 +250,9 @@ public class CollectionTests {
 		assertThat( namedStuffFieldValueWildcardType.isExtends() ).isTrue();
 		assertThat( namedStuffFieldValueWildcardType.getBound().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
 		assertThat( namedStuffFieldValueWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
+		assertThat( namedStuffField.getElementType() ).isSameAs( namedStuffFieldValueWildcardType );
+		assertThat( namedStuffField.getMapKeyType().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
+		assertThat( namedStuffField.getMapKeyType().asClassType().getClassDetails().toJavaClass() ).isEqualTo( String.class );
 	}
 
 	@SuppressWarnings("unused")
