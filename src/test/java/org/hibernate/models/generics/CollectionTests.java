@@ -229,6 +229,25 @@ public class CollectionTests {
 		assertThat( superStuffFieldWildcardType.isExtends() ).isFalse();
 		assertThat( superStuffFieldWildcardType.getBound().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
 		assertThat( superStuffFieldWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
+
+		final FieldDetails namedStuffField = classDetails.findFieldByName( "namedStuff" );
+		final TypeDetails namedStuffFieldType = namedStuffField.getType();
+		assertThat( namedStuffFieldType.isImplementor( Collection.class ) ).isFalse();
+		assertThat( namedStuffFieldType.isImplementor( List.class ) ).isFalse();
+		assertThat( namedStuffFieldType.isImplementor( Set.class ) ).isFalse();
+		assertThat( namedStuffFieldType.isImplementor( Map.class ) ).isTrue();
+		assertThat( namedStuffFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.PARAMETERIZED_TYPE );
+		assertThat( namedStuffFieldType.asParameterizedType().getArguments() ).hasSize( 2 );
+		assertThat( namedStuffFieldType.asParameterizedType().getArguments().get( 0 ).getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
+		assertThat( namedStuffFieldType.asParameterizedType().getArguments().get( 0 ).asClassType().getClassDetails().toJavaClass() ).isEqualTo( String.class );
+		assertThat( namedStuffFieldType.asParameterizedType().getArguments().get( 1 ).getTypeKind() ).isEqualTo( TypeDetails.Kind.WILDCARD_TYPE );
+		final WildcardTypeDetails namedStuffFieldValueWildcardType = namedStuffFieldType.asParameterizedType()
+				.getArguments()
+				.get( 1 )
+				.asWildcardType();
+		assertThat( namedStuffFieldValueWildcardType.isExtends() ).isTrue();
+		assertThat( namedStuffFieldValueWildcardType.getBound().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
+		assertThat( namedStuffFieldValueWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
 	}
 
 	@SuppressWarnings("unused")
@@ -266,5 +285,7 @@ public class CollectionTests {
 	static class Things {
 		List<? extends Stuff> extendsStuff;
 		List<? super Stuff> superStuff;
+
+		Map<String, ? extends Stuff> namedStuff;
 	}
 }
