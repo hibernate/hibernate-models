@@ -45,14 +45,6 @@ public class SimpleTypeVariableTests {
 		);
 
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Simple.class.getName() );
-		final FieldDetails idField = classDetails.findFieldByName( "id" );
-		final TypeDetails idFieldType = idField.getType();
-		assertThat( idFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
-		assertThat( idFieldType.isImplementor( Integer.class ) ).isFalse();
-		assertThat( idFieldType.isImplementor( Number.class ) ).isTrue();
-		assertThat( idFieldType.isImplementor( Object.class ) ).isTrue();
-		assertThat( idFieldType.isImplementor( String.class ) ).isFalse();
-
 		assertThat( classDetails.getTypeParameters() ).hasSize( 1 );
 		assertThat( classDetails.getTypeParameters().get( 0 ) ).isInstanceOf( TypeVariableDetails.class );
 		final TypeVariableDetails typeParameter = classDetails.getTypeParameters().get( 0 );
@@ -61,11 +53,23 @@ public class SimpleTypeVariableTests {
 		assertThat( typeParameter.getBounds().get( 0 ) ).isInstanceOf( ClassTypeDetails.class );
 		assertThat( ( (ClassTypeDetails) typeParameter.getBounds().get( 0 ) ).getClassDetails().toJavaClass() ).isEqualTo( Number.class );
 
+		final FieldDetails idField = classDetails.findFieldByName( "id" );
+		final TypeDetails idFieldType = idField.getType();
+		assertThat( idFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
+		assertThat( idFieldType.isImplementor( Integer.class ) ).isFalse();
+		assertThat( idFieldType.isImplementor( Number.class ) ).isTrue();
+		assertThat( idFieldType.isImplementor( Object.class ) ).isTrue();
+		assertThat( idFieldType.isImplementor( String.class ) ).isFalse();
+		// resolved because we know it is a Number
+		assertThat( idFieldType.isResolved() ).isTrue();
+		assertThat( idFieldType.determineRelativeType( classDetails ).isResolved() ).isTrue();
+
 		final TypeDetails idFieldConcreteType = idField.resolveRelativeType( classDetails );
 		assertThat( idFieldConcreteType ).isInstanceOf( TypeVariableDetails.class );
 		final TypeVariableDetails typeVariable = idFieldConcreteType.asTypeVariable();
 		assertThat( typeVariable.getBounds() ).hasSize( 1 );
 		assertThat( typeVariable.getBounds().get( 0 ).asClassType().getClassDetails().toJavaClass() ).isEqualTo( Number.class );
+		assertThat( idFieldConcreteType.isResolved() ).isTrue();
 
 		final ClassBasedTypeDetails classBasedTypeDetails = idField.resolveRelativeClassType( classDetails );
 		assertThat( classBasedTypeDetails.getClassDetails().toJavaClass() ).isEqualTo( Number.class );

@@ -20,6 +20,7 @@ import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
@@ -67,6 +68,7 @@ public class CollectionTests {
 			assertThat( type.getArguments().get(0) ).isInstanceOf( ClassTypeDetails.class );
 			final ClassTypeDetails elementType = (ClassTypeDetails) type.getArguments().get( 0);
 			assertThat( elementType.isImplementor( String.class ) ).isTrue();
+			assertThat( type.isResolved() ).isTrue();
 		}
 
 		{
@@ -84,6 +86,7 @@ public class CollectionTests {
 			final TypeVariableDetails elementType = (TypeVariableDetails) type.getArguments().get( 0);
 			assertThat( elementType.isImplementor( String.class ) ).isFalse();
 			assertThat( elementType.getIdentifier() ).isEqualTo( "T" );
+			assertThat( type.isResolved() ).isFalse();
 		}
 
 		{
@@ -97,16 +100,19 @@ public class CollectionTests {
 			assertThat( type.isImplementor( Map.class ) ).isTrue();
 
 			assertThat( type.getArguments() ).hasSize( 2 );
+			assertThat( type.isResolved() ).isTrue();
 
 			// key
 			assertThat( type.getArguments().get(0) ).isInstanceOf( ClassTypeDetails.class );
 			final ClassTypeDetails keyType = (ClassTypeDetails) type.getArguments().get( 0);
 			assertThat( keyType.isImplementor( String.class ) ).isTrue();
+			assertThat( type.isResolved() ).isTrue();
 
 			// value
 			assertThat( type.getArguments().get(1) ).isInstanceOf( ClassTypeDetails.class );
 			final ClassTypeDetails valueType = (ClassTypeDetails) type.getArguments().get( 0);
 			assertThat( valueType.isImplementor( String.class ) ).isTrue();
+			assertThat( type.isResolved() ).isTrue();
 		}
 
 		{
@@ -120,17 +126,20 @@ public class CollectionTests {
 			assertThat( type.isImplementor( Map.class ) ).isTrue();
 
 			assertThat( type.getArguments() ).hasSize( 2 );
+			assertThat( type.isResolved() ).isFalse();
 
 			// key
 			assertThat( type.getArguments().get(0) ).isInstanceOf( ClassTypeDetails.class );
 			final ClassTypeDetails keyType = (ClassTypeDetails) type.getArguments().get(0);
 			assertThat( keyType.isImplementor( String.class ) ).isTrue();
+			assertThat( keyType.isResolved() ).isTrue();
 
 			// value
 			assertThat( type.getArguments().get(1) ).isInstanceOf( TypeVariableDetails.class );
 			final TypeVariableDetails valueType = (TypeVariableDetails) type.getArguments().get(1);
 			assertThat( valueType.isImplementor( String.class ) ).isFalse();
 			assertThat( valueType.getIdentifier() ).isEqualTo( "T" );
+			assertThat( valueType.isResolved() ).isFalse();
 		}
 	}
 
@@ -162,6 +171,7 @@ public class CollectionTests {
 			assertThat( intArrayFieldType.isImplementor( Number.class ) ).isFalse();
 			assertThat( intArrayFieldType.isImplementor( Object.class ) ).isTrue();
 			assertThat( intArrayFieldType.isImplementor( String.class ) ).isFalse();
+			assertThat( intArrayFieldType.isResolved() ).isTrue();
 		}
 
 		{
@@ -175,6 +185,7 @@ public class CollectionTests {
 			assertThat( constituentType.asTypeVariable().getIdentifier() ).isEqualTo( "T" );
 			final TypeDetails fieldConcreteType = field.resolveRelativeType( classDetails );
 			assertThat( fieldConcreteType ).isSameAs( arrayType );
+			assertThat( constituentType.isResolved() ).isFalse();
 		}
 	}
 
@@ -213,6 +224,7 @@ public class CollectionTests {
 		assertThat( extendsStuffFieldWildcardType.getBound().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
 		assertThat( extendsStuffFieldWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
 		assertThat( extendsStuffField.getElementType() ).isSameAs( extendsStuffFieldWildcardType );
+		assertThat( extendsStuffFieldType.isResolved() ).isTrue();
 
 		final FieldDetails superStuffField = classDetails.findFieldByName( "superStuff" );
 		final TypeDetails superStuffFieldType = superStuffField.getType();
@@ -231,6 +243,7 @@ public class CollectionTests {
 		assertThat( superStuffFieldWildcardType.getBound().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
 		assertThat( superStuffFieldWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
 		assertThat( superStuffField.getElementType() ).isSameAs( superStuffFieldWildcardType );
+		assertThat( superStuffFieldWildcardType.isResolved() ).isTrue();
 
 		final FieldDetails namedStuffField = classDetails.findFieldByName( "namedStuff" );
 		final TypeDetails namedStuffFieldType = namedStuffField.getType();
@@ -253,6 +266,7 @@ public class CollectionTests {
 		assertThat( namedStuffField.getElementType() ).isSameAs( namedStuffFieldValueWildcardType );
 		assertThat( namedStuffField.getMapKeyType().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
 		assertThat( namedStuffField.getMapKeyType().asClassType().getClassDetails().toJavaClass() ).isEqualTo( String.class );
+		assertThat( namedStuffFieldType.isResolved() ).isTrue();
 	}
 
 	@SuppressWarnings("unused")

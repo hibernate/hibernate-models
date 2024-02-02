@@ -12,7 +12,6 @@ import java.util.List;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
-import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableDetails;
 
 /**

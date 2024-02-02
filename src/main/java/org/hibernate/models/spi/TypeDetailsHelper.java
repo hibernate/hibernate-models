@@ -14,9 +14,29 @@ import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.util.CollectionHelper;
 
 /**
+ * Helper utilities for dealing with {@linkplain TypeDetails}
+ *
  * @author Steve Ebersole
  */
 public class TypeDetailsHelper {
+	/**
+	 * Given an attribute member type and a concrete container type, resolve the type of
+	 * the attribute relative to that container.
+	 * <p/>
+	 * For example, consider
+	 * <pre class="brush:java">
+	 * class {@code Item<T>} {
+	 *     T id;
+	 * }
+	 * class Hat extends {@code Item<Integer} {
+	 *     ...
+	 * }
+	 * </pre>
+	 * Given this model, a call to resolve the type of {@code id} relative to {@code Hat}
+	 * will return {@code ClassTypeDetails(Integer)}.  A call to resolve the type of {@code id}
+	 * relative to {@code Item} returns {@code ParameterizedTypeDetails(T)} (roughly Object)
+	 */
+	@SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
 	public static TypeDetails resolveRelativeType(TypeDetails type, TypeDetails container) {
 		switch ( type.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
@@ -67,6 +87,10 @@ public class TypeDetailsHelper {
 		return null;
 	}
 
+	/**
+	 * Overload of {@linkplain #resolveRelativeType(TypeDetails, TypeDetails)}
+	 */
+	@SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
 	public static TypeDetails resolveRelativeType(TypeDetails memberType, ClassDetails containerType) {
 		switch ( memberType.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
@@ -91,6 +115,12 @@ public class TypeDetailsHelper {
 		}
 	}
 
+	/**
+	 * Very much the same as {@linkplain #resolveRelativeType(TypeDetails, TypeDetails)}, except that
+	 * here we resolve the relative type to the corresponding {@link ClassBasedTypeDetails} which
+	 * gives easy access to the type's {@linkplain ClassBasedTypeDetails#getClassDetails() ClassDetails}
+	 */
+	@SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
 	public static ClassBasedTypeDetails resolveRelativeClassType(TypeDetails memberType, TypeDetails containerType) {
 		switch ( memberType.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
@@ -121,13 +151,13 @@ public class TypeDetailsHelper {
 				}
 			}
 			case TYPE_VARIABLE_REFERENCE -> {
-				throw new UnsupportedOperationException( "TypeVariableReferenceDetails not supported for relative type resolution" );
+				throw new UnsupportedOperationException( "TypeVariableReferenceDetails not supported for relative class resolution" );
 			}
 			case PARAMETERIZED_TYPE -> {
-				throw new UnsupportedOperationException( "ParameterizedTypeDetails not supported for relative type resolution" );
+				throw new UnsupportedOperationException( "ParameterizedTypeDetails not supported for relative class resolution" );
 			}
 			case WILDCARD_TYPE -> {
-				throw new UnsupportedOperationException( "WildcardTypeDetails not supported for relative type resolution" );
+				throw new UnsupportedOperationException( "WildcardTypeDetails not supported for relative class resolution" );
 			}
 			default -> {
 				throw new UnsupportedOperationException( "Unknown TypeDetails kind - " + memberType.getTypeKind() );
@@ -135,6 +165,10 @@ public class TypeDetailsHelper {
 		}
 	}
 
+	/**
+	 * Overload form of {@linkplain #resolveRelativeClassType(TypeDetails, TypeDetails)}
+	 */
+	@SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
 	public static ClassBasedTypeDetails resolveRelativeClassType(TypeDetails memberType, ClassDetails containerType) {
 		switch ( memberType.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
@@ -179,9 +213,12 @@ public class TypeDetailsHelper {
 		}
 	}
 
+	/**
+	 * Given a type, resolve the underlying ClassDetails
+	 */
 	public static ClassDetails resolveRawClass(
 			TypeDetails typeDetails,
-			SourceModelBuildingContext buildingContext) {
+			@SuppressWarnings("unused") SourceModelBuildingContext buildingContext) {
 		switch ( typeDetails.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
 				return ( (ClassBasedTypeDetails) typeDetails ).getClassDetails();
@@ -206,6 +243,9 @@ public class TypeDetailsHelper {
 		return ClassDetails.OBJECT_CLASS_DETAILS;
 	}
 
+	/**
+	 * Make an array type of the given component type
+	 */
 	public static ArrayTypeDetails arrayOf(TypeDetails constituentType, SourceModelBuildingContext buildingContext) {
 		final ClassDetails arrayClassDetails;
 		if ( constituentType.getTypeKind() == TypeDetails.Kind.PRIMITIVE ) {

@@ -7,6 +7,9 @@
 
 package org.hibernate.models.spi;
 
+import static org.hibernate.models.internal.IsResolvedTypeSwitch.IS_RESOLVED_SWITCH;
+import static org.hibernate.models.spi.TypeDetailsSwitch.switchType;
+
 /**
  * Abstraction for what Hibernate understands about a "type", generally before it has access to
  * the actual {@link java.lang.reflect.Type} reference.
@@ -88,6 +91,50 @@ public interface TypeDetails extends TypeVariableScope {
 	default WildcardTypeDetails asWildcardType() {
 		throw new IllegalArgumentException( "Not a wildcard type - " + this );
 	}
+
+	/**
+	 * Determine whether all the bounds (if any) of the type are concretely known
+	 * <p/>
+	 * For example, given:
+	 * <pre class="brush:java">
+	 * class {@code Thing<T>} {
+	 *     T id;
+	 * }
+	 * class {@code AnotherThing extends Thing<Integer>} {
+	 * }
+	 * </pre>
+	 * The type for {@code id} {@linkplain TypeDetails#determineRelativeType relative} to {@code Thing} is NOT resolved
+	 * whereas the type for {@code id} relative to {@code AnotherThing} is.
+	 */
+	default boolean isResolved() {
+		// IMPORTANT : Relies on the fact that `IsResolvedTypeSwitch` never uses the
+		// `SourceModelBuildingContext` passed to it as a `TypeDetailsSwitch` implementation.
+		// Hence, the passing `null` here
+		return switchType( this, IS_RESOLVED_SWITCH, null );
+	}
+
+	/**
+	 * Determine the type relative to the passed {@code container}.
+	 * <p/>
+	 * For example, given the classes defined in {@linkplain #isResolved()}, calling
+	 * this method has the following outcomes based on the passed {@code container} - <ul>
+	 *     <li>Passing {@code Thing}, the result would be the {@code ParameterizedTypeDetails(T)}</li>
+	 *     <li>Passing {@code AnotherThing}, the result would be {@code ClassTypeDetails(Integer)}</li>
+	 * </ul>
+	 */
+	default TypeDetails determineRelativeType(TypeDetails container) {
+		return TypeDetailsHelper.resolveRelativeType( this, container );
+	}
+
+	/**
+	 * Determine the type relative to the passed {@code container}.
+	 * <p/>
+	 * Overload of {@linkplain #determineRelativeType(TypeDetails)}
+	 */
+	default TypeDetails determineRelativeType(ClassDetails container) {
+		return TypeDetailsHelper.resolveRelativeType( this, container );
+	}
+
 
 	enum Kind {
 

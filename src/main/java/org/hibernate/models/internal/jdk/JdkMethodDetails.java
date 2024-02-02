@@ -126,7 +126,7 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	@Override
 	public TypeDetails resolveRelativeType(TypeDetails container) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
-			return TypeDetailsHelper.resolveRelativeType( type, container );
+			return type.determineRelativeType( container );
 		}
 
 		throw new IllegalStateException( "Method does not have a type - " + this );

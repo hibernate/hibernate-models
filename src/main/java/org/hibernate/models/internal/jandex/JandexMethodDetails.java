@@ -134,7 +134,7 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	@Override
 	public TypeDetails resolveRelativeType(TypeDetails container) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
-			return TypeDetailsHelper.resolveRelativeType( type, container );
+			return type.determineRelativeType( container );
 		}
 		throw new IllegalStateException( "Method does not have a type - " + this );
 	}

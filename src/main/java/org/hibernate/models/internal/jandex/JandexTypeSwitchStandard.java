@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.models.internal.ArrayTypeDetailsImpl;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.internal.ParameterizedTypeDetailsImpl;
 import org.hibernate.models.internal.PrimitiveTypeDetailsImpl;
@@ -21,7 +20,6 @@ import org.hibernate.models.internal.TypeVariableDetailsImpl;
 import org.hibernate.models.internal.TypeVariableReferenceDetailsImpl;
 import org.hibernate.models.internal.VoidTypeDetailsImpl;
 import org.hibernate.models.internal.WildcardTypeDetailsImpl;
-import org.hibernate.models.internal.jdk.JdkTrackingTypeSwitch;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
@@ -42,6 +40,8 @@ import static org.hibernate.models.internal.jandex.JandexTypeSwitcher.switchType
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
 
 /**
+ * JandexTypeSwitch implementation which builds corresponding {@linkplain TypeDetails} references
+ *
  * @author Steve Ebersole
  */
 public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {

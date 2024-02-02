@@ -227,7 +227,7 @@ public interface MemberDetails extends AnnotationTarget {
 	 * getters, setters and record components.
 	 */
 	default TypeDetails resolveRelativeType(TypeDetails container) {
-		return TypeDetailsHelper.resolveRelativeType( getType(), container );
+		return getType().determineRelativeType( container );
 	}
 
 	/**
@@ -236,7 +236,7 @@ public interface MemberDetails extends AnnotationTarget {
 	 * @see #resolveRelativeType(TypeDetails)
 	 */
 	default TypeDetails resolveRelativeType(ClassDetails container) {
-		return TypeDetailsHelper.resolveRelativeType( getType(), container );
+		return getType().determineRelativeType( container );
 	}
 
 	/**

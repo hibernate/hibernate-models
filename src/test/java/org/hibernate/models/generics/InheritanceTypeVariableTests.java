@@ -51,6 +51,9 @@ public class InheritanceTypeVariableTests {
 		);
 
 		final ClassDetails rootClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Root.class.getName() );
+		final ClassDetails base1ClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Base1.class.getName() );
+		final ClassDetails base2ClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Base2.class.getName() );
+
 		final FieldDetails idField = rootClassDetails.findFieldByName( "id" );
 		final TypeDetails idFieldType = idField.getType();
 		assertThat( idFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
@@ -58,9 +61,11 @@ public class InheritanceTypeVariableTests {
 		assertThat( idFieldType.isImplementor( Number.class ) ).isFalse();
 		assertThat( idFieldType.isImplementor( Object.class ) ).isTrue();
 		assertThat( idFieldType.isImplementor( String.class ) ).isFalse();
+		assertThat( idFieldType.isResolved() ).isFalse();
 
 		{
 			final TypeDetails resolvedRelativeType = idField.resolveRelativeType( rootClassDetails );
+			assertThat( resolvedRelativeType.isResolved() ).isFalse();
 			assertThat( resolvedRelativeType ).isInstanceOf( TypeVariableDetails.class );
 			final TypeDetails bound = ( (TypeVariableDetails) resolvedRelativeType ).getBounds().get( 0 );
 			assertThat( bound.getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
@@ -68,28 +73,31 @@ public class InheritanceTypeVariableTests {
 
 			final ClassBasedTypeDetails resolvedClassType = idField.resolveRelativeClassType( rootClassDetails );
 			assertThat( resolvedClassType.getClassDetails().toJavaClass() ).isEqualTo( Object.class );
+			assertThat( resolvedClassType.isResolved() ).isFalse();
 		}
 
 		{
-			final ClassDetails base1ClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Base1.class.getName() );
 			final TypeDetails concreteType = idField.resolveRelativeType( base1ClassDetails );
 			assertThat( concreteType ).isInstanceOf( ClassTypeDetails.class );
 			final ClassDetails concreteClassDetails = ( (ClassTypeDetails) concreteType ).getClassDetails();
 			assertThat( concreteClassDetails.toJavaClass() ).isEqualTo( Integer.class );
 
 			final ClassBasedTypeDetails resolvedClassType = idField.resolveRelativeClassType( base1ClassDetails );
+			assertThat( resolvedClassType.isResolved() ).isTrue();
 			assertThat( resolvedClassType.getClassDetails().toJavaClass() ).isEqualTo( Integer.class );
+			assertThat( resolvedClassType.isResolved() ).isTrue();
 		}
 
 		{
-			final ClassDetails base2ClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Base2.class.getName() );
 			final TypeDetails concreteType = idField.resolveRelativeType( base2ClassDetails );
 			assertThat( concreteType ).isInstanceOf( ClassTypeDetails.class );
 			final ClassDetails concreteClassDetails = ( (ClassTypeDetails) concreteType ).getClassDetails();
 			assertThat( concreteClassDetails.toJavaClass() ).isEqualTo( String.class );
 
 			final ClassBasedTypeDetails resolvedClassType = idField.resolveRelativeClassType( base2ClassDetails );
+			assertThat( resolvedClassType.isResolved() ).isTrue();
 			assertThat( resolvedClassType.getClassDetails().toJavaClass() ).isEqualTo( String.class );
+			assertThat( resolvedClassType.isResolved() ).isTrue();
 		}
 
 	}
