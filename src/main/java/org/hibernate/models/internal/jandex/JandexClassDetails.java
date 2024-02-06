@@ -40,7 +40,7 @@ import static org.hibernate.models.internal.util.CollectionHelper.isEmpty;
 public class JandexClassDetails extends AbstractAnnotationTarget implements ClassDetailsSupport {
 	private final ClassInfo classInfo;
 
-	private final ClassDetails superType;
+	private final ClassDetails superClass;
 	private final TypeDetails genericSuperType;
 	private final List<TypeDetails> implementedInterfaces;
 	private final List<TypeVariableDetails> typeParameters;
@@ -53,7 +53,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		super( buildingContext );
 		this.classInfo = classInfo;
 
-		this.superType = determineSuperType( classInfo, buildingContext );
+		this.superClass = determineSuperType( classInfo, buildingContext );
 		this.genericSuperType = determineGenericSuperType( classInfo, buildingContext );
 		this.implementedInterfaces = determineInterfaces( classInfo, buildingContext );
 		this.typeParameters = determineTypeParameters( classInfo, buildingContext );
@@ -143,8 +143,8 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
-	public ClassDetails getSuperType() {
-		return superType;
+	public ClassDetails getSuperClass() {
+		return superClass;
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
-	public List<TypeDetails> getImplementedInterfaceTypes() {
+	public List<TypeDetails> getImplementedInterfaces() {
 		return implementedInterfaces;
 	}
 
@@ -168,7 +168,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 			return true;
 		}
 
-		if ( superType != null && superType.isImplementor( checkType ) ) {
+		if ( superClass != null && superClass.isImplementor( checkType ) ) {
 			return true;
 		}
 

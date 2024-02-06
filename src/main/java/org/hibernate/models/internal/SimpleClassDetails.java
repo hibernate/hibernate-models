@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationUsage;
-import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -29,16 +28,16 @@ import org.hibernate.models.spi.TypeVariableDetails;
  */
 public class SimpleClassDetails implements ClassDetails {
 	private final Class<?> clazz;
-	private final ClassDetails superTypeDetails;
+	private final ClassDetails superClassDetails;
 	private final TypeDetails genericSuperTypeDetails;
 
 	public SimpleClassDetails(Class<?> clazz) {
 		this( clazz, ClassDetails.OBJECT_CLASS_DETAILS, null );
 	}
 
-	public SimpleClassDetails(Class<?> clazz, ClassDetails superTypeDetails, TypeDetails genericSuperTypeDetails) {
+	public SimpleClassDetails(Class<?> clazz, ClassDetails superClassDetails, TypeDetails genericSuperTypeDetails) {
 		this.clazz = clazz;
-		this.superTypeDetails = superTypeDetails;
+		this.superClassDetails = superClassDetails;
 		this.genericSuperTypeDetails = genericSuperTypeDetails;
 	}
 
@@ -53,8 +52,8 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
-	public ClassDetails getSuperType() {
-		return superTypeDetails;
+	public ClassDetails getSuperClass() {
+		return superClassDetails;
 	}
 
 	@Override
@@ -89,7 +88,7 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
-	public List<TypeDetails> getImplementedInterfaceTypes() {
+	public List<TypeDetails> getImplementedInterfaces() {
 		return Collections.emptyList();
 	}
 

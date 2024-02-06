@@ -48,12 +48,12 @@ public class ClassDetailsRegistryStandard extends AbstractClassDetailsRegistry {
 	public void addClassDetails(String name, ClassDetails classDetails) {
 		classDetailsMap.put( name, classDetails );
 
-		if ( classDetails.getSuperType() != null ) {
-			List<ClassDetails> subTypes = subTypeClassDetailsMap.get( classDetails.getSuperType().getName() );
+		if ( classDetails.getSuperClass() != null ) {
+			List<ClassDetails> subTypes = subTypeClassDetailsMap.get( classDetails.getSuperClass().getName() );
 			//noinspection Java8MapApi
 			if ( subTypes == null ) {
 				subTypes = new ArrayList<>();
-				subTypeClassDetailsMap.put( classDetails.getSuperType().getName(), subTypes );
+				subTypeClassDetailsMap.put( classDetails.getSuperClass().getName(), subTypes );
 			}
 			subTypes.add( classDetails );
 		}

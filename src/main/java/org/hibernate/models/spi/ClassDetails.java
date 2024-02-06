@@ -41,6 +41,11 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 */
 	ClassDetails VOID_OBJECT_CLASS_DETAILS = new SimpleClassDetails( Void.class );
 
+	@Override
+	default Kind getKind() {
+		return Kind.CLASS;
+	}
+
 	/**
 	 * The name of the class.
 	 * <p/>
@@ -56,11 +61,6 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 * @apiNote Will be {@code null} for dynamic models
 	 */
 	String getClassName();
-
-	@Override
-	default Kind getKind() {
-		return Kind.CLASS;
-	}
 
 	/**
 	 * Whether the {@linkplain Class}, if one, represented by this ClassDetails is
@@ -83,14 +83,14 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Details for the class that is the super type for this class.
 	 */
-	ClassDetails getSuperType();
+	ClassDetails getSuperClass();
 
 	TypeDetails getGenericSuperType();
 
 	/**
 	 * Details for the interfaces this class implements.
 	 */
-	List<TypeDetails> getImplementedInterfaceTypes();
+	List<TypeDetails> getImplementedInterfaces();
 
 	/**
 	 * Access to the type parameters associated with this class.
@@ -119,7 +119,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 			}
 			else {
 				// assume parameterized
-				final List<TypeVariableDetails> typeParameters = getSuperType().getTypeParameters();
+				final List<TypeVariableDetails> typeParameters = getSuperClass().getTypeParameters();
 				final List<TypeDetails> typeArguments = getGenericSuperType().asParameterizedType().getArguments();
 				assert typeParameters.size() == typeArguments.size();
 
@@ -140,8 +140,8 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 			}
 		}
 
-		if ( getSuperType() != null ) {
-			return getSuperType().resolveTypeVariable( identifier );
+		if ( getSuperClass() != null ) {
+			return getSuperClass().resolveTypeVariable( identifier );
 		}
 
 		return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;

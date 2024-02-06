@@ -65,8 +65,8 @@ public class InheritanceTests {
 		assertThat( value2.getAnnotationUsage( ClassMarker.class ) ).isNull();
 		assertThat( value2.getAnnotationUsage( Transient.class ) ).isNotNull();
 
-		assertThat( rootClassDetails.getSuperType() ).isNotNull();
-		assertThat( rootClassDetails.getSuperType().toJavaClass() ).isEqualTo( Object.class );
+		assertThat( rootClassDetails.getSuperClass() ).isNotNull();
+		assertThat( rootClassDetails.getSuperClass().toJavaClass() ).isEqualTo( Object.class );
 	}
 
 	@Test
@@ -113,8 +113,8 @@ public class InheritanceTests {
 		assertThat( value4.getAnnotationUsage( ClassMarker.class ) ).isNull();
 		assertThat( value4.getAnnotationUsage( Transient.class ) ).isNotNull();
 
-		assertThat( trunkClassDetails.getSuperType() ).isNotNull();
-		assertThat( trunkClassDetails.getSuperType().toJavaClass() ).isEqualTo( RootClass.class );
+		assertThat( trunkClassDetails.getSuperClass() ).isNotNull();
+		assertThat( trunkClassDetails.getSuperClass().toJavaClass() ).isEqualTo( RootClass.class );
 	}
 
 	@Test
@@ -184,7 +184,7 @@ public class InheritanceTests {
 
 		final ClassDetails rootClassDetails = classDetailsRegistry.getClassDetails( RootClass.class.getName() );
 		assertThat( rootClassDetails.isImplementor( Intf.class ) ).isFalse();
-		assertThat( rootClassDetails.getSuperType() ).isSameAs( ClassDetails.OBJECT_CLASS_DETAILS );
+		assertThat( rootClassDetails.getSuperClass() ).isSameAs( ClassDetails.OBJECT_CLASS_DETAILS );
 
 		final ClassDetails branchClassDetails = classDetailsRegistry.getClassDetails( BranchClass.class.getName() );
 		assertThat( branchClassDetails.isImplementor( Intf.class ) ).isTrue();

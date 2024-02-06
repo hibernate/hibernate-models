@@ -52,8 +52,8 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 			return localUsage;
 		}
 
-		if ( type.isInherited() && getSuperType() != null ) {
-			return getSuperType().getAnnotationUsage( type );
+		if ( type.isInherited() && getSuperClass() != null ) {
+			return getSuperClass().getAnnotationUsage( type );
 		}
 
 		return null;
@@ -63,8 +63,8 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 	default  <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(AnnotationDescriptor<A> type) {
 		final List<AnnotationUsage<A>> localUsages = AnnotationTargetSupport.super.getRepeatedAnnotationUsages( type );
 
-		if ( type.isInherited() && getSuperType() != null ) {
-			final List<AnnotationUsage<A>> inheritedUsages = getSuperType().getRepeatedAnnotationUsages( type );
+		if ( type.isInherited() && getSuperClass() != null ) {
+			final List<AnnotationUsage<A>> inheritedUsages = getSuperClass().getRepeatedAnnotationUsages( type );
 			return CollectionHelper.join( localUsages, inheritedUsages );
 		}
 
@@ -81,8 +81,8 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 			return localUsage;
 		}
 
-		if ( type.isInherited() && getSuperType() != null ) {
-			return getSuperType().getNamedAnnotationUsage( type, matchValue, attributeToMatch );
+		if ( type.isInherited() && getSuperClass() != null ) {
+			return getSuperClass().getNamedAnnotationUsage( type, matchValue, attributeToMatch );
 		}
 		return null;
 	}

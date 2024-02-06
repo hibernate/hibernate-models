@@ -40,7 +40,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	private final String name;
 	private final Class<?> managedClass;
 
-	private final ClassDetails superType;
+	private final ClassDetails superClass;
 	private TypeDetails genericSuperType;
 	private List<TypeDetails> interfaces;
 	private List<TypeVariableDetails> typeParameters;
@@ -67,10 +67,10 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 
 		final Class<?> superclass = managedClass.getSuperclass();
 		if ( superclass == null ) {
-			superType = null;
+			superClass = null;
 		}
 		else {
-			superType = classDetailsRegistry.resolveClassDetails(
+			superClass = classDetailsRegistry.resolveClassDetails(
 					superclass.getName(),
 					(n) -> JdkBuilders.buildClassDetailsStatic( superclass, buildingContext )
 			);
@@ -109,8 +109,8 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	}
 
 	@Override
-	public ClassDetails getSuperType() {
-		return superType;
+	public ClassDetails getSuperClass() {
+		return superClass;
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	}
 
 	@Override
-	public List<TypeDetails> getImplementedInterfaceTypes() {
+	public List<TypeDetails> getImplementedInterfaces() {
 		if ( interfaces == null ) {
 			interfaces = collectInterfaces();
 		}

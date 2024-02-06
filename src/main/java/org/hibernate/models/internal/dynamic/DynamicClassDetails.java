@@ -26,7 +26,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	private final String name;
 	private final String className;
 	private final boolean isAbstract;
-	private final ClassDetails superType;
+	private final ClassDetails superClass;
 	private final TypeDetails genericSuperType;
 
 	private List<FieldDetails> fields;
@@ -38,22 +38,26 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 		this( name, null, null, buildingContext );
 	}
 
-	public DynamicClassDetails(String name, ClassDetails superType, TypeDetails genericSuperType, SourceModelBuildingContext buildingContext) {
-		this( name, null, false, superType, genericSuperType, buildingContext );
+	public DynamicClassDetails(
+			String name,
+			ClassDetails superClass,
+			TypeDetails genericSuperType,
+			SourceModelBuildingContext buildingContext) {
+		this( name, null, false, superClass, genericSuperType, buildingContext );
 	}
 
 	public DynamicClassDetails(
 			String name,
 			String className,
 			boolean isAbstract,
-			ClassDetails superType,
+			ClassDetails superClass,
 			TypeDetails genericSuperType,
 			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.name = name;
 		this.className = className;
 		this.isAbstract = isAbstract;
-		this.superType = superType;
+		this.superClass = superClass;
 		this.genericSuperType = genericSuperType;
 	}
 
@@ -83,8 +87,8 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
-	public ClassDetails getSuperType() {
-		return superType;
+	public ClassDetails getSuperClass() {
+		return superClass;
 	}
 
 	@Override
@@ -93,7 +97,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
-	public List<TypeDetails> getImplementedInterfaceTypes() {
+	public List<TypeDetails> getImplementedInterfaces() {
 		// todo : do we need these for dynamic classes?
 		return null;
 	}
