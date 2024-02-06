@@ -135,6 +135,16 @@ public interface TypeDetails extends TypeVariableScope {
 		return TypeDetailsHelper.resolveRelativeType( this, container );
 	}
 
+	/**
+	 * Determine the raw {@linkplain ClassDetails class} for the given type.  Never returns {@code null}, opting
+	 * to return {@linkplain ClassDetails#OBJECT_CLASS_DETAILS Object} instead if the raw class is not known
+	 *
+	 * @return The raw class details, or {@linkplain ClassDetails#OBJECT_CLASS_DETAILS Object} if "not known".
+	 */
+	default ClassDetails determineRawClass() {
+		return TypeDetailsHelper.resolveRawClass( this );
+	}
+
 
 	enum Kind {
 

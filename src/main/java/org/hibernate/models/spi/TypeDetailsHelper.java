@@ -215,10 +215,10 @@ public class TypeDetailsHelper {
 
 	/**
 	 * Given a type, resolve the underlying ClassDetails
+	 *
+	 * @see TypeDetails#determineRawClass()
 	 */
-	public static ClassDetails resolveRawClass(
-			TypeDetails typeDetails,
-			@SuppressWarnings("unused") SourceModelBuildingContext buildingContext) {
+	public static ClassDetails resolveRawClass(TypeDetails typeDetails) {
 		switch ( typeDetails.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
 				return ( (ClassBasedTypeDetails) typeDetails ).getClassDetails();
@@ -226,18 +226,28 @@ public class TypeDetailsHelper {
 			case TYPE_VARIABLE -> {
 				final TypeVariableDetails resolvedTypeVariable = typeDetails.asTypeVariable();
 				if ( CollectionHelper.size( resolvedTypeVariable.getBounds() ) == 1 ) {
-					// and assume the bound is a class
-					return resolvedTypeVariable.getBounds().get( 0 ).asClassType().getClassDetails();
+					return resolvedTypeVariable.getBounds().get( 0 ).determineRawClass();
 				}
 				return ClassDetails.OBJECT_CLASS_DETAILS;
 			}
 			case PARAMETERIZED_TYPE -> {
 				final ParameterizedTypeDetails parameterizedType = typeDetails.asParameterizedType();
 				if ( CollectionHelper.size( parameterizedType.getArguments() ) == 1 ) {
-					// and assume the bound is a class
-					return parameterizedType.getArguments().get( 0 ).asClassType().getClassDetails();
+					return parameterizedType.getArguments().get( 0 ).determineRawClass();
 				}
 				return ClassDetails.OBJECT_CLASS_DETAILS;
+			}
+			case WILDCARD_TYPE -> {
+				final WildcardTypeDetails wildcardType = typeDetails.asWildcardType();
+				if ( wildcardType.getBound() != null ) {
+					return wildcardType.getBound().determineRawClass();
+				}
+				return ClassDetails.OBJECT_CLASS_DETAILS;
+			}
+			case TYPE_VARIABLE_REFERENCE -> {
+				final String identifier = typeDetails.asTypeVariableReference().getIdentifier();
+				final TypeDetails identifiedTypeDetails = typeDetails.resolveTypeVariable( identifier );
+				return identifiedTypeDetails.determineRawClass();
 			}
 		}
 		return ClassDetails.OBJECT_CLASS_DETAILS;
@@ -256,7 +266,7 @@ public class TypeDetailsHelper {
 					.resolveClassDetails( "[" + primitiveKind.getJavaTypeChar() );
 		}
 		else {
-			final ClassDetails rawComponentType = TypeDetailsHelper.resolveRawClass( constituentType, buildingContext );
+			final ClassDetails rawComponentType = constituentType.determineRawClass();
 			final String arrayClassName = "[L" + rawComponentType.getName().replace( '.', '/' ) + ";";
 			arrayClassDetails = buildingContext
 					.getClassDetailsRegistry()

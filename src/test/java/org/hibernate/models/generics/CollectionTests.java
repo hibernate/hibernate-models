@@ -20,7 +20,6 @@ import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
-import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
@@ -225,6 +224,7 @@ public class CollectionTests {
 		assertThat( extendsStuffFieldWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
 		assertThat( extendsStuffField.getElementType() ).isSameAs( extendsStuffFieldWildcardType );
 		assertThat( extendsStuffFieldType.isResolved() ).isTrue();
+		assertThat( extendsStuffFieldWildcardType.determineRawClass() ).isNotNull();
 
 		final FieldDetails superStuffField = classDetails.findFieldByName( "superStuff" );
 		final TypeDetails superStuffFieldType = superStuffField.getType();
@@ -244,6 +244,7 @@ public class CollectionTests {
 		assertThat( superStuffFieldWildcardType.getBound().asClassType().getClassDetails().getName() ).endsWith( "Stuff" );
 		assertThat( superStuffField.getElementType() ).isSameAs( superStuffFieldWildcardType );
 		assertThat( superStuffFieldWildcardType.isResolved() ).isTrue();
+		assertThat( superStuffFieldWildcardType.determineRawClass() ).isNotNull();
 
 		final FieldDetails namedStuffField = classDetails.findFieldByName( "namedStuff" );
 		final TypeDetails namedStuffFieldType = namedStuffField.getType();
@@ -267,6 +268,7 @@ public class CollectionTests {
 		assertThat( namedStuffField.getMapKeyType().getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );
 		assertThat( namedStuffField.getMapKeyType().asClassType().getClassDetails().toJavaClass() ).isEqualTo( String.class );
 		assertThat( namedStuffFieldType.isResolved() ).isTrue();
+		assertThat( namedStuffFieldValueWildcardType.determineRawClass() ).isNotNull();
 	}
 
 	@SuppressWarnings("unused")
@@ -295,12 +297,15 @@ public class CollectionTests {
 	static class Stuff extends Item {
 	}
 
+	@SuppressWarnings("unused")
 	static class Coat extends Stuff {
 	}
 
+	@SuppressWarnings("unused")
 	static class Hat extends Stuff {
 	}
 
+	@SuppressWarnings("unused")
 	static class Things {
 		List<? extends Stuff> extendsStuff;
 		List<? super Stuff> superStuff;
