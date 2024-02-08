@@ -57,7 +57,7 @@ public class CollectionTests {
 			final FieldDetails listOfString = classDetails.findFieldByName( "listOfString" );
 
 			assertThat( listOfString.getType() ).isInstanceOf( ParameterizedTypeDetails.class );
-			final ParameterizedTypeDetails type = (ParameterizedTypeDetails) listOfString.getType();
+			final ParameterizedTypeDetails type = listOfString.getType().asParameterizedType();
 			assertThat( type.isImplementor( Collection.class ) ).isTrue();
 			assertThat( type.isImplementor( List.class ) ).isTrue();
 			assertThat( type.isImplementor( Set.class ) ).isFalse();
@@ -68,6 +68,8 @@ public class CollectionTests {
 			final ClassTypeDetails elementType = (ClassTypeDetails) type.getArguments().get( 0);
 			assertThat( elementType.isImplementor( String.class ) ).isTrue();
 			assertThat( type.isResolved() ).isTrue();
+			assertThat( type.getRawClassDetails().toJavaClass() ).isEqualTo( List.class );
+			assertThat( type.determineRawClass().toJavaClass() ).isEqualTo( List.class );
 		}
 
 		{
@@ -86,6 +88,8 @@ public class CollectionTests {
 			assertThat( elementType.isImplementor( String.class ) ).isFalse();
 			assertThat( elementType.getIdentifier() ).isEqualTo( "T" );
 			assertThat( type.isResolved() ).isFalse();
+			assertThat( type.getRawClassDetails().toJavaClass() ).isEqualTo( List.class );
+			assertThat( type.determineRawClass().toJavaClass() ).isEqualTo( List.class );
 		}
 
 		{
@@ -100,6 +104,8 @@ public class CollectionTests {
 
 			assertThat( type.getArguments() ).hasSize( 2 );
 			assertThat( type.isResolved() ).isTrue();
+			assertThat( type.getRawClassDetails().toJavaClass() ).isEqualTo( Map.class );
+			assertThat( type.determineRawClass().toJavaClass() ).isEqualTo( Map.class );
 
 			// key
 			assertThat( type.getArguments().get(0) ).isInstanceOf( ClassTypeDetails.class );
@@ -126,6 +132,8 @@ public class CollectionTests {
 
 			assertThat( type.getArguments() ).hasSize( 2 );
 			assertThat( type.isResolved() ).isFalse();
+			assertThat( type.getRawClassDetails().toJavaClass() ).isEqualTo( Map.class );
+			assertThat( type.determineRawClass().toJavaClass() ).isEqualTo( Map.class );
 
 			// key
 			assertThat( type.getArguments().get(0) ).isInstanceOf( ClassTypeDetails.class );

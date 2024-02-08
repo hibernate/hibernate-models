@@ -232,10 +232,7 @@ public class TypeDetailsHelper {
 			}
 			case PARAMETERIZED_TYPE -> {
 				final ParameterizedTypeDetails parameterizedType = typeDetails.asParameterizedType();
-				if ( CollectionHelper.size( parameterizedType.getArguments() ) == 1 ) {
-					return parameterizedType.getArguments().get( 0 ).determineRawClass();
-				}
-				return ClassDetails.OBJECT_CLASS_DETAILS;
+				return parameterizedType.getRawClassDetails();
 			}
 			case WILDCARD_TYPE -> {
 				final WildcardTypeDetails wildcardType = typeDetails.asWildcardType();
