@@ -47,7 +47,7 @@ public class FieldDetailsTests {
 				.getClassDetailsRegistry()
 				.findClassDetails( RandomClass.class.getName() );
 		assertThat( classDetails ).isNotNull();
-		assertThat( classDetails.getFields() ).hasSize( 10 );
+		assertThat( classDetails.getFields() ).hasSize( 12 );
 
 		final FieldDetails propertyField = classDetails.findFieldByName( "property" );
 		assertThat( propertyField.toJavaMember() ).isInstanceOf( Field.class );
@@ -121,6 +121,12 @@ public class FieldDetailsTests {
 		assertThat( intValueArrayField.isPersistable() ).isTrue();
 		assertThat( intValueArrayField.getDeclaringType() ).isSameAs( classDetails );
 
+		final FieldDetails staticFieldField = classDetails.findFieldByName( "staticField" );
+		assertThat( staticFieldField.isPersistable() ).isFalse();
+
+		final FieldDetails transientFieldField = classDetails.findFieldByName( "transientField" );
+		assertThat( transientFieldField.isPersistable() ).isFalse();
+
 		classDetails.forEachField( (position, fieldDetails) -> {
 			System.out.printf( "  > Field (%s) : %s\n", position, fieldDetails );
 		} );
@@ -139,5 +145,8 @@ public class FieldDetailsTests {
 		private double doubleValue;
 		float floatValue;
 		protected int[] intValueArray;
+
+		private static int staticField;
+		private transient int transientField;
 	}
 }

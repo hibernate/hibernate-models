@@ -26,6 +26,6 @@ public interface FieldDetails extends MemberDetails {
 
 	@Override
 	default boolean isPersistable() {
-		return ModifierUtils.isPersistableField( getModifiers() );
+		return ModifierUtils.hasPersistableFieldModifiers( getModifiers() );
 	}
 }

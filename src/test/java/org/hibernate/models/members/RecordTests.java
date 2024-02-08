@@ -9,6 +9,7 @@ package org.hibernate.models.members;
 
 import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
+import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 
@@ -48,6 +49,9 @@ public class RecordTests {
 
 		for ( RecordComponentDetails recordComponent : classDetails.getRecordComponents() ) {
 			assertThat( recordComponent.getDeclaringType() ).isSameAs( classDetails );
+			assertThat( recordComponent.isPersistable() ).isTrue();
+			assertThat( recordComponent.getKind() ).isEqualTo( AnnotationTarget.Kind.RECORD_COMPONENT );
+			assertThat( recordComponent.resolveAttributeName() ).isEqualTo( recordComponent.getName() );
 		}
 	}
 

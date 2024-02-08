@@ -149,6 +149,11 @@ public class MethodDetailsTests {
 				assertThat( method.isPersistable() ).isTrue();
 				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 			}
+			else if ( method.getName().equals( "somethingStatic" ) ) {
+				assertThat( method.getMethodKind() ).isEqualTo( MethodDetails.MethodKind.OTHER );
+				assertThat( method.isPersistable() ).isFalse();
+				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
+			}
 			else {
 				if ( ( (JdkMethodDetails) method ).getMethod().isSynthetic() ) {
 					// ignore it
@@ -177,5 +182,7 @@ public class MethodDetailsTests {
 
 		public void nothing() {}
 		public void something(Object stuff) {}
+
+		public static void somethingStatic() {}
 	}
 }

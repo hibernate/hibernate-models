@@ -9,7 +9,7 @@ package org.hibernate.models.spi;
 import java.beans.Introspector;
 import java.util.List;
 
-import static org.hibernate.models.internal.ModifierUtils.isPersistableMethod;
+import static org.hibernate.models.internal.ModifierUtils.hasPersistableMethodModifiers;
 
 /**
  * Models a {@linkplain java.lang.reflect.Method method} in a {@linkplain ClassDetails class}.
@@ -36,19 +36,8 @@ public interface MethodDetails extends MemberDetails {
 
 	@Override
 	default boolean isPersistable() {
-		if ( !getArgumentTypes().isEmpty() ) {
-			// should be the getter
-			return false;
-		}
-
-		if ( getReturnType() == null
-				|| "void".equals( getReturnType().getName() )
-				|| "Void".equals( getReturnType().getName() ) ) {
-			// again, should be the getter
-			return false;
-		}
-
-		return isPersistableMethod( getModifiers() );
+		return getMethodKind() == MethodKind.GETTER
+				&& hasPersistableMethodModifiers( getModifiers() );
 	}
 
 	@Override

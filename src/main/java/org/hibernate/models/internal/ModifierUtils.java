@@ -90,12 +90,16 @@ public class ModifierUtils {
 	 *
 	 * @see MemberDetails#isPersistable()
 	 */
-	public static boolean isPersistableField(int modifierFlags) {
+	public static boolean hasPersistableFieldModifiers(int modifierFlags) {
 		if ( isTransient( modifierFlags ) ) {
 			return false;
 		}
 
 		if ( ModifierUtils.isSynthetic( modifierFlags ) ) {
+			return false;
+		}
+
+		if ( ModifierUtils.isStatic( modifierFlags ) ) {
 			return false;
 		}
 
@@ -111,7 +115,7 @@ public class ModifierUtils {
 	 *
 	 * @see MemberDetails#isPersistable()
 	 */
-	public static boolean isPersistableMethod(int modifierFlags) {
+	public static boolean hasPersistableMethodModifiers(int modifierFlags) {
 		if ( ModifierUtils.isStatic( modifierFlags ) ) {
 			return false;
 		}
