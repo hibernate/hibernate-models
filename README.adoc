@@ -15,6 +15,25 @@ library, which suffered from a number of shortcomings.
 
 === Annotations
 
-Hibernate Models defines an actual descriptor for annotations called `AnnotationDescriptor` which provides access
-to information (whether it is repeatable, etc.) about the annotation class.  These descriptors are available from the
-`AnnotationDescriptorRegistry`.
+The modeling of annotations in hibernate-models is defined by a few main actors:
+
+AnnotationDescriptor:: Extended information about an annotation class
+AnnotationTarget:: Something (Class, Method, ...) where an annotation can be used
+AnnotationUsage:: Specific usage of an annotation on a target
+AttributeDescriptor:: Details about an annotation attribute, including it's `ValueTypeDescriptor`
+ValueTypeDescriptor:: Describes an allowable type for annotation attributes - ints, enums, etc.  Provides the capability to manipulate these values (create them, wrap them, unwrap them, etc).
+AnnotationDescriptorRegistry:: registry of `AnnotationDescriptor` references
+
+
+=== Model
+
+These mostly model Java constructs such as Class, Method, etc. but adds the capability
+for these to be dynamic models (no physical Class).
+
+ClassDetails:: Think `java.lang.Class`
+TypeDetails:: Think `java.lang.reflect.Type`
+MemberDetails:: Think `java.lang.reflect.Member`
+FieldDetails:: Think `java.lang.reflect.Field`
+MethodDetails:: Think `java.lang.reflect.Method`
+RecordComponentDetails:: Think `java.lang.reflect.RecordComponent`
+ClassDetailsRegistry:: registry of `ClassDetails` references

@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -19,7 +18,9 @@ import java.util.function.Consumer;
 import org.hibernate.models.AnnotationAccessException;
 
 /**
- * Abstraction of {@linkplain java.lang.reflect.AnnotatedElement}
+ * Abstract for something where an annotation can be {@linkplain AnnotationUsage used}.
+ *
+ * @see java.lang.reflect.AnnotatedElement
  *
  * @author Steve Ebersole
  */
@@ -36,24 +37,50 @@ public interface AnnotationTarget {
 
 	/**
 	 * Access to all the annotations used on this target.
+	 *
+	 * @apiNote This returns the usages directly available on the target; it does not
+	 * expand repeatable containers (e.g. NamedQueries -> *NamedQuery).
 	 */
 	Collection<AnnotationUsage<?>> getAllAnnotationUsages();
 
+	/**
+	 * Allows to visit every annotation on the target.
+	 *
+	 * @apiNote Only visits the usages directly available on the target; it does not
+	 * visit across repeatable containers (e.g. NamedQueries -> *NamedQuery).
+	 */
 	default void forAllAnnotationUsages(Consumer<AnnotationUsage<?>> consumer) {
 		getAllAnnotationUsages().forEach( consumer );
 	}
 
 	/**
-	 * Whether the given annotation is used on this target
+	 * Whether the given annotation is used on this target.
+	 *
+	 * @see #hasRepeatableAnnotationUsage
+	 *
+	 * @apiNote This form does not check across repeatable containers.  E.g., calling this
+	 * method with {@code NamedQuery} will return {@code false} when the target directly
+	 * has a NamedQueries.
 	 */
 	<A extends Annotation> boolean hasAnnotationUsage(Class<A> type);
+
+	/**
+	 * Whether the given annotation is used on this target.
+	 *
+	 * @see #hasAnnotationUsage
+	 *
+	 * @apiNote This forms does check across repeatable containers.  E.g., calling this
+	 * method with {@code NamedQuery} will return {@code true} when the target directly
+	 * has a NamedQueries.
+	 */
+	<A extends Annotation> boolean hasRepeatableAnnotationUsage(Class<A> type);
 
 	/**
 	 * Get the usage of the given annotation on this target.
 	 * <p/>
 	 * For {@linkplain Repeatable repeatable} annotation types (e.g. {@code @NamedQuery}), this method will either-<ul>
 	 *     <li>
-	 *         if the repeatable annotation itself is present, it is returned.
+	 *         if a single repeatable annotation itself is present, it is returned.
 	 *     </li>
 	 *     <li>
 	 *         if the {@linkplain Repeatable#value() "containing annotation"} is present (e.g. {@code @NamedQueries}), <ul>
@@ -67,15 +94,14 @@ public interface AnnotationTarget {
 	 *     </li>
 	 * </ul>
 	 * <p/>
-	 * For annotations which can {@linkplain ElementType#ANNOTATION_TYPE target annotations},
-	 * all annotations on this target will be checked as well.
+	 * For also checking across meta-annotations, see {@linkplain #locateAnnotationUsage(Class)}.
 	 *
 	 * @return The usage or {@code null}
 	 */
 	<A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> descriptor);
 
 	/**
-	 * Helper form of {@link #getAnnotationUsage(AnnotationDescriptor)}
+	 * Form of {@link #getAnnotationUsage(AnnotationDescriptor)} accepting the annotation {@linkplain Class}
 	 */
 	<A extends Annotation> AnnotationUsage<A> getAnnotationUsage(Class<A> type);
 
@@ -87,26 +113,17 @@ public interface AnnotationTarget {
 
 	/**
 	 * Get all usages of the specified {@code annotationType} in this scope.
-	 * <p/>
-	 * For {@linkplain Repeatable repeatable} annotation types (e.g. {@code @NamedQuery}) -<ul>
-	 *     <li>
-	 *         if the repeatable annotation itself is present, a singleton list containing that single usage is returned
-	 *     </li>
-	 *     <li>
-	 *         if the {@linkplain Repeatable#value() "containing annotation"} (e.g. {@code @NamedQueries}) is present,
-	 *         the contained repeatable usages are extracted from the container and returned as a list
-	 *     </li>
-	 *     <li>
-	 *         Otherwise, an empty list is returned.
-	 *     </li>
-	 * </ul>
 	 *
-	 * @apiNote If the passed annotation type is not repeatable, an empty list is returned.
+	 * @apiNote For {@linkplain Repeatable repeatable} annotation types (e.g. {@code @NamedQuery}),
+	 * the returned list will contain the union of <ol>
+	 *     <li>the singular {@code @NamedQuery} usage</li>
+	 *     <li>the nested {@code @NamedQuery} usages from the {@code @NamedQueries} usage</li>
+	 * </ol>
 	 */
 	<A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(AnnotationDescriptor<A> type);
 
 	/**
-	 * Helper form of {@linkplain #getRepeatedAnnotationUsages(AnnotationDescriptor)}
+	 * Form of {@linkplain #getRepeatedAnnotationUsages(AnnotationDescriptor)} accepting the annotation {@linkplain Class}
 	 */
 	<A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(Class<A> type);
 
@@ -128,7 +145,7 @@ public interface AnnotationTarget {
 	}
 
 	/**
-	 * Helper form of {@link #forEachAnnotationUsage(AnnotationDescriptor, Consumer)}
+	 * Form of {@link #forEachAnnotationUsage(AnnotationDescriptor, Consumer)} accepting the annotation {@linkplain Class}
 	 */
 	<X extends Annotation> void forEachAnnotationUsage(Class<X> type, Consumer<AnnotationUsage<X>> consumer);
 
@@ -155,17 +172,11 @@ public interface AnnotationTarget {
 	 * </pre>
 	 * a call to this method passing {@code TheMeta} on {@code ClassDetails(TheClass)} will return
 	 * the usage of {@code @TheAnnotation} on {@code TheClass}.
+	 *
+	 * @apiNote This method does not check across repeatable containers.  Although the return is a List, we
+	 * are functionally wanting just the unique ones.
 	 */
-	default <A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType) {
-		final List<AnnotationUsage<?>> usages = new ArrayList<>();
-		forAllAnnotationUsages( (usage) -> {
-			final AnnotationUsage<? extends Annotation> metaUsage = usage.getAnnotationDescriptor().getAnnotationUsage( metaAnnotationType );
-			if ( metaUsage != null ) {
-				usages.add( usage );
-			}
-		} );
-		return usages;
-	}
+	<A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType);
 
 	/**
 	 * Get a usage of the given annotation {@code type} whose {@code attributeToMatch} attribute value
@@ -208,6 +219,43 @@ public interface AnnotationTarget {
 			String matchName,
 			String attributeToMatch);
 
+	/**
+	 * Functional contract to process an annotation and return a value.
+	 *
+	 * @param <T> The type of the value being returned.
+	 */
+	@FunctionalInterface
+	interface AnnotationUsageProcessor<T> {
+		/**
+		 * The processed value.  May be {@code null} to indicate a "no match"
+		 */
+		T process(AnnotationUsage<? extends Annotation> annotationUsage);
+	}
+
+	/**
+	 * Returns a "matching value" using the passed {@code processor} from the
+	 * annotations, of the passed {@code annotationType}, used on the target.
+	 *
+	 * @apiNote In the case of repeatable annotations, the first usage for which
+	 * the passed {@code processor} does not return {@code null} will be returned.
+	 *
+	 * @return The matching value or {@code null}
+	 *
+	 * @param <T> The type of the value being returned.
+	 * @param <A> The type of annotations to check
+	 */
+	default <T, A extends Annotation> T fromAnnotations(
+			Class<A> annotationType,
+			AnnotationUsageProcessor<T> processor) {
+		final List<AnnotationUsage<A>> annotationUsages = getRepeatedAnnotationUsages( annotationType );
+		for ( AnnotationUsage<A> annotationUsage : annotationUsages ) {
+			final T result = processor.process( annotationUsage );
+			if ( result != null ) {
+				return result;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Subset of {@linkplain ElementType annotation targets} supported for mapping annotations

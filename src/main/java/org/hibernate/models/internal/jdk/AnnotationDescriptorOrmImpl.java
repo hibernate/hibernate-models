@@ -99,6 +99,11 @@ public class AnnotationDescriptorOrmImpl<A extends Annotation> implements Annota
 	}
 
 	@Override
+	public <A extends Annotation> boolean hasRepeatableAnnotationUsage(Class<A> type) {
+		return false;
+	}
+
+	@Override
 	public <X extends Annotation> AnnotationUsage<X> getAnnotationUsage(AnnotationDescriptor<X> descriptor) {
 		// there are none
 		return null;
@@ -138,6 +143,11 @@ public class AnnotationDescriptorOrmImpl<A extends Annotation> implements Annota
 	@Override
 	public <X extends Annotation> void forEachAnnotationUsage(Class<X> type, Consumer<AnnotationUsage<X>> consumer) {
 		// there are none
+	}
+
+	public <X extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<X> metaAnnotationType) {
+		// there are none
+		return Collections.emptyList();
 	}
 
 	@Override

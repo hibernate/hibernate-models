@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.internal.util.MutableInteger;
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
@@ -20,7 +21,10 @@ import org.jboss.jandex.Index;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SecondaryTable;
+import jakarta.persistence.SecondaryTables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -261,5 +265,110 @@ public class AnnotationUsageTests {
 			assertThat( annotation.nullable() ).isFalse();
 			assertThat( annotation.unique() ).isTrue();
 		}
+	}
+
+	@Test
+	void testFromAnnotationsWithJandex() {
+		testFromAnnotations( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testFromAnnotationsWithoutJandex() {
+		testFromAnnotations( null );
+	}
+
+	void testFromAnnotations(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+
+		final String query = classDetails.fromAnnotations( NamedQuery.class, (usage) -> {
+			final String name = usage.getString( "name" );
+			if ( "abc".equals( name ) ) {
+				return usage.getString( "query" );
+			}
+			return null;
+		} );
+		assertThat( query ).isEqualTo( "select me" );
+
+		final String query2 = classDetails.fromAnnotations( NamedQuery.class, (usage) -> {
+			final String name = usage.getString( "name" );
+			if ( "xyz".equals( name ) ) {
+				return usage.getString( "query" );
+			}
+			return null;
+		} );
+		assertThat( query2 ).isEqualTo( "select you" );
+
+		final AnnotationUsage<SecondaryTable> secondaryTable = classDetails.fromAnnotations( SecondaryTable.class, (usage) -> {
+			final String name = usage.getString( "name" );
+			if ( "another_table".equals( name ) ) {
+				//noinspection unchecked
+				return (AnnotationUsage<SecondaryTable>) usage;
+			}
+			return null;
+		} );
+		assertThat( query2 ).isEqualTo( "select you" );
+	}
+
+	@Test
+	void testHasAnnotationWithJandex() {
+		testHasAnnotation( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testHasAnnotationWithoutJandex() {
+		testHasAnnotation( null );
+	}
+
+	void testHasAnnotation(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+
+		// with #hasAnnotationUsage we only get true for the actual repeatable/container form used
+		assertThat( classDetails.hasAnnotationUsage( NamedQuery.class ) ).isFalse();
+		assertThat( classDetails.hasAnnotationUsage( NamedQueries.class ) ).isTrue();
+		assertThat( classDetails.hasAnnotationUsage( SecondaryTable.class ) ).isTrue();
+		assertThat( classDetails.hasAnnotationUsage( SecondaryTables.class ) ).isFalse();
+
+		// with #hasRepeatableAnnotationUsage we get true regardless
+		assertThat( classDetails.hasRepeatableAnnotationUsage( NamedQuery.class ) ).isTrue();
+		assertThat( classDetails.hasRepeatableAnnotationUsage( NamedQueries.class ) ).isTrue();
+		assertThat( classDetails.hasRepeatableAnnotationUsage( SecondaryTable.class ) ).isTrue();
+		assertThat( classDetails.hasRepeatableAnnotationUsage( SecondaryTables.class ) ).isFalse();
+	}
+
+	@Test
+	void testForEachAnnotationWithJandex() {
+		testForEachAnnotation( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testForEachAnnotationWithoutJandex() {
+		testForEachAnnotation( null );
+	}
+
+	void testForEachAnnotation(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+
+		final MutableInteger counter = new MutableInteger();
+
+		classDetails.forEachAnnotationUsage( Entity.class, entityAnnotationUsage -> counter.increment() );
+		assertThat( counter.get() ).isEqualTo( 1 );
+
+		counter.set( 0 );
+		classDetails.forEachAnnotationUsage( SecondaryTable.class, entityAnnotationUsage -> counter.increment() );
+		assertThat( counter.get() ).isEqualTo( 1 );
+
+		counter.set( 0 );
+		classDetails.forEachAnnotationUsage( NamedQuery.class, entityAnnotationUsage -> counter.increment() );
+		assertThat( counter.get() ).isEqualTo( 2 );
+
 	}
 }

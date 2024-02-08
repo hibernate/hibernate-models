@@ -76,9 +76,9 @@ public class AnnotationUsageHelper {
 			final List<AnnotationUsage<A>> repetitions = containerUsage.getAttributeValue( "value" );
 			if ( CollectionHelper.isNotEmpty( repetitions ) ) {
 				if ( usage != null ) {
-					// we can have both when repeatable + inherited are mixed
 					final ArrayList<AnnotationUsage<A>> combined = new ArrayList<>( repetitions );
-					combined.add( usage );
+					// prepend the singular usage
+					combined.add( 0, usage );
 					return combined;
 				}
 				return repetitions;

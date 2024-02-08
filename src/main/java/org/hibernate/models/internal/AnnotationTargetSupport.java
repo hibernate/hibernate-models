@@ -7,12 +7,14 @@
 package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
@@ -34,6 +36,23 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	}
 
 	@Override
+	default <A extends Annotation> boolean hasRepeatableAnnotationUsage(Class<A> type) {
+		final boolean containsDirectly = getUsageMap().containsKey( type );
+		if ( containsDirectly ) {
+			return true;
+		}
+
+		final AnnotationDescriptorRegistry descriptorRegistry = getBuildingContext().getAnnotationDescriptorRegistry();
+		final AnnotationDescriptor<A> descriptor = descriptorRegistry.getDescriptor( type );
+		if ( descriptor.isRepeatable() ) {
+			// e.g. caller asks about NamedQuery... let's also check for NamedQueries (which implies NamedQuery)
+			return getUsageMap().containsKey( descriptor.getRepeatableContainer().getAnnotationType() );
+		}
+
+		return false;
+	}
+
+	@Override
 	default <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> descriptor) {
 		return AnnotationUsageHelper.getUsage( descriptor, getUsageMap() );
 	}
@@ -45,21 +64,19 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 
 	@Override
 	default <A extends Annotation> AnnotationUsage<A> locateAnnotationUsage(Class<A> annotationType) {
-		final Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> localUsageMap = getUsageMap();
-
 		// e.g., locate `@Nationalized`
 		//		1. direct - look for `Nationalized.class` in the usage map (direct local use on the target)
 		//		2. "meta annotations" - for each local usage, check that annotation's annotations for `Nationalized.class` (one level deep)
 
 
 		// first, see if we can find it directly...
-		//noinspection unchecked
-		final AnnotationUsage<A> direct = (AnnotationUsage<A>) localUsageMap.get( annotationType );
-		if ( direct != null ) {
-			return direct;
+		final AnnotationUsage<A> localUsage = getAnnotationUsage( annotationType );
+		if ( localUsage != null ) {
+			return null;
 		}
 
 		// check as "meta annotations" (annotations on our annotations)...
+		final Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> localUsageMap = getUsageMap();
 		for ( Map.Entry<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> usageEntry : localUsageMap.entrySet() ) {
 			final AnnotationUsage<? extends Annotation> usage = usageEntry.getValue();
 			if ( annotationType.equals( usage.getAnnotationType() ) ) {
@@ -95,6 +112,19 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 				getBuildingContext().getAnnotationDescriptorRegistry().getDescriptor( type ),
 				consumer
 		);
+	}
+
+	@Override
+	default <A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType) {
+		final AnnotationDescriptorRegistry descriptorRegistry = getBuildingContext().getAnnotationDescriptorRegistry();
+		final List<AnnotationUsage<?>> usages = new ArrayList<>();
+		forAllAnnotationUsages( (usage) -> {
+			final AnnotationUsage<? extends Annotation> metaUsage = usage.getAnnotationDescriptor().getAnnotationUsage( metaAnnotationType );
+			if ( metaUsage != null ) {
+				usages.add( usage );
+			}
+		} );
+		return usages;
 	}
 
 	@Override

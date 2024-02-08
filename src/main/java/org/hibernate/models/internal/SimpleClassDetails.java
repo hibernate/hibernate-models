@@ -146,6 +146,11 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public <A extends Annotation> boolean hasRepeatableAnnotationUsage(Class<A> type) {
+		return false;
+	}
+
+	@Override
 	public <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> descriptor) {
 		return null;
 	}
@@ -172,6 +177,11 @@ public class SimpleClassDetails implements ClassDetails {
 
 	@Override
 	public <X extends Annotation> void forEachAnnotationUsage(Class<X> type, Consumer<AnnotationUsage<X>> consumer) {
+	}
+
+	@Override
+	public <A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType) {
+		return Collections.emptyList();
 	}
 
 	@Override
