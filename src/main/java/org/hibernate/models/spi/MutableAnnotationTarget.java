@@ -4,15 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.internal;
+package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import org.hibernate.models.spi.AnnotationTarget;
-import org.hibernate.models.spi.AnnotationUsage;
-
 /**
+ * Extension of AnnotationTarget which allows manipulation of the annotations
+ *
  * @author Steve Ebersole
  */
 public interface MutableAnnotationTarget extends AnnotationTarget {

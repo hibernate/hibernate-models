@@ -4,13 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.internal;
-
-import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.MethodDetails;
+package org.hibernate.models.spi;
 
 /**
+ * Extension of ClassDetails which allows manipulation of the members
+ *
  * @author Steve Ebersole
  */
 public interface MutableClassDetails extends ClassDetails, MutableAnnotationTarget {

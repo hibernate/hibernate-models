@@ -11,13 +11,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.models.internal.MutableMemberDetails;
-import org.hibernate.models.spi.ClassBasedTypeDetails;
+import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
-import org.hibernate.models.spi.TypeDetailsHelper;
 
 /**
  * @author Steve Ebersole

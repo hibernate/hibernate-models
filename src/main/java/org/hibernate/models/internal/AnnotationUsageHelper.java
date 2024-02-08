@@ -64,7 +64,7 @@ public class AnnotationUsageHelper {
 
 	public static <A extends Annotation> List<AnnotationUsage<A>> getRepeatedUsages(
 			AnnotationDescriptor<A> type,
-			Map<Class<? extends Annotation>, AnnotationUsage<?>> usageMap) {
+			Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> usageMap) {
 		// e.g. `@NamedQuery`
 		final AnnotationUsage<A> usage = findUsage( type, usageMap );
 		// e.g. `@NamedQueries`

@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AnnotationUsage;
+import org.hibernate.models.spi.MutableAnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
@@ -116,7 +117,6 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 
 	@Override
 	default <A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType) {
-		final AnnotationDescriptorRegistry descriptorRegistry = getBuildingContext().getAnnotationDescriptorRegistry();
 		final List<AnnotationUsage<?>> usages = new ArrayList<>();
 		forAllAnnotationUsages( (usage) -> {
 			final AnnotationUsage<? extends Annotation> metaUsage = usage.getAnnotationDescriptor().getAnnotationUsage( metaAnnotationType );
