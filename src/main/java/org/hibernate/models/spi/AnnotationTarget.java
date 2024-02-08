@@ -133,9 +133,30 @@ public interface AnnotationTarget {
 	<X extends Annotation> void forEachAnnotationUsage(Class<X> type, Consumer<AnnotationUsage<X>> consumer);
 
 	/**
-	 * Returns all annotations on this target where the annotation class is annotated with `metaAnnotationType`.
+	 * Returns all AnnotationUsage references from this target where the usage's
+	 * {@linkplain AnnotationUsage#getAnnotationDescriptor() annotation class} is annotated
+	 * with the given {@code metaAnnotationType}.
+	 * <p/>
+	 * E.g., given the following class and annotations
+	 * <pre class="brush:java">
+	 *     {@code @interface TheMeta} {
+	 *         ...
+	 *     }
+	 *
+	 *     {@code @TheMeta(...)}
+	 *     {@code @interface TheAnnotation} {
+	 *         ...
+	 *     }
+	 *
+	 *     {@code @TheAnnotation}
+	 *     {@code class TheClass} {
+	 *         ...
+	 *     }
+	 * </pre>
+	 * a call to this method passing {@code TheMeta} on {@code ClassDetails(TheClass)} will return
+	 * the usage of {@code @TheAnnotation} on {@code TheClass}.
 	 */
-	default List<AnnotationUsage<?>> getMetaAnnotated(Class<? extends Annotation> metaAnnotationType) {
+	default <A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType) {
 		final List<AnnotationUsage<?>> usages = new ArrayList<>();
 		forAllAnnotationUsages( (usage) -> {
 			final AnnotationUsage<? extends Annotation> metaUsage = usage.getAnnotationDescriptor().getAnnotationUsage( metaAnnotationType );
