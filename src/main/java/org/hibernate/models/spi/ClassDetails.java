@@ -97,6 +97,31 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 */
 	List<TypeVariableDetails> getTypeParameters();
 
+	@FunctionalInterface
+	interface ClassDetailsConsumer extends java.util.function.Consumer<ClassDetails> {
+		@Override
+		void accept(ClassDetails classDetails);
+	}
+
+	/**
+	 * Walk our super-classes passing each to the {@code consumer}
+	 */
+	default void forEachSuper(ClassDetailsConsumer consumer) {
+		ClassDetails check = getSuperClass();
+		while ( check != null && check != OBJECT_CLASS_DETAILS ) {
+			consumer.accept( check );
+			check = check.getSuperClass();
+		}
+	}
+
+	/**
+	 * Pass ourselves into the {@code consumer} and then the same {@linkplain #forEachSuper for each super class}
+	 */
+	default void forSelfAndEachSuper(ClassDetailsConsumer consumer) {
+		consumer.accept( this );
+		forEachSuper( consumer );
+	}
+
 	@Override
 	default TypeDetails resolveTypeVariable(String identifier) {
 		final TypeVariableDetails local = TypeDetailsHelper.findTypeVariableDetails(
