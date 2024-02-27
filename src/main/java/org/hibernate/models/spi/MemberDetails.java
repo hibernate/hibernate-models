@@ -39,6 +39,14 @@ public interface MemberDetails extends AnnotationTarget {
 	TypeDetails getType();
 
 	/**
+	 * For plural members, the {@linkplain #getElementType "element type"};
+	 * otherwise, the member's {@linkplain #getType() type}
+	 */
+	default TypeDetails getAssociatedType() {
+		return isPlural() ? getElementType() : getType();
+	}
+
+	/**
 	 * Get the plural element type for this member.  If the member does not have a type or the
 	 * member is not plural, a {@code null} is returned.
 	 * <p/>

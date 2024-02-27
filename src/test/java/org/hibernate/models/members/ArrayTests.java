@@ -41,18 +41,21 @@ public class ArrayTests {
 			final FieldDetails field = classDetails.findFieldByName( "intArray" );
 			assertThat( field.isPersistable() ).isTrue();
 			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( int[].class );
+			assertThat( field.getAssociatedType().determineRawClass().toJavaClass() ).isEqualTo( int.class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "intArray2" );
 			assertThat( field.isPersistable() ).isTrue();
 			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( int[][].class );
+			assertThat( field.getAssociatedType().determineRawClass().toJavaClass() ).isEqualTo( int[].class );
 		}
 
 		{
 			final FieldDetails field = classDetails.findFieldByName( "intArray3" );
 			assertThat( field.isPersistable() ).isTrue();
 			assertThat( field.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( int[][][].class );
+			assertThat( field.getAssociatedType().determineRawClass().toJavaClass() ).isEqualTo( int[][].class );
 		}
 
 		{

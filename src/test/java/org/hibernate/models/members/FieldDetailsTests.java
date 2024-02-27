@@ -54,6 +54,7 @@ public class FieldDetailsTests {
 		assertThat( propertyField.toJavaMember().getName() ).isEqualTo( "property" );
 		assertThat( propertyField.resolveAttributeName() ).isEqualTo( "property" );
 		assertThat( propertyField.getType().asClassType().getClassDetails().toJavaClass() ).isEqualTo( Integer.class );
+		assertThat( propertyField.getAssociatedType().determineRawClass().toJavaClass() ).isEqualTo( Integer.class );
 		assertThat( propertyField.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 		assertThat( propertyField.isPersistable() ).isTrue();
 		assertThat( propertyField.getDeclaringType() ).isSameAs( classDetails );
@@ -61,6 +62,7 @@ public class FieldDetailsTests {
 		final FieldDetails somethingField = classDetails.findFieldByName( "something" );
 		assertThat( somethingField.resolveAttributeName() ).isEqualTo( "something" );
 		assertThat( somethingField.getType().asClassType().getClassDetails().toJavaClass() ).isEqualTo( Object.class );
+		assertThat( somethingField.getAssociatedType().determineRawClass().toJavaClass() ).isEqualTo( Object.class );
 		assertThat( somethingField.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 		assertThat( somethingField.isPersistable() ).isTrue();
 		assertThat( somethingField.getDeclaringType() ).isSameAs( classDetails );
@@ -68,6 +70,7 @@ public class FieldDetailsTests {
 		final FieldDetails activeField = classDetails.findFieldByName( "active" );
 		assertThat( activeField.resolveAttributeName() ).isEqualTo( "active" );
 		assertThat( activeField.getType().asPrimitiveType().getClassDetails().toJavaClass() ).isEqualTo( boolean.class );
+		assertThat( activeField.getAssociatedType().determineRawClass().toJavaClass() ).isEqualTo( boolean.class );
 		assertThat( activeField.getVisibility() ).isEqualTo( MemberDetails.Visibility.PRIVATE );
 		assertThat( activeField.isPersistable() ).isTrue();
 		assertThat( activeField.getDeclaringType() ).isSameAs( classDetails );
@@ -117,6 +120,7 @@ public class FieldDetailsTests {
 		final FieldDetails intValueArrayField = classDetails.findFieldByName( "intValueArray" );
 		assertThat( intValueArrayField.resolveAttributeName() ).isEqualTo( "intValueArray" );
 		assertThat( intValueArrayField.getType().asArrayType().getArrayClassDetails().toJavaClass() ).isEqualTo( int[].class );
+		assertThat( intValueArrayField.getAssociatedType().determineRawClass().toJavaClass() ).isEqualTo( int.class );
 		assertThat( intValueArrayField.getVisibility() ).isEqualTo( MemberDetails.Visibility.PROTECTED );
 		assertThat( intValueArrayField.isPersistable() ).isTrue();
 		assertThat( intValueArrayField.getDeclaringType() ).isSameAs( classDetails );
