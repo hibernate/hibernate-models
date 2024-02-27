@@ -66,17 +66,16 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	@Override
 	default <A extends Annotation> AnnotationUsage<A> locateAnnotationUsage(Class<A> annotationType) {
 		// e.g., locate `@Nationalized`
-		//		1. direct - look for `Nationalized.class` in the usage map (direct local use on the target)
-		//		2. "meta annotations" - for each local usage, check that annotation's annotations for `Nationalized.class` (one level deep)
 
-
-		// first, see if we can find it directly...
+		// first, check for direct use
+		// 		- look for `Nationalized.class` in the usage map of the target
 		final AnnotationUsage<A> localUsage = getAnnotationUsage( annotationType );
 		if ( localUsage != null ) {
-			return null;
+			return localUsage;
 		}
 
-		// check as "meta annotations" (annotations on our annotations)...
+		// next, check as a "meta annotation"
+		// 		- for each local usage, check that annotation's annotations for `Nationalized.class` (one level deep)
 		final Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> localUsageMap = getUsageMap();
 		for ( Map.Entry<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> usageEntry : localUsageMap.entrySet() ) {
 			final AnnotationUsage<? extends Annotation> usage = usageEntry.getValue();
