@@ -6,17 +6,31 @@ group = "org.hibernate.models"
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def versionFile = project.file( "version.txt" )
-def releaseVersion = project.hasProperty('releaseVersion')
-		? project.property('releaseVersion') as String
-		: versionFile.text
-def developmentVersion = project.hasProperty('developmentVersion')
-		? project.property('developmentVersion') as String
-		: versionFile.text
+def releaseVersion = determineVersion("releaseVersion", versionFile )
+def developmentVersion = determineVersion("developmentVersion", versionFile)
+
+project.version = releaseVersion != null
+		? releaseVersion
+		: developmentVersion
 
 ext.versionFile = versionFile
 ext.releaseVersion = releaseVersion
 ext.developmentVersion = developmentVersion
 
-project.version = releaseVersion != null
-		? releaseVersion
-		: developmentVersion
+
+private String determineVersion(String type, File versionFile) {
+	if ( project.hasProperty( type ) ) {
+		// only use the provided value if it is non-empty
+		def incomingValue = project.property( type ) as String
+		if ( incomingValue != null && incomingValue.trim().length() > 0 ) {
+			return incomingValue
+		}
+	}
+
+	def versionFileVersion = versionFile.text.trim()
+	// make sure we have a version
+	if ( versionFileVersion.length() <= 0 ) {
+		throw new RuntimeException("Project version unknown")
+	}
+	return versionFileVersion
+}
