@@ -271,4 +271,5 @@ public class TypeDetailsHelper {
 		}
 		return new ArrayTypeDetailsImpl( arrayClassDetails, constituentType );
 	}
+
 }

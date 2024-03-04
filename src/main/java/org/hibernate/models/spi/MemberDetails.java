@@ -66,8 +66,7 @@ public interface MemberDetails extends AnnotationTarget {
 
 		if ( memberType.isImplementor( Collection.class ) ) {
 			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
-				// raw use
-				return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+				return CollectionElementSwitch.extractCollectionElementType( memberType );
 			}
 			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
 				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
@@ -83,8 +82,7 @@ public interface MemberDetails extends AnnotationTarget {
 
 		if ( memberType.isImplementor( Map.class ) ) {
 			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
-				// raw use
-				return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+				return MapValueSwitch.extractMapValueType( memberType );
 			}
 			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
 				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
@@ -113,8 +111,7 @@ public interface MemberDetails extends AnnotationTarget {
 
 		if ( memberType.isImplementor( Map.class ) ) {
 			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
-				// raw use
-				return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+				return MapKeySwitch.extractMapKeyType( memberType );
 			}
 			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
 				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();

@@ -7,8 +7,12 @@
 
 package org.hibernate.models.generics;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -279,6 +283,117 @@ public class CollectionTests {
 		assertThat( namedStuffFieldValueWildcardType.determineRawClass() ).isNotNull();
 	}
 
+	@Test
+	void testListSubclassesWithJandex() {
+		testListSubclasses( SourceModelTestHelper.buildJandexIndex(
+				SpecialList.class,
+				SpecialArrayList.class,
+				SuperSpecialArrayList.class,
+				SpecialListContainer.class
+		) );
+	}
+
+	@Test
+	void testListSubclassesWithoutJandex() {
+		testListSubclasses( null );
+	}
+
+	private void testListSubclasses(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
+				index,
+				SpecialList.class,
+				SpecialArrayList.class,
+				SuperSpecialArrayList.class,
+				SpecialListContainer.class
+		);
+
+		final ClassDetails specialListDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SpecialList.class.getName() );
+		assertThat( specialListDetails.isImplementor( List.class ) ).isTrue();
+
+		final ClassDetails specialArrayListDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SpecialArrayList.class.getName() );
+		assertThat( specialArrayListDetails.isImplementor( List.class ) ).isTrue();
+
+		final ClassDetails superSpecialArrayListDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SuperSpecialArrayList.class.getName() );
+		assertThat( superSpecialArrayListDetails.isImplementor( List.class ) ).isTrue();
+
+		final ClassDetails containerDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SpecialListContainer.class.getName() );
+
+		final FieldDetails specialListField = containerDetails.findFieldByName( "specialList" );
+		assertThat( specialListField.getAssociatedType() ).isEqualTo( specialListField.getElementType() );
+		assertThat( specialListField.getElementType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+
+		final FieldDetails specialArrayListField = containerDetails.findFieldByName( "specialArrayList" );
+		assertThat( specialArrayListField.getAssociatedType() ).isEqualTo( specialListField.getElementType() );
+		assertThat( specialArrayListField.getElementType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+
+		final FieldDetails superSpecialArrayListField = containerDetails.findFieldByName( "superSpecialArrayList" );
+		assertThat( superSpecialArrayListField.getAssociatedType() ).isEqualTo( specialListField.getElementType() );
+		assertThat( superSpecialArrayListField.getElementType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+	}
+
+	@Test
+	void testMapSubclassesWithJandex() {
+		testMapSubclasses( SourceModelTestHelper.buildJandexIndex(
+				SpecialMap.class,
+				SpecialHashMap.class,
+				SuperSpecialHashMap.class,
+				SpecialMapContainer.class
+		) );
+	}
+
+	@Test
+	void testMapSubclassesWithoutJandex() {
+		testMapSubclasses( null );
+	}
+
+	private void testMapSubclasses(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
+				index,
+				SpecialMap.class,
+				SpecialHashMap.class,
+				SuperSpecialHashMap.class,
+				SpecialMapContainer.class
+		);
+
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SpecialMapContainer.class.getName() );
+
+		final FieldDetails standardMapField = classDetails.findFieldByName( "standardMap" );
+		assertThat( standardMapField.getType().isImplementor( Map.class ) ).isTrue();
+		assertThat( standardMapField.getMapKeyType().isImplementor( String.class ) ).isTrue();
+		assertThat( standardMapField.getMapKeyType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+		assertThat( standardMapField.getElementType().isImplementor( String.class ) ).isTrue();
+		assertThat( standardMapField.getElementType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+
+		final FieldDetails parameterizedMapField = classDetails.findFieldByName( "parameterizedMap" );
+		assertThat( parameterizedMapField.getType().isImplementor( Map.class ) ).isTrue();
+		assertThat( parameterizedMapField.getMapKeyType().isImplementor( String.class ) ).isTrue();
+		assertThat( parameterizedMapField.getMapKeyType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+		// unbound <T>
+		assertThat( parameterizedMapField.getElementType().determineRawClass().toJavaClass() ).isEqualTo( Object.class );
+
+		final FieldDetails specialMapField = classDetails.findFieldByName( "specialMap" );
+		assertThat( specialMapField.getType().isImplementor( Map.class ) ).isTrue();
+		assertThat( specialMapField.getMapKeyType().isImplementor( String.class ) ).isTrue();
+		assertThat( specialMapField.getMapKeyType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+		assertThat( specialMapField.getElementType().isImplementor( String.class ) ).isTrue();
+		assertThat( specialMapField.getElementType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+
+		final FieldDetails specialHashMapField = classDetails.findFieldByName( "specialHashMap" );
+		assertThat( specialHashMapField.getType().isImplementor( Map.class ) ).isTrue();
+		assertThat( specialHashMapField.getMapKeyType().isImplementor( String.class ) ).isTrue();
+		assertThat( specialHashMapField.getMapKeyType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+		assertThat( specialHashMapField.getElementType().isImplementor( String.class ) ).isTrue();
+		assertThat( specialHashMapField.getElementType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+
+		final FieldDetails superSpecialHashMapField = classDetails.findFieldByName( "superSpecialHashMap" );
+		assertThat( superSpecialHashMapField.getType().isImplementor( Map.class ) ).isTrue();
+		assertThat( superSpecialHashMapField.getMapKeyType().isImplementor( String.class ) ).isTrue();
+		assertThat( superSpecialHashMapField.getMapKeyType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+		assertThat( superSpecialHashMapField.getElementType().isImplementor( String.class ) ).isTrue();
+		assertThat( superSpecialHashMapField.getElementType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
+	}
+
+
 	@SuppressWarnings("unused")
 	static class ClassOfCollections<T> {
 		List<String> listOfString;
@@ -319,5 +434,217 @@ public class CollectionTests {
 		List<? super Stuff> superStuff;
 
 		Map<String, ? extends Stuff> namedStuff;
+	}
+
+	static class SpecialListContainer {
+		private SpecialList specialList;
+		private SpecialArrayList specialArrayList;
+		private SuperSpecialArrayList superSpecialArrayList;
+	}
+
+	static class SpecialArrayList extends ArrayList<String> {
+	}
+
+	static class SuperSpecialArrayList extends SpecialArrayList {
+	}
+
+	@SuppressWarnings({ "NullableProblems", "DataFlowIssue", "Contract" })
+	static class SpecialList implements List<String> {
+
+		@Override
+		public int size() {
+			return 0;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return false;
+		}
+
+		@Override
+		public boolean contains(Object o) {
+			return false;
+		}
+
+		@Override
+		public Iterator<String> iterator() {
+			return null;
+		}
+
+		@Override
+		public Object[] toArray() {
+			return new Object[0];
+		}
+
+		@Override
+		public <T> T[] toArray(T[] a) {
+			return null;
+		}
+
+		@Override
+		public boolean add(String s) {
+			return false;
+		}
+
+		@Override
+		public boolean remove(Object o) {
+			return false;
+		}
+
+		@Override
+		public boolean containsAll(Collection<?> c) {
+			return false;
+		}
+
+		@Override
+		public boolean addAll(Collection<? extends String> c) {
+			return false;
+		}
+
+		@Override
+		public boolean addAll(int index, Collection<? extends String> c) {
+			return false;
+		}
+
+		@Override
+		public boolean removeAll(Collection<?> c) {
+			return false;
+		}
+
+		@Override
+		public boolean retainAll(Collection<?> c) {
+			return false;
+		}
+
+		@Override
+		public void clear() {
+
+		}
+
+		@Override
+		public String get(int index) {
+			return null;
+		}
+
+		@Override
+		public String set(int index, String element) {
+			return null;
+		}
+
+		@Override
+		public void add(int index, String element) {
+
+		}
+
+		@Override
+		public String remove(int index) {
+			return null;
+		}
+
+		@Override
+		public int indexOf(Object o) {
+			return 0;
+		}
+
+		@Override
+		public int lastIndexOf(Object o) {
+			return 0;
+		}
+
+		@Override
+		public ListIterator<String> listIterator() {
+			return null;
+		}
+
+		@Override
+		public ListIterator<String> listIterator(int index) {
+			return null;
+		}
+
+		@Override
+		public List<String> subList(int fromIndex, int toIndex) {
+			return null;
+		}
+	}
+
+
+
+	static class SpecialMapContainer<T> {
+		private Map<String,String> standardMap;
+		private Map<String,T> parameterizedMap;
+		private SpecialMap specialMap;
+		private SpecialHashMap specialHashMap;
+		private SuperSpecialHashMap superSpecialHashMap;
+	}
+
+	static class SpecialHashMap extends HashMap<String,String> {
+	}
+
+	static class SuperSpecialHashMap extends SpecialHashMap {
+	}
+
+
+	@SuppressWarnings({ "NullableProblems", "DataFlowIssue" })
+	static class SpecialMap implements Map<String,String> {
+
+		@Override
+		public int size() {
+			return 0;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return false;
+		}
+
+		@Override
+		public boolean containsKey(Object key) {
+			return false;
+		}
+
+		@Override
+		public boolean containsValue(Object value) {
+			return false;
+		}
+
+		@Override
+		public String get(Object key) {
+			return null;
+		}
+
+		@Override
+		public String put(String key, String value) {
+			return null;
+		}
+
+		@Override
+		public String remove(Object key) {
+			return null;
+		}
+
+		@Override
+		public void putAll(Map<? extends String, ? extends String> m) {
+
+		}
+
+		@Override
+		public void clear() {
+
+		}
+
+		@Override
+		public Set<String> keySet() {
+			return null;
+		}
+
+		@Override
+		public Collection<String> values() {
+			return null;
+		}
+
+		@Override
+		public Set<Entry<String, String>> entrySet() {
+			return null;
+		}
 	}
 }
