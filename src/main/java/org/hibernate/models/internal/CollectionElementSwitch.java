@@ -5,12 +5,18 @@
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
 
-package org.hibernate.models.spi;
+package org.hibernate.models.internal;
 
 import java.util.Collection;
 
-import org.hibernate.models.internal.TypeDetailsSwitchSupport;
-import org.hibernate.models.internal.TypeDetailsSwitcher;
+import org.hibernate.models.spi.ClassBasedTypeDetails;
+import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassTypeDetails;
+import org.hibernate.models.spi.ParameterizedTypeDetails;
+import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
+import org.hibernate.models.spi.TypeVariableReferenceDetails;
+import org.hibernate.models.spi.WildcardTypeDetails;
 
 /**
  * Used to determine the type details for a Collection element - see {@linkplain #extractCollectionElementType(TypeDetails)}
@@ -22,7 +28,6 @@ public class CollectionElementSwitch extends TypeDetailsSwitchSupport<TypeDetail
 	public static TypeDetails extractCollectionElementType(TypeDetails memberType) {
 		assert memberType.isImplementor( Collection.class );
 
-		// we may need to handle "concrete types" such as `class SpecialList implements List<String>`
 		final ClassDetails rawClassDetails = memberType.determineRawClass();
 		final CollectionElementSwitch collectionElementSwitch = new CollectionElementSwitch( memberType );
 

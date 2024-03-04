@@ -10,6 +10,9 @@ import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Map;
 
+import org.hibernate.models.internal.CollectionElementSwitch;
+import org.hibernate.models.internal.MapKeySwitch;
+import org.hibernate.models.internal.MapValueSwitch;
 import org.hibernate.models.internal.ModifierUtils;
 
 /**
@@ -66,6 +69,7 @@ public interface MemberDetails extends AnnotationTarget {
 
 		if ( memberType.isImplementor( Collection.class ) ) {
 			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
+				// handle "concrete types" such as `class SpecialList implements List<String>`
 				return CollectionElementSwitch.extractCollectionElementType( memberType );
 			}
 			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
@@ -82,6 +86,7 @@ public interface MemberDetails extends AnnotationTarget {
 
 		if ( memberType.isImplementor( Map.class ) ) {
 			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
+				// handle "concrete types" such as `class SpecialMap implements Map<String,String>`
 				return MapValueSwitch.extractMapValueType( memberType );
 			}
 			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
@@ -111,6 +116,7 @@ public interface MemberDetails extends AnnotationTarget {
 
 		if ( memberType.isImplementor( Map.class ) ) {
 			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
+				// handle "concrete types" such as `class SpecialMap implements Map<String,String>`
 				return MapKeySwitch.extractMapKeyType( memberType );
 			}
 			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {

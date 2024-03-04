@@ -5,30 +5,35 @@
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
 
-package org.hibernate.models.spi;
+package org.hibernate.models.internal;
 
 import java.util.Map;
 
-import org.hibernate.models.internal.TypeDetailsSwitchSupport;
-import org.hibernate.models.internal.TypeDetailsSwitcher;
+import org.hibernate.models.spi.ClassBasedTypeDetails;
+import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassTypeDetails;
+import org.hibernate.models.spi.ParameterizedTypeDetails;
+import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
+import org.hibernate.models.spi.TypeVariableReferenceDetails;
+import org.hibernate.models.spi.WildcardTypeDetails;
 
 /**
- * Used to determine the type details for a Map key - see {@linkplain #extractMapKeyType(TypeDetails)}
+ * Used to determine the type details for a Map value - see {@linkplain #extractMapValueType(TypeDetails)}
  *
  * @author Steve Ebersole
  */
-public class MapKeySwitch extends TypeDetailsSwitchSupport<TypeDetails> {
+public class MapValueSwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 
-	public static TypeDetails extractMapKeyType(TypeDetails memberType) {
+	public static TypeDetails extractMapValueType(TypeDetails memberType) {
 		assert memberType.isImplementor( Map.class );
 
-		// we may need to handle "concrete types" such as `class SpecialList implements List<String>`
 		final ClassDetails rawClassDetails = memberType.determineRawClass();
-		final MapKeySwitch mapKeySwitch = new MapKeySwitch( memberType );
+		final MapValueSwitch mapValueSwitch = new MapValueSwitch( memberType );
 
 		// first, check super-type...
 		if ( rawClassDetails.getGenericSuperType() != null ) {
-			final TypeDetails typeDetails = TypeDetailsSwitcher.switchType( rawClassDetails.getGenericSuperType(), mapKeySwitch );
+			final TypeDetails typeDetails = TypeDetailsSwitcher.switchType( rawClassDetails.getGenericSuperType(), mapValueSwitch );
 			if ( typeDetails != null ) {
 				return typeDetails;
 			}
@@ -36,7 +41,7 @@ public class MapKeySwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 
 		// then, interfaces...
 		for ( TypeDetails implementedInterface : rawClassDetails.getImplementedInterfaces() ) {
-			final TypeDetails typeDetails = TypeDetailsSwitcher.switchType( implementedInterface, mapKeySwitch );
+			final TypeDetails typeDetails = TypeDetailsSwitcher.switchType( implementedInterface, mapValueSwitch );
 			if ( typeDetails != null ) {
 				return typeDetails;
 			}
@@ -48,7 +53,7 @@ public class MapKeySwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 
 	private final TypeDetails memberTypeDetails;
 
-	private MapKeySwitch(TypeDetails memberTypeDetails) {
+	private MapValueSwitch(TypeDetails memberTypeDetails) {
 		this.memberTypeDetails = memberTypeDetails;
 	}
 
@@ -65,7 +70,7 @@ public class MapKeySwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 	@Override
 	public TypeDetails caseParameterizedType(ParameterizedTypeDetails parameterizedType) {
 		if ( parameterizedType.isImplementor( Map.class ) ) {
-			return parameterizedType.getArguments().get( 0 );
+			return parameterizedType.getArguments().get( 1 );
 		}
 		return null;
 	}
