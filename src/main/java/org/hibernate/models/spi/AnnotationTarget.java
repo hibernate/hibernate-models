@@ -106,6 +106,32 @@ public interface AnnotationTarget {
 	<A extends Annotation> AnnotationUsage<A> getAnnotationUsage(Class<A> type);
 
 	/**
+	 * Form of {@linkplain #getAnnotationUsage(AnnotationDescriptor)} which returns {@code null} instead of
+	 * throwing {@linkplain AnnotationAccessException} when more than one usage of the requested
+	 * annotation exists.
+	 */
+	default <A extends Annotation> AnnotationUsage<A> getSingleAnnotationUsage(AnnotationDescriptor<A> descriptor) {
+		try {
+			return getAnnotationUsage( descriptor );
+		}
+		catch (AnnotationAccessException ignore) {
+			return null;
+		}
+	}
+
+	/**
+	 * Form of {@link #getSingleAnnotationUsage(AnnotationDescriptor)} accepting the annotation {@linkplain Class}
+	 */
+	default <A extends Annotation> AnnotationUsage<A> getSingleAnnotationUsage(Class<A> type) {
+		try {
+			return getAnnotationUsage( type );
+		}
+		catch (AnnotationAccessException ignore) {
+			return null;
+		}
+	}
+
+	/**
 	 * Form of {@linkplain #getAnnotationUsage} which also considers meta-annotations -
 	 * annotations on the classes of each {@linkplain #getAllAnnotationUsages() local annotation}.
 	 */

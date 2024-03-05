@@ -5,6 +5,7 @@ import java.util.List;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.internal.util.MutableInteger;
+import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
@@ -369,6 +370,32 @@ public class AnnotationUsageTests {
 		counter.set( 0 );
 		classDetails.forEachAnnotationUsage( NamedQuery.class, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 2 );
+	}
 
+	@Test
+	void testGetSingleUsageWithJandex() {
+		testGetSingleUsage( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testGetSingleUsageWithoutJandex() {
+		testGetSingleUsage( null );
+	}
+
+	void testGetSingleUsage(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+
+		try {
+			classDetails.getAnnotationUsage( NamedQuery.class );
+			fail( "Expecting an AnnotationAccessException to be thrown" );
+		}
+		catch (AnnotationAccessException expected) {
+			// this is expected
+		}
+
+		final AnnotationUsage<NamedQuery> singleAnnotationUsage = classDetails.getSingleAnnotationUsage( NamedQuery.class );
+		assertThat( singleAnnotationUsage ).isNull();
 	}
 }
