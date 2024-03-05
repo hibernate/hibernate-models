@@ -15,9 +15,12 @@ import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
+import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.MutableAnnotationUsage;
 
 /**
+ * AnnotationUsage built dynamically (for dynamic models, XML mappings, etc.)
+ *
  * @author Steve Ebersole
  */
 public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnnotationUsage<A> {
@@ -33,6 +36,8 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 	public DynamicAnnotationUsage(AnnotationDescriptor<A> annotationDescriptor, AnnotationTarget target) {
 		this.annotationDescriptor = annotationDescriptor;
 		this.target = target;
+
+		this.values = extractBaselineValues( annotationDescriptor );
 	}
 
 	@Override
@@ -60,11 +65,24 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 		return null;
 	}
 
+	/**
+	 * DynamicAnnotationUsage
+	 */
+	@Override
+	public <V> V getAttributeValue(String name) {
+		final Object value = findAttributeValue( name );
+		if ( value == null ) {
+			// null values are not supported as annotation attribute values; we honor that
+			// in hibernate-models.  return the default.
+			//noinspection unchecked
+			return (V) getAnnotationDescriptor().getAttribute( name ).getAttributeMethod().getDefaultValue();
+		}
+		//noinspection unchecked
+		return (V) value;
+	}
+
 	@Override
 	public <V> V setAttributeValue(String name, V value) {
-		// for set, we need to check up front -
-		// todo : do we want to add a distinction for a checked versus unchecked set?
-		//		- i.e. setAttributeValueSafely
 		if ( annotationDescriptor.getAttribute( name ) == null ) {
 			throw new UnknownAnnotationAttributeException(
 					String.format(
@@ -82,5 +100,13 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 
 		//noinspection unchecked
 		return (V) values.put( name, value );
+	}
+
+	private static <A extends Annotation> Map<String, Object> extractBaselineValues(AnnotationDescriptor<A> annotationDescriptor) {
+		final HashMap<String, Object> values = new HashMap<>();
+		for ( AttributeDescriptor<?> attribute : annotationDescriptor.getAttributes() ) {
+			values.put( attribute.getName(), attribute.getAttributeMethod().getDefaultValue() );
+		}
+		return values;
 	}
 }
