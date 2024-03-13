@@ -118,7 +118,7 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	default <A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType) {
 		final List<AnnotationUsage<?>> usages = new ArrayList<>();
 		forAllAnnotationUsages( (usage) -> {
-			final AnnotationUsage<? extends Annotation> metaUsage = usage.getAnnotationDescriptor().getAnnotationUsage( metaAnnotationType );
+			final Annotation metaUsage = usage.getAnnotationType().getAnnotation( metaAnnotationType );
 			if ( metaUsage != null ) {
 				usages.add( usage );
 			}
