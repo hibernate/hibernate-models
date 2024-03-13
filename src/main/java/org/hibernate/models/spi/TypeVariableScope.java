@@ -30,4 +30,12 @@ public interface TypeVariableScope {
 	 * @return The type variable, or {@code null} none could be found
 	 */
 	TypeDetails resolveTypeVariable(String identifier);
+
+	/**
+	 * Determine the raw {@linkplain ClassDetails class} for the given type. Never returns {@code null}, opting
+	 * to return {@linkplain ClassDetails#OBJECT_CLASS_DETAILS Object} instead if the raw class is not known
+	 *
+	 * @return The raw class details, or {@linkplain ClassDetails#OBJECT_CLASS_DETAILS Object} if "not known".
+	 */
+	ClassDetails determineRawClass();
 }

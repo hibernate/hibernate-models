@@ -237,33 +237,17 @@ public interface MemberDetails extends AnnotationTarget {
 	 * @apiNote It is only valid to call this on members which have a type, i.e. fields,
 	 * getters, setters and record components.
 	 */
-	default TypeDetails resolveRelativeType(TypeDetails container) {
-		return getType().determineRelativeType( container );
-	}
-
-	/**
-	 * Determine the type of the member relative to the given {@code container} class.
-	 *
-	 * @see #resolveRelativeType(TypeDetails)
-	 */
-	default TypeDetails resolveRelativeType(ClassDetails container) {
+	default TypeDetails resolveRelativeType(TypeVariableScope container) {
 		return getType().determineRelativeType( container );
 	}
 
 	/**
 	 * Determine the concrete class of the member relative to the given {@code container} type.
 	 * <p/>
-	 * Similar to {@linkplain #resolveRelativeType(TypeDetails)}, but fully resolving the result
+	 * Similar to {@linkplain #resolveRelativeType(TypeVariableScope)}, but fully resolving the result
 	 * into the concrete class.
 	 */
-	default ClassBasedTypeDetails resolveRelativeClassType(TypeDetails container) {
-		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
-	}
-
-	/**
-	 * @see #resolveRelativeClassType(TypeDetails)
-	 */
-	default ClassBasedTypeDetails resolveRelativeClassType(ClassDetails container) {
+	default ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container) {
 		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
 	}
 

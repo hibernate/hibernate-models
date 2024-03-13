@@ -21,6 +21,7 @@ import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeDetailsHelper;
+import org.hibernate.models.spi.TypeVariableScope;
 
 import static org.hibernate.models.spi.MethodDetails.MethodKind.GETTER;
 import static org.hibernate.models.spi.MethodDetails.MethodKind.SETTER;
@@ -124,7 +125,7 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	}
 
 	@Override
-	public TypeDetails resolveRelativeType(TypeDetails container) {
+	public TypeDetails resolveRelativeType(TypeVariableScope container) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
 			return type.determineRelativeType( container );
 		}
@@ -133,24 +134,7 @@ public class JdkMethodDetails extends AbstractAnnotationTarget implements Method
 	}
 
 	@Override
-	public TypeDetails resolveRelativeType(ClassDetails container) {
-		if ( methodKind == GETTER || methodKind == SETTER ) {
-			return TypeDetailsHelper.resolveRelativeType( type, container );
-		}
-
-		throw new IllegalStateException( "Method does not have a type - " + this );
-	}
-
-	@Override
-	public ClassBasedTypeDetails resolveRelativeClassType(TypeDetails container) {
-		if ( methodKind == GETTER || methodKind == SETTER ) {
-			return TypeDetailsHelper.resolveRelativeClassType( type, container );
-		}
-		throw new IllegalStateException( "Method does not have a type - " + this );
-	}
-
-	@Override
-	public ClassBasedTypeDetails resolveRelativeClassType(ClassDetails container) {
+	public ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
 			return TypeDetailsHelper.resolveRelativeClassType( type, container );
 		}

@@ -27,7 +27,7 @@ public interface ParameterizedTypeDetails extends ClassBasedTypeDetails {
 
 	List<TypeDetails> getArguments();
 
-	TypeDetails getOwner();
+	TypeVariableScope getOwner();
 
 	@Override
 	default ClassDetails getClassDetails() {

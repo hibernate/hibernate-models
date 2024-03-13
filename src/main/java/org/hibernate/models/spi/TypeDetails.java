@@ -122,25 +122,11 @@ public interface TypeDetails extends TypeVariableScope {
 	 *     <li>Passing {@code AnotherThing}, the result would be {@code ClassTypeDetails(Integer)}</li>
 	 * </ul>
 	 */
-	default TypeDetails determineRelativeType(TypeDetails container) {
+	default TypeDetails determineRelativeType(TypeVariableScope container) {
 		return TypeDetailsHelper.resolveRelativeType( this, container );
 	}
 
-	/**
-	 * Determine the type relative to the passed {@code container}.
-	 * <p/>
-	 * Overload of {@linkplain #determineRelativeType(TypeDetails)}
-	 */
-	default TypeDetails determineRelativeType(ClassDetails container) {
-		return TypeDetailsHelper.resolveRelativeType( this, container );
-	}
-
-	/**
-	 * Determine the raw {@linkplain ClassDetails class} for the given type.  Never returns {@code null}, opting
-	 * to return {@linkplain ClassDetails#OBJECT_CLASS_DETAILS Object} instead if the raw class is not known
-	 *
-	 * @return The raw class details, or {@linkplain ClassDetails#OBJECT_CLASS_DETAILS Object} if "not known".
-	 */
+	@Override
 	default ClassDetails determineRawClass() {
 		return TypeDetailsHelper.resolveRawClass( this );
 	}

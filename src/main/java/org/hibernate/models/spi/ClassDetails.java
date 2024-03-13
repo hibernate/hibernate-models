@@ -128,7 +128,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 				identifier,
 				getTypeParameters()
 		);
-		if ( local != null ) {
+		if ( local != null && local.isResolved() ) {
 			return local;
 		}
 
@@ -166,10 +166,18 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		}
 
 		if ( getSuperClass() != null ) {
-			return getSuperClass().resolveTypeVariable( identifier );
+			final TypeDetails typeDetails = getSuperClass().resolveTypeVariable( identifier );
+			if ( typeDetails != ClassBasedTypeDetails.OBJECT_TYPE_DETAILS ) {
+				return typeDetails;
+			}
 		}
 
-		return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+		return local != null ? local : ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+	}
+
+	@Override
+	default ClassDetails determineRawClass() {
+		return this;
 	}
 
 	/**
