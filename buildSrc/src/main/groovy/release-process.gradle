@@ -16,7 +16,6 @@ plugins {
 
 def releaseVersion = project.ext.releaseVersion as String
 def developmentVersion = project.ext.developmentVersion as String
-def gitRemote = determineGitRemote( project )
 def gitBranch = determineGitBranch( project )
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,6 +135,7 @@ def pushToGitTask = tasks.register( 'pushToGit' ) {
 	dependsOn changeToDevelopmentVersionTask
 
 	doLast {
+		def gitRemote = determineGitRemote( project )
 		logger.lifecycle "Pushing branch and tag to Git : {}", gitRemote
 		logger.lifecycle "    > branch : {}", gitBranch
 		logger.lifecycle "    > tag    : {}", releaseVersion
