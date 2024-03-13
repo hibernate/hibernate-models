@@ -16,6 +16,7 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableScope;
 
 /**
  * @author Steve Ebersole
@@ -102,12 +103,7 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 	}
 
 	@Override
-	public TypeDetails resolveRelativeType(TypeDetails container) {
-		return type;
-	}
-
-	@Override
-	public TypeDetails resolveRelativeType(ClassDetails container) {
+	public TypeDetails resolveRelativeType(TypeVariableScope container) {
 		return type;
 	}
 
