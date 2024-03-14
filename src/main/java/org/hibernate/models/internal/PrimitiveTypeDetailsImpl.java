@@ -10,6 +10,7 @@ package org.hibernate.models.internal;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.PrimitiveTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
 
 /**
  * @author Steve Ebersole
@@ -31,7 +32,7 @@ public record PrimitiveTypeDetailsImpl(ClassDetails classDetails) implements Pri
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable) {
 		return this;
 	}
 

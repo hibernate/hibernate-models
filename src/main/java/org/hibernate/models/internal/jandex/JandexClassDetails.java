@@ -30,7 +30,7 @@ import org.jboss.jandex.TypeVariable;
 
 import static java.util.Collections.emptyList;
 import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
-import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.TYPE_SWITCH_STANDARD;
+import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.switchType;
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
 import static org.hibernate.models.internal.util.CollectionHelper.isEmpty;
 
@@ -41,9 +41,9 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	private final ClassInfo classInfo;
 
 	private final ClassDetails superClass;
-	private final TypeDetails genericSuperType;
+	private TypeDetails genericSuperType;
 	private final List<TypeDetails> implementedInterfaces;
-	private final List<TypeVariableDetails> typeParameters;
+	private List<TypeVariableDetails> typeParameters;
 
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
@@ -54,9 +54,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		this.classInfo = classInfo;
 
 		this.superClass = determineSuperType( classInfo, buildingContext );
-		this.genericSuperType = determineGenericSuperType( classInfo, buildingContext );
 		this.implementedInterfaces = determineInterfaces( classInfo, buildingContext );
-		this.typeParameters = determineTypeParameters( classInfo, buildingContext );
 	}
 
 	private static ClassDetails determineSuperType(
@@ -76,7 +74,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 			return null;
 		}
 
-		return JandexTypeSwitcher.switchType( classInfo.superClassType(), TYPE_SWITCH_STANDARD, buildingContext );
+		return switchType( classInfo.superClassType(), buildingContext );
 	}
 
 	private static List<TypeDetails> determineInterfaces(
@@ -89,9 +87,8 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 		final List<TypeDetails> result = arrayList( interfaceTypes.size() );
 		for ( Type interfaceType : interfaceTypes ) {
-			final TypeDetails switchedType = JandexTypeSwitcher.switchType(
+			final TypeDetails switchedType = switchType(
 					interfaceType,
-					TYPE_SWITCH_STANDARD,
 					buildingContext
 			);
 			result.add( switchedType );
@@ -107,7 +104,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 		final ArrayList<TypeVariableDetails> result = arrayList( jandexTypeVariables.size() );
 		for ( TypeVariable jandexTypeVariable : jandexTypeVariables ) {
-			result.add( (TypeVariableDetails) JandexTypeSwitcher.switchType( jandexTypeVariable, TYPE_SWITCH_STANDARD, buildingContext ) );
+			result.add( (TypeVariableDetails) switchType( jandexTypeVariable, this, buildingContext ) );
 		}
 		return result;
 	}
@@ -149,6 +146,9 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 	@Override
 	public TypeDetails getGenericSuperType() {
+		if ( genericSuperType == null && classInfo.superClassType() != null ) {
+			genericSuperType = determineGenericSuperType( classInfo, getBuildingContext() );
+		}
 		return genericSuperType;
 	}
 
@@ -159,6 +159,9 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 	@Override
 	public List<TypeVariableDetails> getTypeParameters() {
+		if ( typeParameters == null ) {
+			this.typeParameters = determineTypeParameters( classInfo, getBuildingContext() );
+		}
 		return typeParameters;
 	}
 

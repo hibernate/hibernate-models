@@ -20,8 +20,7 @@ import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.RecordComponentInfo;
 import org.jboss.jandex.Type;
 
-import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.TYPE_SWITCH_STANDARD;
-import static org.hibernate.models.internal.jandex.JandexTypeSwitcher.switchType;
+import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.switchType;
 
 /**
  * @author Steve Ebersole
@@ -41,7 +40,7 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 		super( buildingContext );
 		this.recordComponentInfo = recordComponentInfo;
 		this.declaringType = declaringType;
-		this.type = switchType( recordComponentInfo.type(), TYPE_SWITCH_STANDARD, buildingContext );
+		this.type = switchType( recordComponentInfo.type(), declaringType, buildingContext );
 
 		this.isArray = recordComponentInfo.type().kind() == Type.Kind.ARRAY;
 		this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );

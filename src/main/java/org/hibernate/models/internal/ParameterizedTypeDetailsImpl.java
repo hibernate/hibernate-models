@@ -15,6 +15,8 @@ import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.TypeVariableScope;
 
+import static org.hibernate.models.spi.TypeDetailsHelper.resolveTypeVariableFromParameterizedType;
+
 /**
  * @author Steve Ebersole
  */
@@ -45,16 +47,7 @@ public class ParameterizedTypeDetailsImpl implements ParameterizedTypeDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
-		final List<TypeVariableDetails> typeParameters = genericClassDetails.getTypeParameters();
-		assert typeParameters.size() == arguments.size();
-
-		for ( int i = 0; i < typeParameters.size(); i++ ) {
-			if ( typeParameters.get( i ).getIdentifier().equals( identifier ) ) {
-				return arguments.get( i );
-			}
-		}
-
-		return null;
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable) {
+		return resolveTypeVariableFromParameterizedType( this, typeVariable );
 	}
 }

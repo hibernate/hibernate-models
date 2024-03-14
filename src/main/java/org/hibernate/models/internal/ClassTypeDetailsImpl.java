@@ -12,6 +12,7 @@ import java.util.Objects;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
 
 /**
  * @author Steve Ebersole
@@ -42,8 +43,8 @@ public class ClassTypeDetailsImpl implements ClassTypeDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
-		return getClassDetails().resolveTypeVariable( identifier );
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable) {
+		return getClassDetails().resolveTypeVariable( typeVariable );
 	}
 
 	@Override

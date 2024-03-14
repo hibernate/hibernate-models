@@ -9,6 +9,7 @@ package org.hibernate.models.internal;
 
 import java.util.List;
 
+import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -17,12 +18,14 @@ import org.hibernate.models.spi.TypeVariableDetails;
  */
 public class TypeVariableDetailsImpl implements TypeVariableDetails {
 	private final String identifier;
+	private final ClassDetails declaringType;
 	private final List<TypeDetails> bounds;
 
 	private final String name;
 
-	public TypeVariableDetailsImpl(String identifier, List<TypeDetails> bounds) {
+	public TypeVariableDetailsImpl(String identifier, ClassDetails declaringType, List<TypeDetails> bounds) {
 		this.identifier = identifier;
+		this.declaringType = declaringType;
 		this.bounds = bounds;
 
 		this.name = calculateName( bounds );
@@ -37,6 +40,10 @@ public class TypeVariableDetailsImpl implements TypeVariableDetails {
 
 	@Override public String getIdentifier() {
 		return identifier;
+	}
+
+	@Override public ClassDetails getDeclaringType() {
+		return declaringType;
 	}
 
 	@Override public List<TypeDetails> getBounds() {
@@ -57,8 +64,8 @@ public class TypeVariableDetailsImpl implements TypeVariableDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
-		return this.identifier.equals( identifier ) ? this : null;
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable) {
+		return identifier.equals( typeVariable.getIdentifier() ) ? this : null;
 	}
 
 	@Override

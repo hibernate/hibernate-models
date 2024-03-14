@@ -11,9 +11,9 @@ import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Map;
 
-import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 
@@ -21,8 +21,7 @@ import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.Type;
 
-import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.TYPE_SWITCH_STANDARD;
-import static org.hibernate.models.internal.jandex.JandexTypeSwitcher.switchType;
+import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.switchType;
 
 /**
  * @author Steve Ebersole
@@ -42,7 +41,7 @@ public class JandexFieldDetails extends AbstractAnnotationTarget implements Fiel
 		super( buildingContext );
 		this.fieldInfo = fieldInfo;
 		this.declaringType = declaringType;
-		this.type = switchType( fieldInfo.type(), TYPE_SWITCH_STANDARD, buildingContext );
+		this.type = switchType( fieldInfo.type(), declaringType, buildingContext );
 
 		this.isArray = fieldInfo.type().kind() == Type.Kind.ARRAY;
 		this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
