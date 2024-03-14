@@ -12,13 +12,14 @@ import java.util.function.Predicate;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
 
+import static org.hibernate.models.spi.TypeDetailsHelper.resolveTypeVariableFromParameterizedType;
+
 /**
  * Abstraction for what Hibernate understands about a "class", generally before it has access to
  * the actual {@link Class} reference, if there is a {@code Class} at all (dynamic models).
  *
- * @see ClassDetailsRegistry
- *
  * @author Steve Ebersole
+ * @see ClassDetailsRegistry
  */
 public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
@@ -122,57 +123,49 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		forEachSuper( consumer );
 	}
 
+	/**
+	 * Returns {@code true} is the provided classDetails is a
+	 * superclass of this class, {@code false} otherwise
+	 */
+	default boolean isSuperclass(ClassDetails classDetails) {
+		ClassDetails check = getSuperClass();
+		while ( check != null && check != OBJECT_CLASS_DETAILS ) {
+			if ( classDetails == check ) {
+				return true;
+			}
+			check = check.getSuperClass();
+		}
+		return false;
+	}
+
 	@Override
-	default TypeDetails resolveTypeVariable(String identifier) {
-		final TypeVariableDetails local = TypeDetailsHelper.findTypeVariableDetails(
-				identifier,
-				getTypeParameters()
-		);
-		if ( local != null && local.isResolved() ) {
-			return local;
+	default TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable) {
+		if ( this == typeVariable.getDeclaringType() ) {
+			return TypeDetailsHelper.findTypeVariableDetails(
+					typeVariable.getIdentifier(),
+					getTypeParameters()
+			);
 		}
 
-		if ( getGenericSuperType() != null ) {
-			if ( getGenericSuperType().getTypeKind() == TypeDetails.Kind.CLASS ) {
-				final TypeVariableDetails genericSuperVar = TypeDetailsHelper.findTypeVariableDetails(
-						identifier,
-						getGenericSuperType().asClassType().getClassDetails().getTypeParameters()
+		if ( isSuperclass( typeVariable.getDeclaringType() ) ) {
+			final TypeDetails genericSuperType = getGenericSuperType();
+			if ( genericSuperType != null && genericSuperType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
+				final TypeDetails resolvedType = resolveTypeVariableFromParameterizedType(
+						genericSuperType.asParameterizedType(),
+						typeVariable
 				);
-				if ( genericSuperVar != null ) {
-					return genericSuperVar;
+				if ( resolvedType != null ) {
+					return resolvedType;
 				}
 			}
-			else {
-				// assume parameterized
-				final List<TypeVariableDetails> typeParameters = getSuperClass().getTypeParameters();
-				final List<TypeDetails> typeArguments = getGenericSuperType().asParameterizedType().getArguments();
-				assert typeParameters.size() == typeArguments.size();
 
-				for ( int i = 0; i < typeParameters.size(); i++ ) {
-					final TypeVariableDetails typeVariableDetails = typeParameters.get( i );
-					if ( typeVariableDetails.getIdentifier().equals( identifier ) ) {
-						// we found the parameter, use the matching argument
-						return typeArguments.get( i );
-					}
-				}
-				final TypeVariableDetails genericSuperVar = TypeDetailsHelper.findTypeVariableDetails2(
-						identifier,
-						typeArguments
-				);
-				if ( genericSuperVar != null ) {
-					return genericSuperVar;
-				}
+			final ClassDetails superClass = getSuperClass();
+			if ( superClass != null ) {
+				return superClass.resolveTypeVariable( typeVariable );
 			}
 		}
 
-		if ( getSuperClass() != null ) {
-			final TypeDetails typeDetails = getSuperClass().resolveTypeVariable( identifier );
-			if ( typeDetails != ClassBasedTypeDetails.OBJECT_TYPE_DETAILS ) {
-				return typeDetails;
-			}
-		}
-
-		return local != null ? local : ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+		return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
 	}
 
 	@Override

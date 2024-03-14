@@ -30,6 +30,11 @@ import java.util.List;
 public interface TypeVariableDetails extends TypeDetails {
 	String getIdentifier();
 
+	/**
+	 * The {@linkplain ClassDetails class} where this type variable is defined.
+	 */
+	ClassDetails getDeclaringType();
+
 	List<TypeDetails> getBounds();
 
 	@Override

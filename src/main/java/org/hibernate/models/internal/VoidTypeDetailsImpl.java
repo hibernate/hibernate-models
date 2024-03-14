@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.VoidTypeDetails;
 
 /**
@@ -41,7 +42,7 @@ public class VoidTypeDetailsImpl implements VoidTypeDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable) {
 		return this;
 	}
 

@@ -14,22 +14,30 @@ package org.hibernate.models.spi;
  */
 public interface TypeVariableScope {
 	/**
-	 * Find the identified type variable for this type.
+	 * Resolve the type of the provided type variable relative to this scope.
 	 * <p/>
-	 * Foe example, given
+	 * For example, given
 	 * <pre class="brush:java">
 	 * class {@code Thing<I extends Number>} {
 	 *     I id;
 	 * }
 	 * </pre>
-	 * A call to this method with {@code "I"} will return the {@code I extends Number}
-	 * type variable.
+	 * A call to this method on the {@code Thing} scope with the type variable representing
+	 * {@code I} will return the {@code I extends Number} type variable definition itself.
+	 * <p/>
+	 * If this scope defines a corresponding type argument, the concrete type is returned.
+	 * For example, given
+	 * <pre class="brush:java">
+	 * class {@code Stuff extends Thing<Integer>} {
+	 * }
+	 * </pre>
+	 * This method will yield the {@code Integer} type details.
 	 *
-	 * @param identifier The type variable identifier
+	 * @param typeVariable The type variable to resolve
 	 *
-	 * @return The type variable, or {@code null} none could be found
+	 * @return The type variable's resolved type, or {@code null} none could be found
 	 */
-	TypeDetails resolveTypeVariable(String identifier);
+	TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable);
 
 	/**
 	 * Determine the raw {@linkplain ClassDetails class} for the given type. Never returns {@code null}, opting

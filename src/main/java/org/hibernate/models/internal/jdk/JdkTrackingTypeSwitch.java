@@ -8,6 +8,8 @@
 package org.hibernate.models.internal.jdk;
 
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.GenericDeclaration;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -96,8 +98,19 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 	}
 
 	public TypeVariableDetails caseTypeVariable(TypeVariable<?> typeVariable) {
+		final GenericDeclaration genericDeclaration = typeVariable.getGenericDeclaration();
+		final ClassDetails declaringClass;
+		if ( genericDeclaration instanceof Class<?> genericClass ) {
+			declaringClass = buildingContext.getClassDetailsRegistry().getClassDetails( genericClass.getName() );
+		}
+		else {
+			declaringClass = buildingContext.getClassDetailsRegistry()
+					.getClassDetails( ( (Method) genericDeclaration ).getDeclaringClass().getName() );
+		}
+
 		return new TypeVariableDetailsImpl(
 				typeVariable.getTypeName(),
+				declaringClass,
 				resolveTypes( typeVariable.getBounds() )
 		);
 	}

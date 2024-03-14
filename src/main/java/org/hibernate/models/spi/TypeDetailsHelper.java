@@ -16,6 +16,7 @@ import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.util.CollectionHelper;
 
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
+import static org.hibernate.models.spi.ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
 
 /**
  * Helper utilities for dealing with {@linkplain TypeDetails}
@@ -32,7 +33,7 @@ public class TypeDetailsHelper {
 	 * class {@code Item<T>} {
 	 *     T id;
 	 * }
-	 * class Hat extends {@code Item<Integer} {
+	 * class Hat extends {@code Item<Integer>} {
 	 *     ...
 	 * }
 	 * </pre>
@@ -65,7 +66,7 @@ public class TypeDetailsHelper {
 			}
 			case TYPE_VARIABLE -> {
 				final TypeVariableDetails typeVariable = type.asTypeVariable();
-				return container.resolveTypeVariable( typeVariable.getIdentifier() );
+				return container.resolveTypeVariable( typeVariable );
 			}
 			case TYPE_VARIABLE_REFERENCE -> {
 				throw new UnsupportedOperationException( "TypeVariableReferenceDetails not supported for concrete type resolution" );
@@ -75,7 +76,7 @@ public class TypeDetailsHelper {
 				if ( wildcardType.getBound() != null ) {
 					return wildcardType.getBound();
 				}
-				return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+				return OBJECT_TYPE_DETAILS;
 			}
 			default -> {
 				throw new UnsupportedOperationException( "Unknown TypeDetails kind - " + type.getTypeKind() );
@@ -95,33 +96,21 @@ public class TypeDetailsHelper {
 		return null;
 	}
 
-	public static TypeVariableDetails findTypeVariableDetails2(String identifier, List<TypeDetails> typeParameters) {
-		if ( CollectionHelper.isNotEmpty( typeParameters ) ) {
-			for ( TypeDetails typeParameter : typeParameters ) {
-				if ( typeParameter instanceof TypeVariableDetails typeVariableDetails ) {
-					if ( typeVariableDetails.getIdentifier().equals( identifier ) ) {
-						return typeVariableDetails;
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
 	/**
 	 * Very much the same as {@linkplain #resolveRelativeType(TypeDetails, TypeVariableScope)}, except that
 	 * here we resolve the relative type to the corresponding {@link ClassBasedTypeDetails} which
 	 * gives easy access to the type's {@linkplain ClassBasedTypeDetails#getClassDetails() ClassDetails}
 	 */
-	public static ClassBasedTypeDetails resolveRelativeClassType(TypeDetails memberType, TypeVariableScope containerType) {
+	public static ClassBasedTypeDetails resolveRelativeClassType(
+			TypeDetails memberType,
+			TypeVariableScope containerType) {
 		switch ( memberType.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
 				return (ClassBasedTypeDetails) memberType;
 			}
 			case TYPE_VARIABLE -> {
 				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
-				final TypeDetails typeDetails = containerType.resolveTypeVariable( typeVariable.getIdentifier() );
+				final TypeDetails typeDetails = containerType.resolveTypeVariable( typeVariable );
 				if ( typeDetails.getTypeKind() == TypeDetails.Kind.CLASS ) {
 					return typeDetails.asClassType();
 				}
@@ -131,7 +120,7 @@ public class TypeDetailsHelper {
 						// and assume the bound is a class
 						return resolvedTypeVariable.getBounds().get( 0 ).asClassType();
 					}
-					return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+					return OBJECT_TYPE_DETAILS;
 				}
 				else {
 					// assume parameterized
@@ -140,7 +129,7 @@ public class TypeDetailsHelper {
 						// and assume the bound is a class
 						return parameterizedType.getArguments().get( 0 ).asClassType();
 					}
-					return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+					return OBJECT_TYPE_DETAILS;
 				}
 			}
 			case TYPE_VARIABLE_REFERENCE -> {
@@ -184,12 +173,53 @@ public class TypeDetailsHelper {
 				return ClassDetails.OBJECT_CLASS_DETAILS;
 			}
 			case TYPE_VARIABLE_REFERENCE -> {
-				final String identifier = typeDetails.asTypeVariableReference().getIdentifier();
-				final TypeDetails identifiedTypeDetails = typeDetails.resolveTypeVariable( identifier );
+				final TypeVariableReferenceDetails typeVariableReference = typeDetails.asTypeVariableReference();
+				final TypeDetails identifiedTypeDetails = typeDetails.resolveTypeVariable( typeVariableReference.getTarget() );
 				return identifiedTypeDetails.determineRawClass();
 			}
 		}
 		return ClassDetails.OBJECT_CLASS_DETAILS;
+	}
+
+	/**
+	 * Resolve a {@linkplain TypeVariableDetails type variable}'s type relative to the
+	 * provided {@linkplain ParameterizedTypeDetails parameterized type}.
+	 *
+	 * @param parameterizedType the parameterized type used to resolve the type variable's relative type
+	 * @param typeVariable the type variable to resolve
+	 *
+	 * @return the type variable's relative type, or {@code null} if not resolved
+	 */
+	public static TypeDetails resolveTypeVariableFromParameterizedType(
+			ParameterizedTypeDetails parameterizedType,
+			TypeVariableDetails typeVariable) {
+		final ClassDetails classDetails = parameterizedType.getRawClassDetails();
+		final List<TypeVariableDetails> typeParameters = classDetails.getTypeParameters();
+		final List<TypeDetails> typeArguments = parameterizedType.getArguments();
+		assert typeParameters.size() == typeArguments.size();
+
+		for ( int i = 0; i < typeParameters.size(); i++ ) {
+			final TypeVariableDetails typeParameter = typeParameters.get( i );
+			if ( typeParameter.getIdentifier().equals( typeVariable.getIdentifier() ) ) {
+				if ( classDetails != typeVariable.getDeclaringType() ) {
+					final TypeDetails genericSuper = classDetails.getGenericSuperType();
+					if ( genericSuper != null && genericSuper.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
+						// Recursively check if the type variable is resolved in supertypes
+						final TypeDetails superResolvedType = classDetails.resolveTypeVariable( typeVariable );
+						if ( superResolvedType.getTypeKind() != TypeDetails.Kind.TYPE_VARIABLE
+								&& superResolvedType != OBJECT_TYPE_DETAILS ) {
+							return superResolvedType;
+						}
+					}
+				}
+				// Either we found the exact parameter definition, or the local generic supertype
+				// redefines a type variable with the same identifier, and we should ignore it.
+				// Return the matching generic type argument
+				return typeArguments.get( i );
+			}
+		}
+
+		return null;
 	}
 
 	/**

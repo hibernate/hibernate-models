@@ -242,6 +242,17 @@ public interface MemberDetails extends AnnotationTarget {
 	}
 
 	/**
+	 * Same as {@link #resolveRelativeType(TypeVariableScope)}, but for the
+	 * {@linkplain #getAssociatedType() associated type}.
+	 *
+	 * @see #getAssociatedType()
+	 * @see #resolveRelativeType(TypeVariableScope)
+	 */
+	default TypeDetails resolveRelativeAssociatedType(TypeVariableScope container) {
+		return getAssociatedType().determineRelativeType( container );
+	}
+
+	/**
 	 * Determine the concrete class of the member relative to the given {@code container} type.
 	 * <p/>
 	 * Similar to {@linkplain #resolveRelativeType(TypeVariableScope)}, but fully resolving the result

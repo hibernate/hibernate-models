@@ -61,7 +61,7 @@ public class TypeVariableReferenceDetailsImpl implements TypeVariableReferenceDe
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
-		return this.identifier.equals( identifier ) ? target : null;
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable) {
+		return this.identifier.equals( typeVariable.getIdentifier() ) ? target : null;
 	}
 }
