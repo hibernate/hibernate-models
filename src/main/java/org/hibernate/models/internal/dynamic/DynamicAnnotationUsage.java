@@ -7,16 +7,21 @@
 package org.hibernate.models.internal.dynamic;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.MutableAnnotationUsage;
+import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
  * AnnotationUsage built dynamically (for dynamic models, XML mappings, etc.)
@@ -29,15 +34,20 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 
 	private Map<String,Object> values;
 
-	public DynamicAnnotationUsage(AnnotationDescriptor<A> annotationDescriptor) {
-		this( annotationDescriptor, null );
+	public DynamicAnnotationUsage(
+			AnnotationDescriptor<A> annotationDescriptor,
+			SourceModelBuildingContext context) {
+		this( annotationDescriptor, null, context );
 	}
 
-	public DynamicAnnotationUsage(AnnotationDescriptor<A> annotationDescriptor, AnnotationTarget target) {
+	public DynamicAnnotationUsage(
+			AnnotationDescriptor<A> annotationDescriptor,
+			AnnotationTarget target,
+			SourceModelBuildingContext context) {
 		this.annotationDescriptor = annotationDescriptor;
 		this.target = target;
 
-		this.values = extractBaselineValues( annotationDescriptor );
+		this.values = extractBaselineValues( annotationDescriptor, target, context );
 	}
 
 	@Override
@@ -70,19 +80,32 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 	 */
 	@Override
 	public <V> V getAttributeValue(String name) {
-		final Object value = findAttributeValue( name );
-		if ( value == null ) {
-			// null values are not supported as annotation attribute values; we honor that
-			// in hibernate-models.  return the default.
-			//noinspection unchecked
-			return (V) getAnnotationDescriptor().getAttribute( name ).getAttributeMethod().getDefaultValue();
+		if ( annotationDescriptor.getAttribute( name ) == null ) {
+			throw new UnknownAnnotationAttributeException(
+					String.format(
+							Locale.ROOT,
+							"Unknown attribute `%s` for annotation `%s`",
+							name,
+							getAnnotationType().getName()
+					)
+			);
 		}
-		//noinspection unchecked
-		return (V) value;
+		return findAttributeValue( name );
 	}
 
 	@Override
 	public <V> V setAttributeValue(String name, V value) {
+		if (value == null){
+			throw new IllegalArgumentException(
+					String.format(
+							Locale.ROOT,
+							"Null value not allowed for attribute `%s` of annotation `%s`",
+							name,
+							getAnnotationType().getName()
+					)
+			);
+		}
+
 		if ( annotationDescriptor.getAttribute( name ) == null ) {
 			throw new UnknownAnnotationAttributeException(
 					String.format(
@@ -102,11 +125,67 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 		return (V) values.put( name, value );
 	}
 
-	private static <A extends Annotation> Map<String, Object> extractBaselineValues(AnnotationDescriptor<A> annotationDescriptor) {
+	private static <A extends Annotation> Map<String, Object> extractBaselineValues(
+			AnnotationDescriptor<A> annotationDescriptor,
+			AnnotationTarget target,
+			SourceModelBuildingContext context) {
 		final HashMap<String, Object> values = new HashMap<>();
 		for ( AttributeDescriptor<?> attribute : annotationDescriptor.getAttributes() ) {
-			values.put( attribute.getName(), attribute.getAttributeMethod().getDefaultValue() );
+			values.put( attribute.getName(), getDefaultValue( attribute, target, context ) );
 		}
 		return values;
+	}
+
+	private static Object getDefaultValue(
+			AttributeDescriptor<?> attribute,
+			AnnotationTarget target,
+			SourceModelBuildingContext context) {
+		final Object defaultValue = attribute.getAttributeMethod().getDefaultValue();
+		Object annotation = wrapValue( defaultValue, target, context );
+		if ( annotation != null ) {
+			return annotation;
+		}
+		return defaultValue;
+	}
+
+	private static Object wrapValue(Object value, AnnotationTarget target, SourceModelBuildingContext context) {
+		if ( value instanceof Annotation annotation ) {
+			try {
+				return extractDynamicAnnotationUsage( annotation, target, context );
+			}
+			catch (InvocationTargetException | IllegalAccessException e) {
+				throw new AnnotationAccessException( "Error accessing default annotation attribute value", e );
+			}
+		}
+		else if ( value != null && value.getClass().isArray() ) {
+			return getList( value, target, context );
+		}
+		return value;
+	}
+
+	private static <E> List getList(Object defaultValue, AnnotationTarget target, SourceModelBuildingContext context) {
+		List result = new ArrayList<>();
+		E[] d = (E[]) defaultValue;
+		for ( E e : d ) {
+			result.add( wrapValue( e, target, context ) );
+		}
+		return result;
+	}
+
+	private static DynamicAnnotationUsage<?> extractDynamicAnnotationUsage(
+			Annotation annotation,
+			AnnotationTarget target,
+			SourceModelBuildingContext context) throws InvocationTargetException, IllegalAccessException {
+		final Class<? extends Annotation> annotationType = annotation.annotationType();
+		final AnnotationDescriptor<?> descriptor = context.getAnnotationDescriptorRegistry()
+				.getDescriptor( annotationType );
+		final DynamicAnnotationUsage<?> annotationUsage = new DynamicAnnotationUsage<>( descriptor, target, context );
+		for ( AttributeDescriptor<?> attribute : descriptor.getAttributes() ) {
+			annotationUsage.setAttributeValue(
+					attribute.getName(),
+					attribute.getAttributeMethod().invoke( annotation )
+			);
+		}
+		return annotationUsage;
 	}
 }
