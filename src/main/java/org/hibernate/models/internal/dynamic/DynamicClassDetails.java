@@ -20,6 +20,8 @@ import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
 /**
+ * ClassDetails which does not necessarily map to a physical Class (dynamic models)
+ *
  * @author Steve Ebersole
  */
 public class DynamicClassDetails extends AbstractAnnotationTarget implements ClassDetailsSupport {
@@ -53,12 +55,24 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 			ClassDetails superClass,
 			TypeDetails genericSuperType,
 			SourceModelBuildingContext buildingContext) {
+		this( name, className, null, isAbstract, superClass, genericSuperType, buildingContext );
+	}
+
+	public DynamicClassDetails(
+			String name,
+			String className,
+			Class<?> javaType,
+			boolean isAbstract,
+			ClassDetails superClass,
+			TypeDetails genericSuperType,
+			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.name = name;
 		this.className = className;
 		this.isAbstract = isAbstract;
 		this.superClass = superClass;
 		this.genericSuperType = genericSuperType;
+		this.javaType = javaType;
 	}
 
 	@Override

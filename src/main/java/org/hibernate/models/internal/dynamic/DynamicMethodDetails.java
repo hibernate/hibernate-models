@@ -19,6 +19,8 @@ import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableScope;
 
 /**
+ * MethodDetails which does not necessarily map to a physical Method (dynamic models)
+ *
  * @author Steve Ebersole
  */
 public class DynamicMethodDetails extends AbstractAnnotationTarget implements MethodDetails, MutableMemberDetails {
@@ -43,23 +45,41 @@ public class DynamicMethodDetails extends AbstractAnnotationTarget implements Me
 			ClassDetails returnType,
 			List<ClassDetails> argumentTypes,
 			SourceModelBuildingContext buildingContext) {
+		this(
+				name,
+				type,
+				declaringType,
+				methodKind,
+				modifierFlags,
+				type != null && type.getName().startsWith( "[" ),
+				type != null && ( type.isImplementor( Collection.class ) || type.isImplementor( Map.class ) ),
+				returnType,
+				argumentTypes,
+				buildingContext
+		);
+	}
+
+	public DynamicMethodDetails(
+			String name,
+			TypeDetails type,
+			ClassDetails declaringType,
+			MethodKind methodKind,
+			int modifierFlags,
+			boolean isArray,
+			boolean isPlural,
+			ClassDetails returnType,
+			List<ClassDetails> argumentTypes,
+			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.name = name;
 		this.type = type;
 		this.declaringType = declaringType;
 		this.methodKind = methodKind;
 		this.modifierFlags = modifierFlags;
+		this.isArray = isArray;
+		this.isPlural = isPlural;
 		this.returnType = returnType;
 		this.argumentTypes = argumentTypes;
-
-		if ( type != null ) {
-			this.isArray = type.getName().startsWith( "[" );
-			this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
-		}
-		else {
-			this.isArray = false;
-			this.isPlural = false;
-		}
 	}
 
 	@Override

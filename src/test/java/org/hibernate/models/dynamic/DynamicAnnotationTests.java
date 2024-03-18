@@ -5,7 +5,7 @@
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
 
-package org.hibernate.models.annotations;
+package org.hibernate.models.dynamic;
 
 import java.util.List;
 

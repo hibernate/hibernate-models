@@ -18,6 +18,8 @@ import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableScope;
 
 /**
+ * FieldDetails which does not necessarily map to a physical Field (dynamic models)
+ *
  * @author Steve Ebersole
  */
 public class DynamicFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
@@ -35,20 +37,32 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 			ClassDetails declaringType,
 			int modifierFlags,
 			SourceModelBuildingContext buildingContext) {
+		this(
+				name,
+				type,
+				declaringType,
+				modifierFlags,
+				type != null && type.getName().startsWith( "[" ),
+				type != null && ( type.isImplementor( Collection.class ) || type.isImplementor( Map.class ) ),
+				buildingContext
+		);
+	}
+
+	public DynamicFieldDetails(
+			String name,
+			TypeDetails type,
+			ClassDetails declaringType,
+			int modifierFlags,
+			boolean isArray,
+			boolean isPlural,
+			SourceModelBuildingContext buildingContext) {
 		super( buildingContext );
 		this.name = name;
 		this.type = type;
 		this.declaringType = declaringType;
 		this.modifierFlags = modifierFlags;
-
-		if ( type != null ) {
-			this.isArray = type.getName().startsWith( "[" );
-			this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
-		}
-		else {
-			this.isArray = false;
-			this.isPlural = false;
-		}
+		this.isArray = isArray;
+		this.isPlural = isPlural;
 	}
 
 	@Override
