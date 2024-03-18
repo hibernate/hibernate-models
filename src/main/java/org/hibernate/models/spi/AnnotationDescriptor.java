@@ -60,22 +60,30 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	List<AttributeDescriptor<?>> getAttributes();
 
 	/**
+	 * Get an attribute descriptor by name, returning {@code null} if the name
+	 * is not an attribute of the described annotation.
+	 */
+	default <V> AttributeDescriptor<V> findAttribute(String name) {
+		final List<AttributeDescriptor<?>> attributeDescriptors = getAttributes();
+		for ( final AttributeDescriptor<?> attributeDescriptor : attributeDescriptors ) {
+			if ( attributeDescriptor.getName().equals( name ) ) {
+				//noinspection unchecked
+				return (AttributeDescriptor<V>) attributeDescriptor;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Get an attribute descriptor by name.
 	 *
 	 * @throws UnknownAnnotationAttributeException if the name is not an
 	 * attribute of the described annotation.
 	 */
-	<V> AttributeDescriptor<V> findAttribute(String name);
-
-	/**
-	 * Get an attribute descriptor by name, returning {@code null} if the name
-	 * is not an attribute of the described annotation.
-	 */
 	default <V> AttributeDescriptor<V> getAttribute(String name) {
-		final AttributeDescriptor<Object> attribute = findAttribute( name );
+		final AttributeDescriptor<V> attribute = findAttribute( name );
 		if ( attribute != null ) {
-			//noinspection unchecked
-			return (AttributeDescriptor<V>) attribute;
+			return attribute;
 		}
 
 		throw new UnknownAnnotationAttributeException( getAnnotationType(), name );

@@ -72,18 +72,6 @@ public class AnnotationDescriptorOrmImpl<A extends Annotation> implements Annota
 	}
 
 	@Override
-	public <V> AttributeDescriptor<V> findAttribute(String name) {
-		for ( int i = 0; i < attributeDescriptors.size(); i++ ) {
-			final AttributeDescriptor<?> attributeDescriptor = attributeDescriptors.get( i );
-			if ( attributeDescriptor.getName().equals( name ) ) {
-				//noinspection unchecked
-				return (AttributeDescriptor<V>) attributeDescriptor;
-			}
-		}
-		throw new UnknownAnnotationAttributeException( annotationType, name );
-	}
-
-	@Override
 	public String getName() {
 		return annotationType.getName();
 	}
