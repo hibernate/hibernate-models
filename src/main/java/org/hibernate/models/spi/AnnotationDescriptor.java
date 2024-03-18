@@ -88,10 +88,12 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * @param context Access to needed services
 	 */
 	default MutableAnnotationUsage<A> createUsage(AnnotationTarget target, SourceModelBuildingContext context) {
-		final DynamicAnnotationUsage<A> usage = new DynamicAnnotationUsage<>( this, target );
+		final DynamicAnnotationUsage<A> usage = new DynamicAnnotationUsage<>( this, target, context );
 		getAttributes().forEach( (attr) -> {
 			final Object value = attr.getTypeDescriptor().createValue( attr, target, context );
-			usage.setAttributeValue( attr.getName(), value );
+			if ( value != null ) {
+				usage.setAttributeValue( attr.getName(), value );
+			}
 		} );
 		return usage;
 	}
