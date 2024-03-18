@@ -35,7 +35,7 @@ public interface TypeVariableScope {
 	 *
 	 * @param typeVariable The type variable to resolve
 	 *
-	 * @return The type variable's resolved type, or {@code null} none could be found
+	 * @return The type variable's resolved type, or {@code null} if none could be found
 	 */
 	TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable);
 

@@ -194,31 +194,42 @@ public class TypeDetailsHelper {
 			ParameterizedTypeDetails parameterizedType,
 			TypeVariableDetails typeVariable) {
 		final ClassDetails classDetails = parameterizedType.getRawClassDetails();
-		final List<TypeVariableDetails> typeParameters = classDetails.getTypeParameters();
-		final List<TypeDetails> typeArguments = parameterizedType.getArguments();
-		assert typeParameters.size() == typeArguments.size();
+		final TypeDetails typeArgument = findMatchingTypeArgument(
+				classDetails.getTypeParameters(),
+				parameterizedType.getArguments(),
+				typeVariable.getIdentifier()
+		);
 
-		for ( int i = 0; i < typeParameters.size(); i++ ) {
-			final TypeVariableDetails typeParameter = typeParameters.get( i );
-			if ( typeParameter.getIdentifier().equals( typeVariable.getIdentifier() ) ) {
-				if ( classDetails != typeVariable.getDeclaringType() ) {
-					final TypeDetails genericSuper = classDetails.getGenericSuperType();
-					if ( genericSuper != null && genericSuper.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
-						// Recursively check if the type variable is resolved in supertypes
-						final TypeDetails superResolvedType = classDetails.resolveTypeVariable( typeVariable );
-						if ( superResolvedType.getTypeKind() != TypeDetails.Kind.TYPE_VARIABLE
-								&& superResolvedType != OBJECT_TYPE_DETAILS ) {
-							return superResolvedType;
-						}
-					}
-				}
-				// Either we found the exact parameter definition, or the local generic supertype
-				// redefines a type variable with the same identifier, and we should ignore it.
-				// Return the matching generic type argument
-				return typeArguments.get( i );
+		// If no type argument is found, or the type variable is defined by another
+		// class, try resolving it in the generic super type if present
+		if ( typeArgument == null || classDetails != typeVariable.getDeclaringType() ) {
+			final TypeDetails genericSuper = classDetails.getGenericSuperType();
+			final TypeDetails resolvedType = genericSuper != null ?
+					genericSuper.resolveTypeVariable( typeVariable ) :
+					null;
+			if ( typeArgument == null || resolvedType != null
+					&& resolvedType.getTypeKind() != TypeDetails.Kind.TYPE_VARIABLE ) {
+				return resolvedType;
 			}
 		}
 
+		// Either we found the exact type variable's argument, or the parameterized class redefines
+		// a type variable with the same identifier as a supertype, and it should be ignored.
+		// Return the matching generic type argument
+		return typeArgument;
+	}
+
+	private static TypeDetails findMatchingTypeArgument(
+			List<TypeVariableDetails> typeParameters,
+			List<TypeDetails> typeArguments,
+			String identifier) {
+		assert typeParameters.size() == typeArguments.size();
+		for ( int i = 0; i < typeParameters.size(); i++ ) {
+			final TypeVariableDetails typeParameter = typeParameters.get( i );
+			if ( typeParameter.getIdentifier().equals( identifier ) ) {
+				return typeArguments.get( i );
+			}
+		}
 		return null;
 	}
 

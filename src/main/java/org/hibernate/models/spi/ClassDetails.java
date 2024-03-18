@@ -12,8 +12,6 @@ import java.util.function.Predicate;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
 
-import static org.hibernate.models.spi.TypeDetailsHelper.resolveTypeVariableFromParameterizedType;
-
 /**
  * Abstraction for what Hibernate understands about a "class", generally before it has access to
  * the actual {@link Class} reference, if there is a {@code Class} at all (dynamic models).
@@ -149,23 +147,12 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 
 		if ( isSuperclass( typeVariable.getDeclaringType() ) ) {
 			final TypeDetails genericSuperType = getGenericSuperType();
-			if ( genericSuperType != null && genericSuperType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
-				final TypeDetails resolvedType = resolveTypeVariableFromParameterizedType(
-						genericSuperType.asParameterizedType(),
-						typeVariable
-				);
-				if ( resolvedType != null ) {
-					return resolvedType;
-				}
-			}
-
-			final ClassDetails superClass = getSuperClass();
-			if ( superClass != null ) {
-				return superClass.resolveTypeVariable( typeVariable );
+			if ( genericSuperType != null ) {
+				return genericSuperType.resolveTypeVariable( typeVariable );
 			}
 		}
 
-		return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+		return null;
 	}
 
 	@Override
