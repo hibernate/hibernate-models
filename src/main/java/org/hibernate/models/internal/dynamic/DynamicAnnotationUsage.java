@@ -157,9 +157,15 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 				throw new AnnotationAccessException( "Error accessing default annotation attribute value", e );
 			}
 		}
-		else if ( value != null && value.getClass().isArray() ) {
-			return getList( value, target, context );
+		else if ( value != null ) {
+			if ( value.getClass().isArray() ) {
+				return getList( value, target, context );
+			}
+			else if ( value.getClass() == Class.class ) {
+				return context.getClassDetailsRegistry().findClassDetails( ( (Class) value ).getName() );
+			}
 		}
+
 		return value;
 	}
 
