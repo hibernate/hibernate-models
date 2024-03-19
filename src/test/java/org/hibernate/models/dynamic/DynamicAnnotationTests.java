@@ -14,10 +14,12 @@ import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.internal.dynamic.DynamicAnnotationUsage;
 import org.hibernate.models.internal.dynamic.DynamicClassDetails;
 import org.hibernate.models.orm.JpaAnnotations;
+import org.hibernate.models.spi.ClassDetails;
 
 import org.junit.jupiter.api.Test;
 
 import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinTable;
@@ -109,5 +111,19 @@ public class DynamicAnnotationTests {
 		assertThat( strategy ).isEqualTo( GenerationType.AUTO );
 		String generator = generatorAnn.findAttributeValue( "generator" );
 		assertThat( generator ).isEqualTo( "" );
+	}
+
+	@Test
+	void testClassDetailsDefaultValue(){
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext();
+		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
+		final DynamicAnnotationUsage<ElementCollection> elementCollectionAnn = new DynamicAnnotationUsage<>(
+				JpaAnnotations.ELEMENT_COLLECTION,
+				dynamicEntity,
+				buildingContext
+		);
+
+		Object value = elementCollectionAnn.getAttributeValue( "targetClass" );
+		assertThat( value ).isInstanceOf( ClassDetails.class );
 	}
 }
