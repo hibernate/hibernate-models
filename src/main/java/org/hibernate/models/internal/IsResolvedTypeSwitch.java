@@ -75,7 +75,8 @@ public class IsResolvedTypeSwitch implements TypeDetailsSwitch<Boolean> {
 
 	@Override
 	public Boolean caseWildcardType(WildcardTypeDetails wildcardType, SourceModelBuildingContext buildingContext) {
-		return isBound( wildcardType.getBound(), buildingContext );
+		final TypeDetails bound = wildcardType.getBound();
+		return bound != null && ( bound.getTypeKind() == TypeDetails.Kind.CLASS || isBound( bound, buildingContext ) );
 	}
 
 	@Override

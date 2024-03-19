@@ -43,7 +43,7 @@ public class TypeDetailsHelper {
 	 */
 	public static TypeDetails resolveRelativeType(TypeDetails type, TypeVariableScope container) {
 		switch ( type.getTypeKind() ) {
-			case CLASS, PRIMITIVE, VOID, ARRAY -> {
+			case CLASS, PRIMITIVE, VOID, ARRAY, WILDCARD_TYPE -> {
 				return type;
 			}
 			case PARAMETERIZED_TYPE -> {
@@ -70,13 +70,6 @@ public class TypeDetailsHelper {
 			}
 			case TYPE_VARIABLE_REFERENCE -> {
 				throw new UnsupportedOperationException( "TypeVariableReferenceDetails not supported for concrete type resolution" );
-			}
-			case WILDCARD_TYPE -> {
-				final WildcardTypeDetails wildcardType = type.asWildcardType();
-				if ( wildcardType.getBound() != null ) {
-					return wildcardType.getBound();
-				}
-				return OBJECT_TYPE_DETAILS;
 			}
 			default -> {
 				throw new UnsupportedOperationException( "Unknown TypeDetails kind - " + type.getTypeKind() );
