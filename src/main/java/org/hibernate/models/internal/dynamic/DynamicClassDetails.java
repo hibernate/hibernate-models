@@ -19,6 +19,8 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
+import static org.hibernate.models.internal.util.StringHelper.isEmpty;
+
 /**
  * ClassDetails which does not necessarily map to a physical Class (dynamic models)
  *
@@ -123,7 +125,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 
 	@Override
 	public boolean isImplementor(Class<?> checkType) {
-		return checkType.isAssignableFrom( javaType );
+		return !isEmpty( className ) && checkType.isAssignableFrom( javaType );
 	}
 
 	@Override

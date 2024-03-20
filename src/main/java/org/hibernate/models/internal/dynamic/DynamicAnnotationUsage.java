@@ -21,7 +21,7 @@ import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.MutableAnnotationUsage;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 
 /**
  * AnnotationUsage built dynamically (for dynamic models, XML mappings, etc.)
@@ -36,14 +36,14 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 
 	public DynamicAnnotationUsage(
 			AnnotationDescriptor<A> annotationDescriptor,
-			SourceModelBuildingContext context) {
+			SourceModelContext context) {
 		this( annotationDescriptor, null, context );
 	}
 
 	public DynamicAnnotationUsage(
 			AnnotationDescriptor<A> annotationDescriptor,
 			AnnotationTarget target,
-			SourceModelBuildingContext context) {
+			SourceModelContext context) {
 		this.annotationDescriptor = annotationDescriptor;
 		this.target = target;
 
@@ -128,7 +128,7 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 	private static <A extends Annotation> Map<String, Object> extractBaselineValues(
 			AnnotationDescriptor<A> annotationDescriptor,
 			AnnotationTarget target,
-			SourceModelBuildingContext context) {
+			SourceModelContext context) {
 		final HashMap<String, Object> values = new HashMap<>();
 		for ( AttributeDescriptor<?> attribute : annotationDescriptor.getAttributes() ) {
 			values.put( attribute.getName(), getDefaultValue( attribute, target, context ) );
@@ -139,7 +139,7 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 	private static Object getDefaultValue(
 			AttributeDescriptor<?> attribute,
 			AnnotationTarget target,
-			SourceModelBuildingContext context) {
+			SourceModelContext context) {
 		final Object defaultValue = attribute.getAttributeMethod().getDefaultValue();
 		Object annotation = wrapValue( defaultValue, target, context );
 		if ( annotation != null ) {
@@ -148,7 +148,7 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 		return defaultValue;
 	}
 
-	private static Object wrapValue(Object value, AnnotationTarget target, SourceModelBuildingContext context) {
+	private static Object wrapValue(Object value, AnnotationTarget target, SourceModelContext context) {
 		if ( value instanceof Annotation annotation ) {
 			try {
 				return extractDynamicAnnotationUsage( annotation, target, context );
@@ -169,7 +169,7 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 		return value;
 	}
 
-	private static <E> List getList(Object defaultValue, AnnotationTarget target, SourceModelBuildingContext context) {
+	private static <E> List getList(Object defaultValue, AnnotationTarget target, SourceModelContext context) {
 		List result = new ArrayList<>();
 		E[] d = (E[]) defaultValue;
 		for ( E e : d ) {
@@ -181,7 +181,7 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 	private static DynamicAnnotationUsage<?> extractDynamicAnnotationUsage(
 			Annotation annotation,
 			AnnotationTarget target,
-			SourceModelBuildingContext context) throws InvocationTargetException, IllegalAccessException {
+			SourceModelContext context) throws InvocationTargetException, IllegalAccessException {
 		final Class<? extends Annotation> annotationType = annotation.annotationType();
 		final AnnotationDescriptor<?> descriptor = context.getAnnotationDescriptorRegistry()
 				.getDescriptor( annotationType );
