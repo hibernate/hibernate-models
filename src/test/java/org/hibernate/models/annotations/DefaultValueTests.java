@@ -68,7 +68,9 @@ public class DefaultValueTests {
 		assertThat( annotationUsage.getClassDetails( "someClassValue" ) ).isNotNull();
 		assertThat( annotationUsage.getClassDetails( "someClassValue" ).toJavaClass() ).isEqualTo( Entity.class );
 
+		// apparently the models code does not use this method directly, but ORM does.  This is the one that was leading to NPE
 		final MutableAnnotationUsage<CustomAnnotation> created = descriptor.createUsage( null, buildingContext );
+		assertThat( created.getClassDetails( "someClassValue" ) ).isNull();
 	}
 
 	@Target( ElementType.TYPE )
