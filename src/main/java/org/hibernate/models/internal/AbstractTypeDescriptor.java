@@ -33,9 +33,15 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 			AttributeDescriptor<?> attributeDescriptor,
 			AnnotationTarget target,
 			SourceModelBuildingContext context) {
+		final Object defaultValue = attributeDescriptor.getAttributeMethod().getDefaultValue();
+		if ( defaultValue == null ) {
+			// a non-defaulted attribute, just return null for the baseline
+			return null;
+		}
+
 		//noinspection unchecked
 		final ValueWrapper<V, Object> valueWrapper = (ValueWrapper<V, Object>) createJdkWrapper( context );
-		return valueWrapper.wrap( attributeDescriptor.getAttributeMethod().getDefaultValue(), target, context );
+		return valueWrapper.wrap( defaultValue, target, context );
 	}
 
 	@Override
