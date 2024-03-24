@@ -7,6 +7,7 @@
 package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import org.jboss.jandex.AnnotationValue;
  */
 public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 	private final ValueTypeDescriptor<V> elementTypeDescriptor;
+	private final Class<?> componentType;
 
 	private ValueWrapper<List<V>, AnnotationValue> jandexValueWrapper;
 	private ValueExtractor<AnnotationInstance,List<V>> jandexValueExtractor;
@@ -39,8 +41,9 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 	private ValueWrapper<List<V>,Object[]> jdkValueWrapper;
 	private ValueExtractor<Annotation,List<V>> jdkValueExtractor;
 
-	public ArrayTypeDescriptor(ValueTypeDescriptor<V> elementTypeDescriptor) {
+	public ArrayTypeDescriptor(ValueTypeDescriptor<V> elementTypeDescriptor, Class<?> componentType) {
 		this.elementTypeDescriptor = elementTypeDescriptor;
+		this.componentType = componentType;
 	}
 
 	@Override
@@ -123,9 +126,9 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 
 	@Override
 	public Object unwrap(List<V> value) {
-		final Object[] result = new Object[value.size()];
+		final Object[] result = (Object[]) Array.newInstance( componentType, value.size() );
 		for ( int i = 0; i < value.size(); i++ ) {
-			result[i] = elementTypeDescriptor.unwrap( value.get(i) );
+			result[i] = elementTypeDescriptor.unwrap( value.get( i ) );
 		}
 		return result;
 	}
