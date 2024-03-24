@@ -72,8 +72,8 @@ public class InheritanceTypeVariableTests {
 			assertThat( bound.asClassType().getClassDetails().toJavaClass() ).isEqualTo( Object.class );
 
 			final ClassBasedTypeDetails resolvedClassType = idField.resolveRelativeClassType( rootClassDetails );
+			assertThat( idField.getType().isResolved() ).isFalse();
 			assertThat( resolvedClassType.getClassDetails().toJavaClass() ).isEqualTo( Object.class );
-			assertThat( resolvedClassType.isResolved() ).isFalse();
 		}
 
 		{

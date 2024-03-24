@@ -23,6 +23,8 @@ import org.hibernate.models.spi.TypeVariableReferenceDetails;
 import org.hibernate.models.spi.VoidTypeDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
+import static org.hibernate.models.internal.IsBoundTypeSwitch.IS_BOUND_SWITCH;
+
 /**
  * TypeDetailsSwitch implementation checking whether a type is resolved (all of its bounds are known)
  *
@@ -31,17 +33,12 @@ import org.hibernate.models.spi.WildcardTypeDetails;
 public class IsResolvedTypeSwitch implements TypeDetailsSwitch<Boolean> {
 	public static final IsResolvedTypeSwitch IS_RESOLVED_SWITCH = new IsResolvedTypeSwitch();
 
-	public static boolean isBound(TypeDetails typeDetails, SourceModelBuildingContext buildingContext) {
-		return TypeDetailsSwitch.switchType( typeDetails, IS_RESOLVED_SWITCH, buildingContext );
+	private static boolean isBound(TypeDetails typeDetails, SourceModelBuildingContext buildingContext) {
+		return TypeDetailsSwitch.switchType( typeDetails, IS_BOUND_SWITCH, buildingContext );
 	}
 
 	@Override
 	public Boolean caseClass(ClassTypeDetails classType, SourceModelBuildingContext buildingContext) {
-		// not completely kosher, but works for our needs
-		//noinspection RedundantIfStatement
-		if ( Objects.equals( classType.getClassDetails(), ClassDetails.OBJECT_CLASS_DETAILS ) ) {
-			return false;
-		}
 		return true;
 	}
 
