@@ -74,7 +74,7 @@ public class TypeDescriptors {
 		if ( attributeType.isArray() ) {
 			final Class<?> componentType = attributeType.getComponentType();
 			final ValueTypeDescriptor<?> elementTypeDescriptor = resolveTypeDescriptor( componentType );
-			return (ValueTypeDescriptor<W>) new ArrayTypeDescriptor<>( elementTypeDescriptor );
+			return (ValueTypeDescriptor<W>) new ArrayTypeDescriptor<>( elementTypeDescriptor, componentType );
 		}
 
 		if ( attributeType.isEnum() ) {
