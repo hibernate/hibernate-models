@@ -64,13 +64,6 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 	}
 
 	@Override
-	public <X extends Annotation> void removeAnnotationUsage(Class<X> annotationType) {
-		if ( usagesMap != null ) {
-			usagesMap.remove( annotationType );
-		}
-	}
-
-	@Override
 	public <X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage) {
 		getUsageMap().put( annotationUsage.getAnnotationType(), annotationUsage );
 	}

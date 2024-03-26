@@ -10,8 +10,6 @@ import java.lang.reflect.Modifier;
 
 import org.hibernate.models.spi.MemberDetails;
 
-import static java.lang.reflect.Modifier.ABSTRACT;
-
 /**
  * Fills-in non-public aspects of the {@link Modifier} class
  *
@@ -19,8 +17,15 @@ import static java.lang.reflect.Modifier.ABSTRACT;
  */
 public class ModifierUtils {
 
-	private static final int BRIDGE    = 0x00000040;
-	private static final int SYNTHETIC = 0x00001000;
+	public static final int BRIDGE    = 0x00000040;
+	public static final int SYNTHETIC = 0x00001000;
+
+	public static final int DYNAMIC_ATTRIBUTE_MODIFIERS = ~Modifier.ABSTRACT
+			& ~BRIDGE
+			& ~Modifier.FINAL
+			& ~Modifier.STATIC
+			& ~SYNTHETIC
+			& ~Modifier.TRANSIENT;
 
 	/**
 	 * Disallow instantiation.  This is a utility class, use statically.
@@ -78,7 +83,7 @@ public class ModifierUtils {
 	}
 
 	public static boolean isAbstract(int modifierFlags) {
-		return (modifierFlags & ABSTRACT) != 0;
+		return (modifierFlags & Modifier.ABSTRACT) != 0;
 	}
 
 	/**
@@ -91,19 +96,9 @@ public class ModifierUtils {
 	 * @see MemberDetails#isPersistable()
 	 */
 	public static boolean hasPersistableFieldModifiers(int modifierFlags) {
-		if ( isTransient( modifierFlags ) ) {
-			return false;
-		}
-
-		if ( ModifierUtils.isSynthetic( modifierFlags ) ) {
-			return false;
-		}
-
-		if ( ModifierUtils.isStatic( modifierFlags ) ) {
-			return false;
-		}
-
-		return true;
+		return !isTransient( modifierFlags )
+				&& !isSynthetic( modifierFlags )
+				&& !isStatic( modifierFlags );
 	}
 
 	/**
@@ -116,22 +111,9 @@ public class ModifierUtils {
 	 * @see MemberDetails#isPersistable()
 	 */
 	public static boolean hasPersistableMethodModifiers(int modifierFlags) {
-		if ( ModifierUtils.isStatic( modifierFlags ) ) {
-			return false;
-		}
-
-		if ( ModifierUtils.isBridge( modifierFlags ) ) {
-			return false;
-		}
-
-		if ( isTransient( modifierFlags ) ) {
-			return false;
-		}
-
-		if ( ModifierUtils.isSynthetic( modifierFlags ) ) {
-			return false;
-		}
-
-		return true;
+		return !isStatic( modifierFlags )
+				&& !isBridge( modifierFlags )
+				&& !isTransient( modifierFlags )
+				&& !isSynthetic( modifierFlags );
 	}
 }

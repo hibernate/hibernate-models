@@ -96,14 +96,7 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * @param context Access to needed services
 	 */
 	default MutableAnnotationUsage<A> createUsage(AnnotationTarget target, SourceModelBuildingContext context) {
-		final DynamicAnnotationUsage<A> usage = new DynamicAnnotationUsage<>( this, target, context );
-		getAttributes().forEach( (attr) -> {
-			final Object value = attr.getTypeDescriptor().createValue( attr, target, context );
-			if ( value != null ) {
-				usage.setAttributeValue( attr.getName(), value );
-			}
-		} );
-		return usage;
+		return createUsage( target, null, context );
 	}
 
 	/**
@@ -113,9 +106,26 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * @param adjuster Callback to allow adjusting the created usage prior to return.
 	 * @param context Access to needed services
 	 */
-	default MutableAnnotationUsage<A> createUsage(AnnotationTarget target, Consumer<MutableAnnotationUsage<A>> adjuster, SourceModelBuildingContext context) {
-		final MutableAnnotationUsage<A> usage = createUsage( target, context );
-		adjuster.accept( usage );
+	default MutableAnnotationUsage<A> createUsage(
+			AnnotationTarget target,
+			Consumer<MutableAnnotationUsage<A>> adjuster,
+			SourceModelBuildingContext context) {
+		// create the "empty" usage
+		final DynamicAnnotationUsage<A> usage = new DynamicAnnotationUsage<>( this, target, context );
+
+		// apply attribute defaults
+		getAttributes().forEach( (attr) -> {
+			final Object value = attr.getTypeDescriptor().createValue( attr, target, context );
+			if ( value != null ) {
+				usage.setAttributeValue( attr.getName(), value );
+			}
+		} );
+
+		// allow configuration
+		if ( adjuster != null ) {
+			adjuster.accept( usage );
+		}
+
 		return usage;
 	}
 }

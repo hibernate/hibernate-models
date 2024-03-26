@@ -9,8 +9,10 @@ package org.hibernate.models.internal.dynamic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
+import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -19,6 +21,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
+import static org.hibernate.models.internal.ModifierUtils.DYNAMIC_ATTRIBUTE_MODIFIERS;
 import static org.hibernate.models.internal.util.StringHelper.isEmpty;
 
 /**
@@ -164,6 +167,52 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 			this.methods = new ArrayList<>();
 		}
 		this.methods.add( methodDetails );
+	}
+
+	/**
+	 * Creates a field representing an attribute and adds it to this class.
+	 */
+	public DynamicFieldDetails applyAttribute(
+			String name,
+			ClassDetails type,
+			boolean isArray,
+			boolean isPlural,
+			Consumer<DynamicFieldDetails> configuration,
+			SourceModelBuildingContext context) {
+		return applyAttribute(
+				name,
+				new ClassTypeDetailsImpl( type, TypeDetails.Kind.CLASS ),
+				isArray,
+				isPlural,
+				configuration,
+				context
+		);
+	}
+
+	/**
+	 * Creates a field representing an attribute and adds it to this class
+	 */
+	public DynamicFieldDetails applyAttribute(
+			String name,
+			TypeDetails type,
+			boolean isArray,
+			boolean isPlural,
+			Consumer<DynamicFieldDetails> configuration,
+			SourceModelBuildingContext context) {
+		final DynamicFieldDetails attribute = new DynamicFieldDetails(
+				name,
+				type,
+				this,
+				DYNAMIC_ATTRIBUTE_MODIFIERS,
+				isArray,
+				isPlural,
+				context
+		);
+		if ( configuration != null ) {
+			configuration.accept( attribute );
+		}
+		addField( attribute );
+		return attribute;
 	}
 
 	@Override

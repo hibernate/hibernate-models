@@ -7,7 +7,7 @@
 package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Extension of AnnotationTarget which allows manipulation of the annotations
@@ -15,13 +15,35 @@ import java.util.List;
  * @author Steve Ebersole
  */
 public interface MutableAnnotationTarget extends AnnotationTarget {
+	/**
+	 * Removes all annotation usages currently associated with this target.
+	 * Useful for complete XML mappings.
+	 */
 	void clearAnnotationUsages();
 
-	<X extends Annotation> void removeAnnotationUsage(Class<X> annotationType);
-
+	/**
+	 * Add an annotation usage to this target
+	 */
 	<X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage);
 
-	default <X extends Annotation> void addAnnotationUsages(List<AnnotationUsage<X>> annotationUsages) {
-		annotationUsages.forEach( this::addAnnotationUsage );
+	/**
+	 * Creates a usage and adds it to this target.
+	 */
+	default <A extends Annotation> MutableAnnotationUsage<A> applyAnnotationUsage(
+			AnnotationDescriptor<A> annotationType,
+			SourceModelBuildingContext buildingContext) {
+		return applyAnnotationUsage( annotationType, null, buildingContext );
+	}
+
+	/**
+	 * Creates a usage and adds it to this target, allowing for configuration of the created usage
+	 */
+	default <A extends Annotation> MutableAnnotationUsage<A> applyAnnotationUsage(
+			AnnotationDescriptor<A> annotationType,
+			Consumer<MutableAnnotationUsage<A>> configuration,
+			SourceModelBuildingContext buildingContext) {
+		final MutableAnnotationUsage<A> usage = annotationType.createUsage( this, configuration, buildingContext );
+		addAnnotationUsage( usage );
+		return usage;
 	}
 }

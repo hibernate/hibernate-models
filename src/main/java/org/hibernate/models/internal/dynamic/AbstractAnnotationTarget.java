@@ -40,11 +40,6 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 		usageMap.clear();
 	}
 
-	@Override
-	public <X extends Annotation> void removeAnnotationUsage(Class<X> annotationType) {
-		usageMap.remove( annotationType );
-	}
-
 	/**
 	 * Applies the given {@code annotationUsage} to this target.
 	 *
