@@ -8,10 +8,8 @@
 package org.hibernate.models.internal;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.hibernate.models.spi.ArrayTypeDetails;
-import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.PrimitiveTypeDetails;
@@ -63,7 +61,7 @@ public class IsResolvedTypeSwitch implements TypeDetailsSwitch<Boolean> {
 			SourceModelBuildingContext buildingContext) {
 		final List<TypeDetails> typeArgs = parameterizedType.getArguments();
 		for ( TypeDetails arg : typeArgs ) {
-			if ( !isBound( arg, buildingContext ) ) {
+			if ( !arg.isResolved() ) {
 				return false;
 			}
 		}
