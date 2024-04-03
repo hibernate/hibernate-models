@@ -50,14 +50,32 @@ public class SimpleDynamicModelTests {
 				"TheEntity",
 				name -> new DynamicClassDetails( name, buildingContext )
 		);
-		entityDetails.applyAnnotationUsage( JpaAnnotations.ENTITY, buildingContext );
+		final MutableAnnotationUsage<Entity> created = entityDetails.applyAnnotationUsage(
+				JpaAnnotations.ENTITY,
+				buildingContext
+		);
+		final MutableAnnotationUsage<Entity> preExisting = entityDetails.applyAnnotationUsage(
+				JpaAnnotations.ENTITY,
+				buildingContext
+		);
+		assertThat( created ).isSameAs( preExisting );
 
 		entityDetails.applyAttribute(
 				"id",
 				integerTypeDetails,
 				false,
 				false,
-				fieldDetails -> fieldDetails.applyAnnotationUsage( JpaAnnotations.ID, buildingContext ),
+				fieldDetails -> {
+					final MutableAnnotationUsage<Id> first = fieldDetails.applyAnnotationUsage(
+							JpaAnnotations.ID,
+							buildingContext
+					);
+					final MutableAnnotationUsage<Id> second = fieldDetails.applyAnnotationUsage(
+							JpaAnnotations.ID,
+							buildingContext
+					);
+					assertThat( first ).isSameAs( second );
+				},
 				buildingContext
 		);
 
