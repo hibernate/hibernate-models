@@ -46,6 +46,7 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 
 	@Override
 	public <X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage) {
+		assert annotationUsage.getAnnotationDescriptor().getAllowableTargets().contains( getKind() );
 		getUsageMap().put( annotationUsage.getAnnotationType(), annotationUsage );
 	}
 

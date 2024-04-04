@@ -46,6 +46,7 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 	 * @todo It is undefined currently what happens if the annotation type is already applied on this target.
 	 */
 	public <X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage) {
+		assert annotationUsage.getAnnotationDescriptor().getAllowableTargets().contains( getKind() );
 		final AnnotationUsage<?> previous = usageMap.put( annotationUsage.getAnnotationType(), annotationUsage );
 
 		if ( previous != null ) {
