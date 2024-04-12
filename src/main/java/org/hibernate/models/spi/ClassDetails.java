@@ -6,9 +6,11 @@
  */
 package org.hibernate.models.spi;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
 
@@ -238,4 +240,34 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 * Know what you are doing before calling this method
 	 */
 	<X> Class<X> toJavaClass();
+
+	@Override
+	default ClassDetails asClassDetails() {
+		return this;
+	}
+
+	@Override
+	default <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
+		throw new IllegalCastException( "ClassDetails cannot be cast to AnnotationDescriptor" );
+	}
+
+	@Override
+	default MemberDetails asMemberDetails() {
+		throw new IllegalCastException( "ClassDetails cannot be cast to MemberDescriptor" );
+	}
+
+	@Override
+	default FieldDetails asFieldDetails() {
+		throw new IllegalCastException( "ClassDetails cannot be cast to FieldDetails" );
+	}
+
+	@Override
+	default MethodDetails asMethodDetails() {
+		throw new IllegalCastException( "ClassDetails cannot be cast to MethodDetails" );
+	}
+
+	@Override
+	default RecordComponentDetails asRecordComponentDetails() {
+		throw new IllegalCastException( "ClassDetails cannot be cast to RecordComponentDetails" );
+	}
 }

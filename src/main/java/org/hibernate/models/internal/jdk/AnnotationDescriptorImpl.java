@@ -10,9 +10,12 @@ import java.lang.annotation.Annotation;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.internal.AnnotationHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.MutableClassDetails;
+import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import static org.hibernate.models.internal.jdk.JdkBuilders.extractAttributeDescriptors;
@@ -80,5 +83,15 @@ public class AnnotationDescriptorImpl<A extends Annotation> extends AbstractAnno
 	@Override
 	public String getName() {
 		return annotationType.getName();
+	}
+
+	@Override
+	public MutableClassDetails asClassDetails() {
+		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to ClassDetails" );
+	}
+
+	@Override
+	public MutableMemberDetails asMemberDetails() {
+		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to MemberDetails" );
 	}
 }

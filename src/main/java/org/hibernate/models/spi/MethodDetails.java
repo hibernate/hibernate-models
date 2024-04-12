@@ -9,6 +9,8 @@ package org.hibernate.models.spi;
 import java.beans.Introspector;
 import java.util.List;
 
+import org.hibernate.models.IllegalCastException;
+
 import static org.hibernate.models.internal.ModifierUtils.hasPersistableMethodModifiers;
 
 /**
@@ -52,5 +54,20 @@ public interface MethodDetails extends MemberDetails {
 		}
 
 		return null;
+	}
+
+	@Override
+	default FieldDetails asFieldDetails() {
+		throw new IllegalCastException( "MethodDetails cannot be cast to FieldDetails" );
+	}
+
+	@Override
+	default MethodDetails asMethodDetails() {
+		return this;
+	}
+
+	@Override
+	default RecordComponentDetails asRecordComponentDetails() {
+		throw new IllegalCastException( "MethodDetails cannot be cast to RecordComponentDetails" );
 	}
 }

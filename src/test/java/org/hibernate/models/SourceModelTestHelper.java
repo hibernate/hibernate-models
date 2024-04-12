@@ -16,12 +16,10 @@ import org.hibernate.models.internal.jandex.JandexBuilders;
 import org.hibernate.models.internal.jandex.JandexIndexerHelper;
 import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.internal.util.CollectionHelper;
-import org.hibernate.models.orm.HibernateAnnotations;
 import org.hibernate.models.orm.JpaAnnotations;
 import org.hibernate.models.orm.OrmAnnotationHelper;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ClassLoading;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.Index;
@@ -100,7 +98,6 @@ public class SourceModelTestHelper {
 		final Indexer indexer = new Indexer();
 		BaseLineJavaTypes.forEachJavaType( (javaType) -> JandexIndexerHelper.apply( javaType, indexer, classLoadingAccess ) );
 		JpaAnnotations.forEachAnnotation( (descriptor) -> JandexIndexerHelper.apply( descriptor.getAnnotationType(), indexer, classLoadingAccess ) );
-		HibernateAnnotations.forEachAnnotation( (descriptor) -> JandexIndexerHelper.apply( descriptor.getAnnotationType(), indexer, classLoadingAccess ) );
 
 		if ( CollectionHelper.isNotEmpty( modelClasses ) ) {
 			for ( Class<?> modelClass : modelClasses ) {

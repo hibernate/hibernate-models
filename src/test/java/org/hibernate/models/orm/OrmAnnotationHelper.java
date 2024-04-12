@@ -21,7 +21,6 @@ public class OrmAnnotationHelper {
 
 	public static void forEachOrmAnnotation(Consumer<AnnotationDescriptor<?>> consumer) {
 		JpaAnnotations.forEachAnnotation( consumer );
-		HibernateAnnotations.forEachAnnotation( consumer );
 	}
 
 	public static void forEachOrmAnnotation(Class<?> declarer, Consumer<AnnotationDescriptor<? extends Annotation>> consumer) {

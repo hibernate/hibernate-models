@@ -1,7 +1,5 @@
 /**
  * @author Steve Ebersole
  */
-@SoftDelete
+@CustomAnnotation
 package org.hibernate.models.pkg;
-
-import org.hibernate.annotations.SoftDelete;

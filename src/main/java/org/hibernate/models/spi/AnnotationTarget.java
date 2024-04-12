@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.models.AnnotationAccessException;
+import org.hibernate.models.IllegalCastException;
 
 /**
  * Abstract for something where an annotation can be {@linkplain AnnotationUsage used}.
@@ -282,6 +283,48 @@ public interface AnnotationTarget {
 		}
 		return null;
 	}
+
+	/**
+	 * Safe cast method for cases when the {@linkplain #getKind() target} is an {@linkplain Kind#ANNOTATION annotation}.
+	 *
+	 * @throws IllegalCastException If the target is not an annotation
+	 */
+	<A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor();
+
+	/**
+	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#CLASS class}.
+	 *
+	 * @throws IllegalCastException If the target is not a class
+	 */
+	ClassDetails asClassDetails();
+
+	/**
+	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#FIELD field}, {@linkplain Kind#METHOD method} or {@linkplain Kind#RECORD_COMPONENT record component}.
+	 *
+	 * @throws IllegalCastException If the target is not a member
+	 */
+	MemberDetails asMemberDetails();
+
+	/**
+	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#FIELD field}.
+	 *
+	 * @throws IllegalCastException If the target is not a field
+	 */
+	FieldDetails asFieldDetails();
+
+	/**
+	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#METHOD method}.
+	 *
+	 * @throws IllegalCastException If the target is not a method
+	 */
+	MethodDetails asMethodDetails();
+
+	/**
+	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#RECORD_COMPONENT record component}.
+	 *
+	 * @throws IllegalCastException If the target is not a record component
+	 */
+	RecordComponentDetails asRecordComponentDetails();
 
 	/**
 	 * Subset of {@linkplain ElementType annotation targets} supported for mapping annotations

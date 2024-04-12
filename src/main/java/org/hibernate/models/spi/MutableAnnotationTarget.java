@@ -57,4 +57,10 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 		addAnnotationUsage( usage );
 		return usage;
 	}
+
+	@Override
+	MutableClassDetails asClassDetails();
+
+	@Override
+	MutableMemberDetails asMemberDetails();
 }

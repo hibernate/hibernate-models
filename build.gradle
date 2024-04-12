@@ -23,10 +23,9 @@ dependencies {
 	annotationProcessor libs.logging
 	annotationProcessor libs.loggingAnnotations
 
+	testImplementation jakartaLibs.jpa
 	testImplementation testLibs.junit5Api
 	testImplementation testLibs.assertjCore
-	testImplementation platform( libs.hibernatePlatform )
-	testImplementation libs.hibernateCore
 
 	testRuntimeOnly testLibs.junit5Engine
 	testRuntimeOnly testLibs.log4j

@@ -6,10 +6,6 @@
  */
 package org.hibernate.models.annotations;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Comment;
-
 import jakarta.persistence.Basic;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
@@ -29,16 +25,13 @@ import jakarta.persistence.Table;
 @NamedQuery( name = "abc", query = "select me" )
 @NamedQuery( name = "xyz", query = "select you" )
 @Cacheable
-@Cache( usage = CacheConcurrencyStrategy.READ_ONLY, region = "custom-region" )
 public class SimpleEntity {
 	@Id
-	@Column(name = "id")
-	@Comment("SimpleColumnEntity PK column")
+	@Column(name = "id", comment = "SimpleColumnEntity PK column")
 	private Integer id;
 
 	@Basic
-	@Column(name = "description", nullable = false, unique = true, insertable = false)
-	@Comment("SimpleColumnEntity#name")
+	@Column(name = "description", nullable = false, unique = true, insertable = false, comment = "SimpleColumnEntity#name")
 	private String name;
 
 	@Basic

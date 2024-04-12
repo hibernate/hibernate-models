@@ -1,7 +1,7 @@
 package org.hibernate.models;
 
 import org.hibernate.models.internal.util.StringHelper;
-import org.hibernate.models.orm.HibernateAnnotations;
+import org.hibernate.models.pkg.CustomAnnotation;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
@@ -25,7 +25,7 @@ public class PackageTests {
 				.resolveClassDetails( packageInfoName );
 		assertThat( classDetails ).isNotNull();
 		assertThat( classDetails.getClassName() ).endsWith( "package-info" );
-		assertThat( classDetails.getAnnotationUsage( HibernateAnnotations.SOFT_DELETE ) ).isNotNull();
+		assertThat( classDetails.getAnnotationUsage( CustomAnnotation.class ) ).isNotNull();
 	}
 
 	@Test
@@ -36,6 +36,6 @@ public class PackageTests {
 				.resolveClassDetails( PACKAGE_NAME );
 		assertThat( classDetails ).isNotNull();
 		assertThat( classDetails.getClassName() ).endsWith( "package-info" );
-		assertThat( classDetails.getAnnotationUsage( HibernateAnnotations.SOFT_DELETE ) ).isNotNull();
+		assertThat( classDetails.getAnnotationUsage( CustomAnnotation.class ) ).isNotNull();
 	}
 }

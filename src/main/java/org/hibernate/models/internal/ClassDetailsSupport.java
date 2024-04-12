@@ -15,13 +15,12 @@ import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.MutableAnnotationTarget;
 import org.hibernate.models.spi.MutableClassDetails;
 
 /**
  * @author Steve Ebersole
  */
-public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTargetSupport, MutableAnnotationTarget {
+public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTargetSupport {
 
 	@Override
 	default void forEachField(IndexedConsumer<FieldDetails> consumer) {

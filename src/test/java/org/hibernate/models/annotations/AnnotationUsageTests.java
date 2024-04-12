@@ -2,10 +2,8 @@ package org.hibernate.models.annotations;
 
 import java.util.List;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.internal.util.MutableInteger;
 import org.hibernate.models.AnnotationAccessException;
+import org.hibernate.models.MutableInteger;
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
@@ -64,10 +62,10 @@ public class AnnotationUsageTests {
 
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
 		// NOTE : the 2 @NamedQuery refs get bundled into 1 @NamedQueries
-		assertThat( classDetails.getAllAnnotationUsages() ).hasSize( 7 );
+		assertThat( classDetails.getAllAnnotationUsages() ).hasSize( 6 );
 
-		assertThat( classDetails.findFieldByName( "id" ).getAllAnnotationUsages() ).hasSize( 3 );
-		assertThat( classDetails.findFieldByName( "name" ).getAllAnnotationUsages() ).hasSize( 3 );
+		assertThat( classDetails.findFieldByName( "id" ).getAllAnnotationUsages() ).hasSize( 2 );
+		assertThat( classDetails.findFieldByName( "name" ).getAllAnnotationUsages() ).hasSize( 2 );
 		assertThat( classDetails.findFieldByName( "name2" ).getAllAnnotationUsages() ).hasSize( 2 );
 	}
 
@@ -116,10 +114,6 @@ public class AnnotationUsageTests {
 		assertThat( classDetails.hasAnnotationUsage( Entity.class ) ).isTrue();
 		final AnnotationUsage<Entity> entityAnn = classDetails.getAnnotationUsage( Entity.class );
 		assertThat( entityAnn.getString( "name" ) ).isEqualTo( "SimpleColumnEntity" );
-
-		assertThat( classDetails.hasAnnotationUsage( Cache.class ) ).isTrue();
-		final AnnotationUsage<Cache> cacheAnn = classDetails.getAnnotationUsage( Cache.class );
-		assertThat( cacheAnn.getEnum( "usage", CacheConcurrencyStrategy.class ) ).isEqualTo( CacheConcurrencyStrategy.READ_ONLY );
 
 		final AnnotationUsage<Column> columnAnn = classDetails.findFieldByName( "name" ).getAnnotationUsage( Column.class );
 		assertThat( columnAnn.getString( "name" ) ).isEqualTo( "description" );
