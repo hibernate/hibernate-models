@@ -27,8 +27,7 @@ public class ArrayValueExtractor<V,R> extends AbstractValueExtractor<List<V>,R[]
 	protected List<V> wrap(
 			R[] rawValues,
 			AttributeDescriptor<List<V>> attributeDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
-		return wrapper.wrap( rawValues, target, buildingContext );
+		return wrapper.wrap( rawValues, buildingContext );
 	}
 }

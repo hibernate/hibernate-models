@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
@@ -26,11 +25,8 @@ public class EnumValueExtractor<E extends Enum<E>> extends AbstractValueExtracto
 	}
 
 	@Override
-	protected E extractAndWrap(
-			AnnotationValue jandexValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	protected E extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return wrapper.wrap( jandexValue, target, buildingContext );
+		return wrapper.wrap( jandexValue, buildingContext );
 	}
 }

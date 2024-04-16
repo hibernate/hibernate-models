@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -21,7 +20,7 @@ public class BooleanValueWrapper implements ValueWrapper<Boolean, AnnotationValu
 	public static final BooleanValueWrapper JANDEX_BOOLEAN_VALUE_WRAPPER = new BooleanValueWrapper();
 
 	@Override
-	public Boolean wrap(AnnotationValue rawValue, AnnotationTarget target, SourceModelBuildingContext buildingContext) {
+	public Boolean wrap(AnnotationValue rawValue, SourceModelBuildingContext buildingContext) {
 		assert rawValue != null;
 		return rawValue.asBoolean();
 	}

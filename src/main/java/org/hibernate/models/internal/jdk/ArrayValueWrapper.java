@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.models.internal.util.CollectionHelper;
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -26,18 +25,18 @@ public class ArrayValueWrapper<V,R> implements ValueWrapper<List<V>,R[]> {
 	}
 
 	@Override
-	public List<V> wrap(R[] rawValues, AnnotationTarget target, SourceModelBuildingContext buildingContext) {
+	public List<V> wrap(R[] rawValues, SourceModelBuildingContext buildingContext) {
 		if ( CollectionHelper.isEmpty( rawValues ) ) {
 			return Collections.emptyList();
 		}
 
 		if ( rawValues.length == 1 ) {
-			return Collections.singletonList( elementWrapper.wrap( rawValues[0], target, buildingContext ) );
+			return Collections.singletonList( elementWrapper.wrap( rawValues[0], buildingContext ) );
 		}
 
 		final List<V> result = new ArrayList<>( rawValues.length );
 		for ( int i = 0; i < rawValues.length; i++ ) {
-			result.add( elementWrapper.wrap( rawValues[i], target, buildingContext ) );
+			result.add( elementWrapper.wrap( rawValues[i], buildingContext ) );
 		}
 		return result;
 	}

@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
@@ -18,11 +17,8 @@ public class StringValueExtractor extends AbstractValueExtractor<String> {
 	public static final StringValueExtractor JANDEX_STRING_EXTRACTOR = new StringValueExtractor();
 
 	@Override
-	protected String extractAndWrap(
-			AnnotationValue jandexValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	protected String extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return StringValueWrapper.JANDEX_STRING_VALUE_WRAPPER.wrap( jandexValue, target, buildingContext );
+		return StringValueWrapper.JANDEX_STRING_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
 	}
 }

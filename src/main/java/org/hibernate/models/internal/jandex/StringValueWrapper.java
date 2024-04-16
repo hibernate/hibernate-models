@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -21,10 +20,7 @@ public class StringValueWrapper implements ValueWrapper<String,AnnotationValue> 
 	public static final StringValueWrapper JANDEX_STRING_VALUE_WRAPPER = new StringValueWrapper();
 
 	@Override
-	public String wrap(
-			AnnotationValue rawValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	public String wrap(AnnotationValue rawValue, SourceModelBuildingContext buildingContext) {
 		assert rawValue != null;
 		return rawValue.asString();
 	}

@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
@@ -20,30 +19,22 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 public class JdkAnnotationUsage<A extends Annotation> implements MutableAnnotationUsage<A> {
 	private final A annotation;
 	private final AnnotationDescriptor<A> annotationDescriptor;
-	private final AnnotationTarget location;
 
 	private final Map<String,?> valueMap;
 
 	public JdkAnnotationUsage(
 			A annotation,
 			AnnotationDescriptor<A> annotationDescriptor,
-			AnnotationTarget location,
 			SourceModelBuildingContext buildingContext) {
 		this.annotation = annotation;
 		this.annotationDescriptor = annotationDescriptor;
-		this.location = location;
 
-		this.valueMap = AnnotationUsageBuilder.extractAttributeValues( annotation, annotationDescriptor, location, buildingContext );
+		this.valueMap = AnnotationUsageBuilder.extractAttributeValues( annotation, annotationDescriptor, buildingContext );
 	}
 
 	@Override
 	public AnnotationDescriptor<A> getAnnotationDescriptor() {
 		return annotationDescriptor;
-	}
-
-	@Override
-	public AnnotationTarget getAnnotationTarget() {
-		return location;
 	}
 
 	@Override

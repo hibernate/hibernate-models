@@ -19,7 +19,6 @@ import java.util.function.BiConsumer;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
@@ -36,7 +35,6 @@ public class AnnotationUsageBuilder {
 	 */
 	public static void processAnnotations(
 			Annotation[] annotations,
-			AnnotationTarget target,
 			BiConsumer<Class<? extends Annotation>, AnnotationUsage<?>> consumer,
 			SourceModelBuildingContext buildingContext) {
 		final AnnotationDescriptorRegistry annotationDescriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
@@ -59,7 +57,6 @@ public class AnnotationUsageBuilder {
 			final AnnotationUsage<?> usage = makeUsage(
 					annotation,
 					annotationDescriptor,
-					target,
 					buildingContext
 			);
 			consumer.accept( annotationType, usage );
@@ -69,10 +66,9 @@ public class AnnotationUsageBuilder {
 	public static <A extends Annotation> AnnotationUsage<A> makeUsage(
 			A annotation,
 			AnnotationDescriptor<A> annotationDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
 		//noinspection unchecked,rawtypes
-		return new JdkAnnotationUsage( annotation, annotationDescriptor, target, buildingContext );
+		return new JdkAnnotationUsage( annotation, annotationDescriptor, buildingContext );
 	}
 
 	/**
@@ -82,7 +78,6 @@ public class AnnotationUsageBuilder {
 	public static <A extends Annotation> Map<String,?> extractAttributeValues(
 			A annotation,
 			AnnotationDescriptor<A> annotationDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
 		if ( CollectionHelper.isEmpty( annotationDescriptor.getAttributes() ) ) {
 			return Collections.emptyMap();
@@ -94,7 +89,7 @@ public class AnnotationUsageBuilder {
 			final ValueExtractor valueExtractor = attributeDescriptor
 					.getTypeDescriptor()
 					.createJdkExtractor( buildingContext );
-			final Object value = valueExtractor.extractValue( annotation, attributeDescriptor, target, buildingContext );
+			final Object value = valueExtractor.extractValue( annotation, attributeDescriptor, buildingContext );
 			valueMap.put( attributeDescriptor.getName(), value );
 		}
 		return valueMap;

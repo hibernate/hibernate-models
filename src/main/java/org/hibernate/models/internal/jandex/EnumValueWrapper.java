@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -25,7 +24,7 @@ public class EnumValueWrapper<E extends Enum<E>> implements ValueWrapper<E,Annot
 	}
 
 	@Override
-	public E wrap(AnnotationValue rawValue, AnnotationTarget target, SourceModelBuildingContext buildingContext) {
+	public E wrap(AnnotationValue rawValue, SourceModelBuildingContext buildingContext) {
 		assert rawValue != null;
 		final String enumName = rawValue.asEnum();
 		return Enum.valueOf( enumClass, enumName );

@@ -8,7 +8,6 @@ package org.hibernate.models.internal.jandex;
 
 import java.util.List;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -25,15 +24,12 @@ public class ArrayValueExtractor<V> extends AbstractValueExtractor<List<V>> {
 	}
 
 	@Override
-	protected List<V> extractAndWrap(
-			AnnotationValue jandexValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	protected List<V> extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
 
 		final List<AnnotationValue> values = jandexValue.asArrayList();
 		assert values != null;
 
-		return wrapper.wrap( jandexValue, target, buildingContext );
+		return wrapper.wrap( jandexValue, buildingContext );
 	}
 }

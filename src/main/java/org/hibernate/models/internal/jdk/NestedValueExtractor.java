@@ -28,8 +28,7 @@ public class NestedValueExtractor<A extends Annotation> extends AbstractValueExt
 	protected AnnotationUsage<A> wrap(
 			A rawValue,
 			AttributeDescriptor<AnnotationUsage<A>> attributeDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
-		return wrapper.wrap( rawValue, target, buildingContext );
+		return wrapper.wrap( rawValue, buildingContext );
 	}
 }

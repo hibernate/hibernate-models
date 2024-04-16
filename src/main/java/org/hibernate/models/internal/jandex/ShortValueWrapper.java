@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -21,10 +20,7 @@ public class ShortValueWrapper implements ValueWrapper<Short,AnnotationValue> {
 	public static final ShortValueWrapper JANDEX_SHORT_VALUE_WRAPPER = new ShortValueWrapper();
 
 	@Override
-	public Short wrap(
-			AnnotationValue rawValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	public Short wrap(AnnotationValue rawValue, SourceModelBuildingContext buildingContext) {
 		assert rawValue != null;
 		return rawValue.asShort();
 	}

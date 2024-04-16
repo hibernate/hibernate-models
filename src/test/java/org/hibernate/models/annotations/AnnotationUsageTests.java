@@ -5,6 +5,8 @@ import java.util.List;
 import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.MutableInteger;
 import org.hibernate.models.UnknownAnnotationAttributeException;
+import org.hibernate.models.spi.AnnotationTarget;
+import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.orm.JpaAnnotations;
@@ -18,12 +20,18 @@ import org.junit.jupiter.api.Test;
 
 import org.jboss.jandex.Index;
 
+import jakarta.persistence.CheckConstraint;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedNativeQueries;
+import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.SecondaryTables;
+import jakarta.persistence.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -62,7 +70,7 @@ public class AnnotationUsageTests {
 
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
 		// NOTE : the 2 @NamedQuery refs get bundled into 1 @NamedQueries
-		assertThat( classDetails.getAllAnnotationUsages() ).hasSize( 6 );
+		assertThat( classDetails.getAllAnnotationUsages() ).hasSize( 7 );
 
 		assertThat( classDetails.findFieldByName( "id" ).getAllAnnotationUsages() ).hasSize( 2 );
 		assertThat( classDetails.findFieldByName( "name" ).getAllAnnotationUsages() ).hasSize( 2 );
@@ -391,5 +399,61 @@ public class AnnotationUsageTests {
 
 		final AnnotationUsage<NamedQuery> singleAnnotationUsage = classDetails.getSingleAnnotationUsage( NamedQuery.class );
 		assertThat( singleAnnotationUsage ).isNull();
+	}
+
+	@Test
+	void testAnnotationTargetWithJandex() {
+		testAnnotationTarget( buildJandexIndex( SimpleEntity.class ) );
+	}
+
+	@Test
+	void testAnnotationTargetWithoutJandex() {
+		testAnnotationTarget( null );
+	}
+
+	void testAnnotationTarget(Index index) {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
+
+		// type annotation usage
+		final AnnotationUsage<Table> table = classDetails.getAnnotationUsage( Table.class );
+		assertThat( table ).isNotNull();
+		assertThat( table.getAnnotationDescriptor().getAllowableTargets() ).contains( classDetails.getKind() );
+		// nested type annotation usage
+		final AnnotationUsage<CheckConstraint> checkConstraint = table.<List<AnnotationUsage<CheckConstraint>>>getAttributeValue( "check" ).get( 0 );
+		assertThat( checkConstraint.getAnnotationDescriptor().getAllowableTargets() ).isEmpty();
+		assertThat( classDetails.getAnnotationUsage( CheckConstraint.class ) ).isNull();
+
+		// field annotation usage
+		final FieldDetails elementCollection = classDetails.findFieldByName( "elementCollection" );
+		final AnnotationUsage<CollectionTable> collectionTable = elementCollection.getAnnotationUsage( CollectionTable.class );
+		assertThat( collectionTable ).isNotNull();
+		assertThat( collectionTable.getAnnotationDescriptor().getAllowableTargets() ).contains( elementCollection.getKind() );
+		// nested field annotation usage
+		final AnnotationUsage<JoinColumn> joinColumn = collectionTable.<List<AnnotationUsage<JoinColumn>>>getAttributeValue( "joinColumns" ).get( 0 );
+		assertThat( joinColumn.getAnnotationDescriptor().getAllowableTargets() ).contains( elementCollection.getKind() );
+		assertThat( elementCollection.getAnnotationUsage( JoinColumn.class ) ).isNull();
+
+		// repeatable parent annotation usage
+		final AnnotationUsage<NamedNativeQueries> namedNativeQueries = classDetails.getAnnotationUsage( NamedNativeQueries.class );
+		assertThat( namedNativeQueries ).isNotNull();
+		assertThat( namedNativeQueries.getAnnotationDescriptor().getAllowableTargets() ).contains( classDetails.getKind() );
+		// nested repeated annotation usage
+		final AnnotationUsage<NamedNativeQuery> namedNativeQuery = namedNativeQueries.<List<AnnotationUsage<NamedNativeQuery>>>getAttributeValue("value" ).get( 0 );
+		assertThat( namedNativeQuery.getAnnotationDescriptor().getAllowableTargets() ).contains( classDetails.getKind() );
+		assertThat( classDetails.getAnnotationUsage( NamedNativeQuery.class ) ).isSameAs( namedNativeQuery );
+
+		// direct repeated annotation usage
+		final List<AnnotationUsage<NamedQuery>> repeatedNamedQueries = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		assertThat( repeatedNamedQueries ).hasSize( 2 )
+				.allMatch( namedQuery -> namedQuery.getAnnotationDescriptor()
+				.getAllowableTargets()
+				.contains( classDetails.getKind() ) );
+		assertThat( classDetails.getSingleAnnotationUsage( NamedQuery.class ) ).isNull();
+		// we can still find a usage for the repeatable container
+		final AnnotationUsage<NamedQueries> namedQueries = classDetails.getAnnotationUsage( NamedQueries.class );
+		assertThat( namedQueries ).isNotNull();
+		assertThat( namedQueries.getAnnotationDescriptor().getAllowableTargets() ).contains( classDetails.getKind() );
 	}
 }

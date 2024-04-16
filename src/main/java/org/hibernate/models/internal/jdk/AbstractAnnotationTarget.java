@@ -51,7 +51,6 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 		final Map<Class<? extends Annotation>, AnnotationUsage<?>> result = new HashMap<>();
 		AnnotationUsageBuilder.processAnnotations(
 				annotationSupplier.get(),
-				this,
 				result::put,
 				buildingContext
 		);

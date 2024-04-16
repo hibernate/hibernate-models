@@ -25,31 +25,28 @@ public abstract class AbstractValueExtractor<W,R> implements ValueExtractor<Anno
 	protected abstract W wrap(
 			R rawValue,
 			AttributeDescriptor<W> attributeDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext);
 
 	@Override
 	public W extractValue(
 			Annotation annotation,
 			String attributeName,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
 		final AnnotationDescriptor<? extends Annotation> annDescriptor = buildingContext
 				.getAnnotationDescriptorRegistry()
 				.getDescriptor( annotation.annotationType() );
-		return extractValue( annotation, annDescriptor.getAttribute( attributeName ), target, buildingContext );
+		return extractValue( annotation, annDescriptor.getAttribute( attributeName ), buildingContext );
 	}
 
 	@Override
 	public W extractValue(
 			Annotation annotation,
 			AttributeDescriptor<W> attributeDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
 		try {
 			//noinspection unchecked
 			final R rawValue = (R) attributeDescriptor.getAttributeMethod().invoke( annotation );
-			return wrap( rawValue, attributeDescriptor, target, buildingContext );
+			return wrap( rawValue, attributeDescriptor, buildingContext );
 		}
 		catch (IllegalAccessException | InvocationTargetException e) {
 			throw new AnnotationAccessException(

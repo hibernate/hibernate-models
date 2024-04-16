@@ -32,7 +32,7 @@ public interface ValueExtractor<S, V> {
 	/**
 	 * Extract the value of the named attribute from the given annotation
 	 */
-	V extractValue(S annotation, String attributeName, AnnotationTarget target, SourceModelBuildingContext buildingContext);
+	V extractValue(S annotation, String attributeName, SourceModelBuildingContext buildingContext);
 
 	/**
 	 * Extract the value of the described attribute from the given annotation
@@ -40,8 +40,7 @@ public interface ValueExtractor<S, V> {
 	default V extractValue(
 			S annotation,
 			AttributeDescriptor<V> attributeDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
-		return extractValue( annotation, attributeDescriptor.getName(), target, buildingContext );
+		return extractValue( annotation, attributeDescriptor.getName(), buildingContext );
 	}
 }

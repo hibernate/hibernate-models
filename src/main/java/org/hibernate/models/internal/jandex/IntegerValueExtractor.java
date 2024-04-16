@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
@@ -18,11 +17,8 @@ public class IntegerValueExtractor extends AbstractValueExtractor<Integer> {
 	public static final IntegerValueExtractor JANDEX_INTEGER_EXTRACTOR = new IntegerValueExtractor();
 
 	@Override
-	protected Integer extractAndWrap(
-			AnnotationValue jandexValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	protected Integer extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return IntegerValueWrapper.JANDEX_INTEGER_VALUE_WRAPPER.wrap( jandexValue, target, buildingContext );
+		return IntegerValueWrapper.JANDEX_INTEGER_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
 	}
 }

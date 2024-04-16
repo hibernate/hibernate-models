@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationProxy;
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
@@ -24,25 +23,21 @@ import org.jboss.jandex.AnnotationInstance;
  */
 public class JandexAnnotationUsage<A extends Annotation> implements MutableAnnotationUsage<A> {
 	private final AnnotationDescriptor<A> annotationDescriptor;
-	private final AnnotationTarget annotationTarget;
 
 	private final Map<String,?> attributeValueMap;
 
 	public JandexAnnotationUsage(
 			AnnotationInstance annotationInstance,
 			AnnotationDescriptor<A> annotationDescriptor,
-			AnnotationTarget annotationTarget,
 			SourceModelBuildingContext processingContext) {
 		assert annotationInstance != null : "Jandex AnnotationInstance was null";
 		assert annotationDescriptor != null : "AnnotationDescriptor was null - " + annotationInstance;
 
-		this.annotationTarget = annotationTarget;
 		this.annotationDescriptor = annotationDescriptor;
 
 		this.attributeValueMap = AnnotationUsageBuilder.extractAttributeValues(
 				annotationInstance,
 				annotationDescriptor,
-				annotationTarget,
 				processingContext
 		);
 	}
@@ -50,11 +45,6 @@ public class JandexAnnotationUsage<A extends Annotation> implements MutableAnnot
 	@Override
 	public AnnotationDescriptor<A> getAnnotationDescriptor() {
 		return annotationDescriptor;
-	}
-
-	@Override
-	public AnnotationTarget getAnnotationTarget() {
-		return annotationTarget;
 	}
 
 	@Override

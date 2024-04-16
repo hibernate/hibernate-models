@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
@@ -18,11 +17,8 @@ public class FloatValueExtractor extends AbstractValueExtractor<Float> {
 	public static final FloatValueExtractor JANDEX_FLOAT_EXTRACTOR = new FloatValueExtractor();
 
 	@Override
-	protected Float extractAndWrap(
-			AnnotationValue jandexValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	protected Float extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return FloatValueWrapper.JANDEX_FLOAT_VALUE_WRAPPER.wrap( jandexValue, target, buildingContext );
+		return FloatValueWrapper.JANDEX_FLOAT_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
 	}
 }

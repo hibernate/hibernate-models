@@ -62,7 +62,7 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 			return Collections.emptyList();
 		}
 
-		return jdkValueWrapper.wrap( defaultValue, target, context );
+		return jdkValueWrapper.wrap( defaultValue, context );
 	}
 
 	@Override

@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
@@ -20,9 +19,8 @@ public class DoubleValueExtractor extends AbstractValueExtractor<Double> {
 	@Override
 	protected Double extractAndWrap(
 			AnnotationValue jandexValue,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return DoubleValueWrapper.JANDEX_DOUBLE_VALUE_WRAPPER.wrap( jandexValue, target, buildingContext );
+		return DoubleValueWrapper.JANDEX_DOUBLE_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
 	}
 }

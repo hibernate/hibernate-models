@@ -9,7 +9,6 @@ package org.hibernate.models.internal.jandex;
 import java.lang.annotation.Annotation;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
@@ -32,8 +31,7 @@ public class NestedValueExtractor<A extends Annotation> extends AbstractValueExt
 	@Override
 	protected AnnotationUsage<A> extractAndWrap(
 			AnnotationValue jandexValue,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
-		return wrapper.wrap( jandexValue, target, buildingContext );
+		return wrapper.wrap( jandexValue, buildingContext );
 	}
 }

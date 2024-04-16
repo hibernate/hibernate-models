@@ -23,9 +23,8 @@ public class ClassValueExtractor extends AbstractValueExtractor<ClassDetails,Cla
 	protected ClassDetails wrap(
 			Class<?> rawValue,
 			AttributeDescriptor<ClassDetails> attributeDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
-		return JDK_CLASS_VALUE_WRAPPER.wrap( rawValue, target, buildingContext );
+		return JDK_CLASS_VALUE_WRAPPER.wrap( rawValue, buildingContext );
 	}
 
 }

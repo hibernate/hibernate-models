@@ -39,7 +39,6 @@ public class DynamicAnnotationTests {
 		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
 		final DynamicAnnotationUsage<SequenceGenerator> generatorAnn = new DynamicAnnotationUsage<>(
 				JpaAnnotations.SEQUENCE_GENERATOR,
-				dynamicEntity,
 				buildingContext
 		);
 		assertThat( generatorAnn.getString( "name" ) ).isEqualTo( "" );
@@ -65,7 +64,6 @@ public class DynamicAnnotationTests {
 		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
 		final DynamicAnnotationUsage<JoinTable> generatorAnn = new DynamicAnnotationUsage<>(
 				JpaAnnotations.JOIN_TABLE,
-				dynamicEntity,
 				buildingContext
 		);
 
@@ -88,7 +86,6 @@ public class DynamicAnnotationTests {
 		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
 		final DynamicAnnotationUsage<JoinTable> generatorAnn = new DynamicAnnotationUsage<>(
 				JpaAnnotations.JOIN_TABLE,
-				dynamicEntity,
 				buildingContext
 		);
 
@@ -103,7 +100,6 @@ public class DynamicAnnotationTests {
 		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
 		final DynamicAnnotationUsage<GeneratedValue> generatorAnn = new DynamicAnnotationUsage<>(
 				JpaAnnotations.GENERATED_VALUE,
-				dynamicEntity,
 				buildingContext
 		);
 
@@ -119,7 +115,6 @@ public class DynamicAnnotationTests {
 		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
 		final DynamicAnnotationUsage<ElementCollection> elementCollectionAnn = new DynamicAnnotationUsage<>(
 				JpaAnnotations.ELEMENT_COLLECTION,
-				dynamicEntity,
 				buildingContext
 		);
 

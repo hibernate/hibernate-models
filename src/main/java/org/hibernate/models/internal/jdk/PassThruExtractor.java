@@ -20,7 +20,6 @@ public class PassThruExtractor<V> extends AbstractValueExtractor<V,V> {
 	protected V wrap(
 			V rawValue,
 			AttributeDescriptor<V> attributeDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
 		return rawValue;
 	}

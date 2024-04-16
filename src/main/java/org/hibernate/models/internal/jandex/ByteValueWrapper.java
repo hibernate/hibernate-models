@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -21,7 +20,7 @@ public class ByteValueWrapper implements ValueWrapper<Byte, AnnotationValue> {
 	public static final ByteValueWrapper JANDEX_BYTE_VALUE_WRAPPER = new ByteValueWrapper();
 
 	@Override
-	public Byte wrap(AnnotationValue rawValue, AnnotationTarget target, SourceModelBuildingContext buildingContext) {
+	public Byte wrap(AnnotationValue rawValue, SourceModelBuildingContext buildingContext) {
 		assert rawValue != null;
 		return rawValue.asByte();
 	}

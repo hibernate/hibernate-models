@@ -22,5 +22,5 @@ package org.hibernate.models.spi;
  * @author Steve Ebersole
  */
 public interface ValueWrapper<W,R> {
-	W wrap(R rawValue, AnnotationTarget target, SourceModelBuildingContext buildingContext);
+	W wrap(R rawValue, SourceModelBuildingContext buildingContext);
 }

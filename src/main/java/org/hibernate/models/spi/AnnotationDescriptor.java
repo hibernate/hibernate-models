@@ -112,15 +112,7 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 			Consumer<MutableAnnotationUsage<A>> adjuster,
 			SourceModelBuildingContext context) {
 		// create the "empty" usage
-		final DynamicAnnotationUsage<A> usage = new DynamicAnnotationUsage<>( this, target, context );
-
-		// apply attribute defaults
-		getAttributes().forEach( (attr) -> {
-			final Object value = attr.getTypeDescriptor().createValue( attr, target, context );
-			if ( value != null ) {
-				usage.setAttributeValue( attr.getName(), value );
-			}
-		} );
+		final DynamicAnnotationUsage<A> usage = new DynamicAnnotationUsage<>( this, context );
 
 		// allow configuration
 		if ( adjuster != null ) {
