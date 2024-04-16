@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -21,10 +20,7 @@ public class LongValueWrapper implements ValueWrapper<Long,AnnotationValue> {
 	public static final LongValueWrapper JANDEX_LONG_VALUE_WRAPPER = new LongValueWrapper();
 
 	@Override
-	public Long wrap(
-			AnnotationValue rawValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	public Long wrap(AnnotationValue rawValue, SourceModelBuildingContext buildingContext) {
 		assert rawValue != null;
 		return rawValue.asLong();
 	}

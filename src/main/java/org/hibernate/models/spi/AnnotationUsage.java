@@ -49,11 +49,6 @@ public interface AnnotationUsage<A extends Annotation> {
 	}
 
 	/**
-	 * The target where this usage occurs
-	 */
-	AnnotationTarget getAnnotationTarget();
-
-	/**
 	 * Create the Annotation representation of this usage
 	 */
 	A toAnnotation();

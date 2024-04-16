@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jdk;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -20,7 +19,7 @@ public class PassThruWrapper<V> implements ValueWrapper<V,V> {
 	public static final PassThruWrapper PASS_THRU_WRAPPER = new PassThruWrapper();
 
 	@Override
-	public V wrap(V rawValue, AnnotationTarget target, SourceModelBuildingContext buildingContext) {
+	public V wrap(V rawValue, SourceModelBuildingContext buildingContext) {
 		return rawValue;
 	}
 }

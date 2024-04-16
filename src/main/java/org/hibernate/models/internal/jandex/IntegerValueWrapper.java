@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
 
@@ -21,10 +20,7 @@ public class IntegerValueWrapper implements ValueWrapper<Integer,AnnotationValue
 	public static final IntegerValueWrapper JANDEX_INTEGER_VALUE_WRAPPER = new IntegerValueWrapper();
 
 	@Override
-	public Integer wrap(
-			AnnotationValue rawValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	public Integer wrap(AnnotationValue rawValue, SourceModelBuildingContext buildingContext) {
 		assert rawValue != null;
 		return rawValue.asInt();
 	}

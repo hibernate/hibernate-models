@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
@@ -17,12 +16,9 @@ import org.jboss.jandex.AnnotationValue;
 public class ShortValueExtractor extends AbstractValueExtractor<Short> {
 	public static final ShortValueExtractor JANDEX_SHORT_EXTRACTOR = new ShortValueExtractor();
 
-	protected Short extractAndWrap(
-			AnnotationValue jandexValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	protected Short extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return ShortValueWrapper.JANDEX_SHORT_VALUE_WRAPPER.wrap( jandexValue, target, buildingContext );
+		return ShortValueWrapper.JANDEX_SHORT_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
 	}
 
 }

@@ -41,7 +41,7 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 
 		//noinspection unchecked
 		final ValueWrapper<V, Object> valueWrapper = (ValueWrapper<V, Object>) createJdkWrapper( context );
-		return valueWrapper.wrap( defaultValue, target, context );
+		return valueWrapper.wrap( defaultValue, context );
 	}
 
 	@Override

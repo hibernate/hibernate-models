@@ -9,7 +9,6 @@ package org.hibernate.models.internal.jandex;
 import java.lang.annotation.Annotation;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
@@ -31,11 +30,9 @@ public class NestedValueWrapper<A extends Annotation> implements ValueWrapper<An
 	}
 
 	@Override
-	public AnnotationUsage<A> wrap(
-			AnnotationValue rawValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	public AnnotationUsage<A> wrap(AnnotationValue rawValue, SourceModelBuildingContext buildingContext) {
 		final AnnotationInstance nested = rawValue.asNested();
-		return AnnotationUsageBuilder.makeUsage( nested, descriptor, target, buildingContext );
+		assert nested.target() == null;
+		return AnnotationUsageBuilder.makeUsage( nested, descriptor, buildingContext );
 	}
 }

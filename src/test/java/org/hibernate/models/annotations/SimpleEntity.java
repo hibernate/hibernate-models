@@ -6,11 +6,19 @@
  */
 package org.hibernate.models.annotations;
 
+import java.util.List;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Cacheable;
+import jakarta.persistence.CheckConstraint;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedNativeQueries;
+import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.Table;
@@ -19,12 +27,13 @@ import jakarta.persistence.Table;
  * @author Steve Ebersole
  */
 @Entity(name = "SimpleColumnEntity")
-@Table(name = "simple_entities")
+@Table(name = "simple_entities", check = @CheckConstraint ( constraint = "test" ))
 @SecondaryTable(name="another_table")
 @CustomAnnotation()
 @NamedQuery( name = "abc", query = "select me" )
 @NamedQuery( name = "xyz", query = "select you" )
 @Cacheable
+@NamedNativeQueries( @NamedNativeQuery( name = "native_1", query = "select * from simple_entities" ) )
 public class SimpleEntity {
 	@Id
 	@Column(name = "id", comment = "SimpleColumnEntity PK column")
@@ -37,6 +46,10 @@ public class SimpleEntity {
 	@Basic
 	@Column(table = "another_table", columnDefinition = "special_type")
 	private String name2;
+
+	@ElementCollection
+	@CollectionTable( joinColumns = @JoinColumn( name = "test" ) )
+	private List<String> elementCollection;
 
 	private SimpleEntity() {
 		// for use by Hibernate

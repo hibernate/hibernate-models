@@ -19,7 +19,6 @@ public class ToAnnotationTest {
 		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
 		final DynamicAnnotationUsage<JoinTable> generatorAnn = new DynamicAnnotationUsage<>(
 				JpaAnnotations.JOIN_TABLE,
-				dynamicEntity,
 				buildingContext
 		);
 

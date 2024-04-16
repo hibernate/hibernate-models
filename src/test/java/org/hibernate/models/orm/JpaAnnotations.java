@@ -18,6 +18,7 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Cacheable;
+import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ColumnResult;
@@ -185,6 +186,7 @@ public interface JpaAnnotations {
 	AnnotationDescriptor<SqlResultSetMapping> SQL_RESULT_SET_MAPPING = createOrmDescriptor( SqlResultSetMapping.class, SQL_RESULT_SET_MAPPINGS );
 	AnnotationDescriptor<StoredProcedureParameter> STORED_PROCEDURE_PARAMETER = createOrmDescriptor( StoredProcedureParameter.class );
 	AnnotationDescriptor<Table> TABLE = createOrmDescriptor( Table.class );
+	AnnotationDescriptor<CheckConstraint> CHECK_CONSTRAINT = createOrmDescriptor( CheckConstraint.class );
 	AnnotationDescriptor<TableGenerators> TABLE_GENERATORS = createOrmDescriptor( TableGenerators.class );
 	AnnotationDescriptor<TableGenerator> TABLE_GENERATOR = createOrmDescriptor( TableGenerator.class, TABLE_GENERATORS );
 	AnnotationDescriptor<Temporal> TEMPORAL = createOrmDescriptor( Temporal.class );

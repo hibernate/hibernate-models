@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueExtractor;
 
@@ -18,20 +17,16 @@ import org.jboss.jandex.AnnotationValue;
  */
 public abstract class AbstractValueExtractor<W> implements ValueExtractor<AnnotationInstance,W> {
 
-	protected abstract W extractAndWrap(
-			AnnotationValue jandexValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext);
+	protected abstract W extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext);
 
 	@Override
 	public W extractValue(
 			AnnotationInstance annotation,
 			String attributeName,
-			AnnotationTarget target,
 			SourceModelBuildingContext buildingContext) {
 		final AnnotationValue jandexValue = resolveAnnotationValue( annotation, attributeName, buildingContext );
 		assert jandexValue != null;
-		return extractAndWrap( jandexValue, target, buildingContext );
+		return extractAndWrap( jandexValue, buildingContext );
 	}
 
 	protected AnnotationValue resolveAnnotationValue(

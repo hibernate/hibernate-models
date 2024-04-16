@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jdk;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
@@ -18,7 +17,7 @@ public class ClassValueWrapper implements ValueWrapper<ClassDetails,Class<?>> {
 	public static final ClassValueWrapper JDK_CLASS_VALUE_WRAPPER = new ClassValueWrapper();
 
 	@Override
-	public ClassDetails wrap(Class<?> rawValue, AnnotationTarget target, SourceModelBuildingContext buildingContext) {
+	public ClassDetails wrap(Class<?> rawValue, SourceModelBuildingContext buildingContext) {
 		return buildingContext.getClassDetailsRegistry().resolveClassDetails( rawValue.getName() );
 	}
 }

@@ -34,7 +34,7 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 	@Override
 	public Map<Class<? extends Annotation>, AnnotationUsage<?>> getUsageMap() {
 		if ( usageMap == null ) {
-			usageMap = AnnotationUsageBuilder.collectUsages( getJandexAnnotationTarget(), this, buildingContext );
+			usageMap = AnnotationUsageBuilder.collectUsages( getJandexAnnotationTarget(), buildingContext );
 		}
 		return usageMap;
 	}

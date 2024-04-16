@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
@@ -22,11 +21,8 @@ public class CharacterValueExtractor extends AbstractValueExtractor<Character> {
 	public static final CharacterValueExtractor JANDEX_CHARACTER_EXTRACTOR = new CharacterValueExtractor();
 
 	@Override
-	protected Character extractAndWrap(
-			AnnotationValue jandexValue,
-			AnnotationTarget target,
-			SourceModelBuildingContext buildingContext) {
+	protected Character extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return JANDEX_CHARACTER_VALUE_WRAPPER.wrap( jandexValue, target, buildingContext );
+		return JANDEX_CHARACTER_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
 	}
 }

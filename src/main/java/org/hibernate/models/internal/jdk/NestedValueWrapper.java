@@ -9,7 +9,6 @@ package org.hibernate.models.internal.jdk;
 import java.lang.annotation.Annotation;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
@@ -25,8 +24,7 @@ public class NestedValueWrapper<A extends Annotation> implements ValueWrapper<An
 	}
 
 	@Override
-	public AnnotationUsage<A> wrap(A rawValue, AnnotationTarget target, SourceModelBuildingContext buildingContext) {
-		return AnnotationUsageBuilder.makeUsage( rawValue, descriptor, target, buildingContext );
-
+	public AnnotationUsage<A> wrap(A rawValue, SourceModelBuildingContext buildingContext) {
+		return AnnotationUsageBuilder.makeUsage( rawValue, descriptor, buildingContext );
 	}
 }
