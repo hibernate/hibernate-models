@@ -43,8 +43,15 @@ public class TypeDetailsHelper {
 	 */
 	public static TypeDetails resolveRelativeType(TypeDetails type, TypeVariableScope container) {
 		switch ( type.getTypeKind() ) {
-			case CLASS, PRIMITIVE, VOID, ARRAY, WILDCARD_TYPE -> {
+			case CLASS, PRIMITIVE, VOID, WILDCARD_TYPE -> {
 				return type;
+			}
+			case ARRAY -> {
+				final ArrayTypeDetails arrayType = type.asArrayType();
+				return new ArrayTypeDetailsImpl(
+						arrayType.getArrayClassDetails(),
+						arrayType.getConstituentType().determineRelativeType( container )
+				);
 			}
 			case PARAMETERIZED_TYPE -> {
 				final ParameterizedTypeDetails parameterizedType = type.asParameterizedType();

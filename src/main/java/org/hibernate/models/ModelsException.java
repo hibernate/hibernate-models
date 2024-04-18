@@ -8,7 +8,7 @@
 package org.hibernate.models;
 
 /**
- * Base exception for models building
+ * Base exception for hibernate-models
  *
  * @author Steve Ebersole
  */

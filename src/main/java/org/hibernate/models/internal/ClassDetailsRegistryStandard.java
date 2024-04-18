@@ -8,6 +8,7 @@ package org.hibernate.models.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.jandex.JandexBuilders;
@@ -134,6 +135,9 @@ public class ClassDetailsRegistryStandard extends AbstractClassDetailsRegistry {
 
 	@Override
 	public ClassDetailsRegistry makeImmutableCopy() {
-		return new ClassDetailsRegistryImmutable( classDetailsMap, subTypeClassDetailsMap );
+		return new ClassDetailsRegistryImmutable(
+				Map.copyOf( classDetailsMap ),
+				Map.copyOf( subTypeClassDetailsMap )
+		);
 	}
 }

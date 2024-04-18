@@ -17,13 +17,31 @@ import org.hibernate.models.spi.ClassLoading;
 import org.jboss.jandex.Indexer;
 
 /**
+ * Helper for dealing with the Jandex {@linkplain Indexer}
+ *
  * @author Steve Ebersole
  */
 public class JandexIndexerHelper {
+	/**
+	 * Apply a class to the indexer
+	 *
+	 * @param clazz The class to apply to the indexer
+	 * @param indexer The Jandex Indexer
+	 * @param classLoading Used to load the class file (bytes)
+	 *
+	 * @implNote Simply delegates to {@linkplain #apply(String, Indexer, ClassLoading)} with the class name
+	 */
 	public static void apply(Class<?> clazz, Indexer indexer, ClassLoading classLoading) {
 		apply( clazz.getName(), indexer, classLoading );
 	}
 
+	/**
+	 * Apply a class to the indexer
+	 *
+	 * @param className The class to apply to the indexer
+	 * @param indexer The Jandex Indexer
+	 * @param classLoading Used to load the class file (bytes)
+	 */
 	public static void apply(String className, Indexer indexer, ClassLoading classLoading) {
 		final String resourceName = StringHelper.classNameToResourceName( className );
 		final URL resource = classLoading.locateResource( resourceName );

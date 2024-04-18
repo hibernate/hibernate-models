@@ -192,11 +192,10 @@ public class CollectionTests {
 			assertThat( fieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.ARRAY );
 			final ArrayTypeDetails arrayType = fieldType.asArrayType();
 			final TypeDetails constituentType = arrayType.getConstituentType();
+			assertThat( arrayType.isResolved() ).isFalse();
+			assertThat( constituentType.isResolved() ).isFalse();
 			assertThat( constituentType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
 			assertThat( constituentType.asTypeVariable().getIdentifier() ).isEqualTo( "T" );
-			final TypeDetails fieldConcreteType = field.resolveRelativeType( classDetails );
-			assertThat( fieldConcreteType ).isSameAs( arrayType );
-			assertThat( constituentType.isResolved() ).isFalse();
 		}
 	}
 

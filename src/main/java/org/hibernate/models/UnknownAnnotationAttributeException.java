@@ -19,14 +19,12 @@ import java.util.Locale;
  */
 public class UnknownAnnotationAttributeException extends ModelsException {
 	public UnknownAnnotationAttributeException(Class<? extends Annotation> annotationType, String attributeName) {
-		this(
-				String.format(
-						Locale.ROOT,
-						"Unable to locate attribute named `%s` on annotation `%s`",
-						attributeName,
-						annotationType.getName()
-				)
-		);
+		this( String.format(
+				Locale.ROOT,
+				"Unable to locate attribute named `%s` on annotation `%s`",
+				attributeName,
+				annotationType.getName()
+		) );
 	}
 
 	public UnknownAnnotationAttributeException(String message) {

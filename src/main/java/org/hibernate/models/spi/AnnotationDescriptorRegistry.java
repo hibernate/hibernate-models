@@ -34,6 +34,9 @@ public interface AnnotationDescriptorRegistry {
 	 */
 	<A extends Annotation> AnnotationDescriptor<A> getContainedRepeatableDescriptor(Class<A> javaType);
 
+	/**
+	 * Make a copy of this registry which cannot be added-to.
+	 */
 	AnnotationDescriptorRegistry makeImmutableCopy();
 
 	@FunctionalInterface

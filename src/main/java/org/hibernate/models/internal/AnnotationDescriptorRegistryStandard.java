@@ -8,6 +8,8 @@ package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
+import java.util.Collections;
+import java.util.HashMap;
 
 import org.hibernate.models.internal.jdk.AnnotationDescriptorImpl;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -79,6 +81,9 @@ public class AnnotationDescriptorRegistryStandard extends AbstractAnnotationDesc
 
 	@Override
 	public AnnotationDescriptorRegistry makeImmutableCopy() {
-		return new AnnotationDescriptorRegistryImmutable( descriptorMap, repeatableByContainerMap );
+		return new AnnotationDescriptorRegistryImmutable(
+				java.util.Map.copyOf( descriptorMap ),
+				java.util.Map.copyOf( repeatableByContainerMap )
+		);
 	}
 }
