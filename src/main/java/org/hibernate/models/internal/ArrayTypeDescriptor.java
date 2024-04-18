@@ -15,7 +15,6 @@ import org.hibernate.models.internal.jandex.ArrayValueExtractor;
 import org.hibernate.models.internal.jandex.ArrayValueWrapper;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueExtractor;
@@ -55,7 +54,6 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 	@Override
 	public List<V> createValue(
 			AttributeDescriptor<?> attributeDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext context) {
 		final Object[] defaultValue = (Object[]) attributeDescriptor.getAttributeMethod().getDefaultValue();
 		if ( CollectionHelper.isEmpty( defaultValue ) ) {

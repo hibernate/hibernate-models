@@ -9,7 +9,6 @@ package org.hibernate.models.internal;
 import java.util.Locale;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
@@ -31,7 +30,6 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 	@Override
 	public V createValue(
 			AttributeDescriptor<?> attributeDescriptor,
-			AnnotationTarget target,
 			SourceModelBuildingContext context) {
 		final Object defaultValue = attributeDescriptor.getAttributeMethod().getDefaultValue();
 		if ( defaultValue == null ) {
