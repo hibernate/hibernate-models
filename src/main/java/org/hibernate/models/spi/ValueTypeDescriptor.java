@@ -26,7 +26,7 @@ public interface ValueTypeDescriptor<V> {
 	/**
 	 * Creates a properly typed default attribute value.  Generally used in creating dynamic annotations.
 	 */
-	V createValue(AttributeDescriptor<?> attributeDescriptor, AnnotationTarget target, SourceModelBuildingContext context);
+	V createValue(AttributeDescriptor<?> attributeDescriptor, SourceModelBuildingContext context);
 
 	/**
 	 * Factory for creating typed {@linkplain AttributeDescriptor} references
