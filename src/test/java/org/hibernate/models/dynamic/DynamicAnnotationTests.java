@@ -14,12 +14,15 @@ import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.internal.dynamic.DynamicAnnotationUsage;
 import org.hibernate.models.internal.dynamic.DynamicClassDetails;
 import org.hibernate.models.orm.JpaAnnotations;
+import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.MutableAnnotationUsage;
 
 import org.junit.jupiter.api.Test;
 
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinTable;
@@ -69,15 +72,16 @@ public class DynamicAnnotationTests {
 
 		final Object foreignKey = generatorAnn.getAttributeValue( "foreignKey" );
 
-		assertThat( foreignKey ).isInstanceOf( DynamicAnnotationUsage.class );
+		assertThat( foreignKey ).isInstanceOf( AnnotationUsage.class );
 
-		final DynamicAnnotationUsage foreignKeyAnnotationUsage = (DynamicAnnotationUsage) foreignKey;
+		//noinspection unchecked
+		final AnnotationUsage<ForeignKey> foreignKeyAnnotationUsage = (AnnotationUsage<ForeignKey>) foreignKey;
 
-		assertThat( foreignKeyAnnotationUsage.getAttributeValue( "value" ) ).isEqualTo( ConstraintMode.PROVIDER_DEFAULT );
+		assertThat( foreignKeyAnnotationUsage.<ConstraintMode>getAttributeValue( "value" ) ).isEqualTo( ConstraintMode.PROVIDER_DEFAULT );
 
-		assertThat( foreignKeyAnnotationUsage.getAttributeValue( "name" )).isEqualTo( "" );
-		assertThat( foreignKeyAnnotationUsage.getAttributeValue( "options" )).isEqualTo( "" );
-		assertThat( foreignKeyAnnotationUsage.getAttributeValue( "foreignKeyDefinition" )).isEqualTo( "" );
+		assertThat( foreignKeyAnnotationUsage.<String>getAttributeValue( "name" ) ).isEqualTo( "" );
+		assertThat( foreignKeyAnnotationUsage.<String>getAttributeValue( "options" ) ).isEqualTo( "" );
+		assertThat( foreignKeyAnnotationUsage.<String>getAttributeValue( "foreignKeyDefinition" ) ).isEqualTo( "" );
 	}
 
 	@Test

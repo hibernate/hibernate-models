@@ -7,19 +7,15 @@
 package org.hibernate.models.internal.dynamic;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.internal.AnnotationProxy;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.MutableAnnotationUsage;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
  * AnnotationUsage built dynamically (for dynamic models, XML mappings, etc.)
@@ -31,7 +27,7 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 
 	private Map<String, Object> values;
 
-	public DynamicAnnotationUsage( AnnotationDescriptor<A> annotationDescriptor, SourceModelContext context) {
+	public DynamicAnnotationUsage( AnnotationDescriptor<A> annotationDescriptor, SourceModelBuildingContext context) {
 		this( annotationDescriptor, extractBaselineValues( annotationDescriptor, context ) );
 	}
 
@@ -96,59 +92,14 @@ public class DynamicAnnotationUsage<A extends Annotation> implements MutableAnno
 
 	private static <A extends Annotation> Map<String, Object> extractBaselineValues(
 			AnnotationDescriptor<A> annotationDescriptor,
-			SourceModelContext context) {
+			SourceModelBuildingContext context) {
 		final HashMap<String, Object> values = new HashMap<>();
 		for ( AttributeDescriptor<?> attribute : annotationDescriptor.getAttributes() ) {
 			values.put(
 					attribute.getName(),
-					extractDefaultValue( attribute.getAttributeMethod().getDefaultValue(), context )
+					attribute.getTypeDescriptor().createValue( attribute, context )
 			);
 		}
 		return values;
-	}
-
-	private static Object extractDefaultValue(Object value, SourceModelContext context) {
-		if ( value != null ) {
-			if ( value.getClass().isArray() ) {
-				return extractList( value, context );
-			}
-			else if ( value instanceof Class<?> clazz ) {
-				return context.getClassDetailsRegistry().resolveClassDetails( clazz.getName() );
-			}
-			else if ( value instanceof Annotation annotation ) {
-				try {
-					return extractAnnotation( annotation, context );
-				}
-				catch (InvocationTargetException | IllegalAccessException e) {
-					throw new AnnotationAccessException( "Error accessing default annotation-typed attribute", e );
-				}
-			}
-		}
-		return value;
-	}
-
-	private static <E> List<Object> extractList(Object value, SourceModelContext context) {
-		final List<Object> result = new ArrayList<>();
-		//noinspection unchecked
-		final E[] array = (E[]) value;
-		for ( E element : array ) {
-			result.add( extractDefaultValue( element, context ) );
-		}
-		return result;
-	}
-
-	private static DynamicAnnotationUsage<?> extractAnnotation(Annotation annotation, SourceModelContext context)
-			throws InvocationTargetException, IllegalAccessException {
-		final Class<? extends Annotation> annotationType = annotation.annotationType();
-		final AnnotationDescriptor<?> descriptor = context.getAnnotationDescriptorRegistry()
-				.getDescriptor( annotationType );
-		final Map<String, Object> values = new HashMap<>();
-		for ( AttributeDescriptor<?> attribute : descriptor.getAttributes() ) {
-			values.put(
-					attribute.getName(),
-					extractDefaultValue( attribute.getAttributeMethod().invoke( annotation ), context )
-			);
-		}
-		return new DynamicAnnotationUsage<>( descriptor, values );
 	}
 }
