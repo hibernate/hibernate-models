@@ -9,6 +9,7 @@ package org.hibernate.models.internal.jandex;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueWrapper;
@@ -32,18 +33,10 @@ public class ArrayValueWrapper<V> implements ValueWrapper<List<V>,AnnotationValu
 		final List<AnnotationValue> values = rawValue.asArrayList();
 		assert values != null;
 
-		if ( values.isEmpty() ) {
-			return Collections.emptyList();
+		final List<V> result = new ArrayList<>( values.size() );
+		for ( final AnnotationValue value : values ) {
+			result.add( elementWrapper.wrap( value, buildingContext ) );
 		}
-
-		if ( values.size() == 1 ) {
-			return Collections.singletonList( elementWrapper.wrap( values.get(0), buildingContext ) );
-		}
-
-		final List<V> results = new ArrayList<>( values.size() );
-		values.forEach( (value) -> {
-			results.add( elementWrapper.wrap( value, buildingContext ) );
-		} );
-		return results;
+		return result;
 	}
 }

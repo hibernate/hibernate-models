@@ -55,12 +55,14 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 	public List<V> createValue(
 			AttributeDescriptor<?> attributeDescriptor,
 			SourceModelBuildingContext context) {
-		final Object[] defaultValue = (Object[]) attributeDescriptor.getAttributeMethod().getDefaultValue();
-		if ( CollectionHelper.isEmpty( defaultValue ) ) {
-			return Collections.emptyList();
+		final Object defaultValue = attributeDescriptor.getAttributeMethod().getDefaultValue();
+		if ( defaultValue == null ) {
+			// a non-defaulted attribute, just return null for the baseline
+			return null;
 		}
 
-		return jdkValueWrapper.wrap( defaultValue, context );
+		final ValueWrapper<List<V>, Object[]> jdkWrapper = createJdkWrapper( context );
+		return jdkWrapper.wrap( (Object[]) defaultValue, context );
 	}
 
 	@Override
