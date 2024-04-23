@@ -53,7 +53,7 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 			return existing;
 		}
 
-		final MutableAnnotationUsage<A> usage = annotationType.createUsage( this, configuration, buildingContext );
+		final MutableAnnotationUsage<A> usage = annotationType.createUsage( configuration, buildingContext );
 		addAnnotationUsage( usage );
 		return usage;
 	}

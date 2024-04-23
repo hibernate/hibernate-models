@@ -93,22 +93,19 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	/**
 	 * Create a usage of this annotation with all attribute values defaulted.
 	 *
-	 * @param target The target of the annotation being created.  May generally be {@code null}.
 	 * @param context Access to needed services
 	 */
-	default MutableAnnotationUsage<A> createUsage(AnnotationTarget target, SourceModelBuildingContext context) {
-		return createUsage( target, null, context );
+	default MutableAnnotationUsage<A> createUsage(SourceModelBuildingContext context) {
+		return createUsage( null, context );
 	}
 
 	/**
 	 * Create a usage of this annotation with all attribute values defaulted, allowing customization prior to return.
 	 *
-	 * @param target The target of the annotation being created.  May generally be {@code null}.
 	 * @param adjuster Callback to allow adjusting the created usage prior to return.
 	 * @param context Access to needed services
 	 */
 	default MutableAnnotationUsage<A> createUsage(
-			AnnotationTarget target,
 			Consumer<MutableAnnotationUsage<A>> adjuster,
 			SourceModelBuildingContext context) {
 		// create the "empty" usage
