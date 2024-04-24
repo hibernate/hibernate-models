@@ -60,31 +60,28 @@ public class SimpleDynamicModelTests {
 		);
 		assertThat( created ).isSameAs( preExisting );
 
-		entityDetails.applyAttribute(
+		final DynamicFieldDetails idMember = entityDetails.applyAttribute(
 				"id",
 				integerTypeDetails,
 				false,
 				false,
-				fieldDetails -> {
-					final MutableAnnotationUsage<Id> first = fieldDetails.applyAnnotationUsage(
-							JpaAnnotations.ID,
-							buildingContext
-					);
-					final MutableAnnotationUsage<Id> second = fieldDetails.applyAnnotationUsage(
-							JpaAnnotations.ID,
-							buildingContext
-					);
-					assertThat( first ).isSameAs( second );
-				},
 				buildingContext
 		);
+		final MutableAnnotationUsage<Id> first = idMember.applyAnnotationUsage(
+				JpaAnnotations.ID,
+				buildingContext
+		);
+		final MutableAnnotationUsage<Id> second = idMember.applyAnnotationUsage(
+				JpaAnnotations.ID,
+				buildingContext
+		);
+		assertThat( first ).isSameAs( second );
 
 		entityDetails.applyAttribute(
 				"name",
 				stringTypeDetails,
 				false,
 				false,
-				null,
 				buildingContext
 		);
 
@@ -137,7 +134,6 @@ public class SimpleDynamicModelTests {
 				stringClassDetails,
 				false,
 				false,
-				null,
 				buildingContext
 		);
 
@@ -146,7 +142,6 @@ public class SimpleDynamicModelTests {
 				stringClassDetails,
 				false,
 				false,
-				null,
 				buildingContext
 		);
 
@@ -169,24 +164,20 @@ public class SimpleDynamicModelTests {
 				integerTypeDetails,
 				false,
 				false,
-				(fieldDetails) -> {
-					final MutableAnnotationUsage<Id> idUsage = fieldDetails.applyAnnotationUsage( JpaAnnotations.ID, buildingContext );
-					assertThat( idUsage ).isNotNull();
-				},
 				buildingContext
 		);
+		final MutableAnnotationUsage<Id> idUsage = idMember.applyAnnotationUsage( JpaAnnotations.ID, buildingContext );
+		assertThat( idUsage ).isNotNull();
 
 		final DynamicFieldDetails nameMember = entityDetails.applyAttribute(
 				"name",
 				new ClassTypeDetailsImpl( nameEmbeddableDetails, TypeDetails.Kind.CLASS ),
 				false,
 				false,
-				(fieldDetails) -> {
-					final MutableAnnotationUsage<Embedded> embeddedUsage = fieldDetails.applyAnnotationUsage( JpaAnnotations.EMBEDDED, buildingContext );
-					assertThat( embeddedUsage ).isNotNull();
-				},
 				buildingContext
 		);
+		final MutableAnnotationUsage<Embedded> embeddedUsage = nameMember.applyAnnotationUsage( JpaAnnotations.EMBEDDED, buildingContext );
+		assertThat( embeddedUsage ).isNotNull();
 
 
 		// ASSERTIONS
