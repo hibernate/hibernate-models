@@ -11,9 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.hibernate.models.RepeatableAnnotationException;
 import org.hibernate.models.internal.AnnotationTargetSupport;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+
+import static org.hibernate.models.internal.ModelsLogging.MODELS_LOGGER;
 
 /**
  * AnnotationTarget where we know the annotations up front, but
@@ -65,6 +68,16 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 	@Override
 	public <X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage) {
 		assert annotationUsage.getAnnotationDescriptor().getAllowableTargets().contains( getKind() );
-		getUsageMap().put( annotationUsage.getAnnotationType(), annotationUsage );
+		if ( annotationUsage.getAnnotationDescriptor().isRepeatable() ) {
+			throw new RepeatableAnnotationException( annotationUsage.getAnnotationDescriptor(), this );
+		}
+
+		final AnnotationUsage<? extends Annotation> previous = getUsageMap().put(
+				annotationUsage.getAnnotationType(),
+				annotationUsage
+		);
+		if ( previous != null && MODELS_LOGGER.isDebugEnabled() ) {
+			MODELS_LOGGER.debugf( "AnnotationUsage (%s) was replaced (%s)", annotationUsage, previous );
+		}
 	}
 }
