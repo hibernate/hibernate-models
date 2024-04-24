@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.UnknownAnnotationAttributeException;
@@ -96,27 +95,7 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * @param context Access to needed services
 	 */
 	default MutableAnnotationUsage<A> createUsage(SourceModelBuildingContext context) {
-		return createUsage( null, context );
-	}
-
-	/**
-	 * Create a usage of this annotation with all attribute values defaulted, allowing customization prior to return.
-	 *
-	 * @param adjuster Callback to allow adjusting the created usage prior to return.
-	 * @param context Access to needed services
-	 */
-	default MutableAnnotationUsage<A> createUsage(
-			Consumer<MutableAnnotationUsage<A>> adjuster,
-			SourceModelBuildingContext context) {
-		// create the "empty" usage
-		final DynamicAnnotationUsage<A> usage = new DynamicAnnotationUsage<>( this, context );
-
-		// allow configuration
-		if ( adjuster != null ) {
-			adjuster.accept( usage );
-		}
-
-		return usage;
+		return new DynamicAnnotationUsage<>( this, context );
 	}
 
 	@Override

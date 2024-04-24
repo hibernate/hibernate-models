@@ -9,7 +9,6 @@ package org.hibernate.models.internal.dynamic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
@@ -177,14 +176,12 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 			ClassDetails type,
 			boolean isArray,
 			boolean isPlural,
-			Consumer<DynamicFieldDetails> configuration,
 			SourceModelBuildingContext context) {
 		return applyAttribute(
 				name,
 				new ClassTypeDetailsImpl( type, TypeDetails.Kind.CLASS ),
 				isArray,
 				isPlural,
-				configuration,
 				context
 		);
 	}
@@ -197,7 +194,6 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 			TypeDetails type,
 			boolean isArray,
 			boolean isPlural,
-			Consumer<DynamicFieldDetails> configuration,
 			SourceModelBuildingContext context) {
 		final DynamicFieldDetails attribute = new DynamicFieldDetails(
 				name,
@@ -208,9 +204,6 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 				isPlural,
 				context
 		);
-		if ( configuration != null ) {
-			configuration.accept( attribute );
-		}
 		addField( attribute );
 		return attribute;
 	}

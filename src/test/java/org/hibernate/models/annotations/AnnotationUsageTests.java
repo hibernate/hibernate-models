@@ -158,7 +158,7 @@ public class AnnotationUsageTests {
 	@Test
 	void testDynamicAttributeCreation() {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( (Index) null, SimpleEntity.class );
-		final AnnotationUsage<Column> usage = JpaAnnotations.COLUMN.createUsage( null, buildingContext );
+		final AnnotationUsage<Column> usage = JpaAnnotations.COLUMN.createUsage( buildingContext );
 		// check the attribute defaults
 		assertThat( usage.getString( "name" ) ).isEqualTo( "" );
 		assertThat( usage.getString( "table" ) ).isEqualTo( "" );
