@@ -10,12 +10,9 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.models.RepeatableAnnotationException;
 import org.hibernate.models.internal.AnnotationTargetSupport;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-
-import static org.hibernate.models.internal.ModelsLogging.MODELS_LOGGER;
 
 /**
  * @author Steve Ebersole
@@ -43,20 +40,17 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 		usageMap.clear();
 	}
 
-	@Override
+	/**
+	 * Applies the given {@code annotationUsage} to this target.
+	 *
+	 * @todo It is undefined currently what happens if the annotation type is already applied on this target.
+	 */
 	public <X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage) {
 		assert annotationUsage.getAnnotationDescriptor().getAllowableTargets().contains( getKind() );
+		final AnnotationUsage<?> previous = usageMap.put( annotationUsage.getAnnotationType(), annotationUsage );
 
-		if ( annotationUsage.getAnnotationDescriptor().isRepeatable() ) {
-			throw new RepeatableAnnotationException( annotationUsage.getAnnotationDescriptor(), this );
-		}
-
-		final AnnotationUsage<? extends Annotation> previous = getUsageMap().put(
-				annotationUsage.getAnnotationType(),
-				annotationUsage
-		);
-		if ( previous != null && MODELS_LOGGER.isDebugEnabled() ) {
-			MODELS_LOGGER.debugf( "AnnotationUsage (%s) was replaced (%s)", annotationUsage, previous );
+		if ( previous != null ) {
+			// todo : ignore?  log?  exception?
 		}
 	}
 
