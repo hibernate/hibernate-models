@@ -17,6 +17,7 @@ import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.MutableAnnotationTarget;
+import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
@@ -149,5 +150,21 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 				matchName,
 				attributeToMatch
 		);
+	}
+
+	@Override
+	default <S extends Annotation, P extends Annotation> MutableAnnotationUsage<P> replaceAnnotationUsage(
+			AnnotationDescriptor<S> repeatableType,
+			AnnotationDescriptor<P> containerType,
+			SourceModelBuildingContext buildingContext) {
+		assert repeatableType.isRepeatable();
+		assert repeatableType.getRepeatableContainer() == containerType;
+
+		final MutableAnnotationUsage<P> containerTypeUsage = containerType.createUsage( buildingContext );
+		// effectively overwrites any previous registrations
+		getUsageMap().put( containerType.getAnnotationType(), containerTypeUsage );
+		getUsageMap().put( repeatableType.getAnnotationType(), null );
+
+		return containerTypeUsage;
 	}
 }
