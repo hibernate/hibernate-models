@@ -326,6 +326,10 @@ public interface AnnotationTarget {
 	 */
 	RecordComponentDetails asRecordComponentDetails();
 
+	void render();
+
+	void render(RenderingCollector collector);
+
 	/**
 	 * Subset of {@linkplain ElementType annotation targets} supported for mapping annotations
 	 */

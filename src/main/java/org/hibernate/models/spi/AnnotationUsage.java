@@ -9,6 +9,8 @@ package org.hibernate.models.spi;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import org.hibernate.models.internal.RenderingCollectorImpl;
+
 /**
  * Describes the usage of an {@linkplain AnnotationDescriptor annotation class} on one of its
  * allowable {@linkplain AnnotationTarget targets}.
@@ -125,5 +127,30 @@ public interface AnnotationUsage<A extends Annotation> {
 
 	default <E> List<E> getList(String name) {
 		return getAttributeValue( name );
+	}
+
+	default void render() {
+		final RenderingCollectorImpl renderingCollector = new RenderingCollectorImpl();
+		render( renderingCollector );
+		renderingCollector.render();
+	}
+
+	default void render(RenderingCollector collector) {
+		final List<AttributeDescriptor<?>> attributes = getAnnotationDescriptor().getAttributes();
+		if ( attributes.isEmpty() ) {
+			collector.addLine( "@%s", getAnnotationType().getName() );
+		}
+		else {
+			collector.addLine( "@%s(", getAnnotationType().getName() );
+			collector.indent( 2 );
+			attributes.forEach( (attribute) -> attribute.getTypeDescriptor().render(
+					collector,
+					attribute.getName(),
+					getAttributeValue( attribute.getName() )
+			) );
+
+			collector.unindent( 2 );
+			collector.addLine( ")" );
+		}
 	}
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.internal.RenderingCollectorImpl;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
 
@@ -269,5 +270,52 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	@Override
 	default RecordComponentDetails asRecordComponentDetails() {
 		throw new IllegalCastException( "ClassDetails cannot be cast to RecordComponentDetails" );
+	}
+
+	@Override
+	default void render() {
+		final RenderingCollectorImpl renderingCollector = new RenderingCollectorImpl();
+		render( renderingCollector );
+		renderingCollector.render();
+	}
+
+	@Override
+	default void render(RenderingCollector collector) {
+		getAllAnnotationUsages().forEach( (usage) -> usage.render( collector ) );
+
+		final String pattern = isRecord()
+				? "record %s {"
+				: "class %s {";
+
+		collector.addLine( pattern, getName() );
+		collector.indent( 1 );
+
+		collector.addLine( "// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
+		collector.addLine( "// fields" );
+		getFields().forEach( (fieldDetails) -> {
+			fieldDetails.render( collector );
+			collector.addLine();
+		} );
+		collector.addLine();
+
+		collector.addLine( "// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
+		collector.addLine( "// methods" );
+		getMethods().forEach( (methodDetails) -> {
+			methodDetails.render( collector );
+			collector.addLine();
+		} );
+		collector.addLine();
+
+		if ( isRecord() ) {
+			collector.addLine( "// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
+			collector.addLine( "// record components" );
+			getRecordComponents().forEach( (recordComponentDetails) -> {
+				recordComponentDetails.render( collector );
+				collector.addLine();
+			} );
+		}
+
+		collector.unindent( 1 );
+		collector.addLine( "}" );
 	}
 }

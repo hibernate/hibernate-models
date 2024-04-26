@@ -42,4 +42,8 @@ public interface ValueTypeDescriptor<V> {
 	ValueExtractor<Annotation,V> createJdkExtractor(SourceModelBuildingContext buildingContext);
 
 	Object unwrap(V value);
+
+	default void render(RenderingCollector collector, String name, Object attributeValue) {
+		collector.addLine( "%s=%s", name, "..." );
+	}
 }
