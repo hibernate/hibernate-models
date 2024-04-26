@@ -57,7 +57,7 @@ public class AnnotationReplacementTests {
 				buildingContext
 		);
 
-		assertThat( classDetails.hasAnnotationUsage( SecondaryTable.class ) ).isTrue();
+		assertThat( classDetails.hasAnnotationUsage( SecondaryTable.class ) ).isFalse();
 		assertThat( classDetails.hasAnnotationUsage( SecondaryTables.class ) ).isTrue();
 
 		List<MutableAnnotationUsage<SecondaryTable>> valueList = replacement.getList( "value" );
@@ -75,6 +75,9 @@ public class AnnotationReplacementTests {
 
 		final AnnotationUsage<SecondaryTables> annotationUsage1 = classDetails.getAnnotationUsage( SecondaryTables.class );
 		assertThat( annotationUsage1.getList( "value" ) ).isSameAs( valueList );
+
+		// see #76
+		classDetails.locateAnnotationUsage( SecondaryTable.class );
 	}
 
 }

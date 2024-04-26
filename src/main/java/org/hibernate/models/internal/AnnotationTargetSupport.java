@@ -163,7 +163,8 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 		final MutableAnnotationUsage<P> containerTypeUsage = containerType.createUsage( buildingContext );
 		// effectively overwrites any previous registrations
 		getUsageMap().put( containerType.getAnnotationType(), containerTypeUsage );
-		getUsageMap().put( repeatableType.getAnnotationType(), null );
+		// remove any entry for the repeatable/singular form
+		getUsageMap().remove( repeatableType.getAnnotationType() );
 
 		return containerTypeUsage;
 	}
