@@ -8,6 +8,7 @@
 package org.hibernate.models.spi;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.internal.RenderingCollectorImpl;
 
 import static org.hibernate.models.spi.AnnotationTarget.Kind.RECORD_COMPONENT;
 
@@ -46,4 +47,19 @@ public interface RecordComponentDetails extends MemberDetails {
 	default RecordComponentDetails asRecordComponentDetails() {
 		return this;
 	}
+
+	@Override
+	default void render() {
+		final RenderingCollectorImpl renderingCollector = new RenderingCollectorImpl();
+		render( renderingCollector );
+		renderingCollector.render();
+	}
+
+	@Override
+	default void render(RenderingCollector collector) {
+		forAllAnnotationUsages( (usage) -> usage.render( collector ) );
+		// todo : would be nice to render the type-details to include generics, etc
+		collector.addLine( "%s %s", getType().determineRawClass().getName(), getName() );
+	}
+
 }

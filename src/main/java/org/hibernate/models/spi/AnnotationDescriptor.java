@@ -128,4 +128,14 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	default RecordComponentDetails asRecordComponentDetails() {
 		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to a RecordComponentDetails" );
 	}
+
+	@Override
+	default void render() {
+		throw new UnsupportedOperationException( "Not yet implemented" );
+	}
+
+	@Override
+	default void render(RenderingCollector collector) {
+		throw new UnsupportedOperationException( "Not yet implemented" );
+	}
 }
