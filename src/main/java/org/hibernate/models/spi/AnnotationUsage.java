@@ -153,4 +153,23 @@ public interface AnnotationUsage<A extends Annotation> {
 			collector.addLine( ")" );
 		}
 	}
+
+	default void renderAttributeValue(String name, RenderingCollector collector) {
+		final List<AttributeDescriptor<?>> attributes = getAnnotationDescriptor().getAttributes();
+		if ( attributes.isEmpty() ) {
+			collector.addLine( "%s = @%s", name, getAnnotationType().getName() );
+		}
+		else {
+			collector.addLine( "%s = @%s(", name, getAnnotationType().getName() );
+			collector.indent( 2 );
+			attributes.forEach( (attribute) -> attribute.getTypeDescriptor().render(
+					collector,
+					attribute.getName(),
+					getAttributeValue( attribute.getName() )
+			) );
+
+			collector.unindent( 2 );
+			collector.addLine( ")" );
+		}
+	}
 }

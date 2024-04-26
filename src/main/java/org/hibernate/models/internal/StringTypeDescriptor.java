@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.models.internal.jandex.StringValueExtractor;
 import org.hibernate.models.internal.jandex.StringValueWrapper;
 import org.hibernate.models.internal.jdk.PassThruExtractor;
+import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.ValueWrapper;
@@ -58,5 +59,15 @@ public class StringTypeDescriptor extends AbstractTypeDescriptor<String> {
 	@Override
 	public Object unwrap(String value) {
 		return value;
+	}
+
+	@Override
+	public void render(RenderingCollector collector, String name, Object attributeValue) {
+		super.render( collector, name, "\"" + attributeValue + "\"" );
+	}
+
+	@Override
+	public void render(RenderingCollector collector, Object attributeValue) {
+		super.render( collector, attributeValue );
 	}
 }

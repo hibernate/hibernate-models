@@ -8,14 +8,13 @@ package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.models.internal.jandex.ArrayValueExtractor;
 import org.hibernate.models.internal.jandex.ArrayValueWrapper;
-import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.ValueTypeDescriptor;
@@ -131,5 +130,29 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 			result[i] = elementTypeDescriptor.unwrap( value.get( i ) );
 		}
 		return result;
+	}
+
+	@Override
+	public void render(RenderingCollector collector, String name, Object attributeValue) {
+		//noinspection unchecked
+		final List<V> values = (List<V>) attributeValue;
+
+		collector.addLine( "%s = {", name );
+		collector.indent( 2 );
+		values.forEach( (value) -> elementTypeDescriptor.render( collector, value ) );
+		collector.unindent( 2 );
+		collector.addLine( "}" );
+	}
+
+	@Override
+	public void render(RenderingCollector collector, Object attributeValue) {
+		//noinspection unchecked
+		final List<V> values = (List<V>) attributeValue;
+
+		collector.addLine( "{" );
+		collector.indent( 2 );
+		values.forEach( (value) -> elementTypeDescriptor.render( collector, value ) );
+		collector.unindent( 2 );
+		collector.addLine( "}" );
 	}
 }

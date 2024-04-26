@@ -14,6 +14,7 @@ import org.hibernate.models.internal.jandex.NestedValueWrapper;
 import org.hibernate.models.internal.jdk.AnnotationDescriptorImpl;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationUsage;
+import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.ValueWrapper;
@@ -107,6 +108,20 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 			jdkExtractor = new org.hibernate.models.internal.jdk.NestedValueExtractor<>( resolveJdkWrapper( buildingContext ) );
 		}
 		return jdkExtractor;
+	}
+
+	@Override
+	public void render(RenderingCollector collector, String name, Object attributeValue) {
+		//noinspection unchecked
+		final AnnotationUsage<A> nested = (AnnotationUsage<A>) attributeValue;
+		nested.renderAttributeValue( name, collector );
+	}
+
+	@Override
+	public void render(RenderingCollector collector, Object attributeValue) {
+		//noinspection unchecked
+		final AnnotationUsage<A> nested = (AnnotationUsage<A>) attributeValue;
+		nested.render( collector );
 	}
 
 	@Override

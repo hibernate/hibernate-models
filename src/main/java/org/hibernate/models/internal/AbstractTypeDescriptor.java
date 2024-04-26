@@ -10,6 +10,7 @@ import java.util.Locale;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 import org.hibernate.models.spi.ValueWrapper;
@@ -40,6 +41,16 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 		//noinspection unchecked
 		final ValueWrapper<V, Object> valueWrapper = (ValueWrapper<V, Object>) createJdkWrapper( context );
 		return valueWrapper.wrap( defaultValue, context );
+	}
+
+	@Override
+	public void render(RenderingCollector collector, String name, Object attributeValue) {
+		collector.addLine( "%s = %s", name, attributeValue );
+	}
+
+	@Override
+	public void render(RenderingCollector collector, Object attributeValue) {
+		collector.addLine( "%s = %s", attributeValue );
 	}
 
 	@Override

@@ -46,4 +46,6 @@ public interface ValueTypeDescriptor<V> {
 	default void render(RenderingCollector collector, String name, Object attributeValue) {
 		collector.addLine( "%s=%s", name, "..." );
 	}
+
+	void render(RenderingCollector collector, Object attributeValue);
 }

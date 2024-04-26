@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.models.internal.jandex.ClassValueExtractor;
 import org.hibernate.models.internal.jandex.ClassValueWrapper;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.ValueWrapper;
@@ -54,5 +55,15 @@ public class ClassTypeDescriptor extends AbstractTypeDescriptor<ClassDetails> {
 	@Override
 	public Object unwrap(ClassDetails value) {
 		return value.toJavaClass();
+	}
+
+	@Override
+	public void render(RenderingCollector collector, String name, Object attributeValue) {
+		super.render( collector, name, ( (ClassDetails) attributeValue ).getName() );
+	}
+
+	@Override
+	public void render(RenderingCollector collector, Object attributeValue) {
+		super.render( collector, ( (ClassDetails) attributeValue ).getName() );
 	}
 }
