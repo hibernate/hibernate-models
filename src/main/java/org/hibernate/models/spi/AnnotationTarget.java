@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.internal.RenderingCollectorImpl;
 
 /**
  * Abstract for something where an annotation can be {@linkplain AnnotationUsage used}.
@@ -327,6 +328,12 @@ public interface AnnotationTarget {
 	RecordComponentDetails asRecordComponentDetails();
 
 	void render();
+
+	default String renderToString() {
+		final RenderingCollectorImpl renderingCollector = new RenderingCollectorImpl();
+		render( renderingCollector );
+		return renderingCollector.toString();
+	}
 
 	void render(RenderingCollector collector);
 

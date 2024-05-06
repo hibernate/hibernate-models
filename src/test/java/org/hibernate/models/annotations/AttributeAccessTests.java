@@ -7,11 +7,6 @@
 
 package org.hibernate.models.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
@@ -71,33 +66,11 @@ public class AttributeAccessTests {
 			theDouble = 6.2,
 			theClass = TheClass.class,
 			theNested = @Nested(),
+			theNesteds = {@Nested(), @Nested()},
 			theStrings = {"a", "b", "c"}
 	)
 	public static class TheClass {
 
 	}
 
-	public enum Status { ACTIVE }
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Nested {
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface EverythingBagel {
-		String theString();
-		Status theEnum();
-		boolean theBoolean();
-		byte theByte();
-		short theShort();
-		int theInteger();
-		long theLong();
-		float theFloat();
-		double theDouble();
-		Class<?> theClass();
-		Nested theNested();
-		String[] theStrings();
-	}
 }

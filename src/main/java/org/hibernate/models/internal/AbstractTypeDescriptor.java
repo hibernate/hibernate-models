@@ -50,7 +50,7 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 
 	@Override
 	public void render(RenderingCollector collector, Object attributeValue) {
-		collector.addLine( "%s = %s", attributeValue );
+		collector.addLine( "%s", attributeValue );
 	}
 
 	@Override

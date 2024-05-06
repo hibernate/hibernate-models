@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.models.internal.jandex.FloatValueExtractor;
 import org.hibernate.models.internal.jandex.FloatValueWrapper;
 import org.hibernate.models.internal.jdk.PassThruExtractor;
+import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.ValueWrapper;
@@ -58,5 +59,15 @@ public class FloatTypeDescriptor extends AbstractTypeDescriptor<Float> {
 	@Override
 	public Object unwrap(Float value) {
 		return value;
+	}
+
+	@Override
+	public void render(RenderingCollector collector, String name, Object attributeValue) {
+		collector.addLine( "%s = %sF", name, attributeValue );
+	}
+
+	@Override
+	public void render(RenderingCollector collector, Object attributeValue) {
+		collector.addLine( "%sF", attributeValue );
 	}
 }

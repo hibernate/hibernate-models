@@ -7,7 +7,11 @@
 
 package org.hibernate.models;
 
+import org.hibernate.models.annotations.AttributeAccessTests;
+import org.hibernate.models.annotations.EverythingBagel;
+import org.hibernate.models.annotations.Nested;
 import org.hibernate.models.annotations.SimpleEntity;
+import org.hibernate.models.annotations.Status;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassDetails;
 
@@ -25,8 +29,34 @@ public class RenderingSmokeTest {
 	void testRendering() {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( (Index) null, SimpleEntity.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry()
-				.resolveClassDetails( SimpleEntity.class.getName() );
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().resolveClassDetails( SimpleEntity.class.getName() );
 		classDetails.render();
+	}
+
+	@Test
+	void testRendering2() {
+		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( (org.jboss.jandex.Index) null, SimpleClass.class );
+		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
+
+		System.out.println( classDetails.renderToString() );
+	}
+
+
+	@EverythingBagel(
+			theString = "hello",
+			theEnum = Status.ACTIVE,
+			theBoolean = true,
+			theByte = 1,
+			theShort = 2,
+			theInteger = 3,
+			theLong = 4L,
+			theFloat = 5.1F,
+			theDouble = 6.2,
+			theClass = AttributeAccessTests.TheClass.class,
+			theNested = @Nested(),
+			theNesteds = {@Nested(), @Nested()},
+			theStrings = {"a", "b", "c"}
+	)
+	public static class SimpleClass {
 	}
 }

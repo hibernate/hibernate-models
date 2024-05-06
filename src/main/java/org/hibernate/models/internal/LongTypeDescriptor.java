@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.models.internal.jandex.LongValueExtractor;
 import org.hibernate.models.internal.jandex.LongValueWrapper;
 import org.hibernate.models.internal.jdk.PassThruExtractor;
+import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueExtractor;
 import org.hibernate.models.spi.ValueWrapper;
@@ -58,5 +59,15 @@ public class LongTypeDescriptor extends AbstractTypeDescriptor<Long> {
 	@Override
 	public Object unwrap(Long value) {
 		return value;
+	}
+
+	@Override
+	public void render(RenderingCollector collector, String name, Object attributeValue) {
+		collector.addLine( "%s = %sL", name, attributeValue );
+	}
+
+	@Override
+	public void render(RenderingCollector collector, Object attributeValue) {
+		collector.addLine( "%sL", attributeValue );
 	}
 }

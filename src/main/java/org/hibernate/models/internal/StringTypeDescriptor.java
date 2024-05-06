@@ -63,11 +63,11 @@ public class StringTypeDescriptor extends AbstractTypeDescriptor<String> {
 
 	@Override
 	public void render(RenderingCollector collector, String name, Object attributeValue) {
-		super.render( collector, name, "\"" + attributeValue + "\"" );
+		collector.addLine( "%s = \"%s\"", name, attributeValue );
 	}
 
 	@Override
 	public void render(RenderingCollector collector, Object attributeValue) {
-		super.render( collector, attributeValue );
+		collector.addLine( "\"%s\"", attributeValue );
 	}
 }
