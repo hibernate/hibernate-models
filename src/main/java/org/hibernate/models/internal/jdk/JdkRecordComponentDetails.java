@@ -7,11 +7,17 @@
 
 package org.hibernate.models.internal.jdk;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.lang.reflect.RecordComponent;
 import java.util.Collection;
 import java.util.Map;
 
+import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
@@ -83,5 +89,35 @@ public class JdkRecordComponentDetails extends AbstractAnnotationTarget implemen
 	@Override
 	public String toString() {
 		return "JdkRecordComponentDetails(" + getName() + ")";
+	}
+
+	@Override
+	public RecordComponentDetails asRecordComponentDetails() {
+		return this;
+	}
+
+	@Override
+	public MutableMemberDetails asMemberDetails() {
+		return this;
+	}
+
+	@Override
+	public FieldDetails asFieldDetails() {
+		throw new IllegalCastException( "RecordComponentDetails cannot be cast as FieldDetails" );
+	}
+
+	@Override
+	public MethodDetails asMethodDetails() {
+		throw new IllegalCastException( "RecordComponentDetails cannot be cast as MethodDetails" );
+	}
+
+	@Override
+	public MutableClassDetails asClassDetails() {
+		throw new IllegalCastException( "RecordComponentDetails cannot be cast as ClassDetails" );
+	}
+
+	@Override
+	public <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
+		throw new IllegalCastException( "RecordComponentDetails cannot be cast as AnnotationDescriptor" );
 	}
 }

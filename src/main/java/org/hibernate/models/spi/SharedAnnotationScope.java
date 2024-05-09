@@ -19,17 +19,17 @@ import java.util.function.Consumer;
  * @author Steve Ebersole
  */
 public interface SharedAnnotationScope {
-	<A extends Annotation> List<AnnotationUsage<A>> getAllAnnotationUsages(Class<A> annotationType);
+	<A extends Annotation> List<A> getAllAnnotationUsages(Class<A> annotationType);
 
-	default <A extends Annotation> List<AnnotationUsage<A>> getAllAnnotationUsages(AnnotationDescriptor<A> annotationDescriptor) {
+	default <A extends Annotation> List<A> getAllAnnotationUsages(AnnotationDescriptor<A> annotationDescriptor) {
 		return getAllAnnotationUsages( annotationDescriptor.getAnnotationType() );
 	}
 
-	<A extends Annotation> void forEachAnnotationUsage(Class<A> annotationType, Consumer<AnnotationUsage<A>> consumer);
+	<A extends Annotation> void forEachAnnotationUsage(Class<A> annotationType, Consumer<A> consumer);
 
 	default <A extends Annotation> void forEachAnnotationUsage(
 			AnnotationDescriptor<A> annotationDescriptor,
-			Consumer<AnnotationUsage<A>> consumer) {
+			Consumer<A> consumer) {
 		forEachAnnotationUsage( annotationDescriptor.getAnnotationType(), consumer );
 	}
 }

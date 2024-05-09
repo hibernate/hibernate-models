@@ -6,14 +6,17 @@
  */
 package org.hibernate.models.internal;
 
+import java.lang.annotation.Annotation;
 import java.util.Locale;
 
-import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.internal.jdk.PassThruConverter;
+import org.hibernate.models.internal.jdk.PassThruExtractor;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.JdkValueConverter;
+import org.hibernate.models.spi.JdkValueExtractor;
 import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
-import org.hibernate.models.spi.ValueWrapper;
 
 /**
  * Base support for {@linkplain AttributeDescriptor} implementations
@@ -23,33 +26,28 @@ import org.hibernate.models.spi.ValueWrapper;
 public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V> {
 	@Override
 	public AttributeDescriptor<V> createAttributeDescriptor(
-			AnnotationDescriptor<?> annotationDescriptor,
+			Class<? extends Annotation> annotationType,
 			String attributeName) {
-		return new AttributeDescriptorImpl<>( annotationDescriptor.getAnnotationType(), attributeName, this );
+		return new AttributeDescriptorImpl<>( annotationType, attributeName, this );
 	}
 
 	@Override
-	public V createValue(
-			AttributeDescriptor<?> attributeDescriptor,
-			SourceModelBuildingContext context) {
-		final Object defaultValue = attributeDescriptor.getAttributeMethod().getDefaultValue();
-		if ( defaultValue == null ) {
-			// a non-defaulted attribute, just return null for the baseline
-			return null;
-		}
-
-		//noinspection unchecked
-		final ValueWrapper<V, Object> valueWrapper = (ValueWrapper<V, Object>) createJdkWrapper( context );
-		return valueWrapper.wrap( defaultValue, context );
+	public JdkValueConverter<V> createJdkValueConverter(SourceModelBuildingContext modelContext) {
+		return PassThruConverter.passThruConverter();
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue) {
+	public JdkValueExtractor<V> createJdkValueExtractor(SourceModelBuildingContext modelContext) {
+		return PassThruExtractor.passThruExtractor();
+	}
+
+	@Override
+	public void render(RenderingCollector collector, String name, Object attributeValue, SourceModelBuildingContext modelContext) {
 		collector.addLine( "%s = %s", name, attributeValue );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue) {
+	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
 		collector.addLine( "%s", attributeValue );
 	}
 
@@ -58,7 +56,7 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 		return String.format(
 				Locale.ROOT,
 				"AttributeTypeDescriptor(%s)",
-				getWrappedValueType().getName()
+				getValueType().getName()
 		);
 	}
 }

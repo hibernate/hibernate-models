@@ -19,6 +19,6 @@ public class IntegerValueExtractor extends AbstractValueExtractor<Integer> {
 	@Override
 	protected Integer extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return IntegerValueWrapper.JANDEX_INTEGER_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return IntegerValueConverter.JANDEX_INTEGER_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 }

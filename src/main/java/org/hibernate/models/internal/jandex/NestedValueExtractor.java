@@ -8,8 +8,6 @@ package org.hibernate.models.internal.jandex;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
@@ -17,21 +15,17 @@ import org.jboss.jandex.AnnotationValue;
 /**
  * @author Steve Ebersole
  */
-public class NestedValueExtractor<A extends Annotation> extends AbstractValueExtractor<AnnotationUsage<A>> {
-	private final NestedValueWrapper<A> wrapper;
+public class NestedValueExtractor<A extends Annotation> extends AbstractValueExtractor<A> {
+	private final NestedValueConverter<A> wrapper;
 
-	public NestedValueExtractor(NestedValueWrapper<A> wrapper) {
+	public NestedValueExtractor(NestedValueConverter<A> wrapper) {
 		this.wrapper = wrapper;
 	}
 
-	public NestedValueExtractor(AnnotationDescriptor<A> descriptor) {
-		this( new NestedValueWrapper<>( descriptor ) );
-	}
-
 	@Override
-	protected AnnotationUsage<A> extractAndWrap(
+	protected A extractAndWrap(
 			AnnotationValue jandexValue,
 			SourceModelBuildingContext buildingContext) {
-		return wrapper.wrap( jandexValue, buildingContext );
+		return wrapper.convert( jandexValue, buildingContext );
 	}
 }

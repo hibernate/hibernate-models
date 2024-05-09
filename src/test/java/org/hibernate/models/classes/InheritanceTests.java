@@ -49,21 +49,21 @@ public class InheritanceTests {
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
 		final ClassDetails rootClassDetails = classDetailsRegistry.getClassDetails( RootClass.class.getName() );
-		assertThat( rootClassDetails.getAnnotationUsage( ClassMarker.class ) ).isNotNull();
-		assertThat( rootClassDetails.getAnnotationUsage( SubclassableMarker.class ) ).isNotNull();
-		assertThat( rootClassDetails.getAnnotationUsage( Composable.class ) ).isNull();
-		Assertions.assertThat( rootClassDetails.getAnnotationUsage( MemberMarker.class ) ).isNull();
+		assertThat( rootClassDetails.getAnnotationUsage( ClassMarker.class, buildingContext ) ).isNotNull();
+		assertThat( rootClassDetails.getAnnotationUsage( SubclassableMarker.class, buildingContext ) ).isNotNull();
+		assertThat( rootClassDetails.getAnnotationUsage( Composable.class, buildingContext ) ).isNull();
+		Assertions.assertThat( rootClassDetails.getAnnotationUsage( MemberMarker.class, buildingContext ) ).isNull();
 
 		assertThat( rootClassDetails.getFields() ).hasSize( 2 );
 		final FieldDetails value1 = rootClassDetails.findFieldByName( "value1" );
 		assertThat( value1 ).isNotNull();
-		assertThat( value1.getAnnotationUsage( MemberMarker.class ) ).isNotNull();
-		assertThat( value1.getAnnotationUsage( ClassMarker.class ) ).isNull();
-		assertThat( value1.getAnnotationUsage( Transient.class ) ).isNull();
+		assertThat( value1.getAnnotationUsage( MemberMarker.class, buildingContext ) ).isNotNull();
+		assertThat( value1.getAnnotationUsage( ClassMarker.class, buildingContext ) ).isNull();
+		assertThat( value1.getAnnotationUsage( Transient.class, buildingContext ) ).isNull();
 		final FieldDetails value2 = rootClassDetails.findFieldByName( "value2" );
-		assertThat( value2.getAnnotationUsage( MemberMarker.class ) ).isNull();
-		assertThat( value2.getAnnotationUsage( ClassMarker.class ) ).isNull();
-		assertThat( value2.getAnnotationUsage( Transient.class ) ).isNotNull();
+		assertThat( value2.getAnnotationUsage( MemberMarker.class, buildingContext ) ).isNull();
+		assertThat( value2.getAnnotationUsage( ClassMarker.class, buildingContext ) ).isNull();
+		assertThat( value2.getAnnotationUsage( Transient.class, buildingContext ) ).isNotNull();
 
 		assertThat( rootClassDetails.getSuperClass() ).isNotNull();
 		assertThat( rootClassDetails.getSuperClass().toJavaClass() ).isEqualTo( Object.class );
@@ -96,22 +96,22 @@ public class InheritanceTests {
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
 		final ClassDetails trunkClassDetails = classDetailsRegistry.getClassDetails( TrunkClass.class.getName() );
-		assertThat( trunkClassDetails.getAnnotationUsage( ClassMarker.class ) ).isNotNull();
+		assertThat( trunkClassDetails.getAnnotationUsage( ClassMarker.class, buildingContext ) ).isNotNull();
 		// NOTE : SubclassableMarker is @Inherited, so we should see it here too
-		assertThat( trunkClassDetails.getAnnotationUsage( SubclassableMarker.class ) ).isNotNull();
-		assertThat( trunkClassDetails.getAnnotationUsage( MemberMarker.class ) ).isNull();
+		assertThat( trunkClassDetails.getAnnotationUsage( SubclassableMarker.class, buildingContext ) ).isNotNull();
+		assertThat( trunkClassDetails.getAnnotationUsage( MemberMarker.class, buildingContext ) ).isNull();
 
 		assertThat( trunkClassDetails.getFields() ).hasSize( 2 );
 		final FieldDetails value3 = trunkClassDetails.findFieldByName( "value3" );
 		assertThat( value3 ).isNotNull();
-		assertThat( value3.getAnnotationUsage( MemberMarker.class ) ).isNotNull();
-		assertThat( value3.getAnnotationUsage( ClassMarker.class ) ).isNull();
-		assertThat( value3.getAnnotationUsage( Transient.class ) ).isNull();
+		assertThat( value3.getAnnotationUsage( MemberMarker.class, buildingContext ) ).isNotNull();
+		assertThat( value3.getAnnotationUsage( ClassMarker.class, buildingContext ) ).isNull();
+		assertThat( value3.getAnnotationUsage( Transient.class, buildingContext ) ).isNull();
 
 		final FieldDetails value4 = trunkClassDetails.findFieldByName( "value4" );
-		assertThat( value4.getAnnotationUsage( MemberMarker.class ) ).isNull();
-		assertThat( value4.getAnnotationUsage( ClassMarker.class ) ).isNull();
-		assertThat( value4.getAnnotationUsage( Transient.class ) ).isNotNull();
+		assertThat( value4.getAnnotationUsage( MemberMarker.class, buildingContext ) ).isNull();
+		assertThat( value4.getAnnotationUsage( ClassMarker.class, buildingContext ) ).isNull();
+		assertThat( value4.getAnnotationUsage( Transient.class, buildingContext ) ).isNotNull();
 
 		assertThat( trunkClassDetails.getSuperClass() ).isNotNull();
 		assertThat( trunkClassDetails.getSuperClass().toJavaClass() ).isEqualTo( RootClass.class );
@@ -144,15 +144,15 @@ public class InheritanceTests {
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
 		final ClassDetails leafClassDetails = classDetailsRegistry.getClassDetails( LeafClass.class.getName() );
-		assertThat( leafClassDetails.getAnnotationUsage( ClassMarker.class ) ).isNotNull();
+		assertThat( leafClassDetails.getAnnotationUsage( ClassMarker.class, buildingContext ) ).isNotNull();
 		// NOTE : SubclassableMarker is @Inherited, so we should see it here too
-		assertThat( leafClassDetails.getAnnotationUsage( SubclassableMarker.class ) ).isNotNull();
-		assertThat( leafClassDetails.getAnnotationUsage( MemberMarker.class ) ).isNull();
+		assertThat( leafClassDetails.getAnnotationUsage( SubclassableMarker.class, buildingContext ) ).isNotNull();
+		assertThat( leafClassDetails.getAnnotationUsage( MemberMarker.class, buildingContext ) ).isNull();
 
-		assertThat( leafClassDetails.getAnnotationUsage( ClassMarker.class ) ).isNotNull();
+		assertThat( leafClassDetails.getAnnotationUsage( ClassMarker.class, buildingContext ) ).isNotNull();
 		// NOTE : SubclassableMarker is @Inherited, so we should see it even way down here too
-		assertThat( leafClassDetails.getAnnotationUsage( SubclassableMarker.class ) ).isNotNull();
-		assertThat( leafClassDetails.getAnnotationUsage( MemberMarker.class ) ).isNull();
+		assertThat( leafClassDetails.getAnnotationUsage( SubclassableMarker.class, buildingContext ) ).isNotNull();
+		assertThat( leafClassDetails.getAnnotationUsage( MemberMarker.class, buildingContext ) ).isNull();
 	}
 
 	@Test

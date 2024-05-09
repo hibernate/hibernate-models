@@ -21,6 +21,6 @@ public class ByteValueExtractor extends AbstractValueExtractor<Byte> {
 	@Override
 	protected Byte extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return ByteValueWrapper.JANDEX_BYTE_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return ByteValueConverter.JANDEX_BYTE_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 }

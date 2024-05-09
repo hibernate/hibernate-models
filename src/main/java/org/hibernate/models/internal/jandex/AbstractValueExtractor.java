@@ -7,7 +7,7 @@
 package org.hibernate.models.internal.jandex;
 
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueExtractor;
+import org.hibernate.models.spi.JandexValueExtractor;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationValue;
@@ -15,7 +15,7 @@ import org.jboss.jandex.AnnotationValue;
 /**
  * @author Steve Ebersole
  */
-public abstract class AbstractValueExtractor<W> implements ValueExtractor<AnnotationInstance,W> {
+public abstract class AbstractValueExtractor<W> implements JandexValueExtractor<W> {
 
 	protected abstract W extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext);
 

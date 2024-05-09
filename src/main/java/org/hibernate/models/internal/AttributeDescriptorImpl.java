@@ -63,7 +63,7 @@ public class AttributeDescriptorImpl<T> implements AttributeDescriptor<T> {
 				Locale.ROOT,
 				"AttributeDescriptor(%s : %s)",
 				name,
-				getTypeDescriptor().getWrappedValueType().getName()
+				getTypeDescriptor().getValueType().getName()
 		);
 	}
 }

@@ -23,21 +23,21 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	/**
 	 * Add an annotation usage to this target
 	 */
-	<X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage);
+	<X extends Annotation> void addAnnotationUsage(X annotationUsage);
 
 	/**
 	 * Applies a usage of the given {@code annotationType} to this target.  Will return
 	 * an existing usage, if one, or create a new usage.
 	 */
-	default <A extends Annotation> MutableAnnotationUsage<A> applyAnnotationUsage(
+	default <A extends Annotation> A applyAnnotationUsage(
 			AnnotationDescriptor<A> annotationType,
-			SourceModelBuildingContext buildingContext) {
-		final MutableAnnotationUsage<A> existing = (MutableAnnotationUsage<A>) getAnnotationUsage( annotationType );
+			SourceModelBuildingContext modelContext) {
+		final A existing = getAnnotationUsage( annotationType, modelContext );
 		if ( existing != null ) {
 			return existing;
 		}
 
-		final MutableAnnotationUsage<A> usage = annotationType.createUsage( buildingContext );
+		final A usage = annotationType.createUsage( modelContext );
 		addAnnotationUsage( usage );
 		return usage;
 	}
@@ -55,10 +55,10 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	 *
 	 * @see #replaceAnnotationUsage(AnnotationDescriptor, AnnotationDescriptor, SourceModelBuildingContext)
 	 */
-	default <A extends Annotation> MutableAnnotationUsage<A> replaceAnnotationUsage(
+	default <A extends Annotation> A replaceAnnotationUsage(
 			AnnotationDescriptor<A> annotationType,
-			SourceModelBuildingContext buildingContext) {
-		final MutableAnnotationUsage<A> usage = annotationType.createUsage( buildingContext );
+			SourceModelBuildingContext modelContext) {
+		final A usage = annotationType.createUsage( modelContext );
 		// effectively overwrites any previous registration
 		addAnnotationUsage( usage );
 		return usage;
@@ -73,10 +73,10 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	 *
 	 * @see #replaceAnnotationUsage(AnnotationDescriptor, SourceModelBuildingContext)
 	 */
-	<S extends Annotation, P extends Annotation> MutableAnnotationUsage<P> replaceAnnotationUsage(
+	<S extends Annotation, P extends Annotation> P replaceAnnotationUsage(
 			AnnotationDescriptor<S> repeatableType,
 			AnnotationDescriptor<P> containerType,
-			SourceModelBuildingContext buildingContext);
+			SourceModelBuildingContext modelContext);
 
 	@Override
 	MutableClassDetails asClassDetails();

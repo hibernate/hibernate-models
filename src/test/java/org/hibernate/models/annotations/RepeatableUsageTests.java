@@ -1,11 +1,9 @@
 package org.hibernate.models.annotations;
 
 import java.lang.reflect.Modifier;
-import java.util.List;
 
 import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
 
 import org.junit.jupiter.api.Test;
@@ -72,16 +70,16 @@ public class RepeatableUsageTests {
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing1.class.getName() );
 
 		try {
-			classDetails.getAnnotationUsage( NamedQuery.class );
+			classDetails.getAnnotationUsage( NamedQuery.class, buildingContext );
 			fail( "Expecting failure" );
 		}
 		catch (AnnotationAccessException expected) {
 		}
 
-		final List<AnnotationUsage<NamedQuery>> usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		final NamedQuery[] usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class, buildingContext );
 		assertThat( usages ).hasSize( 2 );
 
-		final AnnotationUsage<NamedQueries> containerUsage = classDetails.getAnnotationUsage( NamedQueries.class );
+		final NamedQueries containerUsage = classDetails.getAnnotationUsage( NamedQueries.class, buildingContext );
 		assertThat( containerUsage ).isNotNull();
 	}
 
@@ -89,50 +87,50 @@ public class RepeatableUsageTests {
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing2.class.getName() );
 
 		try {
-			classDetails.getAnnotationUsage( NamedQuery.class );
+			classDetails.getAnnotationUsage( NamedQuery.class, buildingContext );
 			fail( "Expecting failure" );
 		}
 		catch (AnnotationAccessException expected) {
 		}
 
-		final List<AnnotationUsage<NamedQuery>> usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		final NamedQuery[] usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class, buildingContext );
 		assertThat( usages ).hasSize( 2 );
 
-		final AnnotationUsage<NamedQueries> containerUsage = classDetails.getAnnotationUsage( NamedQueries.class );
+		final NamedQueries containerUsage = classDetails.getAnnotationUsage( NamedQueries.class, buildingContext );
 		assertThat( containerUsage ).isNotNull();
 	}
 
 	private void verifyThing3(SourceModelBuildingContextImpl buildingContext) {
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing3.class.getName() );
 
-		assertThat( classDetails.getAnnotationUsage( NamedQuery.class ) ).isNull();
-		assertThat( classDetails.getAnnotationUsage( NamedQueries.class ) ).isNull();
+		assertThat( classDetails.getAnnotationUsage( NamedQuery.class, buildingContext ) ).isNull();
+		assertThat( classDetails.getAnnotationUsage( NamedQueries.class, buildingContext ) ).isNull();
 	}
 
 	private void verifyThing4(SourceModelBuildingContextImpl buildingContext) {
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing4.class.getName() );
 
 		// NOTE : this works like the JDK call, though we may want to make this more sane
-		final AnnotationUsage<NamedQuery> usage = classDetails.getAnnotationUsage( NamedQuery.class );
+		final NamedQuery usage = classDetails.getAnnotationUsage( NamedQuery.class, buildingContext );
 		assertThat( usage ).isNotNull();
 
-		final List<AnnotationUsage<NamedQuery>> usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		final NamedQuery[] usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class, buildingContext );
 		assertThat( usages ).hasSize( 3 );
 
-		final AnnotationUsage<NamedQueries> containerUsage = classDetails.getAnnotationUsage( NamedQueries.class );
+		final NamedQueries containerUsage = classDetails.getAnnotationUsage( NamedQueries.class, buildingContext );
 		assertThat( containerUsage ).isNotNull();
 	}
 
 	private void verifyThing5(SourceModelBuildingContextImpl buildingContext) {
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Thing5.class.getName() );
 
-		final AnnotationUsage<NamedQueries> containerUsage = classDetails.getAnnotationUsage( NamedQueries.class );
+		final NamedQueries containerUsage = classDetails.getAnnotationUsage( NamedQueries.class, buildingContext );
 		assertThat( containerUsage ).isNotNull();
 
-		final AnnotationUsage<NamedQuery> usage = classDetails.getAnnotationUsage( NamedQuery.class );
+		final NamedQuery usage = classDetails.getAnnotationUsage( NamedQuery.class, buildingContext );
 		assertThat( usage ).isNotNull();
 
-		final List<AnnotationUsage<NamedQuery>> usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		final NamedQuery[] usages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class, buildingContext );
 		assertThat( usages ).hasSize( 1 );
 	}
 

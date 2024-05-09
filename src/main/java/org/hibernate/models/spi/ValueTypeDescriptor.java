@@ -8,44 +8,42 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationValue;
-
 /**
  * Descriptor for the annotation attribute types, acting as a producer for
- * {@link AttributeDescriptor}, {@link ValueWrapper} and {@link ValueExtractor} references
+ * {@link AttributeDescriptor}, {@link JandexValueConverter} and {@link JandexValueExtractor} references
  *
  * @author Steve Ebersole
  */
 public interface ValueTypeDescriptor<V> {
 	/**
-	 * The type for the value as modeled in {@linkplain AnnotationUsage}.
+	 * The type for the value.
 	 */
-	Class<V> getWrappedValueType();
-
-	/**
-	 * Creates a properly typed default attribute value.  Generally used in creating dynamic annotations.
-	 */
-	V createValue(AttributeDescriptor<?> attributeDescriptor, SourceModelBuildingContext context);
+	Class<V> getValueType();
 
 	/**
 	 * Factory for creating typed {@linkplain AttributeDescriptor} references
 	 */
-	AttributeDescriptor<V> createAttributeDescriptor(AnnotationDescriptor<?> annotationDescriptor, String attributeName);
+	AttributeDescriptor<V> createAttributeDescriptor(Class<? extends Annotation> annotationType, String attributeName);
 
-	ValueWrapper<V, AnnotationValue> createJandexWrapper(SourceModelBuildingContext buildingContext);
+	JandexValueConverter<V> createJandexValueConverter(SourceModelBuildingContext modelContext);
 
-	ValueExtractor<AnnotationInstance,V> createJandexExtractor(SourceModelBuildingContext buildingContext);
+	JandexValueExtractor<V> createJandexValueExtractor(SourceModelBuildingContext modelContext);
 
-	ValueWrapper<V,?> createJdkWrapper(SourceModelBuildingContext buildingContext);
+	JdkValueConverter<V> createJdkValueConverter(SourceModelBuildingContext modelContext);
 
-	ValueExtractor<Annotation,V> createJdkExtractor(SourceModelBuildingContext buildingContext);
+	JdkValueExtractor<V> createJdkValueExtractor(SourceModelBuildingContext modelContext);
 
 	Object unwrap(V value);
 
-	default void render(RenderingCollector collector, String name, Object attributeValue) {
+	V[] makeArray(int size, SourceModelBuildingContext modelContext);
+
+	default void render(
+			RenderingCollector collector,
+			String name,
+			Object attributeValue,
+			SourceModelBuildingContext modelContext) {
 		collector.addLine( "%s=%s", name, "..." );
 	}
 
-	void render(RenderingCollector collector, Object attributeValue);
+	void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext);
 }

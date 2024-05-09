@@ -11,19 +11,21 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
+import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
 /**
+ * ClassDetails implementation for cases where we do not care about fields,
+ * methods, record-components nor annotations
+ *
  * @author Steve Ebersole
  */
 public class SimpleClassDetails implements ClassDetails {
@@ -136,67 +138,66 @@ public class SimpleClassDetails implements ClassDetails {
 	// nor do we care about its annotations
 
 	@Override
-	public Collection<AnnotationUsage<?>> getAllAnnotationUsages() {
+	public Collection<? extends Annotation> getDirectAnnotationUsages() {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type) {
+	public <A extends Annotation> boolean hasDirectAnnotationUsage(Class<A> type) {
 		return false;
 	}
 
 	@Override
-	public <A extends Annotation> boolean hasRepeatableAnnotationUsage(Class<A> type) {
+	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
 		return false;
 	}
 
 	@Override
-	public <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> descriptor) {
+	public <A extends Annotation> A getAnnotationUsage(
+			AnnotationDescriptor<A> descriptor,
+			SourceModelBuildingContext modelContext) {
 		return null;
 	}
 
 	@Override
-	public <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(Class<A> type) {
+	public <A extends Annotation> A getAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
 		return null;
 	}
 
 	@Override
-	public <A extends Annotation> AnnotationUsage<A> locateAnnotationUsage(Class<A> type) {
+	public <A extends Annotation> A locateAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
 		return null;
 	}
 
 	@Override
-	public <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(AnnotationDescriptor<A> type) {
-		return Collections.emptyList();
+	public <A extends Annotation> A[] getRepeatedAnnotationUsages(
+			AnnotationDescriptor<A> type,
+			SourceModelBuildingContext modelContext) {
+		return null;
 	}
 
 	@Override
-	public <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(Class<A> type) {
-		return Collections.emptyList();
+	public <A extends Annotation> List<? extends Annotation> getMetaAnnotated(
+			Class<A> metaAnnotationType,
+			SourceModelBuildingContext modelContext) {
+		return null;
 	}
 
 	@Override
-	public <X extends Annotation> void forEachAnnotationUsage(Class<X> type, Consumer<AnnotationUsage<X>> consumer) {
-	}
-
-	@Override
-	public <A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType) {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public <X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
+	public <X extends Annotation> X getNamedAnnotationUsage(
 			AnnotationDescriptor<X> type,
 			String matchName,
-			String attributeToMatch) {
+			String attributeToMatch,
+			SourceModelBuildingContext modelContext) {
 		return null;
 	}
 
 	@Override
-	public <X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
+	public <X extends Annotation> X getNamedAnnotationUsage(
 			Class<X> type,
 			String matchName,
-			String attributeToMatch) {
+			String attributeToMatch,
+			SourceModelBuildingContext modelContext) {
 		return null;
 	}
 }

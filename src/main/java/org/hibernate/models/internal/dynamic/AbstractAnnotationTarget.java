@@ -11,27 +11,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationTargetSupport;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
  * @author Steve Ebersole
  */
 public abstract class AbstractAnnotationTarget implements AnnotationTargetSupport {
-	private final SourceModelBuildingContext buildingContext;
-	private final Map<Class<? extends Annotation>, AnnotationUsage<?>> usageMap = new HashMap<>();
+	private final SourceModelBuildingContext modelContext;
+	private final Map<Class<? extends Annotation>, ? extends Annotation> usageMap = new HashMap<>();
 
-	public AbstractAnnotationTarget(SourceModelBuildingContext buildingContext) {
-		this.buildingContext = buildingContext;
+	public AbstractAnnotationTarget(SourceModelBuildingContext modelContext) {
+		this.modelContext = modelContext;
+	}
+
+	public SourceModelBuildingContext getModelContext() {
+		return modelContext;
 	}
 
 	@Override
-	public SourceModelBuildingContext getBuildingContext() {
-		return buildingContext;
-	}
-
-	@Override
-	public Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> getUsageMap() {
+	public Map<Class<? extends Annotation>, ? extends Annotation> getUsageMap() {
 		return usageMap;
 	}
 
@@ -39,19 +37,4 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 	public void clearAnnotationUsages() {
 		usageMap.clear();
 	}
-
-	/**
-	 * Applies the given {@code annotationUsage} to this target.
-	 *
-	 * @todo It is undefined currently what happens if the annotation type is already applied on this target.
-	 */
-	public <X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage) {
-		assert annotationUsage.getAnnotationDescriptor().getAllowableTargets().contains( getKind() );
-		final AnnotationUsage<?> previous = usageMap.put( annotationUsage.getAnnotationType(), annotationUsage );
-
-		if ( previous != null ) {
-			// todo : ignore?  log?  exception?
-		}
-	}
-
 }

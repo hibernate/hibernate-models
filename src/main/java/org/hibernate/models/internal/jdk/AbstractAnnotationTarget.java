@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import org.hibernate.models.internal.AnnotationTargetSupport;
-import org.hibernate.models.spi.AnnotationUsage;
+import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
@@ -23,37 +23,38 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  */
 public abstract class AbstractAnnotationTarget implements AnnotationTargetSupport {
 	private final Supplier<Annotation[]> annotationSupplier;
-	private final SourceModelBuildingContext buildingContext;
+	private final SourceModelBuildingContext modelContext;
 
-	private Map<Class<? extends Annotation>, AnnotationUsage<?>> usagesMap;
+	private Map<Class<? extends Annotation>, ? extends Annotation> usagesMap;
 
 	public AbstractAnnotationTarget(
 			Supplier<Annotation[]> annotationSupplier,
-			SourceModelBuildingContext buildingContext) {
+			SourceModelBuildingContext modelContext) {
 		this.annotationSupplier = annotationSupplier;
-		this.buildingContext = buildingContext;
+		this.modelContext = modelContext;
+	}
+
+	public SourceModelBuildingContext getModelContext() {
+		return modelContext;
 	}
 
 	@Override
-	public SourceModelBuildingContext getBuildingContext() {
-		return buildingContext;
-	}
-
-	@Override
-	public Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> getUsageMap() {
+	public Map<Class<? extends Annotation>, ? extends Annotation> getUsageMap() {
 		if ( usagesMap == null ) {
 			usagesMap = buildUsagesMap();
 		}
 		return usagesMap;
 	}
 
-	private Map<Class<? extends Annotation>, AnnotationUsage<?>> buildUsagesMap() {
-		final Map<Class<? extends Annotation>, AnnotationUsage<?>> result = new HashMap<>();
-		AnnotationUsageBuilder.processAnnotations(
-				annotationSupplier.get(),
-				result::put,
-				buildingContext
-		);
+	private Map<Class<? extends Annotation>, ? extends Annotation> buildUsagesMap() {
+		final Map<Class<? extends Annotation>, Annotation> result = new HashMap<>();
+		for ( Annotation annotation : annotationSupplier.get() ) {
+			//noinspection unchecked
+			final AnnotationDescriptor<Annotation> descriptor = (AnnotationDescriptor<Annotation>) modelContext
+					.getAnnotationDescriptorRegistry()
+					.getDescriptor( annotation.annotationType() );
+			result.put( annotation.annotationType(), descriptor.createUsage( annotation, modelContext ) );
+		}
 		return result;
 	}
 
@@ -63,8 +64,8 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 	}
 
 	@Override
-	public <X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage) {
-		assert annotationUsage.getAnnotationDescriptor().getAllowableTargets().contains( getKind() );
-		getUsageMap().put( annotationUsage.getAnnotationType(), annotationUsage );
+	public <X extends Annotation> void addAnnotationUsage(X annotationUsage) {
+		//noinspection unchecked,rawtypes
+		( (Map) getUsageMap() ).put( annotationUsage.annotationType(), annotationUsage );
 	}
 }

@@ -21,6 +21,6 @@ public class DoubleValueExtractor extends AbstractValueExtractor<Double> {
 			AnnotationValue jandexValue,
 			SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return DoubleValueWrapper.JANDEX_DOUBLE_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return DoubleValueConverter.JANDEX_DOUBLE_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 }

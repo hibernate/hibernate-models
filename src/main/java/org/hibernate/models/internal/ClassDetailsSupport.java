@@ -9,13 +9,15 @@ package org.hibernate.models.internal;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import org.hibernate.models.internal.util.CollectionHelper;
+import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
+import org.hibernate.models.spi.MutableMemberDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
+import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
  * @author Steve Ebersole
@@ -47,44 +49,56 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 	}
 
 	@Override
-	default <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> type) {
-		final AnnotationUsage<A> localUsage = AnnotationUsageHelper.getUsage( type, getUsageMap() );
+	default <A extends Annotation> A getAnnotationUsage(
+			AnnotationDescriptor<A> descriptor,
+			SourceModelBuildingContext modelContext) {
+		final A localUsage = AnnotationUsageHelper.getUsage( descriptor, getUsageMap(),modelContext );
 		if ( localUsage != null ) {
 			return localUsage;
 		}
 
-		if ( type.isInherited() && getSuperClass() != null ) {
-			return getSuperClass().getAnnotationUsage( type );
+		if ( descriptor.isInherited() && getSuperClass() != null ) {
+			return getSuperClass().getAnnotationUsage( descriptor, modelContext );
 		}
 
 		return null;
 	}
 
 	@Override
-	default  <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(AnnotationDescriptor<A> type) {
-		final List<AnnotationUsage<A>> localUsages = AnnotationTargetSupport.super.getRepeatedAnnotationUsages( type );
-
-		if ( type.isInherited() && getSuperClass() != null ) {
-			final List<AnnotationUsage<A>> inheritedUsages = getSuperClass().getRepeatedAnnotationUsages( type );
-			return CollectionHelper.join( localUsages, inheritedUsages );
-		}
-
-		return localUsages;
+	default <A extends Annotation> A getAnnotationUsage(Class<A> annotationType, SourceModelBuildingContext modelContext) {
+		return getAnnotationUsage(
+				modelContext.getAnnotationDescriptorRegistry().getDescriptor( annotationType ),
+				modelContext
+		);
 	}
 
 	@Override
-	default <A extends Annotation> AnnotationUsage<A> getNamedAnnotationUsage(
-			AnnotationDescriptor<A> type,
-			String matchValue,
-			String attributeToMatch) {
-		final AnnotationUsage<A> localUsage = AnnotationTargetSupport.super.getNamedAnnotationUsage( type, matchValue, attributeToMatch );
-		if ( localUsage != null ) {
-			return localUsage;
-		}
+	default MutableClassDetails asClassDetails() {
+		return this;
+	}
 
-		if ( type.isInherited() && getSuperClass() != null ) {
-			return getSuperClass().getNamedAnnotationUsage( type, matchValue, attributeToMatch );
-		}
-		return null;
+	@Override
+	default <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
+		throw new IllegalCastException( "ClassDetails cannot be cast as AnnotationDescriptor" );
+	}
+
+	@Override
+	default MutableMemberDetails asMemberDetails() {
+		throw new IllegalCastException( "ClassDetails cannot be cast as MemberDetails" );
+	}
+
+	@Override
+	default FieldDetails asFieldDetails() {
+		throw new IllegalCastException( "ClassDetails cannot be cast as FieldDetails" );
+	}
+
+	@Override
+	default MethodDetails asMethodDetails() {
+		throw new IllegalCastException( "ClassDetails cannot be cast as MethodDetails" );
+	}
+
+	@Override
+	default RecordComponentDetails asRecordComponentDetails() {
+		throw new IllegalCastException( "ClassDetails cannot be cast as RecordComponentDetails" );
 	}
 }

@@ -10,6 +10,8 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.models.internal.AnnotationHelper;
+
 /**
  * AnnotationScope with the ability to resolve "named" annotations
  *
@@ -24,7 +26,7 @@ public interface SharedNamedAnnotationScope extends SharedAnnotationScope {
 	 * @param matchName The name to match.
 	 * @return The matching annotation usage, or {@code null} if none matched
 	 */
-	default <X extends Annotation> AnnotationUsage<X> getNamedAnnotation(
+	default <X extends Annotation> X getNamedAnnotation(
 			AnnotationDescriptor<X> annotationDescriptor,
 			String matchName) {
 		return getNamedAnnotation( annotationDescriptor, matchName, "name" );
@@ -40,14 +42,15 @@ public interface SharedNamedAnnotationScope extends SharedAnnotationScope {
 	 *
 	 * @return The matching annotation usage, or {@code null} if none matched
 	 */
-	default <A extends Annotation> AnnotationUsage<A> getNamedAnnotation(
+	default <A extends Annotation> A getNamedAnnotation(
 			AnnotationDescriptor<A> annotationDescriptor,
 			String matchName,
 			String attributeToMatch) {
-		final List<AnnotationUsage<A>> allUsages = getAllAnnotationUsages( annotationDescriptor );
+		final List<A> allUsages = getAllAnnotationUsages( annotationDescriptor );
+		final AttributeDescriptor<String> matchAttribute = annotationDescriptor.getAttribute( attributeToMatch );
 		for ( int i = 0; i < allUsages.size(); i++ ) {
-			final AnnotationUsage<A> annotationUsage = allUsages.get( i );
-			final Object usageName = annotationUsage.getAttributeValue( attributeToMatch );
+			final A annotationUsage = allUsages.get( i );
+			final String usageName = AnnotationHelper.extractValue( annotationUsage, matchAttribute );
 			if ( Objects.equals( matchName, usageName ) ) {
 				return annotationUsage;
 			}

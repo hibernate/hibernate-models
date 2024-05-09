@@ -7,35 +7,33 @@
 package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.util.Locale;
 
+import org.hibernate.models.internal.jandex.NestedValueConverter;
 import org.hibernate.models.internal.jandex.NestedValueExtractor;
-import org.hibernate.models.internal.jandex.NestedValueWrapper;
-import org.hibernate.models.internal.jdk.AnnotationDescriptorImpl;
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationUsage;
+import org.hibernate.models.spi.JandexValueConverter;
+import org.hibernate.models.spi.JandexValueExtractor;
+import org.hibernate.models.spi.JdkValueConverter;
+import org.hibernate.models.spi.JdkValueExtractor;
 import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueExtractor;
-import org.hibernate.models.spi.ValueWrapper;
-
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationValue;
 
 /**
  * Descriptor for nested annotation values
  *
  * @author Steve Ebersole
  */
-public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDescriptor<AnnotationUsage<A>> {
+public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDescriptor<A> {
 	private final Class<A> annotationType;
 
 	private AnnotationDescriptor<A> descriptor;
 
-	private NestedValueWrapper<A> jandexWrapper;
+	private NestedValueConverter<A> jandexConverter;
 	private NestedValueExtractor<A> jandexExtractor;
 
-	private org.hibernate.models.internal.jdk.NestedValueWrapper<A> jdkWrapper;
+	private org.hibernate.models.internal.jdk.NestedValueConverter<A> jdkConverter;
 	private org.hibernate.models.internal.jdk.NestedValueExtractor<A> jdkExtractor;
 
 	public NestedTypeDescriptor(Class<A> annotationType) {
@@ -43,34 +41,33 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 	}
 
 	@Override
-	public Class<AnnotationUsage<A>> getWrappedValueType() {
-		//noinspection unchecked,rawtypes
-		return (Class) AnnotationUsage.class;
+	public Class<A> getValueType() {
+		return annotationType;
 	}
 
 	private AnnotationDescriptor<A> resolveDescriptor(SourceModelBuildingContext context) {
 		if ( descriptor == null ) {
 			descriptor = context
 					.getAnnotationDescriptorRegistry()
-					.resolveDescriptor( annotationType, (t) -> new AnnotationDescriptorImpl<>( annotationType, context ) );
+					.resolveDescriptor( annotationType, (t) -> new StandardAnnotationDescriptor<>( annotationType, descriptor, context ) );
 		}
 		return descriptor;
 	}
 
 	@Override
-	public ValueWrapper<AnnotationUsage<A>, AnnotationValue> createJandexWrapper(SourceModelBuildingContext buildingContext) {
+	public JandexValueConverter<A> createJandexValueConverter(SourceModelBuildingContext buildingContext) {
 		return resolveJandexWrapper( buildingContext );
 	}
 
-	public NestedValueWrapper<A> resolveJandexWrapper(SourceModelBuildingContext buildingContext) {
-		if ( jandexWrapper == null ) {
-			jandexWrapper = new NestedValueWrapper<>( resolveDescriptor( buildingContext ) );
+	public NestedValueConverter<A> resolveJandexWrapper(SourceModelBuildingContext buildingContext) {
+		if ( jandexConverter == null ) {
+			jandexConverter = new NestedValueConverter<>( resolveDescriptor( buildingContext ) );
 		}
-		return jandexWrapper;
+		return jandexConverter;
 	}
 
 	@Override
-	public ValueExtractor<AnnotationInstance, AnnotationUsage<A>> createJandexExtractor(SourceModelBuildingContext buildingContext) {
+	public JandexValueExtractor<A> createJandexValueExtractor(SourceModelBuildingContext buildingContext) {
 		return resolveJandexExtractor( buildingContext );
 	}
 
@@ -82,46 +79,42 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 	}
 
 	@Override
-	public ValueWrapper<AnnotationUsage<A>, ?> createJdkWrapper(SourceModelBuildingContext buildingContext) {
-		return resolveJdkWrapper( buildingContext );
-	}
-
-	public org.hibernate.models.internal.jdk.NestedValueWrapper<A> resolveJdkWrapper(SourceModelBuildingContext buildingContext) {
-		if ( jdkWrapper == null ) {
-			jdkWrapper = new org.hibernate.models.internal.jdk.NestedValueWrapper<>( resolveDescriptor( buildingContext ) );
+	public JdkValueConverter<A> createJdkValueConverter(SourceModelBuildingContext modelContext) {
+		if ( jdkConverter == null ) {
+			jdkConverter = new org.hibernate.models.internal.jdk.NestedValueConverter<>( descriptor );
 		}
-		return jdkWrapper;
+		return jdkConverter;
 	}
 
 	@Override
-	public ValueExtractor<Annotation, AnnotationUsage<A>> createJdkExtractor(SourceModelBuildingContext buildingContext) {
-		return resolveJdkExtractor( buildingContext );
-	}
-
-	@Override
-	public Object unwrap(AnnotationUsage<A> value) {
-		return value.toAnnotation();
-	}
-
-	public ValueExtractor<Annotation, AnnotationUsage<A>> resolveJdkExtractor(SourceModelBuildingContext buildingContext) {
+	public JdkValueExtractor<A> createJdkValueExtractor(SourceModelBuildingContext modelContext) {
 		if ( jdkExtractor == null ) {
-			jdkExtractor = new org.hibernate.models.internal.jdk.NestedValueExtractor<>( resolveJdkWrapper( buildingContext ) );
+			jdkExtractor = new org.hibernate.models.internal.jdk.NestedValueExtractor<>( jdkConverter );
 		}
 		return jdkExtractor;
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue) {
-		//noinspection unchecked
-		final AnnotationUsage<A> nested = (AnnotationUsage<A>) attributeValue;
-		nested.renderAttributeValue( name, collector );
+	public Object unwrap(A value) {
+		return value;
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue) {
+	public void render(RenderingCollector collector, String name, Object attributeValue, SourceModelBuildingContext modelContext) {
 		//noinspection unchecked
-		final AnnotationUsage<A> nested = (AnnotationUsage<A>) attributeValue;
-		nested.render( collector );
+		resolveDescriptor( modelContext ).renderUsage( collector, name, (A) attributeValue, modelContext );
+	}
+
+	@Override
+	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
+		//noinspection unchecked
+		resolveDescriptor( modelContext ).renderUsage( collector, (A) attributeValue, modelContext );
+	}
+
+	@Override
+	public A[] makeArray(int size, SourceModelBuildingContext modelContext) {
+		//noinspection unchecked
+		return (A[]) Array.newInstance( resolveDescriptor( modelContext ).getAnnotationType(), size );
 	}
 
 	@Override

@@ -7,29 +7,22 @@
 
 package org.hibernate.models.dynamic;
 
-import java.util.List;
-
-import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
-import org.hibernate.models.internal.dynamic.DynamicAnnotationUsage;
 import org.hibernate.models.internal.dynamic.DynamicClassDetails;
+import org.hibernate.models.orm.ForeignKeyAnnotation;
 import org.hibernate.models.orm.JpaAnnotations;
-import org.hibernate.models.spi.AnnotationUsage;
-import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.MutableAnnotationUsage;
+import org.hibernate.models.orm.SecondaryTableAnnotation;
+import org.hibernate.models.orm.TableAnnotation;
 
 import org.junit.jupiter.api.Test;
 
-import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.JoinTable;
+import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.SequenceGenerators;
+import jakarta.persistence.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.models.SourceModelTestHelper.createBuildingContext;
 
 /**
@@ -39,90 +32,41 @@ public class DynamicAnnotationTests {
 	@Test
 	void testBasicUsage() {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext();
-		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
-		final DynamicAnnotationUsage<SequenceGenerator> generatorAnn = new DynamicAnnotationUsage<>(
-				JpaAnnotations.SEQUENCE_GENERATOR,
-				buildingContext
-		);
-		assertThat( generatorAnn.getString( "name" ) ).isEqualTo( "" );
-		assertThat( generatorAnn.getString( "sequenceName" ) ).isEqualTo( "" );
-		assertThat( generatorAnn.getString( "catalog" ) ).isEqualTo( "" );
-		assertThat( generatorAnn.getString( "schema" ) ).isEqualTo( "" );
-		assertThat( generatorAnn.getInteger( "initialValue" ) ).isEqualTo( 1 );
-		assertThat( generatorAnn.getInteger( "allocationSize" ) ).isEqualTo( 50 );
+		final SequenceGenerator generatorAnn = JpaAnnotations.SEQUENCE_GENERATOR.createUsage( buildingContext );
+		assertThat( generatorAnn.name() ).isEqualTo( "" );
+		assertThat( generatorAnn.sequenceName() ).isEqualTo( "" );
+		assertThat( generatorAnn.catalog() ).isEqualTo( "" );
+		assertThat( generatorAnn.schema() ).isEqualTo( "" );
+		assertThat( generatorAnn.initialValue() ).isEqualTo( 1 );
+		assertThat( generatorAnn.allocationSize() ).isEqualTo( 50 );
+		assertThat( generatorAnn.options() ).isEqualTo("" );
 
-		try {
-			generatorAnn.getInteger( "incrementBy" );
-			fail( "Expecting UnknownAnnotationAttributeException" );
-		}
-		catch (UnknownAnnotationAttributeException expected) {
-			// ignore
-		}
-
+		final SequenceGenerators generatorsAnn = JpaAnnotations.SEQUENCE_GENERATORS.createUsage( buildingContext );
+		assertThat( generatorsAnn.value() ).isNotNull();
+		assertThat( generatorsAnn.value() ).isEmpty();
 	}
 
 	@Test
-	void testJoinTableForeignKeyDefaultValue() {
+	void testAnnotationWrapping() {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext();
 		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
-		final DynamicAnnotationUsage<JoinTable> generatorAnn = new DynamicAnnotationUsage<>(
-				JpaAnnotations.JOIN_TABLE,
+		final Table tableUsage = dynamicEntity.applyAnnotationUsage(
+				JpaAnnotations.TABLE,
 				buildingContext
 		);
+		assertThat( tableUsage ).isInstanceOf( TableAnnotation.class );
 
-		final Object foreignKey = generatorAnn.getAttributeValue( "foreignKey" );
-
-		assertThat( foreignKey ).isInstanceOf( AnnotationUsage.class );
-
-		//noinspection unchecked
-		final AnnotationUsage<ForeignKey> foreignKeyAnnotationUsage = (AnnotationUsage<ForeignKey>) foreignKey;
-
-		assertThat( foreignKeyAnnotationUsage.<ConstraintMode>getAttributeValue( "value" ) ).isEqualTo( ConstraintMode.PROVIDER_DEFAULT );
-
-		assertThat( foreignKeyAnnotationUsage.<String>getAttributeValue( "name" ) ).isEqualTo( "" );
-		assertThat( foreignKeyAnnotationUsage.<String>getAttributeValue( "options" ) ).isEqualTo( "" );
-		assertThat( foreignKeyAnnotationUsage.<String>getAttributeValue( "foreignKeyDefinition" ) ).isEqualTo( "" );
-	}
-
-	@Test
-	void testDefaultArrayValue() {
-		final SourceModelBuildingContextImpl buildingContext = createBuildingContext();
-		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
-		final DynamicAnnotationUsage<JoinTable> generatorAnn = new DynamicAnnotationUsage<>(
-				JpaAnnotations.JOIN_TABLE,
+		final SecondaryTable secondaryTableUsage = dynamicEntity.applyAnnotationUsage(
+				JpaAnnotations.SECONDARY_TABLE,
 				buildingContext
 		);
+		assertThat( secondaryTableUsage ).isInstanceOf( SecondaryTableAnnotation.class );
 
-		final Object joinColumns = generatorAnn.getAttributeValue( "joinColumns" );
-		assertThat( joinColumns ).isInstanceOf( List.class );
-
+		final ForeignKey foreignKeyUsage = secondaryTableUsage.foreignKey();
+		assertThat( foreignKeyUsage ).isInstanceOf( ForeignKeyAnnotation.class );
+		assertThat( foreignKeyUsage.name() ).isEqualTo( "" );
+		assertThat( foreignKeyUsage.options() ).isEqualTo( "" );
+		assertThat( foreignKeyUsage.foreignKeyDefinition() ).isEqualTo( "" );
 	}
 
-	@Test
-	void testDefaultValues() {
-		final SourceModelBuildingContextImpl buildingContext = createBuildingContext();
-		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
-		final DynamicAnnotationUsage<GeneratedValue> generatorAnn = new DynamicAnnotationUsage<>(
-				JpaAnnotations.GENERATED_VALUE,
-				buildingContext
-		);
-
-		GenerationType strategy = generatorAnn.getAttributeValue( "strategy" );
-		assertThat( strategy ).isEqualTo( GenerationType.AUTO );
-		String generator = generatorAnn.findAttributeValue( "generator" );
-		assertThat( generator ).isEqualTo( "" );
-	}
-
-	@Test
-	void testClassDetailsDefaultValue(){
-		final SourceModelBuildingContextImpl buildingContext = createBuildingContext();
-		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
-		final DynamicAnnotationUsage<ElementCollection> elementCollectionAnn = new DynamicAnnotationUsage<>(
-				JpaAnnotations.ELEMENT_COLLECTION,
-				buildingContext
-		);
-
-		Object value = elementCollectionAnn.getAttributeValue( "targetClass" );
-		assertThat( value ).isInstanceOf( ClassDetails.class );
-	}
 }

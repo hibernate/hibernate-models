@@ -8,10 +8,7 @@ package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
-import java.util.Collections;
-import java.util.HashMap;
 
-import org.hibernate.models.internal.jdk.AnnotationDescriptorImpl;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 
@@ -70,7 +67,7 @@ public class AnnotationDescriptorRegistryStandard extends AbstractAnnotationDesc
 			containerDescriptor = null;
 		}
 
-		final AnnotationDescriptorImpl<A> descriptor = new AnnotationDescriptorImpl<>(
+		final StandardAnnotationDescriptor<A> descriptor = new StandardAnnotationDescriptor<>(
 				javaType,
 				containerDescriptor,
 				modelBuildingContext

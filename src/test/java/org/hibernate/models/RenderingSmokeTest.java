@@ -30,7 +30,7 @@ public class RenderingSmokeTest {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( (Index) null, SimpleEntity.class );
 
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().resolveClassDetails( SimpleEntity.class.getName() );
-		classDetails.render();
+		classDetails.render( buildingContext );
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class RenderingSmokeTest {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( (org.jboss.jandex.Index) null, SimpleClass.class );
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
 
-		System.out.println( classDetails.renderToString() );
+		System.out.println( classDetails.renderToString( buildingContext ) );
 	}
 
 

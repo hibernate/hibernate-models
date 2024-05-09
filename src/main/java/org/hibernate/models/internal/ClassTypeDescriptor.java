@@ -6,64 +6,58 @@
  */
 package org.hibernate.models.internal;
 
-import java.lang.annotation.Annotation;
-
+import org.hibernate.models.internal.jandex.ClassValueConverter;
 import org.hibernate.models.internal.jandex.ClassValueExtractor;
-import org.hibernate.models.internal.jandex.ClassValueWrapper;
-import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.JandexValueConverter;
+import org.hibernate.models.spi.JandexValueExtractor;
 import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueExtractor;
-import org.hibernate.models.spi.ValueWrapper;
-
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationValue;
 
 /**
  * Descriptor for class values
  *
  * @author Steve Ebersole
  */
-public class ClassTypeDescriptor extends AbstractTypeDescriptor<ClassDetails> {
+public class ClassTypeDescriptor extends AbstractTypeDescriptor<Class<?>> {
 	public static final ClassTypeDescriptor CLASS_TYPE_DESCRIPTOR = new ClassTypeDescriptor();
 
 	@Override
-	public Class<ClassDetails> getWrappedValueType() {
-		return ClassDetails.class;
+	public Class<Class<?>> getValueType() {
+		//noinspection unchecked,rawtypes
+		return (Class) Class.class;
 	}
 
 	@Override
-	public ValueWrapper<ClassDetails, AnnotationValue> createJandexWrapper(SourceModelBuildingContext buildingContext) {
-		return ClassValueWrapper.JANDEX_CLASS_VALUE_WRAPPER;
+	public JandexValueConverter<Class<?>> createJandexValueConverter(SourceModelBuildingContext buildingContext) {
+		return ClassValueConverter.JANDEX_CLASS_VALUE_WRAPPER;
 	}
 
 	@Override
-	public ValueExtractor<AnnotationInstance, ClassDetails> createJandexExtractor(SourceModelBuildingContext buildingContext) {
+	public JandexValueExtractor<Class<?>> createJandexValueExtractor(SourceModelBuildingContext buildingContext) {
 		return ClassValueExtractor.JANDEX_CLASS_EXTRACTOR;
 	}
 
 	@Override
-	public ValueWrapper<ClassDetails, ?> createJdkWrapper(SourceModelBuildingContext buildingContext) {
-		return org.hibernate.models.internal.jdk.ClassValueWrapper.JDK_CLASS_VALUE_WRAPPER;
+	public Object unwrap(Class<?> value) {
+		return value;
 	}
 
 	@Override
-	public ValueExtractor<Annotation, ClassDetails> createJdkExtractor(SourceModelBuildingContext buildingContext) {
-		return org.hibernate.models.internal.jdk.ClassValueExtractor.JDK_CLASS_EXTRACTOR;
+	public void render(
+			RenderingCollector collector,
+			String name,
+			Object attributeValue,
+			SourceModelBuildingContext modelContext) {
+		super.render( collector, name, ( (Class<?>) attributeValue ).getName(), modelContext );
 	}
 
 	@Override
-	public Object unwrap(ClassDetails value) {
-		return value.toJavaClass();
+	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
+		super.render( collector, ( (Class<?>) attributeValue ).getName(), modelContext );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue) {
-		super.render( collector, name, ( (ClassDetails) attributeValue ).getName() );
-	}
-
-	@Override
-	public void render(RenderingCollector collector, Object attributeValue) {
-		super.render( collector, ( (ClassDetails) attributeValue ).getName() );
+	public Class<?>[] makeArray(int size, SourceModelBuildingContext modelContext) {
+		return new Class<?>[size];
 	}
 }

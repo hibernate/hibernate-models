@@ -6,13 +6,19 @@
  */
 package org.hibernate.models.internal.dynamic;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Map;
 
+import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableScope;
@@ -108,5 +114,35 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	@Override
 	public String toString() {
 		return "DynamicFieldDetails(" + name + ")";
+	}
+
+	@Override
+	public FieldDetails asFieldDetails() {
+		return this;
+	}
+
+	@Override
+	public MutableMemberDetails asMemberDetails() {
+		return this;
+	}
+
+	@Override
+	public MethodDetails asMethodDetails() {
+		throw new IllegalCastException( "FieldDetails cannot be cast as MethodDetails" );
+	}
+
+	@Override
+	public RecordComponentDetails asRecordComponentDetails() {
+		throw new IllegalCastException( "FieldDetails cannot be cast as RecordComponentDetails" );
+	}
+
+	@Override
+	public MutableClassDetails asClassDetails() {
+		throw new IllegalCastException( "FieldDetails cannot be cast as ClassDetails" );
+	}
+
+	@Override
+	public <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
+		throw new IllegalCastException( "FieldDetails cannot be cast as AnnotationDescriptor" );
 	}
 }

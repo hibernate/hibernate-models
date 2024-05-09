@@ -9,27 +9,27 @@ package org.hibernate.models.internal.jandex;
 import java.util.List;
 
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueWrapper;
+import org.hibernate.models.spi.JandexValueConverter;
 
 import org.jboss.jandex.AnnotationValue;
 
 /**
  * @author Steve Ebersole
  */
-public class ArrayValueExtractor<V> extends AbstractValueExtractor<List<V>> {
-	private final ValueWrapper<List<V>,AnnotationValue> wrapper;
+public class ArrayValueExtractor<V> extends AbstractValueExtractor<V[]> {
+	private final JandexValueConverter<V[]> wrapper;
 
-	public ArrayValueExtractor(ValueWrapper<List<V>,AnnotationValue> wrapper) {
+	public ArrayValueExtractor(JandexValueConverter<V[]> wrapper) {
 		this.wrapper = wrapper;
 	}
 
 	@Override
-	protected List<V> extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
+	protected V[] extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
 
 		final List<AnnotationValue> values = jandexValue.asArrayList();
 		assert values != null;
 
-		return wrapper.wrap( jandexValue, buildingContext );
+		return wrapper.convert( jandexValue, buildingContext );
 	}
 }

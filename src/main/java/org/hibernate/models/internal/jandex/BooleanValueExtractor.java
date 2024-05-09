@@ -21,6 +21,6 @@ public class BooleanValueExtractor extends AbstractValueExtractor<Boolean> {
 	@Override
 	protected Boolean extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return BooleanValueWrapper.JANDEX_BOOLEAN_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return BooleanValueConverter.JANDEX_BOOLEAN_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 }

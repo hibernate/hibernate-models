@@ -10,24 +10,20 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
 import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.PrimitiveKind;
-import org.hibernate.models.internal.TypeDescriptors;
+import org.hibernate.models.internal.StandardAnnotationDescriptor;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
-import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
-import org.hibernate.models.spi.ValueTypeDescriptor;
 
 /**
  * ClassDetailsBuilder implementation based on {@link Class}
@@ -186,52 +182,35 @@ public class JdkBuilders implements ClassDetailsBuilder {
 		return type == void.class || type == Void.class;
 	}
 
-	public static <A extends Annotation> AnnotationDescriptorOrmImpl<A> buildAnnotationDescriptor(
+	public static <A extends Annotation> AnnotationDescriptor<A> buildAnnotationDescriptor(
 			Class<A> annotationType,
-			AnnotationDescriptorRegistry descriptorRegistry) {
+			SourceModelBuildingContext modelContext) {
 		return buildAnnotationDescriptor(
 				annotationType,
-				resolveRepeatableContainerDescriptor( annotationType, descriptorRegistry )
+				resolveRepeatableContainerDescriptor( annotationType, modelContext ),
+				modelContext
 		);
 	}
 
 	public static <A extends Annotation, C extends Annotation> AnnotationDescriptor<C> resolveRepeatableContainerDescriptor(
 			Class<A> annotationType,
-			AnnotationDescriptorRegistry descriptorRegistry) {
+			SourceModelBuildingContext modelContext) {
 		final Repeatable repeatableAnnotation = annotationType.getAnnotation( Repeatable.class );
 		if ( repeatableAnnotation == null ) {
 			return null;
 		}
+		final AnnotationDescriptorRegistry descriptorRegistry = modelContext.getAnnotationDescriptorRegistry();
 		//noinspection unchecked
 		final AnnotationDescriptor<C> containerDescriptor = (AnnotationDescriptor<C>) descriptorRegistry.getDescriptor( repeatableAnnotation.value() );
 		( (AnnotationDescriptorRegistryStandard) descriptorRegistry ).register( containerDescriptor );
 		return containerDescriptor;
 	}
 
-	public static <A extends Annotation> AnnotationDescriptorOrmImpl<A> buildAnnotationDescriptor(
+	public static <A extends Annotation> AnnotationDescriptor<A> buildAnnotationDescriptor(
 			Class<A> annotationType,
-			AnnotationDescriptor<?> repeatableContainer) {
-		return new AnnotationDescriptorOrmImpl<>( annotationType, repeatableContainer );
+			AnnotationDescriptor<?> repeatableContainer,
+			SourceModelBuildingContext modelContext) {
+		return new StandardAnnotationDescriptor<>( annotationType, repeatableContainer, modelContext );
 	}
 
-	public static <A extends Annotation> List<AttributeDescriptor<?>> extractAttributeDescriptors(
-			AnnotationDescriptor<A> annotationDescriptor,
-			Class<A> annotationType) {
-		final Method[] methods = annotationType.getDeclaredMethods();
-		final List<AttributeDescriptor<?>> attributeDescriptors = new ArrayList<>( methods.length );
-		for ( Method method : methods ) {
-			attributeDescriptors.add( createAttributeDescriptor( annotationDescriptor, method ) );
-		}
-		return attributeDescriptors;
-	}
-
-	private static <X, A extends Annotation> AttributeDescriptor<X> createAttributeDescriptor(
-			AnnotationDescriptor<A> annotationDescriptor,
-			Method method) {
-		//noinspection unchecked
-		final Class<X> attributeType = (Class<X>) method.getReturnType();
-
-		final ValueTypeDescriptor<X> typeDescriptor = TypeDescriptors.resolveTypeDescriptor( attributeType );
-		return typeDescriptor.createAttributeDescriptor( annotationDescriptor, method.getName() );
-	}
 }

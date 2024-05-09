@@ -6,28 +6,40 @@
  */
 package org.hibernate.models.internal.jdk;
 
-import java.util.List;
+import java.lang.annotation.Annotation;
 
-import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueWrapper;
 
 /**
  * @author Steve Ebersole
  */
-public class ArrayValueExtractor<V,R> extends AbstractValueExtractor<List<V>,R[]> {
-	private final ValueWrapper<List<V>,R[]> wrapper;
+public class ArrayValueExtractor<V> extends AbstractValueExtractor<V[]> {
+	private final JdkValueConverter<V[]> converter;
 
-	public ArrayValueExtractor(ValueWrapper<List<V>, R[]> wrapper) {
-		this.wrapper = wrapper;
+	public ArrayValueExtractor(JdkValueConverter<V[]> converter) {
+		this.converter = converter;
 	}
 
 	@Override
-	protected List<V> wrap(
-			R[] rawValues,
-			AttributeDescriptor<List<V>> attributeDescriptor,
+	public <A extends Annotation> V[] extractValue(
+			A usage,
+			AttributeDescriptor<V[]> attributeDescriptor,
+			SourceModelBuildingContext modelContext) {
+		return super.extractValue( usage, attributeDescriptor, modelContext );
+	}
+
+	@Override
+	public V[] extractValue(Annotation annotation, String attributeName, SourceModelBuildingContext buildingContext) {
+		return super.extractValue( annotation, attributeName, buildingContext );
+	}
+
+	@Override
+	protected V[] wrap(
+			V[] rawValue,
+			AttributeDescriptor<V[]> attributeDescriptor,
 			SourceModelBuildingContext buildingContext) {
-		return wrapper.wrap( rawValues, buildingContext );
+		return converter.convert( rawValue, buildingContext );
 	}
 }

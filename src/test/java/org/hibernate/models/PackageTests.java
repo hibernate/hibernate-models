@@ -25,7 +25,7 @@ public class PackageTests {
 				.resolveClassDetails( packageInfoName );
 		assertThat( classDetails ).isNotNull();
 		assertThat( classDetails.getClassName() ).endsWith( "package-info" );
-		assertThat( classDetails.getAnnotationUsage( CustomAnnotation.class ) ).isNotNull();
+		assertThat( classDetails.getAnnotationUsage( CustomAnnotation.class, buildingContext ) ).isNotNull();
 	}
 
 	@Test
@@ -36,6 +36,6 @@ public class PackageTests {
 				.resolveClassDetails( PACKAGE_NAME );
 		assertThat( classDetails ).isNotNull();
 		assertThat( classDetails.getClassName() ).endsWith( "package-info" );
-		assertThat( classDetails.getAnnotationUsage( CustomAnnotation.class ) ).isNotNull();
+		assertThat( classDetails.getAnnotationUsage( CustomAnnotation.class, buildingContext ) ).isNotNull();
 	}
 }

@@ -49,12 +49,12 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	private List<MethodDetails> methods;
 	private List<RecordComponentDetails> recordComponents;
 
-	public JandexClassDetails(ClassInfo classInfo, SourceModelBuildingContext buildingContext) {
-		super( buildingContext );
+	public JandexClassDetails(ClassInfo classInfo, SourceModelBuildingContext modelContext) {
+		super( modelContext );
 		this.classInfo = classInfo;
 
-		this.superClass = determineSuperType( classInfo, buildingContext );
-		this.implementedInterfaces = determineInterfaces( classInfo, buildingContext );
+		this.superClass = determineSuperType( classInfo, modelContext );
+		this.implementedInterfaces = determineInterfaces( classInfo, modelContext );
 	}
 
 	private static ClassDetails determineSuperType(
@@ -147,7 +147,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	@Override
 	public TypeDetails getGenericSuperType() {
 		if ( genericSuperType == null && classInfo.superClassType() != null ) {
-			genericSuperType = determineGenericSuperType( classInfo, getBuildingContext() );
+			genericSuperType = determineGenericSuperType( classInfo, getModelContext() );
 		}
 		return genericSuperType;
 	}
@@ -160,7 +160,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	@Override
 	public List<TypeVariableDetails> getTypeParameters() {
 		if ( typeParameters == null ) {
-			this.typeParameters = determineTypeParameters( classInfo, getBuildingContext() );
+			this.typeParameters = determineTypeParameters( classInfo, getModelContext() );
 		}
 		return typeParameters;
 	}
@@ -196,7 +196,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		final List<FieldInfo> fieldsInfoList = classInfo.fields();
 		final List<FieldDetails> result = new ArrayList<>( fieldsInfoList.size() );
 		for ( FieldInfo fieldInfo : fieldsInfoList ) {
-			result.add( new JandexFieldDetails( fieldInfo, this, getBuildingContext() ) );
+			result.add( new JandexFieldDetails( fieldInfo, this, getModelContext() ) );
 		}
 		return result;
 	}
@@ -218,7 +218,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		final List<RecordComponentInfo> componentInfoList = classInfo.recordComponents();
 		final List<RecordComponentDetails> result = arrayList( componentInfoList.size() );
 		for ( RecordComponentInfo componentInfo : componentInfoList ) {
-			result.add( new JandexRecordComponentDetails( componentInfo, this, getBuildingContext() ) );
+			result.add( new JandexRecordComponentDetails( componentInfo, this, getModelContext() ) );
 		}
 		return result;
 	}
@@ -238,7 +238,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 			if ( methodInfo.isConstructor() || "<clinit>".equals( methodInfo.name() ) ) {
 				continue;
 			}
-			result.add( JandexBuilders.buildMethodDetails( methodInfo, this, getBuildingContext() ) );
+			result.add( JandexBuilders.buildMethodDetails( methodInfo, this, getModelContext() ) );
 		}
 		return result;
 	}
@@ -257,7 +257,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 				throw new UnsupportedOperationException( "Not supported" );
 			}
 			MODELS_CLASS_LOGGER.debugf( "Loading `%s` on to classloader from Jandex ClassDetails", getClassName() );
-			javaClass = getBuildingContext().getClassLoading().classForName( getClassName() );
+			javaClass = getModelContext().getClassLoading().classForName( getClassName() );
 		}
 		//noinspection unchecked
 		return (Class<X>) javaClass;

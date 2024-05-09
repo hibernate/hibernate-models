@@ -13,7 +13,9 @@ import java.util.List;
 
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.UnknownAnnotationAttributeException;
-import org.hibernate.models.internal.dynamic.DynamicAnnotationUsage;
+import org.hibernate.models.internal.AnnotationHelper;
+
+import org.jboss.jandex.AnnotationInstance;
 
 /**
  * Describes an annotation type (the Class)
@@ -30,6 +32,23 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * The annotation type
 	 */
 	Class<A> getAnnotationType();
+
+	/**
+	 * Create a usage from the JDK representation.  This will often just return the passed annotation,
+	 * although for Hibernate and JPA annotations we generally want wrappers to be able to manipulate the
+	 * values.
+	 */
+	A createUsage(A jdkAnnotation, SourceModelBuildingContext context);
+
+	/**
+	 * Create a usage from the Jandex representation.
+	 */
+	A createUsage(AnnotationInstance jandexAnnotation, SourceModelBuildingContext context);
+
+	/**
+	 * Create an empty usage.  Used when there is no source form, such as XML processing.
+	 */
+	A createUsage(SourceModelBuildingContext context);
 
 	/**
 	 * The places the described annotation can be used
@@ -89,15 +108,6 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 		throw new UnknownAnnotationAttributeException( getAnnotationType(), name );
 	}
 
-	/**
-	 * Create a usage of this annotation with all attribute values defaulted.
-	 *
-	 * @param context Access to needed services
-	 */
-	default MutableAnnotationUsage<A> createUsage(SourceModelBuildingContext context) {
-		return new DynamicAnnotationUsage<>( this, context );
-	}
-
 	@Override
 	default <X extends Annotation> AnnotationDescriptor<X> asAnnotationDescriptor() {
 		//noinspection unchecked
@@ -130,12 +140,20 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	}
 
 	@Override
-	default void render() {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+	default void render(SourceModelBuildingContext modelContext) {
+		throw new UnsupportedOperationException( "Rendering of annotation classes not implemented" );
 	}
 
 	@Override
-	default void render(RenderingCollector collector) {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+	default void render(RenderingCollector collector, SourceModelBuildingContext modelContext) {
+		throw new UnsupportedOperationException( "Rendering of annotation classes not implemented" );
+	}
+
+	default void renderUsage(RenderingCollector collector, A usage, SourceModelBuildingContext modelContext) {
+		AnnotationHelper.render( collector, usage, this, modelContext );
+	}
+
+	default void renderUsage(RenderingCollector collector, String name, A usage, SourceModelBuildingContext modelContext) {
+		AnnotationHelper.render( collector, name, usage, modelContext );
 	}
 }

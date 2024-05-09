@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.internal.AnnotationHelper;
 import org.hibernate.models.internal.RenderingCollectorImpl;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
@@ -273,15 +274,15 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	}
 
 	@Override
-	default void render() {
+	default void render(SourceModelBuildingContext modelContext) {
 		final RenderingCollectorImpl renderingCollector = new RenderingCollectorImpl();
-		render( renderingCollector );
+		render( renderingCollector, modelContext );
 		renderingCollector.render();
 	}
 
 	@Override
-	default void render(RenderingCollector collector) {
-		getAllAnnotationUsages().forEach( (usage) -> usage.render( collector ) );
+	default void render(RenderingCollector collector, SourceModelBuildingContext modelContext) {
+		forEachDirectAnnotationUsage( (usage) -> AnnotationHelper.render( collector, usage, modelContext ) );
 
 		final String pattern = isRecord()
 				? "record %s {"
@@ -293,7 +294,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		collector.addLine( "// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
 		collector.addLine( "// fields" );
 		getFields().forEach( (fieldDetails) -> {
-			fieldDetails.render( collector );
+			fieldDetails.render( collector, modelContext );
 			collector.addLine();
 		} );
 		collector.addLine();
@@ -301,7 +302,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		collector.addLine( "// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
 		collector.addLine( "// methods" );
 		getMethods().forEach( (methodDetails) -> {
-			methodDetails.render( collector );
+			methodDetails.render( collector, modelContext );
 			collector.addLine();
 		} );
 		collector.addLine();
@@ -310,7 +311,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 			collector.addLine( "// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
 			collector.addLine( "// record components" );
 			getRecordComponents().forEach( (recordComponentDetails) -> {
-				recordComponentDetails.render( collector );
+				recordComponentDetails.render( collector, modelContext );
 				collector.addLine();
 			} );
 		}

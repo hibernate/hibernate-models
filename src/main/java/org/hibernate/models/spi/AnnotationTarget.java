@@ -20,7 +20,7 @@ import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.internal.RenderingCollectorImpl;
 
 /**
- * Abstract for something where an annotation can be {@linkplain AnnotationUsage used}.
+ * Abstract for something where an annotation can be used.
  *
  * @see java.lang.reflect.AnnotatedElement
  *
@@ -43,7 +43,7 @@ public interface AnnotationTarget {
 	 * @apiNote This returns the usages directly available on the target; it does not
 	 * expand repeatable containers (e.g. NamedQueries -> *NamedQuery).
 	 */
-	Collection<AnnotationUsage<?>> getAllAnnotationUsages();
+	Collection<? extends Annotation> getDirectAnnotationUsages();
 
 	/**
 	 * Allows to visit every annotation on the target.
@@ -51,31 +51,32 @@ public interface AnnotationTarget {
 	 * @apiNote Only visits the usages directly available on the target; it does not
 	 * visit across repeatable containers (e.g. NamedQueries -> *NamedQuery).
 	 */
-	default void forAllAnnotationUsages(Consumer<AnnotationUsage<?>> consumer) {
-		getAllAnnotationUsages().forEach( consumer );
+	default void forEachDirectAnnotationUsage(Consumer<? extends Annotation> consumer) {
+		//noinspection unchecked,rawtypes
+		getDirectAnnotationUsages().forEach( (Consumer) consumer );
 	}
-
-	/**
-	 * Whether the given annotation is used on this target.
-	 *
-	 * @see #hasRepeatableAnnotationUsage
-	 *
-	 * @apiNote This form does not check across repeatable containers.  E.g., calling this
-	 * method with {@code NamedQuery} will return {@code false} when the target directly
-	 * has a NamedQueries.
-	 */
-	<A extends Annotation> boolean hasAnnotationUsage(Class<A> type);
 
 	/**
 	 * Whether the given annotation is used on this target.
 	 *
 	 * @see #hasAnnotationUsage
 	 *
+	 * @apiNote This form does not check across repeatable containers.  E.g., calling this
+	 * method with {@code NamedQuery} will return {@code false} when the target directly
+	 * has a NamedQueries.
+	 */
+	<A extends Annotation> boolean hasDirectAnnotationUsage(Class<A> type);
+
+	/**
+	 * Whether the given annotation is used on this target.
+	 *
+	 * @see #hasDirectAnnotationUsage
+	 *
 	 * @apiNote This forms does check across repeatable containers.  E.g., calling this
 	 * method with {@code NamedQuery} will return {@code true} when the target directly
 	 * has a NamedQueries.
 	 */
-	<A extends Annotation> boolean hasRepeatableAnnotationUsage(Class<A> type);
+	<A extends Annotation> boolean hasAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext);
 
 	/**
 	 * Get the usage of the given annotation on this target.
@@ -96,37 +97,34 @@ public interface AnnotationTarget {
 	 *     </li>
 	 * </ul>
 	 * <p/>
-	 * For also checking across meta-annotations, see {@linkplain #locateAnnotationUsage(Class)}.
+	 * For also checking across meta-annotations, see {@linkplain #locateAnnotationUsage(Class, SourceModelBuildingContext)}.
 	 *
 	 * @return The usage or {@code null}
 	 */
-	<A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> descriptor);
+	<A extends Annotation> A getAnnotationUsage(AnnotationDescriptor<A> descriptor, SourceModelBuildingContext modelContext);
 
 	/**
-	 * Form of {@link #getAnnotationUsage(AnnotationDescriptor)} accepting the annotation {@linkplain Class}
+	 * Form of {@link #getAnnotationUsage(AnnotationDescriptor, SourceModelBuildingContext)} accepting the annotation {@linkplain Class}
 	 */
-	<A extends Annotation> AnnotationUsage<A> getAnnotationUsage(Class<A> type);
-
-	/**
-	 * Form of {@linkplain #getAnnotationUsage(AnnotationDescriptor)} which returns {@code null} instead of
-	 * throwing {@linkplain AnnotationAccessException} when more than one usage of the requested
-	 * annotation exists.
-	 */
-	default <A extends Annotation> AnnotationUsage<A> getSingleAnnotationUsage(AnnotationDescriptor<A> descriptor) {
-		try {
-			return getAnnotationUsage( descriptor );
-		}
-		catch (AnnotationAccessException ignore) {
-			return null;
-		}
+	default <A extends Annotation> A getAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
+		return getAnnotationUsage( modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ), modelContext );
 	}
 
 	/**
-	 * Form of {@link #getSingleAnnotationUsage(AnnotationDescriptor)} accepting the annotation {@linkplain Class}
+	 * Form of {@linkplain #getAnnotationUsage(AnnotationDescriptor, SourceModelBuildingContext)} which returns {@code null} instead of
+	 * throwing {@linkplain AnnotationAccessException} when more than one usage of the requested
+	 * annotation exists.
 	 */
-	default <A extends Annotation> AnnotationUsage<A> getSingleAnnotationUsage(Class<A> type) {
+	default <A extends Annotation> A getDirectAnnotationUsage(AnnotationDescriptor<A> descriptor, SourceModelBuildingContext modelContext) {
+		return getDirectAnnotationUsage( descriptor.getAnnotationType(), modelContext );
+	}
+
+	/**
+	 * Form of {@link #getDirectAnnotationUsage(AnnotationDescriptor, SourceModelBuildingContext)} accepting the annotation {@linkplain Class}
+	 */
+	default <A extends Annotation> A getDirectAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
 		try {
-			return getAnnotationUsage( type );
+			return getAnnotationUsage( type, modelContext );
 		}
 		catch (AnnotationAccessException ignore) {
 			return null;
@@ -135,9 +133,9 @@ public interface AnnotationTarget {
 
 	/**
 	 * Form of {@linkplain #getAnnotationUsage} which also considers meta-annotations -
-	 * annotations on the classes of each {@linkplain #getAllAnnotationUsages() local annotation}.
+	 * annotations on the classes of each {@linkplain #getDirectAnnotationUsages() local annotation}.
 	 */
-	<A extends Annotation> AnnotationUsage<A> locateAnnotationUsage(Class<A> type);
+	<A extends Annotation> A locateAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext);
 
 	/**
 	 * Get all usages of the specified {@code annotationType} in this scope.
@@ -148,39 +146,53 @@ public interface AnnotationTarget {
 	 *     <li>the nested {@code @NamedQuery} usages from the {@code @NamedQueries} usage</li>
 	 * </ol>
 	 */
-	<A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(AnnotationDescriptor<A> type);
+	<A extends Annotation> A[] getRepeatedAnnotationUsages(AnnotationDescriptor<A> type, SourceModelBuildingContext modelContext);
 
 	/**
-	 * Form of {@linkplain #getRepeatedAnnotationUsages(AnnotationDescriptor)} accepting the annotation {@linkplain Class}
+	 * Form of {@linkplain #getRepeatedAnnotationUsages(AnnotationDescriptor, SourceModelBuildingContext)} accepting the annotation {@linkplain Class}
 	 */
-	<A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(Class<A> type);
+	default <A extends Annotation> A[] getRepeatedAnnotationUsages(
+			Class<A> type,
+			SourceModelBuildingContext modelContext) {
+		return getRepeatedAnnotationUsages( modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ), modelContext );
+	}
 
 	/**
-	 * Call the {@code consumer} for each {@linkplain AnnotationUsage usage} of the
-	 * given {@code type}.
+	 * Call the {@code consumer} for each usage of the given {@code type}.
 	 *
 	 * @apiNote For {@linkplain Repeatable repeatable} annotation types, the consumer will also be
 	 * called for those defined on the container.
 	 */
 	default <X extends Annotation> void forEachAnnotationUsage(
 			AnnotationDescriptor<X> type,
-			Consumer<AnnotationUsage<X>> consumer) {
-		final List<AnnotationUsage<X>> annotations = getRepeatedAnnotationUsages( type );
+			Consumer<X> consumer,
+			SourceModelBuildingContext modelContext) {
+		final X[] annotations = getRepeatedAnnotationUsages( type, modelContext );
 		if ( annotations == null ) {
 			return;
 		}
-		annotations.forEach( consumer );
+		for ( X annotation : annotations ) {
+			consumer.accept( annotation );
+		}
 	}
 
 	/**
-	 * Form of {@link #forEachAnnotationUsage(AnnotationDescriptor, Consumer)} accepting the annotation {@linkplain Class}
+	 * Form of {@link #forEachAnnotationUsage(AnnotationDescriptor, Consumer, SourceModelBuildingContext)} accepting the annotation {@linkplain Class}
 	 */
-	<X extends Annotation> void forEachAnnotationUsage(Class<X> type, Consumer<AnnotationUsage<X>> consumer);
+	default <X extends Annotation> void forEachAnnotationUsage(
+			Class<X> type,
+			Consumer<X> consumer,
+			SourceModelBuildingContext modelContext) {
+		forEachAnnotationUsage(
+				modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ),
+				consumer,
+				modelContext
+		);
+	}
 
 	/**
-	 * Returns all AnnotationUsage references from this target where the usage's
-	 * {@linkplain AnnotationUsage#getAnnotationDescriptor() annotation class} is annotated
-	 * with the given {@code metaAnnotationType}.
+	 * Returns all Annotation usages from this target where the usage's annotation class
+	 * is annotated with the given {@code metaAnnotationType}.
 	 * <p/>
 	 * E.g., given the following class and annotations
 	 * <pre class="brush:java">
@@ -204,7 +216,7 @@ public interface AnnotationTarget {
 	 * @apiNote This method does not check across repeatable containers.  Although the return is a List, we
 	 * are functionally wanting just the unique ones.
 	 */
-	<A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType);
+	<A extends Annotation> List<? extends Annotation> getMetaAnnotated(Class<A> metaAnnotationType, SourceModelBuildingContext modelContext);
 
 	/**
 	 * Get a usage of the given annotation {@code type} whose {@code attributeToMatch} attribute value
@@ -212,19 +224,21 @@ public interface AnnotationTarget {
 	 *
 	 * @param matchName The name to match.
 	 */
-	default <X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
+	default <X extends Annotation> X getNamedAnnotationUsage(
 			AnnotationDescriptor<X> type,
-			String matchName) {
-		return getNamedAnnotationUsage( type, matchName, "name" );
+			String matchName,
+			SourceModelBuildingContext modelContext) {
+		return getNamedAnnotationUsage( type, matchName, "name", modelContext );
 	}
 
 	/**
-	 * Helper form of {@linkplain #getNamedAnnotationUsage(AnnotationDescriptor, String)}
+	 * Helper form of {@linkplain #getNamedAnnotationUsage(AnnotationDescriptor, String, SourceModelBuildingContext)}
 	 */
-	default <X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
+	default <X extends Annotation> X getNamedAnnotationUsage(
 			Class<X> type,
-			String matchName) {
-		return getNamedAnnotationUsage( type, matchName, "name" );
+			String matchName,
+			SourceModelBuildingContext modelContext) {
+		return getNamedAnnotationUsage( type, matchName, "name", modelContext );
 	}
 
 	/**
@@ -234,18 +248,20 @@ public interface AnnotationTarget {
 	 * @param matchName The name to match.
 	 * @param attributeToMatch Name of the attribute to match on.
 	 */
-	<X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
+	<X extends Annotation> X getNamedAnnotationUsage(
 			AnnotationDescriptor<X> type,
 			String matchName,
-			String attributeToMatch);
+			String attributeToMatch,
+			SourceModelBuildingContext modelContext);
 
 	/**
-	 * Helper form of {@linkplain #getNamedAnnotationUsage(AnnotationDescriptor, String, String)}
+	 * Helper form of {@linkplain #getNamedAnnotationUsage(AnnotationDescriptor, String, String, SourceModelBuildingContext)}
 	 */
-	<X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
+	<X extends Annotation> X getNamedAnnotationUsage(
 			Class<X> type,
 			String matchName,
-			String attributeToMatch);
+			String attributeToMatch,
+			SourceModelBuildingContext modelContext);
 
 	/**
 	 * Functional contract to process an annotation and return a value.
@@ -253,11 +269,11 @@ public interface AnnotationTarget {
 	 * @param <T> The type of the value being returned.
 	 */
 	@FunctionalInterface
-	interface AnnotationUsageProcessor<T> {
+	interface AnnotationUsageProcessor<T,A extends Annotation> {
 		/**
 		 * The processed value.  May be {@code null} to indicate a "no match"
 		 */
-		T process(AnnotationUsage<? extends Annotation> annotationUsage);
+		T process(A annotationUsage);
 	}
 
 	/**
@@ -274,9 +290,10 @@ public interface AnnotationTarget {
 	 */
 	default <T, A extends Annotation> T fromAnnotations(
 			Class<A> annotationType,
-			AnnotationUsageProcessor<T> processor) {
-		final List<AnnotationUsage<A>> annotationUsages = getRepeatedAnnotationUsages( annotationType );
-		for ( AnnotationUsage<A> annotationUsage : annotationUsages ) {
+			AnnotationUsageProcessor<T,A> processor,
+			SourceModelBuildingContext modelContext) {
+		final A[] annotationUsages = getRepeatedAnnotationUsages( annotationType, modelContext );
+		for ( A annotationUsage : annotationUsages ) {
 			final T result = processor.process( annotationUsage );
 			if ( result != null ) {
 				return result;
@@ -327,15 +344,15 @@ public interface AnnotationTarget {
 	 */
 	RecordComponentDetails asRecordComponentDetails();
 
-	void render();
+	void render(SourceModelBuildingContext modelContext);
 
-	default String renderToString() {
+	default String renderToString(SourceModelBuildingContext modelContext) {
 		final RenderingCollectorImpl renderingCollector = new RenderingCollectorImpl();
-		render( renderingCollector );
+		render( renderingCollector, modelContext );
 		return renderingCollector.toString();
 	}
 
-	void render(RenderingCollector collector);
+	void render(RenderingCollector collector, SourceModelBuildingContext modelContext);
 
 	/**
 	 * Subset of {@linkplain ElementType annotation targets} supported for mapping annotations

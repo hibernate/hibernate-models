@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.internal.jandex;
 
-import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
@@ -14,12 +13,12 @@ import org.jboss.jandex.AnnotationValue;
 /**
  * @author Steve Ebersole
  */
-public class ClassValueExtractor extends AbstractValueExtractor<ClassDetails> {
+public class ClassValueExtractor extends AbstractValueExtractor<Class<?>> {
 	public static final ClassValueExtractor JANDEX_CLASS_EXTRACTOR = new ClassValueExtractor();
 
 	@Override
-	protected ClassDetails extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
+	protected Class<?> extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return ClassValueWrapper.JANDEX_CLASS_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return ClassValueConverter.JANDEX_CLASS_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 }

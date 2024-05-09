@@ -212,7 +212,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	public <X> Class<X> toJavaClass() {
 		if ( javaType == null ) {
 			if ( className != null ) {
-				javaType = getBuildingContext().getClassLoading().classForName( className );
+				javaType = getModelContext().getClassLoading().classForName( className );
 			}
 		}
 		//noinspection unchecked

@@ -8,27 +8,24 @@ package org.hibernate.models.internal.jdk;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.spi.AnnotationTarget;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueWrapper;
 
 /**
  * @author Steve Ebersole
  */
-public class NestedValueExtractor<A extends Annotation> extends AbstractValueExtractor<AnnotationUsage<A>,A> {
-	private final ValueWrapper<AnnotationUsage<A>,A> wrapper;
+public class NestedValueExtractor<A extends Annotation> extends AbstractValueExtractor<A> {
+	private final NestedValueConverter<A> converter;
 
-	public NestedValueExtractor(ValueWrapper<AnnotationUsage<A>, A> wrapper) {
-		this.wrapper = wrapper;
+	public NestedValueExtractor(NestedValueConverter<A> converter) {
+		this.converter = converter;
 	}
 
 	@Override
-	protected AnnotationUsage<A> wrap(
+	protected A wrap(
 			A rawValue,
-			AttributeDescriptor<AnnotationUsage<A>> attributeDescriptor,
+			AttributeDescriptor<A> attributeDescriptor,
 			SourceModelBuildingContext buildingContext) {
-		return wrapper.wrap( rawValue, buildingContext );
+		return converter.convert( rawValue, buildingContext );
 	}
 }

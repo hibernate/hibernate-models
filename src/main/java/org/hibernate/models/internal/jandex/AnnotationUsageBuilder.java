@@ -21,16 +21,15 @@ import java.util.function.BiConsumer;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueExtractor;
+import org.hibernate.models.spi.JandexValueExtractor;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.DotName;
 
 /**
- * Helper for building {@link AnnotationUsage} instances based on
+ * Helper for building annotation usages/instances based on
  * Jandex {@linkplain AnnotationInstance} references
  *
  * @author Steve Ebersole
@@ -44,13 +43,13 @@ public class AnnotationUsageBuilder {
 	/**
 	 * Create the AnnotationUsages map for a given target
 	 */
-	public static Map<Class<? extends Annotation>, AnnotationUsage<?>> collectUsages(
+	public static Map<Class<? extends Annotation>, ? extends Annotation> collectUsages(
 			org.jboss.jandex.AnnotationTarget jandexAnnotationTarget,
 			SourceModelBuildingContext buildingContext) {
 		if ( jandexAnnotationTarget == null ) {
 			return Collections.emptyMap();
 		}
-		final Map<Class<? extends Annotation>, AnnotationUsage<?>> result = new HashMap<>();
+		final Map<Class<? extends Annotation>, Annotation> result = new HashMap<>();
 		processAnnotations(
 				jandexAnnotationTarget.declaredAnnotations(),
 				result::put,
@@ -64,7 +63,7 @@ public class AnnotationUsageBuilder {
 	 */
 	public static void processAnnotations(
 			Collection<AnnotationInstance> annotations,
-			BiConsumer<Class<? extends Annotation>, AnnotationUsage<?>> consumer,
+			BiConsumer<Class<? extends Annotation>, Annotation> consumer,
 			SourceModelBuildingContext buildingContext) {
 		final AnnotationDescriptorRegistry annotationDescriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
 
@@ -81,7 +80,7 @@ public class AnnotationUsageBuilder {
 					.classForName( annotation.name().toString() );
 
 			final AnnotationDescriptor<?> annotationDescriptor = annotationDescriptorRegistry.getDescriptor( annotationType );
-			final AnnotationUsage<?> usage = makeUsage(
+			final Annotation usage = makeUsage(
 					annotation,
 					annotationDescriptor,
 					buildingContext
@@ -90,11 +89,11 @@ public class AnnotationUsageBuilder {
 		}
 	}
 
-	public static <A extends Annotation> AnnotationUsage<A> makeUsage(
+	public static <A extends Annotation> A makeUsage(
 			AnnotationInstance annotation,
 			AnnotationDescriptor<A> annotationDescriptor,
-			SourceModelBuildingContext buildingContext) {
-		return new JandexAnnotationUsage<>( annotation, annotationDescriptor, buildingContext );
+			SourceModelBuildingContext modelContext) {
+		return annotationDescriptor.createUsage( annotation, modelContext );
 	}
 
 	/**
@@ -104,7 +103,7 @@ public class AnnotationUsageBuilder {
 	public static <A extends Annotation> Map<String,?> extractAttributeValues(
 			AnnotationInstance annotationInstance,
 			AnnotationDescriptor<A> annotationDescriptor,
-			SourceModelBuildingContext buildingContext) {
+			SourceModelBuildingContext modelContext) {
 		if ( CollectionHelper.isEmpty( annotationDescriptor.getAttributes() ) ) {
 			return Collections.emptyMap();
 		}
@@ -112,10 +111,14 @@ public class AnnotationUsageBuilder {
 		final ConcurrentHashMap<String, Object> valueMap = new ConcurrentHashMap<>();
 		for ( int i = 0; i < annotationDescriptor.getAttributes().size(); i++ ) {
 			final AttributeDescriptor attributeDescriptor = annotationDescriptor.getAttributes().get( i );
-			final ValueExtractor<AnnotationInstance, ?> extractor = attributeDescriptor
+			final JandexValueExtractor<?> extractor = attributeDescriptor
 					.getTypeDescriptor()
-					.createJandexExtractor( buildingContext );
-			final Object attributeValue = extractor.extractValue( annotationInstance, attributeDescriptor, buildingContext );
+					.createJandexValueExtractor( modelContext );
+			final Object attributeValue = extractor.extractValue(
+					annotationInstance,
+					attributeDescriptor,
+					modelContext
+			);
 			valueMap.put( attributeDescriptor.getName(), attributeValue );
 		}
 		return valueMap;
