@@ -35,7 +35,7 @@ import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
  *
  * @author Steve Ebersole
  */
-public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDetailsSupport {
+public class JdkClassDetails extends AbstractJdkAnnotationTarget implements ClassDetailsSupport {
 	private final String name;
 	private final Class<?> managedClass;
 
@@ -50,19 +50,19 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 
 	public JdkClassDetails(
 			Class<?> managedClass,
-			SourceModelBuildingContext buildingContext) {
-		this( managedClass.getName(), managedClass, buildingContext );
+			SourceModelBuildingContext modelContext) {
+		this( managedClass.getName(), managedClass, modelContext );
 	}
 
 	public JdkClassDetails(
 			String name,
 			Class<?> managedClass,
-			SourceModelBuildingContext buildingContext) {
-		super( managedClass::getAnnotations, buildingContext );
+			SourceModelBuildingContext modelContext) {
+		super( managedClass::getAnnotations, modelContext );
 		this.name = name;
 		this.managedClass = managedClass;
 
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelContext.getClassDetailsRegistry();
 
 		final Class<?> superclass = managedClass.getSuperclass();
 		if ( superclass == null ) {
@@ -71,7 +71,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 		else {
 			superClass = classDetailsRegistry.resolveClassDetails(
 					superclass.getName(),
-					(n) -> JdkBuilders.buildClassDetailsStatic( superclass, buildingContext )
+					(n) -> JdkBuilders.buildClassDetailsStatic( superclass, modelContext )
 			);
 		}
 	}
@@ -115,7 +115,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 	@Override
 	public TypeDetails getGenericSuperType() {
 		if ( genericSuperType == null && managedClass.getGenericSuperclass() != null ) {
-			genericSuperType = new JdkTrackingTypeSwitcher( getBuildingContext() ).switchType( managedClass.getGenericSuperclass() );
+			genericSuperType = new JdkTrackingTypeSwitcher( getModelContext() ).switchType( managedClass.getGenericSuperclass() );
 		}
 		return genericSuperType;
 	}
@@ -135,7 +135,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 		}
 
 		final ArrayList<TypeDetails> result = arrayList( jdkInterfaces.length );
-		final JdkTrackingTypeSwitcher typeSwitcher = new JdkTrackingTypeSwitcher( getBuildingContext() );
+		final JdkTrackingTypeSwitcher typeSwitcher = new JdkTrackingTypeSwitcher( getModelContext() );
 		for ( Type jdkInterface : jdkInterfaces ) {
 			final TypeDetails switchedInterfaceType = typeSwitcher.switchType( jdkInterface );
 			result.add( switchedInterfaceType );
@@ -158,7 +158,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 		}
 
 		final ArrayList<TypeVariableDetails> result = arrayList( jdkTypeParameters.length );
-		final JdkTrackingTypeSwitcher typeSwitcher = new JdkTrackingTypeSwitcher( getBuildingContext() );
+		final JdkTrackingTypeSwitcher typeSwitcher = new JdkTrackingTypeSwitcher( getModelContext() );
 		for ( TypeVariable<? extends Class<?>> jdkTypeParameter : jdkTypeParameters ) {
 			result.add( (TypeVariableDetails) typeSwitcher.switchType( jdkTypeParameter ) );
 		}
@@ -177,7 +177,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 			this.fields = arrayList( reflectionFields.length );
 			for ( int i = 0; i < reflectionFields.length; i++ ) {
 				final Field reflectionField = reflectionFields[i];
-				fields.add( new JdkFieldDetails( reflectionField, this, getBuildingContext() ) );
+				fields.add( new JdkFieldDetails( reflectionField, this, getModelContext() ) );
 			}
 		}
 		return fields;
@@ -194,7 +194,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 			final Method[] reflectionMethods = managedClass.getDeclaredMethods();
 			this.methods = arrayList( reflectionMethods.length );
 			for ( int i = 0; i < reflectionMethods.length; i++ ) {
-				this.methods.add( buildMethodDetails( reflectionMethods[i], this, getBuildingContext() ) );
+				this.methods.add( buildMethodDetails( reflectionMethods[i], this, getModelContext() ) );
 			}
 		}
 		return methods;
@@ -214,7 +214,7 @@ public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDe
 			final RecordComponent[] jdkRecordComponents = managedClass.getRecordComponents();
 			recordComponents = arrayList( jdkRecordComponents.length );
 			for ( int i = 0; i < jdkRecordComponents.length; i++ ) {
-				recordComponents.add( new JdkRecordComponentDetails( jdkRecordComponents[i], this, getBuildingContext() ) );
+				recordComponents.add( new JdkRecordComponentDetails( jdkRecordComponents[i], this, getModelContext() ) );
 			}
 		}
 		return recordComponents;

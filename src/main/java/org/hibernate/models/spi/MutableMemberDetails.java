@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.spi;
 
+import java.lang.annotation.Annotation;
+
 import org.hibernate.models.IllegalCastException;
 
 /**
@@ -17,6 +19,11 @@ public interface MutableMemberDetails extends MemberDetails, MutableAnnotationTa
 	@Override
 	default MutableClassDetails asClassDetails() {
 		throw new IllegalCastException( "MemberDetails cannot be cast to ClassDetails" );
+	}
+
+	@Override
+	default <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
+		throw new IllegalCastException( "MemberDetails cannot be cast to AnnotationDescriptor" );
 	}
 
 	@Override

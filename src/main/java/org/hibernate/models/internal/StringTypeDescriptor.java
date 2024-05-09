@@ -6,20 +6,12 @@
  */
 package org.hibernate.models.internal;
 
-import java.lang.annotation.Annotation;
-
+import org.hibernate.models.internal.jandex.StringValueConverter;
 import org.hibernate.models.internal.jandex.StringValueExtractor;
-import org.hibernate.models.internal.jandex.StringValueWrapper;
-import org.hibernate.models.internal.jdk.PassThruExtractor;
+import org.hibernate.models.spi.JandexValueConverter;
+import org.hibernate.models.spi.JandexValueExtractor;
 import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueExtractor;
-import org.hibernate.models.spi.ValueWrapper;
-
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationValue;
-
-import static org.hibernate.models.internal.jdk.PassThruWrapper.PASS_THRU_WRAPPER;
 
 /**
  * Descriptor for string values
@@ -30,30 +22,18 @@ public class StringTypeDescriptor extends AbstractTypeDescriptor<String> {
 	public static final StringTypeDescriptor STRING_TYPE_DESCRIPTOR = new StringTypeDescriptor();
 
 	@Override
-	public Class<String> getWrappedValueType() {
+	public Class<String> getValueType() {
 		return String.class;
 	}
 
 	@Override
-	public ValueWrapper<String, AnnotationValue> createJandexWrapper(SourceModelBuildingContext buildingContext) {
-		return StringValueWrapper.JANDEX_STRING_VALUE_WRAPPER;
+	public JandexValueConverter<String> createJandexValueConverter(SourceModelBuildingContext buildingContext) {
+		return StringValueConverter.JANDEX_STRING_VALUE_WRAPPER;
 	}
 
 	@Override
-	public ValueExtractor<AnnotationInstance, String> createJandexExtractor(SourceModelBuildingContext buildingContext) {
+	public JandexValueExtractor<String> createJandexValueExtractor(SourceModelBuildingContext buildingContext) {
 		return StringValueExtractor.JANDEX_STRING_EXTRACTOR;
-	}
-
-	@Override
-	public ValueWrapper<String, ?> createJdkWrapper(SourceModelBuildingContext buildingContext) {
-		//noinspection unchecked
-		return PASS_THRU_WRAPPER;
-	}
-
-	@Override
-	public ValueExtractor<Annotation, String> createJdkExtractor(SourceModelBuildingContext buildingContext) {
-		//noinspection unchecked
-		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
 
 	@Override
@@ -62,12 +42,21 @@ public class StringTypeDescriptor extends AbstractTypeDescriptor<String> {
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue) {
+	public void render(
+			RenderingCollector collector,
+			String name,
+			Object attributeValue,
+			SourceModelBuildingContext modelContext) {
 		collector.addLine( "%s = \"%s\"", name, attributeValue );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue) {
+	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
 		collector.addLine( "\"%s\"", attributeValue );
+	}
+
+	@Override
+	public String[] makeArray(int size, SourceModelBuildingContext modelContext) {
+		return new String[size];
 	}
 }

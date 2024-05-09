@@ -11,17 +11,19 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import org.hibernate.models.internal.jandex.ArrayValueExtractor;
-import org.hibernate.models.internal.jandex.ArrayValueWrapper;
-import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.internal.jandex.ArrayValueConverter;
+import org.hibernate.models.internal.jdk.JdkArrayValueConverter;
+import org.hibernate.models.internal.jdk.JdkArrayValueExtractor;
+import org.hibernate.models.internal.jdk.JdkPassThruConverter;
+import org.hibernate.models.internal.jdk.JdkPassThruExtractor;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.JdkValueConverter;
+import org.hibernate.models.spi.JdkValueExtractor;
 import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueExtractor;
+import org.hibernate.models.spi.JandexValueExtractor;
 import org.hibernate.models.spi.ValueTypeDescriptor;
-import org.hibernate.models.spi.ValueWrapper;
-
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationValue;
+import org.hibernate.models.spi.JandexValueConverter;
 
 /**
  * Descriptor for array values.  These are modeled as an array in the
@@ -29,54 +31,46 @@ import org.jboss.jandex.AnnotationValue;
  *
  * @author Steve Ebersole
  */
-public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
+public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 	private final ValueTypeDescriptor<V> elementTypeDescriptor;
-	private final Class<?> componentType;
+	private final Class<V> componentType;
+	private final Class<V[]> arrayType;
 
-	private ValueWrapper<List<V>, AnnotationValue> jandexValueWrapper;
-	private ValueExtractor<AnnotationInstance,List<V>> jandexValueExtractor;
+	private JandexValueConverter<V[]> jandexValueConverter;
+	private JandexValueExtractor<V[]> jandexValueExtractor;
 
-	private ValueWrapper<List<V>,Object[]> jdkValueWrapper;
-	private ValueExtractor<Annotation,List<V>> jdkValueExtractor;
+	private JdkValueConverter<V[]> jdkValueConverter;
+	private JdkValueExtractor<V[]> jdkValueExtractor;
 
-	public ArrayTypeDescriptor(ValueTypeDescriptor<V> elementTypeDescriptor, Class<?> componentType) {
+	public ArrayTypeDescriptor(ValueTypeDescriptor<V> elementTypeDescriptor) {
 		this.elementTypeDescriptor = elementTypeDescriptor;
-		this.componentType = componentType;
+		this.componentType = elementTypeDescriptor.getValueType();
+		//noinspection unchecked
+		this.arrayType = (Class<V[]>) componentType.arrayType();
+	}
+
+	public ValueTypeDescriptor<V> getElementTypeDescriptor() {
+		return elementTypeDescriptor;
 	}
 
 	@Override
-	public Class<List<V>> getWrappedValueType() {
-		//noinspection unchecked,rawtypes
-		return (Class) List.class;
+	public Class<V[]> getValueType() {
+		return arrayType;
 	}
 
 	@Override
-	public List<V> createValue(
-			AttributeDescriptor<?> attributeDescriptor,
-			SourceModelBuildingContext context) {
-		final Object defaultValue = attributeDescriptor.getAttributeMethod().getDefaultValue();
-		if ( defaultValue == null ) {
-			// a non-defaulted attribute, just return null for the baseline
-			return null;
-		}
-
-		final ValueWrapper<List<V>, Object[]> jdkWrapper = createJdkWrapper( context );
-		return jdkWrapper.wrap( (Object[]) defaultValue, context );
-	}
-
-	@Override
-	public AttributeDescriptor<List<V>> createAttributeDescriptor(
-			AnnotationDescriptor<?> annotationDescriptor,
+	public AttributeDescriptor<V[]> createAttributeDescriptor(
+			Class<? extends Annotation> annotationType,
 			String attributeName) {
-		return new AttributeDescriptorImpl<>( annotationDescriptor.getAnnotationType(), attributeName, this );
+		return new AttributeDescriptorImpl<>( annotationType, attributeName, this );
 	}
 
 	@Override
-	public ValueExtractor<AnnotationInstance, List<V>> createJandexExtractor(SourceModelBuildingContext buildingContext) {
+	public JandexValueExtractor<V[]> createJandexValueExtractor(SourceModelBuildingContext buildingContext) {
 		return resolveJandexExtractor( buildingContext );
 	}
 
-	public ValueExtractor<AnnotationInstance, List<V>> resolveJandexExtractor(SourceModelBuildingContext buildingContext) {
+	public JandexValueExtractor<V[]> resolveJandexExtractor(SourceModelBuildingContext buildingContext) {
 		if ( jandexValueExtractor == null ) {
 			this.jandexValueExtractor = new ArrayValueExtractor<>( resolveJandexWrapper( buildingContext ) );
 		}
@@ -84,75 +78,86 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<List<V>> {
 	}
 
 	@Override
-	public ValueWrapper<List<V>, AnnotationValue> createJandexWrapper(SourceModelBuildingContext buildingContext) {
+	public JandexValueConverter<V[]> createJandexValueConverter(SourceModelBuildingContext buildingContext) {
 		return resolveJandexWrapper( buildingContext );
 	}
 
-	private ValueWrapper<List<V>, AnnotationValue> resolveJandexWrapper(SourceModelBuildingContext buildingContext) {
-		if ( jandexValueWrapper == null ) {
-			final ValueWrapper<V,AnnotationValue> jandexElementWrapper = elementTypeDescriptor.createJandexWrapper( buildingContext );
-			jandexValueWrapper = new ArrayValueWrapper<>( jandexElementWrapper );
+	private JandexValueConverter<V[]> resolveJandexWrapper(SourceModelBuildingContext buildingContext) {
+		if ( jandexValueConverter == null ) {
+			jandexValueConverter = new ArrayValueConverter<>( elementTypeDescriptor );
 		}
 
-		return jandexValueWrapper;
+		return jandexValueConverter;
 	}
 
 	@Override
-	public ValueExtractor<Annotation, List<V>> createJdkExtractor(SourceModelBuildingContext buildingContext) {
-		return resolveJdkExtractor( buildingContext );
+	public JdkValueConverter<V[]> createJdkValueConverter(SourceModelBuildingContext modelContext) {
+		if ( jdkValueConverter == null ) {
+			if ( !elementTypeDescriptor.getValueType().isAnnotation() ) {
+				// for arrays of anything other than nested annotations we can simply return the raw array
+				jdkValueConverter = JdkPassThruConverter.passThruConverter();
+			}
+			else {
+				jdkValueConverter = new JdkArrayValueConverter<>( elementTypeDescriptor );
+			}
+		}
+
+		return jdkValueConverter;
 	}
 
-	public ValueExtractor<Annotation, List<V>> resolveJdkExtractor(SourceModelBuildingContext buildingContext) {
+	@Override
+	public JdkValueExtractor<V[]> createJdkValueExtractor(SourceModelBuildingContext modelContext) {
 		if ( jdkValueExtractor == null ) {
-			this.jdkValueExtractor = new org.hibernate.models.internal.jdk.ArrayValueExtractor<>( resolveJkWrapper( buildingContext ) );
+			if ( !elementTypeDescriptor.getValueType().isAnnotation() ) {
+				// for arrays of anything other than nested annotations we can simply return the raw array
+				jdkValueExtractor = JdkPassThruExtractor.passThruExtractor();
+			}
+			else {
+				jdkValueExtractor = new JdkArrayValueExtractor<>( createJdkValueConverter( modelContext ) );
+			}
 		}
 		return jdkValueExtractor;
 	}
 
 	@Override
-	public ValueWrapper<List<V>,Object[]> createJdkWrapper(SourceModelBuildingContext buildingContext) {
-		return resolveJkWrapper( buildingContext );
-	}
-
-	public ValueWrapper<List<V>,Object[]> resolveJkWrapper(SourceModelBuildingContext buildingContext) {
-		if ( jdkValueWrapper == null ) {
-			//noinspection unchecked
-			final ValueWrapper<V,Object> jdkElementWrapper = (ValueWrapper<V, Object>) elementTypeDescriptor.createJdkWrapper( buildingContext );
-			jdkValueWrapper = new org.hibernate.models.internal.jdk.ArrayValueWrapper<>( jdkElementWrapper );
-		}
-		return jdkValueWrapper;
-	}
-
-	@Override
-	public Object unwrap(List<V> value) {
-		final Object[] result = (Object[]) Array.newInstance( componentType, value.size() );
-		for ( int i = 0; i < value.size(); i++ ) {
-			result[i] = elementTypeDescriptor.unwrap( value.get( i ) );
+	public Object unwrap(V[] value) {
+		final Object[] result = (Object[]) Array.newInstance( componentType, value.length );
+		for ( int i = 0; i < value.length; i++ ) {
+			result[i] = elementTypeDescriptor.unwrap( value[i] );
 		}
 		return result;
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue) {
+	public void render(RenderingCollector collector, String name, Object attributeValue, SourceModelBuildingContext modelContext) {
+		assert attributeValue != null : "Annotation value was null - " + name;
+
 		//noinspection unchecked
-		final List<V> values = (List<V>) attributeValue;
+		final V[] values = (V[]) attributeValue;
 
 		collector.addLine( "%s = {", name );
 		collector.indent( 2 );
-		values.forEach( (value) -> elementTypeDescriptor.render( collector, value ) );
+		for ( V value : values ) {
+			elementTypeDescriptor.render( collector, value, modelContext );
+		}
 		collector.unindent( 2 );
 		collector.addLine( "}" );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue) {
+	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
 		//noinspection unchecked
 		final List<V> values = (List<V>) attributeValue;
 
 		collector.addLine( "{" );
 		collector.indent( 2 );
-		values.forEach( (value) -> elementTypeDescriptor.render( collector, value ) );
+		values.forEach( (value) -> elementTypeDescriptor.render( collector, value, modelContext ) );
 		collector.unindent( 2 );
 		collector.addLine( "}" );
+	}
+
+	@Override
+	public V[][] makeArray(int size, SourceModelBuildingContext modelContext) {
+		throw new UnsupportedOperationException( "Nested array creation not supported" );
 	}
 }

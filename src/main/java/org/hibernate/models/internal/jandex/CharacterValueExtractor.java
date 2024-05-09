@@ -10,7 +10,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
 
-import static org.hibernate.models.internal.jandex.CharacterValueWrapper.JANDEX_CHARACTER_VALUE_WRAPPER;
+import static org.hibernate.models.internal.jandex.CharacterValueConverter.JANDEX_CHARACTER_VALUE_WRAPPER;
 
 /**
  * Extracts character values from an attribute
@@ -23,6 +23,6 @@ public class CharacterValueExtractor extends AbstractValueExtractor<Character> {
 	@Override
 	protected Character extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return JANDEX_CHARACTER_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return JANDEX_CHARACTER_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 }

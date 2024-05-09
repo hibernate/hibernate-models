@@ -1,18 +1,17 @@
 package org.hibernate.models.annotations;
 
-import java.util.List;
+import java.lang.reflect.Proxy;
 
 import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.MutableInteger;
-import org.hibernate.models.UnknownAnnotationAttributeException;
-import org.hibernate.models.spi.AnnotationTarget;
-import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.MutableAnnotationUsage;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
+import org.hibernate.models.orm.EntityAnnotation;
 import org.hibernate.models.orm.JpaAnnotations;
+import org.hibernate.models.orm.NamedQueryAnnotation;
+import org.hibernate.models.orm.SecondaryTableAnnotation;
+import org.hibernate.models.orm.TableAnnotation;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 
@@ -20,13 +19,8 @@ import org.junit.jupiter.api.Test;
 
 import org.jboss.jandex.Index;
 
-import jakarta.persistence.CheckConstraint;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.NamedNativeQueries;
-import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.SecondaryTable;
@@ -65,16 +59,32 @@ public class AnnotationUsageTests {
 		assertThat( descriptor ).isNotNull();
 		assertThat( metaDescriptor ).isNotNull();
 
-		final AnnotationUsage<CustomMetaAnnotation> metaUsage = descriptor.getAnnotationUsage( metaDescriptor );
+		final CustomMetaAnnotation metaUsage = descriptor.getAnnotationUsage( metaDescriptor, buildingContext );
 		assertThat( metaUsage ).isNotNull();
+		assertThat( Proxy.isProxyClass( metaUsage.getClass() ) ).isTrue();
 
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
 		// NOTE : the 2 @NamedQuery refs get bundled into 1 @NamedQueries
-		assertThat( classDetails.getAllAnnotationUsages() ).hasSize( 7 );
+		assertThat( classDetails.getDirectAnnotationUsages() ).hasSize( 7 );
 
-		assertThat( classDetails.findFieldByName( "id" ).getAllAnnotationUsages() ).hasSize( 2 );
-		assertThat( classDetails.findFieldByName( "name" ).getAllAnnotationUsages() ).hasSize( 2 );
-		assertThat( classDetails.findFieldByName( "name2" ).getAllAnnotationUsages() ).hasSize( 2 );
+		assertThat( classDetails.findFieldByName( "id" ).getDirectAnnotationUsages() ).hasSize( 2 );
+		assertThat( classDetails.findFieldByName( "name" ).getDirectAnnotationUsages() ).hasSize( 2 );
+		assertThat( classDetails.findFieldByName( "name2" ).getDirectAnnotationUsages() ).hasSize( 2 );
+
+		final Entity entityUsage = classDetails.getDirectAnnotationUsage( Entity.class );
+		assertThat( entityUsage ).isInstanceOf( EntityAnnotation.class );
+
+		final Table tableUsage = classDetails.getDirectAnnotationUsage( Table.class );
+		assertThat( tableUsage ).isInstanceOf( TableAnnotation.class );
+
+		final SecondaryTable secondaryTableUsage = classDetails.getDirectAnnotationUsage( SecondaryTable.class );
+		assertThat( secondaryTableUsage ).isInstanceOf( SecondaryTableAnnotation.class );
+
+		assertThat( classDetails.getDirectAnnotationUsage( NamedQuery.class ) ).isNull();
+		final NamedQuery[] namedQueryUsages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class, buildingContext );
+		assertThat( namedQueryUsages ).hasSize( 2 );
+		assertThat( namedQueryUsages[0] ).isInstanceOf( NamedQueryAnnotation.class );
+		assertThat( namedQueryUsages[1] ).isInstanceOf( NamedQueryAnnotation.class );
 	}
 
 	@Test
@@ -91,8 +101,9 @@ public class AnnotationUsageTests {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
-		final MutableAnnotationUsage<Entity> entityAnn = (MutableAnnotationUsage<Entity>) classDetails.getAnnotationUsage( Entity.class );
-		entityAnn.setAttributeValue( "name", "SimpleEntity" );
+		final EntityAnnotation entityAnn = (EntityAnnotation) classDetails.getAnnotationUsage( Entity.class, buildingContext );
+		entityAnn.name( "SimpleEntity" );
+		assertThat( entityAnn.name() ).isEqualTo( "SimpleEntity" );
 	}
 
 	@Test
@@ -111,23 +122,23 @@ public class AnnotationUsageTests {
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
-		final AnnotationUsage<CustomAnnotation> annotationUsage = classDetails.getAnnotationUsage( CustomAnnotation.class );
+		final CustomAnnotation annotationUsage = classDetails.getAnnotationUsage( CustomAnnotation.class, buildingContext );
 		assertThat( annotationUsage ).isNotNull();
 		final AnnotationDescriptor<CustomAnnotation> descriptor = descriptorRegistry.getDescriptor( CustomAnnotation.class );
 		assertThat( descriptor ).isNotNull();
-		final AnnotationUsage<CustomMetaAnnotation> customMetaAnnotationUsage = descriptor.getAnnotationUsage( CustomMetaAnnotation.class );
+		final CustomMetaAnnotation customMetaAnnotationUsage = descriptor.getAnnotationUsage( CustomMetaAnnotation.class, buildingContext );
 		assertThat( customMetaAnnotationUsage ).isNotNull();
-		assertThat( customMetaAnnotationUsage.getString( "someValue" ) ).isEqualTo( "abc" );
+		assertThat( customMetaAnnotationUsage.someValue() ).isEqualTo( "abc" );
 
-		assertThat( classDetails.hasAnnotationUsage( Entity.class ) ).isTrue();
-		final AnnotationUsage<Entity> entityAnn = classDetails.getAnnotationUsage( Entity.class );
-		assertThat( entityAnn.getString( "name" ) ).isEqualTo( "SimpleColumnEntity" );
+		assertThat( classDetails.hasDirectAnnotationUsage( Entity.class ) ).isTrue();
+		final Entity entityAnn = classDetails.getAnnotationUsage( Entity.class, buildingContext );
+		assertThat( entityAnn.name() ).isEqualTo( "SimpleColumnEntity" );
 
-		final AnnotationUsage<Column> columnAnn = classDetails.findFieldByName( "name" ).getAnnotationUsage( Column.class );
-		assertThat( columnAnn.getString( "name" ) ).isEqualTo( "description" );
-		assertThat( columnAnn.getString( "table" ) ).isEqualTo( "" );
-		assertThat( columnAnn.getBoolean( "nullable" ) ).isFalse();
-		assertThat( columnAnn.<Boolean>getAttributeValue( "unique" ) ).isTrue();
+		final Column columnAnn = classDetails.findFieldByName( "name" ).getAnnotationUsage( Column.class, buildingContext );
+		assertThat( columnAnn.name() ).isEqualTo( "description" );
+		assertThat( columnAnn.table() ).isEqualTo( "" );
+		assertThat( columnAnn.nullable() ).isFalse();
+		assertThat( columnAnn.unique() ).isTrue();
 	}
 
 	@Test
@@ -142,37 +153,36 @@ public class AnnotationUsageTests {
 
 	private void compositionChecks(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
-		final AnnotationDescriptorRegistry descriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
-		assertThat( classDetails.hasAnnotationUsage( CustomMetaAnnotation.class ) ).isFalse();
-		assertThat( classDetails.getAnnotationUsage( CustomMetaAnnotation.class ) ).isNull();
-		assertThat( classDetails.locateAnnotationUsage( CustomMetaAnnotation.class ) ).isNotNull();
+		assertThat( classDetails.hasDirectAnnotationUsage( CustomMetaAnnotation.class ) ).isFalse();
+		assertThat( classDetails.getAnnotationUsage( CustomMetaAnnotation.class, buildingContext ) ).isNull();
+		assertThat( classDetails.locateAnnotationUsage( CustomMetaAnnotation.class, buildingContext ) ).isNotNull();
 
-		assertThat( classDetails.getMetaAnnotated( CustomMetaAnnotation.class ) ).hasSize( 1 );
-		assertThat( classDetails.getMetaAnnotated( CustomAnnotation.class ) ).isEmpty();
+		assertThat( classDetails.getMetaAnnotated( CustomMetaAnnotation.class, buildingContext ) ).hasSize( 1 );
+		assertThat( classDetails.getMetaAnnotated( CustomAnnotation.class, buildingContext ) ).isEmpty();
 	}
 
 	@Test
 	void testDynamicAttributeCreation() {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( (Index) null, SimpleEntity.class );
-		final AnnotationUsage<Column> usage = JpaAnnotations.COLUMN.createUsage( buildingContext );
+		final Column usage = JpaAnnotations.COLUMN.createUsage( buildingContext );
 		// check the attribute defaults
-		assertThat( usage.getString( "name" ) ).isEqualTo( "" );
-		assertThat( usage.getString( "table" ) ).isEqualTo( "" );
-		assertThat( usage.getBoolean( "unique" ) ).isFalse();
-		assertThat( usage.getBoolean( "nullable" ) ).isTrue();
-		assertThat( usage.getBoolean( "insertable" ) ).isTrue();
-		assertThat( usage.getBoolean( "updatable" ) ).isTrue();
-		assertThat( usage.getString( "columnDefinition" ) ).isEqualTo( "" );
-		assertThat( usage.getString( "options" ) ).isEqualTo( "" );
-		assertThat( usage.getString( "comment" ) ).isEqualTo( "" );
-		assertThat( usage.getInteger( "length" ) ).isEqualTo( 255 );
-		assertThat( usage.getInteger( "precision" ) ).isEqualTo( 0 );
-		assertThat( usage.getInteger( "scale" ) ).isEqualTo( 0 );
-		assertThat( usage.getList( "check" ) ).isEmpty();
+		assertThat( usage.name() ).isEqualTo( "" );
+		assertThat( usage.table() ).isEqualTo( "" );
+		assertThat( usage.unique() ).isFalse();
+		assertThat( usage.nullable() ).isTrue();
+		assertThat( usage.insertable() ).isTrue();
+		assertThat( usage.updatable() ).isTrue();
+		assertThat( usage.columnDefinition() ).isEqualTo( "" );
+		assertThat( usage.options() ).isEqualTo( "" );
+		assertThat( usage.comment() ).isEqualTo( "" );
+		assertThat( usage.length() ).isEqualTo( 255 );
+		assertThat( usage.precision() ).isEqualTo( 0 );
+		assertThat( usage.scale() ).isEqualTo( 0 );
+		assertThat( usage.check() ).isEmpty();
 	}
 
 	@Test
@@ -191,83 +201,12 @@ public class AnnotationUsageTests {
 
 		final ClassDetails entityClassDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
-		final List<AnnotationUsage<NamedQuery>> namedQueryAnns = entityClassDetails.getRepeatedAnnotationUsages( NamedQuery.class );
+		final NamedQuery[] namedQueryAnns = entityClassDetails.getRepeatedAnnotationUsages( NamedQuery.class, buildingContext );
 		assertThat( namedQueryAnns ).hasSize( 2 );
 
-		final AnnotationUsage<NamedQuery> abcAnn = entityClassDetails.getNamedAnnotationUsage( NamedQuery.class, "abc" );
+		final NamedQuery abcAnn = entityClassDetails.getNamedAnnotationUsage( NamedQuery.class, "abc", buildingContext );
 		assertThat( abcAnn ).isNotNull();
-		assertThat( abcAnn.getString( "query" ) ).isEqualTo( "select me" );
-	}
-
-	@Test
-	void testBadAttributeNamesWithJandex() {
-		badAttributeNamesChecks( buildJandexIndex( SimpleEntity.class ) );
-	}
-
-	@Test
-	void testBadAttributeNamesWithoutJandex() {
-		badAttributeNamesChecks( null );
-	}
-
-	void badAttributeNamesChecks(Index index) {
-		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
-
-		final ClassDetails entityClassDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
-		final MutableAnnotationUsage<Entity> entityAnn = (MutableAnnotationUsage<Entity>) entityClassDetails.getAnnotationUsage( Entity.class );
-		assertThat( entityAnn ).isNotNull();
-
-		try {
-			entityAnn.getAttributeValue( "doesNotExist" );
-			fail( "Expecting an exception" );
-		}
-		catch (UnknownAnnotationAttributeException expected) {
-		}
-
-		try {
-			entityAnn.setAttributeValue( "doesNotExist", "stuff" );
-			fail( "Expecting an exception" );
-		}
-		catch (UnknownAnnotationAttributeException expected) {
-		}
-	}
-
-	@Test
-	void testToAnnotationJandex() {
-		toAnnotationChecks( buildJandexIndex( SimpleEntity.class ) );
-	}
-
-	@Test
-	void testToAnnotationWithoutJandex() {
-		toAnnotationChecks( null );
-	}
-
-	private void toAnnotationChecks(Index index) {
-		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
-
-		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
-
-		{
-			final AnnotationUsage<CustomAnnotation> annotationUsage = classDetails.getAnnotationUsage( CustomAnnotation.class );
-			final CustomAnnotation annotation = annotationUsage.toAnnotation();
-			assertThat( annotation ).isNotNull();
-		}
-
-		{
-			final AnnotationUsage<Entity> annotationUsage = classDetails.getAnnotationUsage( Entity.class );
-			final Entity annotation = annotationUsage.toAnnotation();
-			assertThat( annotation.name() ).isEqualTo( "SimpleColumnEntity" );
-		}
-
-		{
-			final AnnotationUsage<Column> annotationUsage = classDetails.findFieldByName( "name" ).getAnnotationUsage( Column.class );
-			final Column annotation = annotationUsage.toAnnotation();
-			assertThat( annotation.name() ).isEqualTo( "description" );
-			assertThat( annotation.table() ).isEqualTo( "" );
-			assertThat( annotation.nullable() ).isFalse();
-			assertThat( annotation.unique() ).isTrue();
-		}
+		assertThat( abcAnn.query() ).isEqualTo( "select me" );
 	}
 
 	@Test
@@ -286,33 +225,44 @@ public class AnnotationUsageTests {
 
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
-		final String query = classDetails.fromAnnotations( NamedQuery.class, (usage) -> {
-			final String name = usage.getString( "name" );
-			if ( "abc".equals( name ) ) {
-				return usage.getString( "query" );
-			}
-			return null;
-		} );
+		final String query = classDetails.fromAnnotations(
+				NamedQuery.class,
+				(usage) -> {
+					final String name = usage.name();
+					if ( "abc".equals( name ) ) {
+						return usage.query();
+					}
+					return null;
+				},
+				buildingContext
+		);
 		assertThat( query ).isEqualTo( "select me" );
 
-		final String query2 = classDetails.fromAnnotations( NamedQuery.class, (usage) -> {
-			final String name = usage.getString( "name" );
-			if ( "xyz".equals( name ) ) {
-				return usage.getString( "query" );
-			}
-			return null;
-		} );
+		final String query2 = classDetails.fromAnnotations(
+				NamedQuery.class,
+				(usage) -> {
+					final String name = usage.name();
+					if ( "xyz".equals( name ) ) {
+						return usage.query();
+					}
+					return null;
+				},
+				buildingContext
+		);
 		assertThat( query2 ).isEqualTo( "select you" );
 
-		final AnnotationUsage<SecondaryTable> secondaryTable = classDetails.fromAnnotations( SecondaryTable.class, (usage) -> {
-			final String name = usage.getString( "name" );
-			if ( "another_table".equals( name ) ) {
-				//noinspection unchecked
-				return (AnnotationUsage<SecondaryTable>) usage;
-			}
-			return null;
-		} );
-		assertThat( query2 ).isEqualTo( "select you" );
+		final SecondaryTable secondaryTable = classDetails.fromAnnotations(
+				SecondaryTable.class,
+				(usage) -> {
+					final String name = usage.name();
+					if ( "another_table".equals( name ) ) {
+						return usage;
+					}
+					return null;
+				},
+				buildingContext
+		);
+		assertThat( secondaryTable ).isNotNull();
 	}
 
 	@Test
@@ -332,16 +282,16 @@ public class AnnotationUsageTests {
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
 		// with #hasAnnotationUsage we only get true for the actual repeatable/container form used
-		assertThat( classDetails.hasAnnotationUsage( NamedQuery.class ) ).isFalse();
-		assertThat( classDetails.hasAnnotationUsage( NamedQueries.class ) ).isTrue();
-		assertThat( classDetails.hasAnnotationUsage( SecondaryTable.class ) ).isTrue();
-		assertThat( classDetails.hasAnnotationUsage( SecondaryTables.class ) ).isFalse();
+		assertThat( classDetails.hasDirectAnnotationUsage( NamedQuery.class ) ).isFalse();
+		assertThat( classDetails.hasDirectAnnotationUsage( NamedQueries.class ) ).isTrue();
+		assertThat( classDetails.hasDirectAnnotationUsage( SecondaryTable.class ) ).isTrue();
+		assertThat( classDetails.hasDirectAnnotationUsage( SecondaryTables.class ) ).isFalse();
 
 		// with #hasRepeatableAnnotationUsage we get true regardless
-		assertThat( classDetails.hasRepeatableAnnotationUsage( NamedQuery.class ) ).isTrue();
-		assertThat( classDetails.hasRepeatableAnnotationUsage( NamedQueries.class ) ).isTrue();
-		assertThat( classDetails.hasRepeatableAnnotationUsage( SecondaryTable.class ) ).isTrue();
-		assertThat( classDetails.hasRepeatableAnnotationUsage( SecondaryTables.class ) ).isFalse();
+		assertThat( classDetails.hasAnnotationUsage( NamedQuery.class, buildingContext ) ).isTrue();
+		assertThat( classDetails.hasAnnotationUsage( NamedQueries.class, buildingContext ) ).isTrue();
+		assertThat( classDetails.hasAnnotationUsage( SecondaryTable.class, buildingContext ) ).isTrue();
+		assertThat( classDetails.hasAnnotationUsage( SecondaryTables.class, buildingContext ) ).isFalse();
 	}
 
 	@Test
@@ -362,15 +312,15 @@ public class AnnotationUsageTests {
 
 		final MutableInteger counter = new MutableInteger();
 
-		classDetails.forEachAnnotationUsage( Entity.class, entityAnnotationUsage -> counter.increment() );
+		classDetails.forEachAnnotationUsage( Entity.class, buildingContext, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 1 );
 
 		counter.set( 0 );
-		classDetails.forEachAnnotationUsage( SecondaryTable.class, entityAnnotationUsage -> counter.increment() );
+		classDetails.forEachAnnotationUsage( SecondaryTable.class, buildingContext, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 1 );
 
 		counter.set( 0 );
-		classDetails.forEachAnnotationUsage( NamedQuery.class, entityAnnotationUsage -> counter.increment() );
+		classDetails.forEachAnnotationUsage( NamedQuery.class, buildingContext, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 2 );
 	}
 
@@ -390,70 +340,15 @@ public class AnnotationUsageTests {
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
 		try {
-			classDetails.getAnnotationUsage( NamedQuery.class );
+			classDetails.getAnnotationUsage( NamedQuery.class, buildingContext );
 			fail( "Expecting an AnnotationAccessException to be thrown" );
 		}
 		catch (AnnotationAccessException expected) {
 			// this is expected
 		}
 
-		final AnnotationUsage<NamedQuery> singleAnnotationUsage = classDetails.getSingleAnnotationUsage( NamedQuery.class );
+		final NamedQuery singleAnnotationUsage = classDetails.getDirectAnnotationUsage( NamedQuery.class );
 		assertThat( singleAnnotationUsage ).isNull();
 	}
 
-	@Test
-	void testAnnotationTargetWithJandex() {
-		testAnnotationTarget( buildJandexIndex( SimpleEntity.class ) );
-	}
-
-	@Test
-	void testAnnotationTargetWithoutJandex() {
-		testAnnotationTarget( null );
-	}
-
-	void testAnnotationTarget(Index index) {
-		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( index, SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
-		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
-
-		// type annotation usage
-		final AnnotationUsage<Table> table = classDetails.getAnnotationUsage( Table.class );
-		assertThat( table ).isNotNull();
-		assertThat( table.getAnnotationDescriptor().getAllowableTargets() ).contains( classDetails.getKind() );
-		// nested type annotation usage
-		final AnnotationUsage<CheckConstraint> checkConstraint = table.<List<AnnotationUsage<CheckConstraint>>>getAttributeValue( "check" ).get( 0 );
-		assertThat( checkConstraint.getAnnotationDescriptor().getAllowableTargets() ).isEmpty();
-		assertThat( classDetails.getAnnotationUsage( CheckConstraint.class ) ).isNull();
-
-		// field annotation usage
-		final FieldDetails elementCollection = classDetails.findFieldByName( "elementCollection" );
-		final AnnotationUsage<CollectionTable> collectionTable = elementCollection.getAnnotationUsage( CollectionTable.class );
-		assertThat( collectionTable ).isNotNull();
-		assertThat( collectionTable.getAnnotationDescriptor().getAllowableTargets() ).contains( elementCollection.getKind() );
-		// nested field annotation usage
-		final AnnotationUsage<JoinColumn> joinColumn = collectionTable.<List<AnnotationUsage<JoinColumn>>>getAttributeValue( "joinColumns" ).get( 0 );
-		assertThat( joinColumn.getAnnotationDescriptor().getAllowableTargets() ).contains( elementCollection.getKind() );
-		assertThat( elementCollection.getAnnotationUsage( JoinColumn.class ) ).isNull();
-
-		// repeatable parent annotation usage
-		final AnnotationUsage<NamedNativeQueries> namedNativeQueries = classDetails.getAnnotationUsage( NamedNativeQueries.class );
-		assertThat( namedNativeQueries ).isNotNull();
-		assertThat( namedNativeQueries.getAnnotationDescriptor().getAllowableTargets() ).contains( classDetails.getKind() );
-		// nested repeated annotation usage
-		final AnnotationUsage<NamedNativeQuery> namedNativeQuery = namedNativeQueries.<List<AnnotationUsage<NamedNativeQuery>>>getAttributeValue("value" ).get( 0 );
-		assertThat( namedNativeQuery.getAnnotationDescriptor().getAllowableTargets() ).contains( classDetails.getKind() );
-		assertThat( classDetails.getAnnotationUsage( NamedNativeQuery.class ) ).isSameAs( namedNativeQuery );
-
-		// direct repeated annotation usage
-		final List<AnnotationUsage<NamedQuery>> repeatedNamedQueries = classDetails.getRepeatedAnnotationUsages( NamedQuery.class );
-		assertThat( repeatedNamedQueries ).hasSize( 2 )
-				.allMatch( namedQuery -> namedQuery.getAnnotationDescriptor()
-				.getAllowableTargets()
-				.contains( classDetails.getKind() ) );
-		assertThat( classDetails.getSingleAnnotationUsage( NamedQuery.class ) ).isNull();
-		// we can still find a usage for the repeatable container
-		final AnnotationUsage<NamedQueries> namedQueries = classDetails.getAnnotationUsage( NamedQueries.class );
-		assertThat( namedQueries ).isNotNull();
-		assertThat( namedQueries.getAnnotationDescriptor().getAllowableTargets() ).contains( classDetails.getKind() );
-	}
 }

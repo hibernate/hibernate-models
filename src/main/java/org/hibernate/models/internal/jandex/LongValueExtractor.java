@@ -19,6 +19,6 @@ public class LongValueExtractor extends AbstractValueExtractor<Long> {
 	@Override
 	protected Long extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return LongValueWrapper.JANDEX_LONG_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return LongValueConverter.JANDEX_LONG_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 }

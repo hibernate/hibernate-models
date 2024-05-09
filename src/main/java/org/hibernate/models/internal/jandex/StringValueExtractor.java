@@ -19,6 +19,6 @@ public class StringValueExtractor extends AbstractValueExtractor<String> {
 	@Override
 	protected String extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return StringValueWrapper.JANDEX_STRING_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return StringValueConverter.JANDEX_STRING_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 }

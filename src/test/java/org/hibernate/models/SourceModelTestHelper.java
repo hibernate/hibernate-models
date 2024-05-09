@@ -52,9 +52,7 @@ public class SourceModelTestHelper {
 		final SourceModelBuildingContextImpl buildingContext = new SourceModelBuildingContextImpl(
 				classLoadingAccess,
 				jandexIndex,
-				(contributions, buildingContext1) -> {
-					OrmAnnotationHelper.forEachOrmAnnotation( contributions::registerAnnotation );
-				}
+				(contributions, buildingContext1) -> OrmAnnotationHelper.forEachOrmAnnotation( contributions::registerAnnotation )
 		);
 		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 		final AnnotationDescriptorRegistryStandard annotationDescriptorRegistry = (AnnotationDescriptorRegistryStandard) buildingContext.getAnnotationDescriptorRegistry();
@@ -74,7 +72,7 @@ public class SourceModelTestHelper {
 							annotationClass,
 							annotationType -> JdkBuilders.buildAnnotationDescriptor(
 									annotationType,
-									annotationDescriptorRegistry
+									buildingContext
 							)
 					);
 				}

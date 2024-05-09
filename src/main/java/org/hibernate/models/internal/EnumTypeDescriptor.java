@@ -6,19 +6,13 @@
  */
 package org.hibernate.models.internal;
 
-import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 
+import org.hibernate.models.internal.jandex.EnumValueConverter;
 import org.hibernate.models.internal.jandex.EnumValueExtractor;
-import org.hibernate.models.internal.jandex.EnumValueWrapper;
-import org.hibernate.models.internal.jdk.PassThruExtractor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueExtractor;
-import org.hibernate.models.spi.ValueWrapper;
-
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationValue;
-
-import static org.hibernate.models.internal.jdk.PassThruWrapper.PASS_THRU_WRAPPER;
+import org.hibernate.models.spi.JandexValueConverter;
+import org.hibernate.models.spi.JandexValueExtractor;
 
 /**
  * Descriptor for enum values
@@ -28,44 +22,38 @@ import static org.hibernate.models.internal.jdk.PassThruWrapper.PASS_THRU_WRAPPE
 public class EnumTypeDescriptor<E extends Enum<E>> extends AbstractTypeDescriptor<E> {
 	private final Class<E> enumType;
 
-	private final EnumValueWrapper<E> jandexWrapper;
+	private final EnumValueConverter<E> jandexWrapper;
 	private final EnumValueExtractor<E> jandexExtractor;
 
 	public EnumTypeDescriptor(Class<E> enumType) {
 		this.enumType = enumType;
-		this.jandexWrapper = new EnumValueWrapper<>( enumType );
+		this.jandexWrapper = new EnumValueConverter<>( enumType );
 		this.jandexExtractor = new EnumValueExtractor<>( jandexWrapper );
 	}
 
 	@Override
-	public Class<E> getWrappedValueType() {
+	public Class<E> getValueType() {
 		return enumType;
 	}
 
 	@Override
-	public ValueWrapper<E, AnnotationValue> createJandexWrapper(SourceModelBuildingContext buildingContext) {
+	public JandexValueConverter<E> createJandexValueConverter(SourceModelBuildingContext modelContext) {
 		return jandexWrapper;
 	}
 
 	@Override
-	public ValueExtractor<AnnotationInstance, E> createJandexExtractor(SourceModelBuildingContext buildingContext) {
+	public JandexValueExtractor<E> createJandexValueExtractor(SourceModelBuildingContext modelContext) {
 		return jandexExtractor;
-	}
-
-	@Override
-	public ValueWrapper<E, ?> createJdkWrapper(SourceModelBuildingContext buildingContext) {
-		//noinspection unchecked
-		return PASS_THRU_WRAPPER;
-	}
-
-	@Override
-	public ValueExtractor<Annotation, E> createJdkExtractor(SourceModelBuildingContext buildingContext) {
-		//noinspection unchecked
-		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
 
 	@Override
 	public Object unwrap(E value) {
 		return value;
+	}
+
+	@Override
+	public E[] makeArray(int size, SourceModelBuildingContext modelContext) {
+		//noinspection unchecked
+		return (E[]) Array.newInstance( enumType, size );
 	}
 }

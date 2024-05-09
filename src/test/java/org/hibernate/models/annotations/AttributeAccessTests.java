@@ -8,7 +8,6 @@
 package org.hibernate.models.annotations;
 
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
 
 import org.junit.jupiter.api.Test;
@@ -26,32 +25,21 @@ public class AttributeAccessTests {
 	void testAttributeAccess() {
 		final SourceModelBuildingContextImpl buildingContext = createBuildingContext( (Index) null, TheClass.class );
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( TheClass.class.getName() );
-		final AnnotationUsage<EverythingBagel> annotationUsage = classDetails.getAnnotationUsage( EverythingBagel.class );
+		final EverythingBagel annotationUsage = classDetails.getAnnotationUsage( EverythingBagel.class, buildingContext );
 
-		assertThat( annotationUsage.<String>getAttributeValue( "theString" ) ).isEqualTo( "hello" );
-		assertThat( annotationUsage.<Status>getAttributeValue( "theEnum" ) ).isEqualTo( Status.ACTIVE );
-		assertThat( annotationUsage.<Boolean>getAttributeValue( "theBoolean" ) ).isEqualTo( true );
-		assertThat( annotationUsage.<Byte>getAttributeValue( "theByte" ) ).isEqualTo( (byte) 1 );
-		assertThat( annotationUsage.<Short>getAttributeValue( "theShort" ) ).isEqualTo( (short) 2 );
-		assertThat( annotationUsage.<Integer>getAttributeValue( "theInteger" ) ).isEqualTo( 3 );
-		assertThat( annotationUsage.<Long>getAttributeValue( "theLong" ) ).isEqualTo( 4L );
-		assertThat( annotationUsage.<Float>getAttributeValue( "theFloat" ) ).isEqualTo( 5.1F );
-		assertThat( annotationUsage.<Double>getAttributeValue( "theDouble" ) ).isEqualTo( 6.2 );
+		assertThat( annotationUsage.theString() ).isEqualTo( "hello" );
+		assertThat( annotationUsage.theEnum() ).isEqualTo( Status.ACTIVE );
+		assertThat( annotationUsage.theBoolean() ).isEqualTo( true );
+		assertThat( annotationUsage.theByte() ).isEqualTo( (byte) 1 );
+		assertThat( annotationUsage.theShort() ).isEqualTo( (short) 2 );
+		assertThat( annotationUsage.theInteger() ).isEqualTo( 3 );
+		assertThat( annotationUsage.theLong() ).isEqualTo( 4L );
+		assertThat( annotationUsage.theFloat() ).isEqualTo( 5.1F );
+		assertThat( annotationUsage.theDouble() ).isEqualTo( 6.2 );
 
-		assertThat( annotationUsage.getString( "theString" ) ).isEqualTo( "hello" );
-		assertThat( annotationUsage.getEnum( "theEnum" ).name() ).isEqualTo( Status.ACTIVE.name() );
-		assertThat( annotationUsage.getEnum( "theEnum", Status.class ) ).isEqualTo( Status.ACTIVE );
-		assertThat( annotationUsage.getBoolean( "theBoolean" ) ).isEqualTo( true );
-		assertThat( annotationUsage.getByte( "theByte" ) ).isEqualTo( (byte) 1 );
-		assertThat( annotationUsage.getShort( "theShort" ) ).isEqualTo( (short) 2 );
-		assertThat( annotationUsage.getInteger( "theInteger" ) ).isEqualTo( 3 );
-		assertThat( annotationUsage.getLong( "theLong" ) ).isEqualTo( 4L );
-		assertThat( annotationUsage.getFloat( "theFloat" ) ).isEqualTo( 5.1F );
-		assertThat( annotationUsage.getDouble( "theDouble" ) ).isEqualTo( 6.2 );
-
-		assertThat( annotationUsage.getClassDetails( "theClass" ).toJavaClass() ).isEqualTo( TheClass.class );
-		assertThat( annotationUsage.getNestedUsage( "theNested" ) ).isNotNull();
-		assertThat( annotationUsage.getList( "theStrings" ) ).containsExactly( "a", "b", "c" );
+		assertThat( annotationUsage.theClass() ).isEqualTo( TheClass.class );
+		assertThat( annotationUsage.theNested() ).isNotNull();
+		assertThat( annotationUsage.theStrings() ).containsExactly( "a", "b", "c" );
 	}
 
 	@EverythingBagel(

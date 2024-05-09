@@ -6,6 +6,7 @@
  */
 package org.hibernate.models.internal.jandex;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,11 +14,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeDetailsHelper;
@@ -197,5 +203,35 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 				methodKind.name(),
 				methodInfo.toString()
 		);
+	}
+
+	@Override
+	public MethodDetails asMethodDetails() {
+		return this;
+	}
+
+	@Override
+	public MutableMemberDetails asMemberDetails() {
+		return this;
+	}
+
+	@Override
+	public FieldDetails asFieldDetails() {
+		throw new IllegalCastException( "MethodDetails cannot be cast as FieldDetails" );
+	}
+
+	@Override
+	public RecordComponentDetails asRecordComponentDetails() {
+		throw new IllegalCastException( "MethodDetails cannot be cast as RecordComponentDetails" );
+	}
+
+	@Override
+	public <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
+		throw new IllegalCastException( "MethodDetails cannot be cast to an AnnotationDescriptor" );
+	}
+
+	@Override
+	public MutableClassDetails asClassDetails() {
+		throw new IllegalCastException( "MethodDetails cannot be cast to a ClassDetails" );
 	}
 }

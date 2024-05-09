@@ -18,7 +18,7 @@ public class ShortValueExtractor extends AbstractValueExtractor<Short> {
 
 	protected Short extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return ShortValueWrapper.JANDEX_SHORT_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return ShortValueConverter.JANDEX_SHORT_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 
 }

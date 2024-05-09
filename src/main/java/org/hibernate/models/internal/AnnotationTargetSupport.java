@@ -14,38 +14,63 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationDescriptorRegistry;
-import org.hibernate.models.spi.AnnotationUsage;
+import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableAnnotationTarget;
-import org.hibernate.models.spi.MutableAnnotationUsage;
+import org.hibernate.models.spi.MutableClassDetails;
+import org.hibernate.models.spi.MutableMemberDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
  * @author Steve Ebersole
  */
 public interface AnnotationTargetSupport extends MutableAnnotationTarget {
-	SourceModelBuildingContext getBuildingContext();
-	Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> getUsageMap();
+	/**
+	 * Access to all annotation usages on this target.
+	 */
+	Map<Class<? extends Annotation>,? extends Annotation> getUsageMap();
 
 	@Override
-	default Collection<AnnotationUsage<?>> getAllAnnotationUsages() {
+	default void clearAnnotationUsages() {
+		getUsageMap().clear();
+	}
+
+	@Override
+	default <X extends Annotation> void addAnnotationUsage(X annotationUsage) {
+		//noinspection unchecked,rawtypes
+		( (Map) getUsageMap() ).put( annotationUsage.annotationType(), annotationUsage );
+	}
+
+	@Override
+	default Collection<? extends Annotation> getDirectAnnotationUsages() {
 		return getUsageMap().values();
 	}
 
 	@Override
-	default <A extends Annotation> boolean hasAnnotationUsage(Class<A> type) {
+	default <A extends Annotation> A getDirectAnnotationUsage(AnnotationDescriptor<A> descriptor) {
+		return getDirectAnnotationUsage( descriptor.getAnnotationType() );
+	}
+
+	@Override
+	default <A extends Annotation> A getDirectAnnotationUsage(Class<A> type) {
+		//noinspection unchecked
+		return (A) getUsageMap().get( type );
+	}
+
+	@Override
+	default <A extends Annotation> boolean hasDirectAnnotationUsage(Class<A> type) {
 		return getUsageMap().containsKey( type );
 	}
 
 	@Override
-	default <A extends Annotation> boolean hasRepeatableAnnotationUsage(Class<A> type) {
+	default <X extends Annotation> boolean hasAnnotationUsage(Class<X> type, SourceModelBuildingContext modelContext) {
 		final boolean containsDirectly = getUsageMap().containsKey( type );
 		if ( containsDirectly ) {
 			return true;
 		}
 
-		final AnnotationDescriptorRegistry descriptorRegistry = getBuildingContext().getAnnotationDescriptorRegistry();
-		final AnnotationDescriptor<A> descriptor = descriptorRegistry.getDescriptor( type );
+		final AnnotationDescriptor<X> descriptor = modelContext.getAnnotationDescriptorRegistry().getDescriptor( type );
 		if ( descriptor.isRepeatable() ) {
 			// e.g. caller asks about NamedQuery... let's also check for NamedQueries (which implies NamedQuery)
 			return getUsageMap().containsKey( descriptor.getRepeatableContainer().getAnnotationType() );
@@ -55,38 +80,62 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	}
 
 	@Override
-	default <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(AnnotationDescriptor<A> descriptor) {
-		return AnnotationUsageHelper.getUsage( descriptor, getUsageMap() );
+	default <A extends Annotation> A getAnnotationUsage(AnnotationDescriptor<A> descriptor, SourceModelBuildingContext modelContext) {
+		return AnnotationUsageHelper.getUsage( descriptor, getUsageMap(), modelContext );
 	}
 
 	@Override
-	default <A extends Annotation> AnnotationUsage<A> getAnnotationUsage(Class<A> annotationType) {
-		return getAnnotationUsage( getBuildingContext().getAnnotationDescriptorRegistry().getDescriptor( annotationType ) );
+	default <A extends Annotation> A getAnnotationUsage(Class<A> annotationType, SourceModelBuildingContext modelContext) {
+		return AnnotationUsageHelper.getUsage( annotationType, getUsageMap(), modelContext );
 	}
 
 	@Override
-	default <A extends Annotation> AnnotationUsage<A> locateAnnotationUsage(Class<A> annotationType) {
+	default <A extends Annotation> A[] getRepeatedAnnotationUsages(
+			AnnotationDescriptor<A> type,
+			SourceModelBuildingContext modelContext) {
+		return AnnotationUsageHelper.getRepeatedUsages( type, getUsageMap(), modelContext );
+	}
+
+	@Override
+	default <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
+			Class<A> repeatableType,
+			Class<C> containerType,
+			SourceModelBuildingContext modelContext, Consumer<A> consumer) {
+		AnnotationUsageHelper.forEachRepeatedAnnotationUsages( repeatableType, containerType, consumer, getUsageMap(), modelContext );
+	}
+
+	@Override
+	default <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
+			AnnotationDescriptor<A> repeatableDescriptor,
+			SourceModelBuildingContext modelContext,
+			Consumer<A> consumer) {
+		AnnotationUsageHelper.forEachRepeatedAnnotationUsages( repeatableDescriptor, consumer, getUsageMap(), modelContext );
+	}
+
+	@Override
+	default <A extends Annotation> A locateAnnotationUsage(Class<A> annotationType, SourceModelBuildingContext modelContext) {
 		// e.g., locate `@Nationalized`
 
 		// first, check for direct use
 		// 		- look for `Nationalized.class` in the usage map of the target
-		final AnnotationUsage<A> localUsage = getAnnotationUsage( annotationType );
+		final A localUsage = getAnnotationUsage( annotationType, modelContext );
 		if ( localUsage != null ) {
 			return localUsage;
 		}
 
 		// next, check as a "meta annotation"
 		// 		- for each local usage, check that annotation's annotations for `Nationalized.class` (one level deep)
-		final Map<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> localUsageMap = getUsageMap();
-		for ( Map.Entry<Class<? extends Annotation>, AnnotationUsage<? extends Annotation>> usageEntry : localUsageMap.entrySet() ) {
-			final AnnotationUsage<? extends Annotation> usage = usageEntry.getValue();
-			if ( annotationType.equals( usage.getAnnotationType() ) ) {
+		final Map<Class<? extends Annotation>, ? extends Annotation> localUsageMap = getUsageMap();
+		for ( Map.Entry<Class<? extends Annotation>, ? extends Annotation> usageEntry : localUsageMap.entrySet() ) {
+			final Annotation usage = usageEntry.getValue();
+			if ( annotationType.equals( usage.annotationType() ) ) {
 				// we would have found this on the direct search, so no need
 				// to check its meta-annotations
 				continue;
 			}
 
-			final AnnotationUsage<A> metaAnnotation = usage.getAnnotationDescriptor().getAnnotationUsage( annotationType );
+			final AnnotationDescriptor<? extends Annotation> usageDescriptor = modelContext.getAnnotationDescriptorRegistry().getDescriptor( usage.annotationType() );
+			final A metaAnnotation = usageDescriptor.getDirectAnnotationUsage( annotationType );
 			if ( metaAnnotation != null ) {
 				return metaAnnotation;
 			}
@@ -98,28 +147,12 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	}
 
 	@Override
-	default <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(AnnotationDescriptor<A> type) {
-		return AnnotationUsageHelper.getRepeatedUsages( type, getUsageMap() );
-	}
-
-	@Override
-	default <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotationUsages(Class<A> type) {
-		return getRepeatedAnnotationUsages( getBuildingContext().getAnnotationDescriptorRegistry().getDescriptor( type ) );
-	}
-
-	@Override
-	default <X extends Annotation> void forEachAnnotationUsage(Class<X> type, Consumer<AnnotationUsage<X>> consumer) {
-		forEachAnnotationUsage(
-				getBuildingContext().getAnnotationDescriptorRegistry().getDescriptor( type ),
-				consumer
-		);
-	}
-
-	@Override
-	default <A extends Annotation> List<AnnotationUsage<? extends Annotation>> getMetaAnnotated(Class<A> metaAnnotationType) {
-		final List<AnnotationUsage<?>> usages = new ArrayList<>();
-		forAllAnnotationUsages( (usage) -> {
-			final Annotation metaUsage = usage.getAnnotationType().getAnnotation( metaAnnotationType );
+	default <A extends Annotation> List<? extends Annotation> getMetaAnnotated(
+			Class<A> metaAnnotationType,
+			SourceModelBuildingContext modelContext) {
+		final List<Annotation> usages = new ArrayList<>();
+		forEachDirectAnnotationUsage( (usage) -> {
+			final Annotation metaUsage = usage.annotationType().getAnnotation( metaAnnotationType );
 			if ( metaUsage != null ) {
 				usages.add( usage );
 			}
@@ -128,44 +161,71 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	}
 
 	@Override
-	default <X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(Class<X> type, String matchName) {
-		return getNamedAnnotationUsage( getBuildingContext().getAnnotationDescriptorRegistry().getDescriptor( type ), matchName );
-	}
-
-	@Override
-	default <X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
-			AnnotationDescriptor<X> type,
-			String matchName,
-			String attributeToMatch) {
-		return AnnotationUsageHelper.getNamedUsage( type, matchName, attributeToMatch, getUsageMap() );
-	}
-
-	@Override
-	default <X extends Annotation> AnnotationUsage<X> getNamedAnnotationUsage(
+	default <X extends Annotation> X getNamedAnnotationUsage(
 			Class<X> type,
 			String matchName,
-			String attributeToMatch) {
+			SourceModelBuildingContext modelContext) {
+		return getNamedAnnotationUsage( modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ), matchName, modelContext );
+	}
+
+	@Override
+	default <X extends Annotation> X getNamedAnnotationUsage(
+			AnnotationDescriptor<X> type,
+			String matchName,
+			String attributeToMatch,
+			SourceModelBuildingContext modelContext) {
+		return AnnotationUsageHelper.getNamedUsage( type, matchName, attributeToMatch, getUsageMap(), modelContext );
+	}
+
+	@Override
+	default <X extends Annotation> X getNamedAnnotationUsage(
+			Class<X> type,
+			String matchName,
+			String attributeToMatch,
+			SourceModelBuildingContext modelContext) {
 		return getNamedAnnotationUsage(
-				getBuildingContext().getAnnotationDescriptorRegistry().getDescriptor( type ),
+				modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ),
 				matchName,
-				attributeToMatch
+				attributeToMatch,
+				modelContext
 		);
 	}
 
 	@Override
-	default <S extends Annotation, P extends Annotation> MutableAnnotationUsage<P> replaceAnnotationUsage(
+	default <S extends Annotation, P extends Annotation> P replaceAnnotationUsage(
 			AnnotationDescriptor<S> repeatableType,
 			AnnotationDescriptor<P> containerType,
-			SourceModelBuildingContext buildingContext) {
+			SourceModelBuildingContext modelContext) {
 		assert repeatableType.isRepeatable();
 		assert repeatableType.getRepeatableContainer() == containerType;
 
-		final MutableAnnotationUsage<P> containerTypeUsage = containerType.createUsage( buildingContext );
+		final P containerTypeUsage = containerType.createUsage( modelContext );
 		// effectively overwrites any previous registrations
-		getUsageMap().put( containerType.getAnnotationType(), containerTypeUsage );
+		//noinspection unchecked,rawtypes
+		( (Map) getUsageMap() ).put( containerType.getAnnotationType(), containerTypeUsage );
 		// remove any entry for the repeatable/singular form
 		getUsageMap().remove( repeatableType.getAnnotationType() );
 
 		return containerTypeUsage;
 	}
+
+	@Override
+	default <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
+		return null;
+	}
+
+	@Override
+	FieldDetails asFieldDetails();
+
+	@Override
+	MethodDetails asMethodDetails();
+
+	@Override
+	RecordComponentDetails asRecordComponentDetails();
+
+	@Override
+	MutableClassDetails asClassDetails();
+
+	@Override
+	MutableMemberDetails asMemberDetails();
 }

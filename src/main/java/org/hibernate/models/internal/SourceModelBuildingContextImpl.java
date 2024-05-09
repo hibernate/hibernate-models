@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ClassLoading;
@@ -70,12 +69,12 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 	}
 
 	@Override
-	public <A extends Annotation> List<AnnotationUsage<A>> getAllAnnotationUsages(Class<A> annotationType) {
+	public <A extends Annotation> List<A> getAllAnnotationUsages(Class<A> annotationType) {
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override
-	public <A extends Annotation> void forEachAnnotationUsage(Class<A> annotationType, Consumer<AnnotationUsage<A>> consumer) {
+	public <A extends Annotation> void forEachAnnotationUsage(Class<A> annotationType, Consumer<A> consumer) {
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 

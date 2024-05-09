@@ -19,6 +19,6 @@ public class FloatValueExtractor extends AbstractValueExtractor<Float> {
 	@Override
 	protected Float extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
 		assert jandexValue != null;
-		return FloatValueWrapper.JANDEX_FLOAT_VALUE_WRAPPER.wrap( jandexValue, buildingContext );
+		return FloatValueConverter.JANDEX_FLOAT_VALUE_WRAPPER.convert( jandexValue, buildingContext );
 	}
 }

@@ -6,20 +6,12 @@
  */
 package org.hibernate.models.internal;
 
-import java.lang.annotation.Annotation;
-
+import org.hibernate.models.internal.jandex.LongValueConverter;
 import org.hibernate.models.internal.jandex.LongValueExtractor;
-import org.hibernate.models.internal.jandex.LongValueWrapper;
-import org.hibernate.models.internal.jdk.PassThruExtractor;
 import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueExtractor;
-import org.hibernate.models.spi.ValueWrapper;
-
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationValue;
-
-import static org.hibernate.models.internal.jdk.PassThruWrapper.PASS_THRU_WRAPPER;
+import org.hibernate.models.spi.JandexValueConverter;
+import org.hibernate.models.spi.JandexValueExtractor;
 
 /**
  * Descriptor for long values
@@ -30,30 +22,18 @@ public class LongTypeDescriptor extends AbstractTypeDescriptor<Long> {
 	public static final LongTypeDescriptor LONG_TYPE_DESCRIPTOR = new LongTypeDescriptor();
 
 	@Override
-	public Class<Long> getWrappedValueType() {
+	public Class<Long> getValueType() {
 		return Long.class;
 	}
 
 	@Override
-	public ValueWrapper<Long, AnnotationValue> createJandexWrapper(SourceModelBuildingContext buildingContext) {
-		return LongValueWrapper.JANDEX_LONG_VALUE_WRAPPER;
+	public JandexValueConverter<Long> createJandexValueConverter(SourceModelBuildingContext modelContext) {
+		return LongValueConverter.JANDEX_LONG_VALUE_WRAPPER;
 	}
 
 	@Override
-	public ValueExtractor<AnnotationInstance, Long> createJandexExtractor(SourceModelBuildingContext buildingContext) {
+	public JandexValueExtractor<Long> createJandexValueExtractor(SourceModelBuildingContext modelContext) {
 		return LongValueExtractor.JANDEX_LONG_EXTRACTOR;
-	}
-
-	@Override
-	public ValueWrapper<Long, ?> createJdkWrapper(SourceModelBuildingContext buildingContext) {
-		//noinspection unchecked
-		return PASS_THRU_WRAPPER;
-	}
-
-	@Override
-	public ValueExtractor<Annotation, Long> createJdkExtractor(SourceModelBuildingContext buildingContext) {
-		//noinspection unchecked
-		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
 
 	@Override
@@ -62,12 +42,17 @@ public class LongTypeDescriptor extends AbstractTypeDescriptor<Long> {
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue) {
+	public void render(RenderingCollector collector, String name, Object attributeValue, SourceModelBuildingContext modelContext) {
 		collector.addLine( "%s = %sL", name, attributeValue );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue) {
+	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
 		collector.addLine( "%sL", attributeValue );
+	}
+
+	@Override
+	public Long[] makeArray(int size, SourceModelBuildingContext modelContext) {
+		return new Long[size];
 	}
 }

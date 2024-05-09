@@ -6,20 +6,12 @@
  */
 package org.hibernate.models.internal;
 
-import java.lang.annotation.Annotation;
-
+import org.hibernate.models.internal.jandex.FloatValueConverter;
 import org.hibernate.models.internal.jandex.FloatValueExtractor;
-import org.hibernate.models.internal.jandex.FloatValueWrapper;
-import org.hibernate.models.internal.jdk.PassThruExtractor;
+import org.hibernate.models.spi.JandexValueConverter;
+import org.hibernate.models.spi.JandexValueExtractor;
 import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.ValueExtractor;
-import org.hibernate.models.spi.ValueWrapper;
-
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationValue;
-
-import static org.hibernate.models.internal.jdk.PassThruWrapper.PASS_THRU_WRAPPER;
 
 /**
  * Descriptor for float values
@@ -30,30 +22,18 @@ public class FloatTypeDescriptor extends AbstractTypeDescriptor<Float> {
 	public static final FloatTypeDescriptor FLOAT_TYPE_DESCRIPTOR = new FloatTypeDescriptor();
 
 	@Override
-	public Class<Float> getWrappedValueType() {
+	public Class<Float> getValueType() {
 		return Float.class;
 	}
 
 	@Override
-	public ValueWrapper<Float, AnnotationValue> createJandexWrapper(SourceModelBuildingContext buildingContext) {
-		return FloatValueWrapper.JANDEX_FLOAT_VALUE_WRAPPER;
+	public JandexValueConverter<Float> createJandexValueConverter(SourceModelBuildingContext buildingContext) {
+		return FloatValueConverter.JANDEX_FLOAT_VALUE_WRAPPER;
 	}
 
 	@Override
-	public ValueExtractor<AnnotationInstance, Float> createJandexExtractor(SourceModelBuildingContext buildingContext) {
+	public JandexValueExtractor<Float> createJandexValueExtractor(SourceModelBuildingContext buildingContext) {
 		return FloatValueExtractor.JANDEX_FLOAT_EXTRACTOR;
-	}
-
-	@Override
-	public ValueWrapper<Float, ?> createJdkWrapper(SourceModelBuildingContext buildingContext) {
-		//noinspection unchecked
-		return PASS_THRU_WRAPPER;
-	}
-
-	@Override
-	public ValueExtractor<Annotation, Float> createJdkExtractor(SourceModelBuildingContext buildingContext) {
-		//noinspection unchecked
-		return PassThruExtractor.PASS_THRU_EXTRACTOR;
 	}
 
 	@Override
@@ -62,12 +42,17 @@ public class FloatTypeDescriptor extends AbstractTypeDescriptor<Float> {
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue) {
+	public void render(RenderingCollector collector, String name, Object attributeValue, SourceModelBuildingContext modelContext) {
 		collector.addLine( "%s = %sF", name, attributeValue );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue) {
+	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
 		collector.addLine( "%sF", attributeValue );
+	}
+
+	@Override
+	public Float[] makeArray(int size, SourceModelBuildingContext modelContext) {
+		return new Float[size];
 	}
 }

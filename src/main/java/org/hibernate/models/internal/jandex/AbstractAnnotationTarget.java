@@ -10,19 +10,22 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationTargetSupport;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
  * @author Steve Ebersole
  */
 public abstract class AbstractAnnotationTarget implements AnnotationTargetSupport {
-	private final SourceModelBuildingContext buildingContext;
+	private final SourceModelBuildingContext modelContext;
 
-	private Map<Class<? extends Annotation>, AnnotationUsage<?>> usageMap;
+	private Map<Class<? extends Annotation>, ? extends Annotation> usageMap;
 
-	public AbstractAnnotationTarget(SourceModelBuildingContext buildingContext) {
-		this.buildingContext = buildingContext;
+	public AbstractAnnotationTarget(SourceModelBuildingContext modelContext) {
+		this.modelContext = modelContext;
+	}
+
+	public SourceModelBuildingContext getModelContext() {
+		return modelContext;
 	}
 
 	/**
@@ -32,9 +35,9 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 	protected abstract org.jboss.jandex.AnnotationTarget getJandexAnnotationTarget();
 
 	@Override
-	public Map<Class<? extends Annotation>, AnnotationUsage<?>> getUsageMap() {
+	public Map<Class<? extends Annotation>, ? extends Annotation> getUsageMap() {
 		if ( usageMap == null ) {
-			usageMap = AnnotationUsageBuilder.collectUsages( getJandexAnnotationTarget(), buildingContext );
+			usageMap = AnnotationUsageBuilder.collectUsages( getJandexAnnotationTarget(), modelContext );
 		}
 		return usageMap;
 	}
@@ -42,16 +45,5 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 	@Override
 	public void clearAnnotationUsages() {
 		getUsageMap().clear();
-	}
-
-	@Override
-	public <X extends Annotation> void addAnnotationUsage(AnnotationUsage<X> annotationUsage) {
-		assert annotationUsage.getAnnotationDescriptor().getAllowableTargets().contains( getKind() );
-		getUsageMap().put( annotationUsage.getAnnotationType(), annotationUsage );
-	}
-
-	@Override
-	public SourceModelBuildingContext getBuildingContext() {
-		return buildingContext;
 	}
 }
