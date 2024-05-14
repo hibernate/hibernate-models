@@ -24,7 +24,7 @@ import static org.hibernate.models.orm.JpaAnnotations.COLUMN;
  * @author Steve Ebersole
  */
 @SuppressWarnings({ "ClassExplicitlyAnnotation", "unused" })
-public class ColumnAnnotation implements Column {
+public class ColumnAnnotation implements Column, ColumnDetails {
 	private String name;
 	private String table;
 

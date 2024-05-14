@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
+import org.hibernate.models.UnhandledMethodException;
 import org.hibernate.models.internal.jandex.AnnotationUsageBuilder;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
@@ -23,17 +24,22 @@ import org.jboss.jandex.AnnotationInstance;
 /**
  * Acts as {@link Annotation} usage using {@link InvocationHandler} and {@link Proxy}.
  *
- * @apiNote This should only be used for annotations not known ahead of time (user annotations)
+ * @apiNote Mainly this is used for handling Jandex-based annotations when the annotation
+ * is a non-ORM annotation.
  *
  * @author Steve Ebersole
  */
 public class AnnotationProxy<A extends Annotation> implements InvocationHandler {
 	private final AnnotationDescriptor<A> annotationDescriptor;
-	private final Map<String,?> valueMap;
+	private final Map<String,Object> valueMap;
 
-	public AnnotationProxy(AnnotationDescriptor<A> annotationDescriptor, Map<String, ?> valueMap) {
+	public AnnotationProxy(AnnotationDescriptor<A> annotationDescriptor, Map<String,Object> valueMap) {
 		this.annotationDescriptor = annotationDescriptor;
 		this.valueMap = valueMap;
+	}
+
+	public void setValue(String name, Object value) {
+		valueMap.put( name, value );
 	}
 
 	@Override
@@ -50,13 +56,35 @@ public class AnnotationProxy<A extends Annotation> implements InvocationHandler 
 			}
 		}
 
-		final AttributeDescriptor<Object> attributeDescriptor = annotationDescriptor.getAttribute( method.getName() );
-		return attributeDescriptor.getTypeDescriptor().unwrap( valueMap.get( method.getName() ) );
+		if ( method.getParameterCount() == 0 ) {
+			final AttributeDescriptor<Object> attributeDescriptor = annotationDescriptor.getAttribute( method.getName() );
+			return attributeDescriptor.getTypeDescriptor().unwrap( valueMap.get( method.getName() ) );
+		}
+
+		// allow for mutability
+		if ( isSetValueMethod( method) ) {
+			assert method.getParameterCount() == 2;
+			valueMap.put( (String) args[0], args[1] );
+		}
+		if ( method.getParameterCount() == 1 ) {
+			valueMap.put( method.getName(), args[0] );
+			return null;
+		}
+
+		throw new UnhandledMethodException( "Unhandled method - " + method.toGenericString() );
+	}
+
+	private boolean isSetValueMethod(Method method) {
+		if ( !"setValue".equals( method.getName() ) || method.getParameterCount() != 2 ) {
+			return false;
+		}
+
+		return String.class.equals( method.getParameterTypes()[0] );
 	}
 
 	public static <A extends Annotation> A makeProxy(
 			AnnotationDescriptor<A> descriptor,
-			Map<String,?> valueMap) {
+			Map<String,Object> valueMap) {
 		final AnnotationProxy<A> handler = new AnnotationProxy<>( descriptor, valueMap );
 		//noinspection unchecked
 		return (A) Proxy.newProxyInstance(

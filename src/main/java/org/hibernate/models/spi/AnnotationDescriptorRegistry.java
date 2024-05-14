@@ -36,7 +36,10 @@ public interface AnnotationDescriptorRegistry {
 
 	/**
 	 * Make a copy of this registry which cannot be added-to.
+	 *
+	 * @deprecated No real need to make this immutable
 	 */
+	@Deprecated(forRemoval = true)
 	AnnotationDescriptorRegistry makeImmutableCopy();
 
 	@FunctionalInterface

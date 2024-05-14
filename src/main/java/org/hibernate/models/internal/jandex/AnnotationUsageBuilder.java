@@ -100,7 +100,7 @@ public class AnnotationUsageBuilder {
 	 * Extracts values from an annotation creating AnnotationAttributeValue references.
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <A extends Annotation> Map<String,?> extractAttributeValues(
+	public static <A extends Annotation> Map<String,Object> extractAttributeValues(
 			AnnotationInstance annotationInstance,
 			AnnotationDescriptor<A> annotationDescriptor,
 			SourceModelBuildingContext modelContext) {

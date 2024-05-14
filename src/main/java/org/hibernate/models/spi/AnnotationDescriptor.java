@@ -34,6 +34,11 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	Class<A> getAnnotationType();
 
 	/**
+	 * Create an empty usage.  Used when there is no source form, such as XML processing.
+	 */
+	A createUsage(SourceModelBuildingContext context);
+
+	/**
 	 * Create a usage from the JDK representation.  This will often just return the passed annotation,
 	 * although for Hibernate and JPA annotations we generally want wrappers to be able to manipulate the
 	 * values.
@@ -44,11 +49,6 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * Create a usage from the Jandex representation.
 	 */
 	A createUsage(AnnotationInstance jandexAnnotation, SourceModelBuildingContext context);
-
-	/**
-	 * Create an empty usage.  Used when there is no source form, such as XML processing.
-	 */
-	A createUsage(SourceModelBuildingContext context);
 
 	/**
 	 * The places the described annotation can be used

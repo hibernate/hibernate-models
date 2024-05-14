@@ -19,7 +19,7 @@ import jakarta.persistence.SequenceGenerator;
  * @author Steve Ebersole
  */
 @SuppressWarnings({ "ClassExplicitlyAnnotation", "unused" })
-public class SequenceGeneratorAnnotation implements SequenceGenerator, Named {
+public class SequenceGeneratorAnnotation implements SequenceGenerator, Named, DatabaseObjectDetails {
 	private String name;
 	private String sequenceName;
 	private String catalog;
