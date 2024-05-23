@@ -60,8 +60,7 @@ public class JandexValueHelper {
 			SourceModelBuildingContext modelContext) {
 		final AnnotationValue value = usage.value( attributeDescriptor.getName() );
 		if ( value == null ) {
-			//noinspection unchecked
-			return (V) attributeDescriptor.getAttributeMethod().getDefaultValue();
+			return attributeDescriptor.getDefaultValue();
 		}
 
 		return modelContext.as( JandexModelContext.class )

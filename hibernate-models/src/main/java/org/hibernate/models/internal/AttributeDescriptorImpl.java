@@ -51,6 +51,12 @@ public class AttributeDescriptorImpl<T> implements AttributeDescriptor<T> {
 	}
 
 	@Override
+	public T getDefaultValue() {
+		//noinspection unchecked
+		return (T) method.getDefaultValue();
+	}
+
+	@Override
 	public Method getAttributeMethod() {
 		return method;
 	}

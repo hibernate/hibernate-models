@@ -23,11 +23,19 @@ public interface AttributeDescriptor<T> {
 	ValueTypeDescriptor<T> getTypeDescriptor();
 
 	/**
+	 * The attribute's type.
+	 */
+	default Class<T> getValueType() {
+		return getTypeDescriptor().getValueType();
+	}
+
+	/**
+	 * The attribute's defined default value, if one.
+	 */
+	T getDefaultValue();
+
+	/**
 	 * The attribute method.
 	 */
 	Method getAttributeMethod();
-
-	default boolean isMultiValued() {
-		return getAttributeMethod().getReturnType().isArray();
-	}
 }
