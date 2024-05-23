@@ -10,7 +10,7 @@ import org.jboss.jandex.IndexView;
 
 /**
  * Context object used while building references for {@link AnnotationDescriptor},
- * {@link AnnotationUsage} and friends.
+ * {@link ClassDetails} and friends.
  * <p/>
  * Acts as the global {@linkplain SharedAnnotationScope}
  *

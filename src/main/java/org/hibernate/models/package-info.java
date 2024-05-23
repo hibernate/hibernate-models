@@ -38,7 +38,7 @@
  * @see org.hibernate.models.spi.FieldDetails
  * @see org.hibernate.models.spi.MethodDetails
  * @see org.hibernate.models.spi.AnnotationDescriptor
- * @see org.hibernate.models.spi.AnnotationUsage
+ * @see org.hibernate.models.spi.AttributeDescriptor
  * @see org.hibernate.models.spi.AnnotationDescriptorRegistry
  * @see org.hibernate.models.spi.ClassDetailsRegistry
  *
