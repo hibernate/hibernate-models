@@ -9,15 +9,13 @@ package org.hibernate.models.internal;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Target;
-import java.lang.reflect.InvocationTargetException;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
 
-import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.JdkValueExtractor;
 import org.hibernate.models.spi.RenderingCollector;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
@@ -67,7 +65,7 @@ public class AnnotationHelper {
 			attributes.forEach( (attribute) -> attribute.getTypeDescriptor().render(
 					collector,
 					attribute.getName(),
-					extractValue( annotation, attribute ),
+					extractValue( annotation, attribute, context ),
 					context
 			) );
 
@@ -107,7 +105,7 @@ public class AnnotationHelper {
 			attributes.forEach( (attribute) -> attribute.getTypeDescriptor().render(
 					collector,
 					attribute.getName(),
-					extractValue( annotation, attribute ),
+					extractValue( annotation, attribute, context ),
 					context
 			) );
 
@@ -116,21 +114,11 @@ public class AnnotationHelper {
 		}
 	}
 
-	public static <A extends Annotation, R> R extractValue(A annotationUsage, AttributeDescriptor<R> attributeDescriptor) {
-		try {
-			//noinspection unchecked
-			return (R) attributeDescriptor.getAttributeMethod().invoke( annotationUsage );
-		}
-		catch (IllegalAccessException | InvocationTargetException e) {
-			throw new AnnotationAccessException(
-					String.format(
-							Locale.ROOT,
-							"Unable to access annotation attribute value : %s.%s",
-							annotationUsage.annotationType().getName(),
-							attributeDescriptor.getName()
-					),
-					e
-			);
-		}
+	public static <A extends Annotation, R> R extractValue(
+			A annotationUsage,
+			AttributeDescriptor<R> attributeDescriptor,
+			SourceModelBuildingContext modelContext) {
+		final JdkValueExtractor<R> valueExtractor = attributeDescriptor.getTypeDescriptor().createJdkValueExtractor( modelContext );
+		return valueExtractor.extractValue( annotationUsage, attributeDescriptor, modelContext );
 	}
 }
