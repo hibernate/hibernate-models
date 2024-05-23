@@ -28,22 +28,23 @@ import org.jboss.jandex.AnnotationInstance;
  *
  * @author Steve Ebersole
  */
-public class OrmAnnotationDescriptor<A extends Annotation> extends AbstractAnnotationDescriptor<A> {
-	private final Class<? extends A> concreteClass;
+public class OrmAnnotationDescriptor<A extends Annotation, C extends A> extends AbstractAnnotationDescriptor<A> {
+	private final Class<C> concreteClass;
 	private final List<AttributeDescriptor<?>> attributeDescriptors;
 
-	private JdkCreator<A> jdkCreator;
-	private JandexCreator<A> jandexCreator;
+	private DynamicCreator<A,C> dynamicCreator;
+	private JdkCreator<A,C> jdkCreator;
+	private JandexCreator<A,C> jandexCreator;
 
 	public OrmAnnotationDescriptor(
 			Class<A> annotationType,
-			Class<? extends A> concreteClass) {
+			Class<C> concreteClass) {
 		this( annotationType, concreteClass, null );
 	}
 
 	public OrmAnnotationDescriptor(
 			Class<A> annotationType,
-			Class<? extends A> concreteClass,
+			Class<C> concreteClass,
 			AnnotationDescriptor<?> repeatableContainer) {
 		super(
 				annotationType,
@@ -64,7 +65,15 @@ public class OrmAnnotationDescriptor<A extends Annotation> extends AbstractAnnot
 	}
 
 	@Override
-	public A createUsage(A jdkAnnotation, SourceModelBuildingContext context) {
+	public C createUsage(SourceModelBuildingContext context) {
+		if ( dynamicCreator == null ) {
+			dynamicCreator = new DynamicCreator<>( getAnnotationType(), concreteClass );
+		}
+		return dynamicCreator.createUsage( context );
+	}
+
+	@Override
+	public C createUsage(A jdkAnnotation, SourceModelBuildingContext context) {
 		if ( jdkCreator == null ) {
 			jdkCreator = new JdkCreator<>( getAnnotationType(), concreteClass );
 		}
@@ -72,22 +81,11 @@ public class OrmAnnotationDescriptor<A extends Annotation> extends AbstractAnnot
 	}
 
 	@Override
-	public A createUsage(AnnotationInstance jandexAnnotation, SourceModelBuildingContext context) {
+	public C createUsage(AnnotationInstance jandexAnnotation, SourceModelBuildingContext context) {
 		if ( jandexCreator == null ) {
 			jandexCreator = new JandexCreator<>( concreteClass );
 		}
 		return jandexCreator.createUsage( jandexAnnotation, context );
-	}
-
-	@Override
-	public A createUsage(SourceModelBuildingContext context) {
-		try {
-			final Constructor<? extends A> constructor = concreteClass.getDeclaredConstructor();
-			return constructor.newInstance();
-		}
-		catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-			throw new RuntimeException( e );
-		}
 	}
 
 	@Override
@@ -100,16 +98,46 @@ public class OrmAnnotationDescriptor<A extends Annotation> extends AbstractAnnot
 		return String.format( "AnnotationDescriptor(%s)", getAnnotationType().getName() );
 	}
 
-	public static class JdkCreator<A extends Annotation> {
-		private final Constructor<? extends A> constructor;
+	public static class DynamicCreator<A extends Annotation, C extends A> {
+		private final Constructor<C> constructor;
 
-		public JdkCreator(Class<A> annotationType, Class<? extends A> concreteClass) {
+		public DynamicCreator(Class<A> annotationType, Class<C> concreteClass) {
+			this( resolveConstructor( concreteClass ) );
+		}
+
+		private static <A extends Annotation, C extends A> Constructor<C> resolveConstructor(Class<C> concreteClass) {
+			try {
+				return concreteClass.getDeclaredConstructor( SourceModelBuildingContext.class );
+			}
+			catch (NoSuchMethodException e) {
+				throw new RuntimeException( e );
+			}
+		}
+
+		public DynamicCreator(Constructor<C> constructor) {
+			this.constructor = constructor;
+		}
+
+		public C createUsage(SourceModelBuildingContext context) {
+			try {
+				return constructor.newInstance( context );
+			}
+			catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+				throw new RuntimeException( e );
+			}
+		}
+	}
+
+	public static class JdkCreator<A extends Annotation, C extends A> {
+		private final Constructor<C> constructor;
+
+		public JdkCreator(Class<A> annotationType, Class<C> concreteClass) {
 			this( resolveConstructor( annotationType, concreteClass ) );
 		}
 
-		private static <A extends Annotation> Constructor<? extends A> resolveConstructor(
+		private static <A extends Annotation, C extends A> Constructor<C> resolveConstructor(
 				Class<A> annotationType,
-				Class<? extends A> concreteClass) {
+				Class<C> concreteClass) {
 			try {
 				return concreteClass.getDeclaredConstructor( annotationType, SourceModelBuildingContext.class );
 			}
@@ -118,11 +146,11 @@ public class OrmAnnotationDescriptor<A extends Annotation> extends AbstractAnnot
 			}
 		}
 
-		public JdkCreator(Constructor<? extends A> constructor) {
+		public JdkCreator(Constructor<C> constructor) {
 			this.constructor = constructor;
 		}
 
-		public A createUsage(A jdkAnnotation, SourceModelBuildingContext context) {
+		public C createUsage(A jdkAnnotation, SourceModelBuildingContext context) {
 			try {
 				return constructor.newInstance( jdkAnnotation, context );
 			}
@@ -132,14 +160,14 @@ public class OrmAnnotationDescriptor<A extends Annotation> extends AbstractAnnot
 		}
 	}
 
-	public static class JandexCreator<A extends Annotation> {
-		private final Constructor<? extends A> constructor;
+	public static class JandexCreator<A extends Annotation, C extends A> {
+		private final Constructor<C> constructor;
 
-		public JandexCreator(Class<? extends A> concreteClass) {
+		public JandexCreator(Class<C> concreteClass) {
 			this( resolveConstructor( concreteClass ) );
 		}
 
-		private static <A extends Annotation> Constructor<? extends A> resolveConstructor(Class<? extends A> concreteClass) {
+		private static <A extends Annotation, C extends A> Constructor<C> resolveConstructor(Class<C> concreteClass) {
 			try {
 				return concreteClass.getDeclaredConstructor( AnnotationInstance.class, SourceModelBuildingContext.class );
 			}
@@ -148,11 +176,11 @@ public class OrmAnnotationDescriptor<A extends Annotation> extends AbstractAnnot
 			}
 		}
 
-		public JandexCreator(Constructor<? extends A> constructor) {
+		public JandexCreator(Constructor<C> constructor) {
 			this.constructor = constructor;
 		}
 
-		public A createUsage(AnnotationInstance jandexAnnotation, SourceModelBuildingContext context) {
+		public C createUsage(AnnotationInstance jandexAnnotation, SourceModelBuildingContext context) {
 			try {
 				return constructor.newInstance( jandexAnnotation, context );
 			}

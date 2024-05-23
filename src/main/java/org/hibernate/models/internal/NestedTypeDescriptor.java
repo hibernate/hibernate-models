@@ -10,8 +10,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.Locale;
 
-import org.hibernate.models.internal.jandex.NestedValueConverter;
-import org.hibernate.models.internal.jandex.NestedValueExtractor;
+import org.hibernate.models.internal.jandex.JandexNestedValueConverter;
+import org.hibernate.models.internal.jandex.JandexNestedValueExtractor;
+import org.hibernate.models.internal.jdk.JdkNestedValueConverter;
+import org.hibernate.models.internal.jdk.JdkNestedValueExtractor;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.JandexValueConverter;
 import org.hibernate.models.spi.JandexValueExtractor;
@@ -30,11 +32,11 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 
 	private AnnotationDescriptor<A> descriptor;
 
-	private NestedValueConverter<A> jandexConverter;
-	private NestedValueExtractor<A> jandexExtractor;
+	private JandexNestedValueConverter<A> jandexConverter;
+	private JandexNestedValueExtractor<A> jandexExtractor;
 
-	private org.hibernate.models.internal.jdk.NestedValueConverter<A> jdkConverter;
-	private org.hibernate.models.internal.jdk.NestedValueExtractor<A> jdkExtractor;
+	private JdkNestedValueConverter<A> jdkConverter;
+	private JdkNestedValueExtractor<A> jdkExtractor;
 
 	public NestedTypeDescriptor(Class<A> annotationType) {
 		this.annotationType = annotationType;
@@ -47,9 +49,7 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 
 	private AnnotationDescriptor<A> resolveDescriptor(SourceModelBuildingContext context) {
 		if ( descriptor == null ) {
-			descriptor = context
-					.getAnnotationDescriptorRegistry()
-					.resolveDescriptor( annotationType, (t) -> new StandardAnnotationDescriptor<>( annotationType, descriptor, context ) );
+			descriptor = context.getAnnotationDescriptorRegistry().getDescriptor( annotationType );
 		}
 		return descriptor;
 	}
@@ -59,9 +59,9 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 		return resolveJandexWrapper( buildingContext );
 	}
 
-	public NestedValueConverter<A> resolveJandexWrapper(SourceModelBuildingContext buildingContext) {
+	public JandexNestedValueConverter<A> resolveJandexWrapper(SourceModelBuildingContext buildingContext) {
 		if ( jandexConverter == null ) {
-			jandexConverter = new NestedValueConverter<>( resolveDescriptor( buildingContext ) );
+			jandexConverter = new JandexNestedValueConverter<>( resolveDescriptor( buildingContext ) );
 		}
 		return jandexConverter;
 	}
@@ -71,25 +71,33 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 		return resolveJandexExtractor( buildingContext );
 	}
 
-	public NestedValueExtractor<A> resolveJandexExtractor(SourceModelBuildingContext buildingContext) {
+	public JandexNestedValueExtractor<A> resolveJandexExtractor(SourceModelBuildingContext buildingContext) {
 		if ( jandexExtractor == null ) {
-			this.jandexExtractor = new NestedValueExtractor<>( resolveJandexWrapper( buildingContext ) );
+			this.jandexExtractor = new JandexNestedValueExtractor<>( resolveJandexWrapper( buildingContext ) );
 		}
 		return jandexExtractor;
 	}
 
 	@Override
 	public JdkValueConverter<A> createJdkValueConverter(SourceModelBuildingContext modelContext) {
+		return resolveJdkValueConverter( modelContext );
+	}
+
+	public JdkNestedValueConverter<A> resolveJdkValueConverter(SourceModelBuildingContext modelContext) {
 		if ( jdkConverter == null ) {
-			jdkConverter = new org.hibernate.models.internal.jdk.NestedValueConverter<>( descriptor );
+			jdkConverter = new JdkNestedValueConverter<>( resolveDescriptor( modelContext ) );
 		}
 		return jdkConverter;
 	}
 
 	@Override
 	public JdkValueExtractor<A> createJdkValueExtractor(SourceModelBuildingContext modelContext) {
+		return resolveJdkValueExtractor( modelContext );
+	}
+
+	public JdkValueExtractor<A> resolveJdkValueExtractor(SourceModelBuildingContext modelContext) {
 		if ( jdkExtractor == null ) {
-			jdkExtractor = new org.hibernate.models.internal.jdk.NestedValueExtractor<>( jdkConverter );
+			jdkExtractor = new JdkNestedValueExtractor<>( resolveJdkValueConverter( modelContext ) );
 		}
 		return jdkExtractor;
 	}

@@ -35,7 +35,7 @@ import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
  *
  * @author Steve Ebersole
  */
-public class JdkClassDetails extends AbstractAnnotationTarget implements ClassDetailsSupport {
+public class JdkClassDetails extends AbstractJdkAnnotationTarget implements ClassDetailsSupport {
 	private final String name;
 	private final Class<?> managedClass;
 

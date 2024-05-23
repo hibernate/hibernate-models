@@ -69,7 +69,9 @@ public class StandardAnnotationDescriptor<A extends Annotation> extends Abstract
 
 	@Override
 	public A createUsage(SourceModelBuildingContext context) {
-		throw new UnsupportedOperationException( "Creating empty annotation usage mot supported from StandardAnnotationDescriptor" );
+		throw new UnsupportedOperationException(
+				"Creating empty annotation usage mot supported from StandardAnnotationDescriptor : " + getAnnotationType().getName()
+		);
 	}
 
 	@Override

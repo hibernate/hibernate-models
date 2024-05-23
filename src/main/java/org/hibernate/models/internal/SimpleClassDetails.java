@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -148,6 +149,16 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public <A extends Annotation> A getDirectAnnotationUsage(AnnotationDescriptor<A> descriptor) {
+		return null;
+	}
+
+	@Override
+	public <A extends Annotation> A getDirectAnnotationUsage(Class<A> type) {
+		return null;
+	}
+
+	@Override
 	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
 		return false;
 	}
@@ -174,6 +185,13 @@ public class SimpleClassDetails implements ClassDetails {
 			AnnotationDescriptor<A> type,
 			SourceModelBuildingContext modelContext) {
 		return null;
+	}
+
+	@Override
+	public <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
+			Class<A> repeatable,
+			Class<C> container,
+			SourceModelBuildingContext modelContext, Consumer<A> consumer) {
 	}
 
 	@Override

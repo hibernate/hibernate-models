@@ -15,10 +15,10 @@ import org.jboss.jandex.AnnotationValue;
 /**
  * @author Steve Ebersole
  */
-public class NestedValueExtractor<A extends Annotation> extends AbstractValueExtractor<A> {
-	private final NestedValueConverter<A> wrapper;
+public class JandexNestedValueExtractor<A extends Annotation> extends AbstractValueExtractor<A> {
+	private final JandexNestedValueConverter<A> wrapper;
 
-	public NestedValueExtractor(NestedValueConverter<A> wrapper) {
+	public JandexNestedValueExtractor(JandexNestedValueConverter<A> wrapper) {
 		this.wrapper = wrapper;
 	}
 

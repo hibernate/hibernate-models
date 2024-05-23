@@ -9,6 +9,7 @@ package org.hibernate.models.internal;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.internal.jandex.JandexValueHelper;
@@ -103,6 +104,49 @@ public class AnnotationUsageHelper {
 			}
 		}
 		return found;
+	}
+
+	public static <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
+			Class<A> repeatableType,
+			Class<C> containerType,
+			Consumer<A> consumer,
+			Map<Class<? extends Annotation>, ? extends Annotation> usageMap,
+			SourceModelBuildingContext modelContext) {
+		//noinspection unchecked
+		final A repeatable = (A) usageMap.get( repeatableType );
+		if ( repeatable != null ) {
+			consumer.accept( repeatable );
+		}
+
+		//noinspection unchecked
+		final C container = (C) usageMap.get( containerType );
+		if ( container != null ) {
+			final AnnotationDescriptor<C> containerDescriptor = modelContext.getAnnotationDescriptorRegistry().getDescriptor( containerType );
+			final AttributeDescriptor<A[]> attribute = containerDescriptor.getAttribute( "value" );
+			final A[] repetitions = AnnotationHelper.extractValue( container, attribute );
+			CollectionHelper.forEach( repetitions, consumer );
+		}
+	}
+
+	public static <A extends Annotation> void forEachRepeatedAnnotationUsages(
+			AnnotationDescriptor<A> repeatableDescriptor,
+			Consumer<A> consumer,
+			Map<Class<? extends Annotation>, ? extends Annotation> usageMap,
+			SourceModelBuildingContext modelContext) {
+		//noinspection unchecked
+		final A repeatable = (A) usageMap.get( repeatableDescriptor.getAnnotationType() );
+		if ( repeatable != null ) {
+			consumer.accept( repeatable );
+		}
+
+		final Class<? extends Annotation> containerType = repeatableDescriptor.getRepeatableContainer().getAnnotationType();
+		final Annotation container = usageMap.get( containerType );
+		if ( container != null ) {
+			final AnnotationDescriptor<?> containerDescriptor = modelContext.getAnnotationDescriptorRegistry().getDescriptor( containerType );
+			final AttributeDescriptor<A[]> attribute = containerDescriptor.getAttribute( "value" );
+			final A[] repetitions = AnnotationHelper.extractValue( container, attribute );
+			CollectionHelper.forEach( repetitions, consumer );
+		}
 	}
 
 	public static <A extends Annotation> A[] getRepeatedUsages(

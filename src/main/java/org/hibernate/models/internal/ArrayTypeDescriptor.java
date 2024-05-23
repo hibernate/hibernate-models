@@ -12,8 +12,10 @@ import java.util.List;
 
 import org.hibernate.models.internal.jandex.ArrayValueExtractor;
 import org.hibernate.models.internal.jandex.ArrayValueConverter;
-import org.hibernate.models.internal.jdk.PassThruConverter;
-import org.hibernate.models.internal.jdk.PassThruExtractor;
+import org.hibernate.models.internal.jdk.JdkArrayValueConverter;
+import org.hibernate.models.internal.jdk.JdkArrayValueExtractor;
+import org.hibernate.models.internal.jdk.JdkPassThruConverter;
+import org.hibernate.models.internal.jdk.JdkPassThruExtractor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
@@ -93,10 +95,10 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 		if ( jdkValueConverter == null ) {
 			if ( !elementTypeDescriptor.getValueType().isAnnotation() ) {
 				// for arrays of anything other than nested annotations we can simply return the raw array
-				jdkValueConverter = PassThruConverter.passThruConverter();
+				jdkValueConverter = JdkPassThruConverter.passThruConverter();
 			}
 			else {
-				jdkValueConverter = new org.hibernate.models.internal.jdk.ArrayValueConverter<>( elementTypeDescriptor );
+				jdkValueConverter = new JdkArrayValueConverter<>( elementTypeDescriptor );
 			}
 		}
 
@@ -108,10 +110,10 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 		if ( jdkValueExtractor == null ) {
 			if ( !elementTypeDescriptor.getValueType().isAnnotation() ) {
 				// for arrays of anything other than nested annotations we can simply return the raw array
-				jdkValueExtractor = PassThruExtractor.passThruExtractor();
+				jdkValueExtractor = JdkPassThruExtractor.passThruExtractor();
 			}
 			else {
-				jdkValueExtractor = new org.hibernate.models.internal.jdk.ArrayValueExtractor<>( createJdkValueConverter( modelContext ) );
+				jdkValueExtractor = new JdkArrayValueExtractor<>( createJdkValueConverter( modelContext ) );
 			}
 		}
 		return jdkValueExtractor;

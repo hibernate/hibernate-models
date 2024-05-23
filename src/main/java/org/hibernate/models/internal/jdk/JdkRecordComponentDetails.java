@@ -27,7 +27,8 @@ import org.hibernate.models.spi.TypeDetails;
 /**
  * @author Steve Ebersole
  */
-public class JdkRecordComponentDetails extends AbstractAnnotationTarget implements RecordComponentDetails, MutableMemberDetails {
+public class JdkRecordComponentDetails extends AbstractJdkAnnotationTarget
+		implements RecordComponentDetails, MutableMemberDetails {
 	private final RecordComponent recordComponent;
 	private final TypeDetails type;
 	private final ClassDetails declaringType;

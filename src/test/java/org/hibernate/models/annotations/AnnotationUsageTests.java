@@ -71,16 +71,16 @@ public class AnnotationUsageTests {
 		assertThat( classDetails.findFieldByName( "name" ).getDirectAnnotationUsages() ).hasSize( 2 );
 		assertThat( classDetails.findFieldByName( "name2" ).getDirectAnnotationUsages() ).hasSize( 2 );
 
-		final Entity entityUsage = classDetails.getDirectAnnotationUsage( Entity.class, buildingContext );
+		final Entity entityUsage = classDetails.getDirectAnnotationUsage( Entity.class );
 		assertThat( entityUsage ).isInstanceOf( EntityAnnotation.class );
 
-		final Table tableUsage = classDetails.getDirectAnnotationUsage( Table.class, buildingContext );
+		final Table tableUsage = classDetails.getDirectAnnotationUsage( Table.class );
 		assertThat( tableUsage ).isInstanceOf( TableAnnotation.class );
 
-		final SecondaryTable secondaryTableUsage = classDetails.getDirectAnnotationUsage( SecondaryTable.class, buildingContext );
+		final SecondaryTable secondaryTableUsage = classDetails.getDirectAnnotationUsage( SecondaryTable.class );
 		assertThat( secondaryTableUsage ).isInstanceOf( SecondaryTableAnnotation.class );
 
-		assertThat( classDetails.getDirectAnnotationUsage( NamedQuery.class, buildingContext ) ).isNull();
+		assertThat( classDetails.getDirectAnnotationUsage( NamedQuery.class ) ).isNull();
 		final NamedQuery[] namedQueryUsages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class, buildingContext );
 		assertThat( namedQueryUsages ).hasSize( 2 );
 		assertThat( namedQueryUsages[0] ).isInstanceOf( NamedQueryAnnotation.class );
@@ -312,15 +312,15 @@ public class AnnotationUsageTests {
 
 		final MutableInteger counter = new MutableInteger();
 
-		classDetails.forEachAnnotationUsage( Entity.class, entityAnnotationUsage -> counter.increment(), buildingContext );
+		classDetails.forEachAnnotationUsage( Entity.class, buildingContext, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 1 );
 
 		counter.set( 0 );
-		classDetails.forEachAnnotationUsage( SecondaryTable.class, entityAnnotationUsage -> counter.increment(), buildingContext );
+		classDetails.forEachAnnotationUsage( SecondaryTable.class, buildingContext, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 1 );
 
 		counter.set( 0 );
-		classDetails.forEachAnnotationUsage( NamedQuery.class, entityAnnotationUsage -> counter.increment(), buildingContext );
+		classDetails.forEachAnnotationUsage( NamedQuery.class, buildingContext, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 2 );
 	}
 
@@ -347,7 +347,7 @@ public class AnnotationUsageTests {
 			// this is expected
 		}
 
-		final NamedQuery singleAnnotationUsage = classDetails.getDirectAnnotationUsage( NamedQuery.class, buildingContext );
+		final NamedQuery singleAnnotationUsage = classDetails.getDirectAnnotationUsage( NamedQuery.class );
 		assertThat( singleAnnotationUsage ).isNull();
 	}
 

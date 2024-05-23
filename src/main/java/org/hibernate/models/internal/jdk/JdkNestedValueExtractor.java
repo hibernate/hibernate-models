@@ -14,10 +14,10 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 /**
  * @author Steve Ebersole
  */
-public class NestedValueExtractor<A extends Annotation> extends AbstractValueExtractor<A> {
-	private final NestedValueConverter<A> converter;
+public class JdkNestedValueExtractor<A extends Annotation> extends AbstractJdkValueExtractor<A> {
+	private final JdkNestedValueConverter<A> converter;
 
-	public NestedValueExtractor(NestedValueConverter<A> converter) {
+	public JdkNestedValueExtractor(JdkNestedValueConverter<A> converter) {
 		this.converter = converter;
 	}
 

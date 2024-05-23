@@ -26,7 +26,7 @@ import org.hibernate.models.spi.TypeDetails;
 /**
  * @author Steve Ebersole
  */
-public class JdkFieldDetails extends AbstractAnnotationTarget implements FieldDetails, MutableMemberDetails {
+public class JdkFieldDetails extends AbstractJdkAnnotationTarget implements FieldDetails, MutableMemberDetails {
 	private final Field field;
 	private final JdkClassDetails declaringType;
 	private final TypeDetails type;

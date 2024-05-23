@@ -21,13 +21,13 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  *
  * @author Steve Ebersole
  */
-public abstract class AbstractAnnotationTarget implements AnnotationTargetSupport {
+public abstract class AbstractJdkAnnotationTarget implements AnnotationTargetSupport {
 	private final Supplier<Annotation[]> annotationSupplier;
 	private final SourceModelBuildingContext modelContext;
 
 	private Map<Class<? extends Annotation>, ? extends Annotation> usagesMap;
 
-	public AbstractAnnotationTarget(
+	public AbstractJdkAnnotationTarget(
 			Supplier<Annotation[]> annotationSupplier,
 			SourceModelBuildingContext modelContext) {
 		this.annotationSupplier = annotationSupplier;

@@ -7,11 +7,13 @@
 
 package org.hibernate.models.internal.util;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author Steve Ebersole
@@ -79,5 +81,13 @@ public class CollectionHelper {
 			joined.addAll( second );
 		}
 		return joined;
+	}
+
+	public static <T> void forEach(T[] values, Consumer<T> consumer) {
+		if ( isNotEmpty( values ) ) {
+			for ( int i = 0; i < values.length; i++ ) {
+				consumer.accept( values[i] );
+			}
+		}
 	}
 }

@@ -9,8 +9,8 @@ package org.hibernate.models.internal;
 import java.lang.annotation.Annotation;
 import java.util.Locale;
 
-import org.hibernate.models.internal.jdk.PassThruConverter;
-import org.hibernate.models.internal.jdk.PassThruExtractor;
+import org.hibernate.models.internal.jdk.JdkPassThruConverter;
+import org.hibernate.models.internal.jdk.JdkPassThruExtractor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
@@ -33,12 +33,12 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 
 	@Override
 	public JdkValueConverter<V> createJdkValueConverter(SourceModelBuildingContext modelContext) {
-		return PassThruConverter.passThruConverter();
+		return JdkPassThruConverter.passThruConverter();
 	}
 
 	@Override
 	public JdkValueExtractor<V> createJdkValueExtractor(SourceModelBuildingContext modelContext) {
-		return PassThruExtractor.passThruExtractor();
+		return JdkPassThruExtractor.passThruExtractor();
 	}
 
 	@Override

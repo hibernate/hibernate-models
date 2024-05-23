@@ -20,10 +20,10 @@ import org.jboss.jandex.AnnotationValue;
  *
  * @author Steve Ebersole
  */
-public class NestedValueConverter<A extends Annotation> implements JandexValueConverter<A> {
+public class JandexNestedValueConverter<A extends Annotation> implements JandexValueConverter<A> {
 	private final AnnotationDescriptor<A> descriptor;
 
-	public NestedValueConverter(AnnotationDescriptor<A> descriptor) {
+	public JandexNestedValueConverter(AnnotationDescriptor<A> descriptor) {
 		assert descriptor != null : "AnnotationDescriptor was null";
 		this.descriptor = descriptor;
 	}

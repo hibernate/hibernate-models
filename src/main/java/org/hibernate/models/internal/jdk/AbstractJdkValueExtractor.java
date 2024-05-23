@@ -19,7 +19,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 /**
  * @author Steve Ebersole
  */
-public abstract class AbstractValueExtractor<V> implements JdkValueExtractor<V> {
+public abstract class AbstractJdkValueExtractor<V> implements JdkValueExtractor<V> {
 	@Override
 	public <A extends Annotation> V extractValue(
 			A usage,

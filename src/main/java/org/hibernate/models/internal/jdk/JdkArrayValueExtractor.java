@@ -15,10 +15,10 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 /**
  * @author Steve Ebersole
  */
-public class ArrayValueExtractor<V> extends AbstractValueExtractor<V[]> {
+public class JdkArrayValueExtractor<V> extends AbstractJdkValueExtractor<V[]> {
 	private final JdkValueConverter<V[]> converter;
 
-	public ArrayValueExtractor(JdkValueConverter<V[]> converter) {
+	public JdkArrayValueExtractor(JdkValueConverter<V[]> converter) {
 		this.converter = converter;
 	}
 

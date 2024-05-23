@@ -35,7 +35,7 @@ import static org.hibernate.models.spi.MethodDetails.MethodKind.SETTER;
 /**
  * @author Steve Ebersole
  */
-public class JdkMethodDetails extends AbstractAnnotationTarget implements MethodDetails, MutableMemberDetails {
+public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements MethodDetails, MutableMemberDetails {
 	private final Method method;
 	private final MethodKind methodKind;
 	private final TypeDetails type;

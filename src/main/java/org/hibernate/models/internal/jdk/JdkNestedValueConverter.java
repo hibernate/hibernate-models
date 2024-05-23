@@ -15,10 +15,10 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 /**
  * @author Steve Ebersole
  */
-public class NestedValueConverter<A extends Annotation> implements JdkValueConverter<A> {
+public class JdkNestedValueConverter<A extends Annotation> implements JdkValueConverter<A> {
 	private final AnnotationDescriptor<A> descriptor;
 
-	public NestedValueConverter(AnnotationDescriptor<A> descriptor) {
+	public JdkNestedValueConverter(AnnotationDescriptor<A> descriptor) {
 		this.descriptor = descriptor;
 	}
 

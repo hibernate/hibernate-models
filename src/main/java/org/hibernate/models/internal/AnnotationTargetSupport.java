@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.FieldDetails;
@@ -47,14 +48,12 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	}
 
 	@Override
-	default <A extends Annotation> A getDirectAnnotationUsage(
-			AnnotationDescriptor<A> descriptor,
-			SourceModelBuildingContext modelContext) {
-		return getDirectAnnotationUsage( descriptor.getAnnotationType(), modelContext );
+	default <A extends Annotation> A getDirectAnnotationUsage(AnnotationDescriptor<A> descriptor) {
+		return getDirectAnnotationUsage( descriptor.getAnnotationType() );
 	}
 
 	@Override
-	default <A extends Annotation> A getDirectAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
+	default <A extends Annotation> A getDirectAnnotationUsage(Class<A> type) {
 		//noinspection unchecked
 		return (A) getUsageMap().get( type );
 	}
@@ -98,6 +97,22 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	}
 
 	@Override
+	default <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
+			Class<A> repeatableType,
+			Class<C> containerType,
+			SourceModelBuildingContext modelContext, Consumer<A> consumer) {
+		AnnotationUsageHelper.forEachRepeatedAnnotationUsages( repeatableType, containerType, consumer, getUsageMap(), modelContext );
+	}
+
+	@Override
+	default <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
+			AnnotationDescriptor<A> repeatableDescriptor,
+			SourceModelBuildingContext modelContext,
+			Consumer<A> consumer) {
+		AnnotationUsageHelper.forEachRepeatedAnnotationUsages( repeatableDescriptor, consumer, getUsageMap(), modelContext );
+	}
+
+	@Override
 	default <A extends Annotation> A locateAnnotationUsage(Class<A> annotationType, SourceModelBuildingContext modelContext) {
 		// e.g., locate `@Nationalized`
 
@@ -120,7 +135,7 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 			}
 
 			final AnnotationDescriptor<? extends Annotation> usageDescriptor = modelContext.getAnnotationDescriptorRegistry().getDescriptor( usage.annotationType() );
-			final A metaAnnotation = usageDescriptor.getDirectAnnotationUsage( annotationType, modelContext );
+			final A metaAnnotation = usageDescriptor.getDirectAnnotationUsage( annotationType );
 			if ( metaAnnotation != null ) {
 				return metaAnnotation;
 			}

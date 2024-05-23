@@ -68,6 +68,18 @@ public interface AnnotationTarget {
 	<A extends Annotation> boolean hasDirectAnnotationUsage(Class<A> type);
 
 	/**
+	 * Form of {@linkplain #getAnnotationUsage(AnnotationDescriptor, SourceModelBuildingContext)} which returns {@code null} instead of
+	 * throwing {@linkplain AnnotationAccessException} when more than one usage of the requested
+	 * annotation exists.
+	 */
+	<A extends Annotation> A getDirectAnnotationUsage(AnnotationDescriptor<A> descriptor);
+
+	/**
+	 * Form of {@link #getDirectAnnotationUsage(AnnotationDescriptor)} accepting the annotation {@linkplain Class}
+	 */
+	<A extends Annotation> A getDirectAnnotationUsage(Class<A> type);
+
+	/**
 	 * Whether the given annotation is used on this target.
 	 *
 	 * @see #hasDirectAnnotationUsage
@@ -111,27 +123,6 @@ public interface AnnotationTarget {
 	}
 
 	/**
-	 * Form of {@linkplain #getAnnotationUsage(AnnotationDescriptor, SourceModelBuildingContext)} which returns {@code null} instead of
-	 * throwing {@linkplain AnnotationAccessException} when more than one usage of the requested
-	 * annotation exists.
-	 */
-	default <A extends Annotation> A getDirectAnnotationUsage(AnnotationDescriptor<A> descriptor, SourceModelBuildingContext modelContext) {
-		return getDirectAnnotationUsage( descriptor.getAnnotationType(), modelContext );
-	}
-
-	/**
-	 * Form of {@link #getDirectAnnotationUsage(AnnotationDescriptor, SourceModelBuildingContext)} accepting the annotation {@linkplain Class}
-	 */
-	default <A extends Annotation> A getDirectAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
-		try {
-			return getAnnotationUsage( type, modelContext );
-		}
-		catch (AnnotationAccessException ignore) {
-			return null;
-		}
-	}
-
-	/**
 	 * Form of {@linkplain #getAnnotationUsage} which also considers meta-annotations -
 	 * annotations on the classes of each {@linkplain #getDirectAnnotationUsages() local annotation}.
 	 */
@@ -157,6 +148,25 @@ public interface AnnotationTarget {
 		return getRepeatedAnnotationUsages( modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ), modelContext );
 	}
 
+	<A extends Annotation,C extends Annotation> void forEachRepeatedAnnotationUsages(
+			Class<A> repeatable,
+			Class<C> container,
+			SourceModelBuildingContext modelContext,
+			Consumer<A> consumer);
+
+	default <A extends Annotation,C extends Annotation> void forEachRepeatedAnnotationUsages(
+			AnnotationDescriptor<A> repeatable,
+			SourceModelBuildingContext modelContext,
+			Consumer<A> consumer) {
+		assert repeatable.isRepeatable();
+		forEachRepeatedAnnotationUsages(
+				repeatable.getAnnotationType(),
+				repeatable.getRepeatableContainer().getAnnotationType(),
+				modelContext,
+				consumer
+		);
+	}
+
 	/**
 	 * Call the {@code consumer} for each usage of the given {@code type}.
 	 *
@@ -165,8 +175,8 @@ public interface AnnotationTarget {
 	 */
 	default <X extends Annotation> void forEachAnnotationUsage(
 			AnnotationDescriptor<X> type,
-			Consumer<X> consumer,
-			SourceModelBuildingContext modelContext) {
+			SourceModelBuildingContext modelContext,
+			Consumer<X> consumer) {
 		final X[] annotations = getRepeatedAnnotationUsages( type, modelContext );
 		if ( annotations == null ) {
 			return;
@@ -177,16 +187,16 @@ public interface AnnotationTarget {
 	}
 
 	/**
-	 * Form of {@link #forEachAnnotationUsage(AnnotationDescriptor, Consumer, SourceModelBuildingContext)} accepting the annotation {@linkplain Class}
+	 * Form of {@link #forEachAnnotationUsage(AnnotationDescriptor, SourceModelBuildingContext, Consumer)} accepting the annotation {@linkplain Class}
 	 */
 	default <X extends Annotation> void forEachAnnotationUsage(
 			Class<X> type,
-			Consumer<X> consumer,
-			SourceModelBuildingContext modelContext) {
+			SourceModelBuildingContext modelContext,
+			Consumer<X> consumer) {
 		forEachAnnotationUsage(
 				modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ),
-				consumer,
-				modelContext
+				modelContext,
+				consumer
 		);
 	}
 

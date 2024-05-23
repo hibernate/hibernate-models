@@ -13,10 +13,10 @@ import org.hibernate.models.spi.ValueTypeDescriptor;
 /**
  * @author Steve Ebersole
  */
-public class ArrayValueConverter<V> implements JdkValueConverter<V[]> {
+public class JdkArrayValueConverter<V> implements JdkValueConverter<V[]> {
 	private final ValueTypeDescriptor<V> elementTypeDescriptor;
 
-	public ArrayValueConverter(ValueTypeDescriptor<V> elementTypeDescriptor) {
+	public JdkArrayValueConverter(ValueTypeDescriptor<V> elementTypeDescriptor) {
 		this.elementTypeDescriptor = elementTypeDescriptor;
 	}
 

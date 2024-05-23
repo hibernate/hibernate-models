@@ -13,9 +13,9 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 /**
  * @author Steve Ebersole
  */
-public class PassThruExtractor<V> extends AbstractValueExtractor<V> {
+public class JdkPassThruExtractor<V> extends AbstractJdkValueExtractor<V> {
 	@SuppressWarnings("rawtypes")
-	public static final PassThruExtractor PASS_THRU_EXTRACTOR = new PassThruExtractor();
+	public static final JdkPassThruExtractor PASS_THRU_EXTRACTOR = new JdkPassThruExtractor();
 
 	public static <V> JdkValueExtractor<V> passThruExtractor() {
 		//noinspection unchecked

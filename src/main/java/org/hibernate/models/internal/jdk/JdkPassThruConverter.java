@@ -15,11 +15,11 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  *
  * @author Steve Ebersole
  */
-public class PassThruConverter<V> implements JdkValueConverter<V> {
+public class JdkPassThruConverter<V> implements JdkValueConverter<V> {
 	@SuppressWarnings("rawtypes")
-	public static final PassThruConverter PASS_THRU_CONVERTER = new PassThruConverter();
+	public static final JdkPassThruConverter PASS_THRU_CONVERTER = new JdkPassThruConverter();
 
-	public static <V> PassThruConverter<V> passThruConverter() {
+	public static <V> JdkPassThruConverter<V> passThruConverter() {
 		//noinspection unchecked
 		return PASS_THRU_CONVERTER;
 	}
