@@ -198,7 +198,7 @@ public class SimpleClassDetails implements ClassDetails {
 	public <A extends Annotation> List<? extends Annotation> getMetaAnnotated(
 			Class<A> metaAnnotationType,
 			SourceModelBuildingContext modelContext) {
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
