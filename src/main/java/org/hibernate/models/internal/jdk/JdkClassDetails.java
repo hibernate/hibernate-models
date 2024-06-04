@@ -40,8 +40,8 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	private final Class<?> managedClass;
 
 	private final ClassDetails superClass;
-	private TypeDetails genericSuperType;
 	private List<TypeDetails> interfaces;
+	private TypeDetails genericSuperType;
 	private List<TypeVariableDetails> typeParameters;
 
 	private List<FieldDetails> fields;
@@ -61,19 +61,20 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 		super( managedClass::getAnnotations, modelContext );
 		this.name = name;
 		this.managedClass = managedClass;
+		this.superClass = determineSuperClass( managedClass, modelContext );
+	}
 
-		final ClassDetailsRegistry classDetailsRegistry = modelContext.getClassDetailsRegistry();
-
+	private static ClassDetails determineSuperClass(Class<?> managedClass, SourceModelBuildingContext modelContext) {
 		final Class<?> superclass = managedClass.getSuperclass();
 		if ( superclass == null ) {
-			superClass = null;
+			return null;
 		}
-		else {
-			superClass = classDetailsRegistry.resolveClassDetails(
-					superclass.getName(),
-					(n) -> JdkBuilders.buildClassDetailsStatic( superclass, modelContext )
-			);
-		}
+
+		final ClassDetailsRegistry classDetailsRegistry = modelContext.getClassDetailsRegistry();
+		return classDetailsRegistry.resolveClassDetails(
+				superclass.getName(),
+				(n) -> JdkBuilders.buildClassDetailsStatic( superclass, modelContext )
+		);
 	}
 
 	@Override
@@ -100,6 +101,16 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	@Override
 	public boolean isAbstract() {
 		return Modifier.isAbstract( managedClass.getModifiers() );
+	}
+
+	@Override
+	public boolean isInterface() {
+		return managedClass.isInterface();
+	}
+
+	@Override
+	public boolean isEnum() {
+		return managedClass.isEnum();
 	}
 
 	@Override

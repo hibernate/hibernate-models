@@ -135,6 +135,16 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
+	public boolean isInterface() {
+		return classInfo.isInterface();
+	}
+
+	@Override
+	public boolean isEnum() {
+		return classInfo.isEnum();
+	}
+
+	@Override
 	public boolean isRecord() {
 		return classInfo.isRecord();
 	}

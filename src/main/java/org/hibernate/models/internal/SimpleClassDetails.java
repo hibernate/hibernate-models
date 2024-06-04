@@ -86,6 +86,16 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public boolean isInterface() {
+		return clazz.isInterface();
+	}
+
+	@Override
+	public boolean isEnum() {
+		return clazz.isEnum();
+	}
+
+	@Override
 	public boolean isRecord() {
 		return clazz.isRecord();
 	}

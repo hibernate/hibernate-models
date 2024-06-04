@@ -100,6 +100,18 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
+	public boolean isInterface() {
+		// we never consider dynamic classes as interfaces
+		return false;
+	}
+
+	@Override
+	public boolean isEnum() {
+		// a dynamic enum makes no sense
+		return false;
+	}
+
+	@Override
 	public boolean isRecord() {
 		return false;
 	}

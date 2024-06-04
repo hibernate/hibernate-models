@@ -79,6 +79,16 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	boolean isAbstract();
 
 	/**
+	 * Whether this class is an interface
+	 */
+	boolean isInterface();
+
+	/**
+	 * Whether this class is an enum
+	 */
+	boolean isEnum();
+
+	/**
 	 * Where the class is a Java record
 	 */
 	boolean isRecord();
@@ -88,6 +98,9 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 */
 	ClassDetails getSuperClass();
 
+	/**
+	 * Generic type information for this class.
+	 */
 	TypeDetails getGenericSuperType();
 
 	/**

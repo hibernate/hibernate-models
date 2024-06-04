@@ -175,6 +175,7 @@ public class InheritanceTests {
 	private void testIsImplementor(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
+				Intf.class,
 				RootClass.class,
 				TrunkClass.class,
 				BranchClass.class,
@@ -185,12 +186,18 @@ public class InheritanceTests {
 		final ClassDetails rootClassDetails = classDetailsRegistry.getClassDetails( RootClass.class.getName() );
 		assertThat( rootClassDetails.isImplementor( Intf.class ) ).isFalse();
 		assertThat( rootClassDetails.getSuperClass() ).isSameAs( ClassDetails.OBJECT_CLASS_DETAILS );
+		assertThat( rootClassDetails.isInterface() ).isFalse();
 
 		final ClassDetails branchClassDetails = classDetailsRegistry.getClassDetails( BranchClass.class.getName() );
 		assertThat( branchClassDetails.isImplementor( Intf.class ) ).isTrue();
+		assertThat( branchClassDetails.isInterface() ).isFalse();
 
 		final ClassDetails leafClassDetails = classDetailsRegistry.getClassDetails( LeafClass.class.getName() );
 		assertThat( leafClassDetails.isImplementor( Intf.class ) ).isTrue();
+		assertThat( leafClassDetails.isInterface() ).isFalse();
+
+		final ClassDetails interfaceDetails = classDetailsRegistry.getClassDetails( Intf.class.getName() );
+		assertThat( interfaceDetails.isInterface() ).isTrue();
 	}
 
 	@Test
