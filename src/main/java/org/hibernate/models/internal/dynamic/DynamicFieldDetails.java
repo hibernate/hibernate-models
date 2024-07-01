@@ -8,14 +8,12 @@ package org.hibernate.models.internal.dynamic;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.util.Collection;
-import java.util.Map;
 
 import org.hibernate.models.IllegalCastException;
-import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
@@ -25,7 +23,9 @@ import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableScope;
 
 /**
- * FieldDetails which does not necessarily map to a physical Field (dynamic models)
+ * FieldDetails which does not necessarily map to a physical Field (dynamic models).
+ *
+ * @see org.hibernate.models.internal.ModifierUtils#DYNAMIC_ATTRIBUTE_MODIFIERS
  *
  * @author Steve Ebersole
  */
@@ -38,23 +38,18 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	private final boolean isArray;
 	private final boolean isPlural;
 
-	public DynamicFieldDetails(
-			String name,
-			TypeDetails type,
-			ClassDetails declaringType,
-			int modifierFlags,
-			SourceModelBuildingContext buildingContext) {
-		this(
-				name,
-				type,
-				declaringType,
-				modifierFlags,
-				type != null && type.getName().startsWith( "[" ),
-				type != null && ( type.isImplementor( Collection.class ) || type.isImplementor( Map.class ) ),
-				buildingContext
-		);
-	}
-
+	/**
+	 * Constructs a dynamic FieldDetails.
+	 *
+	 * @param name The name of the "field"
+	 * @param type The type of the "field"
+	 * @param declaringType The type on which the "field" is declared
+	 * @param modifierFlags The modifier flags (public, static, etc.) for the "field".  Typically, callers should use {@linkplain org.hibernate.models.internal.ModifierUtils#DYNAMIC_ATTRIBUTE_MODIFIERS} when
+	 * 		defining a field to be used as a {@linkplain MemberDetails#isPersistable() persistable} member.
+	 * @param isArray Whether the "field" is an array
+	 * @param isPlural Whether the "field" is plural
+	 * @param buildingContext Context for the creation (access to useful information).
+	 */
 	public DynamicFieldDetails(
 			String name,
 			TypeDetails type,
@@ -70,6 +65,8 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 		this.modifierFlags = modifierFlags;
 		this.isArray = isArray;
 		this.isPlural = isPlural;
+
+		assert isPersistable();
 	}
 
 	@Override
