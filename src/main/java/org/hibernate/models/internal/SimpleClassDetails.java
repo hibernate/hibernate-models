@@ -144,6 +144,9 @@ public class SimpleClassDetails implements ClassDetails {
 		return Collections.emptyList();
 	}
 
+	@Override
+	public void forEachRecordComponent(IndexedConsumer<RecordComponentDetails> consumer) {
+	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// nor do we care about its annotations

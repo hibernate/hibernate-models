@@ -43,6 +43,11 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	}
 
 	@Override
+	default <X extends Annotation> void removeAnnotationUsage(AnnotationDescriptor<X> annotationType) {
+		getUsageMap().remove( annotationType.getAnnotationType() );
+	}
+
+	@Override
 	default Collection<? extends Annotation> getDirectAnnotationUsages() {
 		return getUsageMap().values();
 	}

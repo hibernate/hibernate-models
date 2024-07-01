@@ -26,6 +26,11 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	<X extends Annotation> void addAnnotationUsage(X annotationUsage);
 
 	/**
+	 * Remove an annotation, by type, from this target if there is such a usage.
+	 */
+	<X extends Annotation> void removeAnnotationUsage(AnnotationDescriptor<X> annotationType);
+
+	/**
 	 * Applies a usage of the given {@code annotationType} to this target.  Will return
 	 * an existing usage, if one, or create a new usage.
 	 */
@@ -45,9 +50,8 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	/**
 	 * Creates and replaces (if any) an existing usage of the given annotation.
 	 * <p/>
-	 * For repeatable annotations, use
-	 * Applies a usage of the given {@code annotationType} to this target.  Will return
-	 * an existing usage, if one, or create a new usage.
+	 * For repeatable annotations, use {@linkplain #replaceAnnotationUsage(AnnotationDescriptor, AnnotationDescriptor, SourceModelBuildingContext)}
+	 * instead.
 	 *
 	 * @apiNote Generally replacement is used with XML processing and, again generally,
 	 * only for repeatable annotations using

@@ -8,6 +8,7 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.hibernate.models.IllegalCastException;
@@ -249,6 +250,36 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	default RecordComponentDetails findRecordComponentByName(String name) {
 		assert name != null;
 		return findRecordComponent( component -> name.equals( component.getName() ) );
+	}
+
+	/**
+	 * Visit each method
+	 */
+	void forEachRecordComponent(IndexedConsumer<RecordComponentDetails> consumer);
+
+	default void forEachMember(Consumer<MemberDetails> consumer) {
+		forEachField( (i,field) -> consumer.accept( field ) );
+		forEachMethod( (i,method) -> consumer.accept( method ) );
+		forEachRecordComponent( (i,recordComponent) -> consumer.accept( recordComponent ) );
+	}
+
+	default void forEachPersistableMember(Consumer<MemberDetails> consumer) {
+		forEachField( (i,field) -> {
+			if ( field.isPersistable() ) {
+				consumer.accept( field );
+			}
+		} );
+		forEachMethod( (i,method) -> {
+			if ( method.isPersistable() ) {
+				consumer.accept( method );
+			}
+		} );
+		forEachRecordComponent( (i,recordComponent) -> {
+			// can they ever not be?
+			if ( recordComponent.isPersistable() ) {
+				consumer.accept( recordComponent );
+			}
+		} );
 	}
 
 	/**

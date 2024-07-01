@@ -29,6 +29,7 @@ import jakarta.persistence.SecondaryTables;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.SequenceGenerators;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 
 /**
@@ -65,6 +66,7 @@ public interface JpaAnnotations {
 	AnnotationDescriptor<Index> INDEX = new OrmAnnotationDescriptor<>( Index.class, IndexAnnotation.class );
 
 	AnnotationDescriptor<Cacheable> CACHEABLE = new OrmAnnotationDescriptor<>( Cacheable.class, CacheableAnnotation.class );
+	AnnotationDescriptor<Transient> TRANSIENT = new OrmAnnotationDescriptor<>( Transient.class, TransientAnnotation.class );
 
 //	AnnotationDescriptor<Access> ACCESS = createOrmDescriptor( Access.class );
 //	AnnotationDescriptor<AssociationOverrides> ASSOCIATION_OVERRIDES = createOrmDescriptor( AssociationOverrides.class );

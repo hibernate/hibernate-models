@@ -49,6 +49,18 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 	}
 
 	@Override
+	default void forEachRecordComponent(IndexedConsumer<RecordComponentDetails> consumer) {
+		final List<RecordComponentDetails> recordComponents = getRecordComponents();
+		if ( recordComponents == null ) {
+			return;
+		}
+
+		for ( int i = 0; i < recordComponents.size(); i++ ) {
+			consumer.accept( i, recordComponents.get( i ) );
+		}
+	}
+
+	@Override
 	default <A extends Annotation> A getAnnotationUsage(
 			AnnotationDescriptor<A> descriptor,
 			SourceModelBuildingContext modelContext) {
