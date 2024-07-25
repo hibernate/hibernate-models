@@ -28,8 +28,9 @@ public interface SharedNamedAnnotationScope extends SharedAnnotationScope {
 	 */
 	default <X extends Annotation> X getNamedAnnotation(
 			AnnotationDescriptor<X> annotationDescriptor,
-			String matchName) {
-		return getNamedAnnotation( annotationDescriptor, matchName, "name" );
+			String matchName,
+			SourceModelBuildingContext modelContext) {
+		return getNamedAnnotation( annotationDescriptor, matchName, "name", modelContext );
 	}
 
 	/**
@@ -45,12 +46,13 @@ public interface SharedNamedAnnotationScope extends SharedAnnotationScope {
 	default <A extends Annotation> A getNamedAnnotation(
 			AnnotationDescriptor<A> annotationDescriptor,
 			String matchName,
-			String attributeToMatch) {
+			String attributeToMatch,
+			SourceModelBuildingContext modelContext) {
 		final List<A> allUsages = getAllAnnotationUsages( annotationDescriptor );
 		final AttributeDescriptor<String> matchAttribute = annotationDescriptor.getAttribute( attributeToMatch );
 		for ( int i = 0; i < allUsages.size(); i++ ) {
 			final A annotationUsage = allUsages.get( i );
-			final String usageName = AnnotationHelper.extractValue( annotationUsage, matchAttribute );
+			final String usageName = AnnotationHelper.extractValue( annotationUsage, matchAttribute, modelContext );
 			if ( Objects.equals( matchName, usageName ) ) {
 				return annotationUsage;
 			}

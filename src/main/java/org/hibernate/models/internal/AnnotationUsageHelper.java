@@ -17,7 +17,6 @@ import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
 
 import org.jboss.jandex.AnnotationInstance;
 
@@ -123,7 +122,7 @@ public class AnnotationUsageHelper {
 		if ( container != null ) {
 			final AnnotationDescriptor<C> containerDescriptor = modelContext.getAnnotationDescriptorRegistry().getDescriptor( containerType );
 			final AttributeDescriptor<A[]> attribute = containerDescriptor.getAttribute( "value" );
-			final A[] repetitions = AnnotationHelper.extractValue( container, attribute );
+			final A[] repetitions = AnnotationHelper.extractValue( container, attribute, modelContext );
 			CollectionHelper.forEach( repetitions, consumer );
 		}
 	}
@@ -144,7 +143,7 @@ public class AnnotationUsageHelper {
 		if ( container != null ) {
 			final AnnotationDescriptor<?> containerDescriptor = modelContext.getAnnotationDescriptorRegistry().getDescriptor( containerType );
 			final AttributeDescriptor<A[]> attribute = containerDescriptor.getAttribute( "value" );
-			final A[] repetitions = AnnotationHelper.extractValue( container, attribute );
+			final A[] repetitions = AnnotationHelper.extractValue( container, attribute, modelContext );
 			CollectionHelper.forEach( repetitions, consumer );
 		}
 	}
@@ -162,7 +161,7 @@ public class AnnotationUsageHelper {
 
 		if ( containerUsage != null ) {
 			final AttributeDescriptor<A[]> attribute = type.getRepeatableContainer().getAttribute( "value" );
-			final A[] repeatableValues = AnnotationHelper.extractValue( containerUsage, attribute );
+			final A[] repeatableValues = AnnotationHelper.extractValue( containerUsage, attribute, modelContext );
 
 			if ( CollectionHelper.isNotEmpty( repeatableValues ) ) {
 				if ( usage != null ) {
@@ -227,9 +226,9 @@ public class AnnotationUsageHelper {
 			AnnotationDescriptor<A> descriptor,
 			String matchValue,
 			String attributeToMatch,
-			SourceModelContext modelContext) {
+			SourceModelBuildingContext modelContext) {
 		final AttributeDescriptor<String> attributeDescriptor = descriptor.getAttribute( attributeToMatch );
-		final String usageName = AnnotationHelper.extractValue( annotationUsage, attributeDescriptor );
+		final String usageName = AnnotationHelper.extractValue( annotationUsage, attributeDescriptor, modelContext );
 		return matchValue.equals( usageName );
 	}
 
