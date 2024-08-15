@@ -1,16 +1,11 @@
 :fn-managed: footnote:[The application's domain and related classes]
 == Hibernate models
 
-Uses a mix of https://smallrye.io/jandex/[Jandex] and Java reflection to build the de-typed abstraction model of
-classes and annotations referenced by an application's managed resources{fn-managed}.
+Provides support for dealing with an application's managed resources{fn-managed} as a de-typed abstraction model
+backed by one or more sources.  Consumers can then access details from that abstraction model in a unified way,
+regardless of the underlying source.
 
-Consumers can then access details from that abstraction model in a unified way, regardless of the underlying
-source.  For classes which we are able to access from a Jandex index, this has the benefit that the classes are
-not loaded into the ClassLoader which is important because once a classes is loaded into a ClassLoader, its
-bytecode cannot be changed and run-time bytecode enhancement is not possible.
-
-This work is intended to replace the https://github.com/hibernate/hibernate-commons-annotations[`hibernate-commons-annotation`] (HCANN)
-library, which suffered from a number of shortcomings.
+NOTE: This work replaces the https://github.com/hibernate/hibernate-commons-annotations[`hibernate-commons-annotation`] library, which suffered from a number of shortcomings.
 
 
 === Annotations
@@ -37,3 +32,12 @@ FieldDetails:: Think `java.lang.reflect.Field`
 MethodDetails:: Think `java.lang.reflect.Method`
 RecordComponentDetails:: Think `java.lang.reflect.RecordComponent`
 ClassDetailsRegistry:: registry of `ClassDetails` references
+
+
+=== Artifacts
+
+hibernate-models:: The base support, using Java reflection as the backing source.
+hibernate-models-jandex:: Optional support for using https://smallrye.io/jandex/[Jandex] as the backing source.  Using
+definitions from a Jandex index has the benefit that the classes are not loaded into the ClassLoader which can be important
+in a few scenarios (e.g. retain the ability to enhance a class's bytecode).
+

@@ -5,7 +5,7 @@ group = "org.hibernate.models"
 // Version handling
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def versionFile = project.file( "version.txt" )
+def versionFile = rootProject.file( "version.txt" )
 def releaseVersion = determineVersion("releaseVersion", versionFile )
 def developmentVersion = determineVersion("developmentVersion", versionFile)
 
