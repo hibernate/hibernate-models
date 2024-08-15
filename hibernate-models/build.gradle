@@ -1,0 +1,5 @@
+plugins {
+	id "published-java-module"
+}
+
+description = "A de-typed abstraction over reflection and annotations"

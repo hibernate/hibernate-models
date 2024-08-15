@@ -1,118 +1,23 @@
 plugins {
-	id "java-library"
-
-	id "base-information"
-
-	id "checkstyle"
-	id "jacoco"
-
-	id "maven-publish"
-	id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-	id "publishing-config"
-	id "signing-config"
-	id "release-process"
+	id "io.github.gradle-nexus.publish-plugin"
 }
-
-dependencies {
-	implementation libs.jandex
-	implementation libs.logging
-
-	compileOnly libs.loggingAnnotations
-
-	annotationProcessor libs.loggingProcessor
-	annotationProcessor libs.logging
-	annotationProcessor libs.loggingAnnotations
-
-	testImplementation jakartaLibs.jpa
-	testImplementation testLibs.junit5Api
-	testImplementation testLibs.assertjCore
-
-	testRuntimeOnly testLibs.junit5Engine
-	testRuntimeOnly testLibs.log4j
-}
-
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Java handling
+// OSSRH publishing
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// To force the build produce the same byte-for-byte archives and hence make Hibernate Models build reproducible.
-// See also https://docs.gradle.org/current/userguide/working_with_files.html#sec:reproducible_archives
-tasks.withType(AbstractArchiveTask).configureEach {
-	preserveFileTimestamps = false
-	reproducibleFileOrder = true
-}
+String hibernatePublishUsername = project.hasProperty( 'hibernatePublishUsername' )
+		? project.property( 'hibernatePublishUsername' )
+		: null
+String hibernatePublishPassword = project.hasProperty( 'hibernatePublishPassword' )
+		? project.property( 'hibernatePublishPassword' )
+		: null
 
-java {
-	sourceCompatibility = jdks.versions.baseline.get() as int
-	targetCompatibility = jdks.versions.baseline.get() as int
-
-	withJavadocJar()
-	withSourcesJar()
-}
-
-test {
-	useJUnitPlatform()
-}
-
-// create a single "compile" task
-tasks.register( "compile" ).configure {
-	dependsOn tasks.withType( JavaCompile )
-}
-
-tasks.withType( JavaCompile ).configureEach {javaCompile->
-	options.encoding = "UTF-8"
-	options.warnings false
-}
-
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Javadoc
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-tasks.named( "javadoc", Javadoc ) {
-	options {
-		use = true
-		encoding = "UTF-8"
-
-		addStringOption( "Xdoclint:none", "-quiet" )
-
-		tags(
-				"todo:X",
-				"apiNote:a:API Note:",
-				"implSpec:a:Implementation Specification:",
-				"implNote:a:Implementation Note:"
-		)
+nexusPublishing {
+	repositories {
+		sonatype {
+			username = hibernatePublishUsername
+			password = hibernatePublishPassword
+		}
 	}
-}
-
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Checkstyle
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-checkstyle {
-	sourceSets = [ project.sourceSets.main ]
-	showViolations = false
-}
-
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// JaCoCo
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-def jacocoReportTask = tasks.named( "jacocoTestReport" ) {
-	dependsOn tasks.named( "test" )
-}
-
-jacocoTestReport {
-	reports {
-		xml.required = false
-		csv.required = false
-		html.outputLocation = layout.buildDirectory.dir( "jacocoHtml" )
-	}
-}
-
-tasks.named( "check" ) {
-	dependsOn jacocoReportTask
 }

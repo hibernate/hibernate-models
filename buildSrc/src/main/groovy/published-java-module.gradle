@@ -1,0 +1,8 @@
+plugins {
+	id "java-module"
+
+	id "maven-publish"
+	id "publishing-config"
+	id "signing-config"
+	id "release-process"
+}

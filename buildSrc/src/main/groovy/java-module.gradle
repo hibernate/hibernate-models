@@ -1,0 +1,103 @@
+plugins {
+	id "base-information"
+	id "java-library"
+
+	id "checkstyle"
+	id "jacoco"
+}
+
+dependencies {
+	implementation libs.logging
+
+	compileOnly libs.loggingAnnotations
+
+	annotationProcessor libs.loggingProcessor
+	annotationProcessor libs.logging
+	annotationProcessor libs.loggingAnnotations
+
+	testImplementation jakartaLibs.jpa
+	testImplementation testLibs.junit5Api
+	testImplementation testLibs.assertjCore
+
+	testRuntimeOnly testLibs.junit5Engine
+	testRuntimeOnly testLibs.log4j
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Java handling
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+java {
+	sourceCompatibility = jdks.versions.baseline.get() as int
+	targetCompatibility = jdks.versions.baseline.get() as int
+
+	withJavadocJar()
+	withSourcesJar()
+}
+
+test {
+	useJUnitPlatform()
+}
+
+// create a single "compile" task
+tasks.register( "compile" ).configure {
+	dependsOn tasks.withType( JavaCompile )
+}
+
+tasks.withType( JavaCompile ).configureEach {javaCompile->
+	options.encoding = "UTF-8"
+	options.warnings false
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Javadoc
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+tasks.named( "javadoc", Javadoc ) {
+	options {
+		use = true
+		encoding = "UTF-8"
+
+		addStringOption( "Xdoclint:none", "-quiet" )
+
+		tags(
+				"todo:X",
+				"apiNote:a:API Note:",
+				"implSpec:a:Implementation Specification:",
+				"implNote:a:Implementation Note:"
+		)
+	}
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Checkstyle
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+checkstyle {
+	sourceSets = [ project.sourceSets.main ]
+	showViolations = false
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// JaCoCo
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def jacocoReportTask = tasks.named( "jacocoTestReport" ) {
+	dependsOn tasks.named( "test" )
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = false
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir( "jacocoHtml" )
+	}
+}
+
+tasks.named( "check" ) {
+	dependsOn jacocoReportTask
+}

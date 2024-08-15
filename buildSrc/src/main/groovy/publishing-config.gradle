@@ -1,18 +1,8 @@
 plugins {
-	id "java-library"
-	id "io.github.gradle-nexus.publish-plugin"
+	id "java-module"
+	id "maven-publish"
 }
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// OSSRH publishing
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-String hibernatePublishUsername = project.hasProperty( 'hibernatePublishUsername' )
-		? project.property( 'hibernatePublishUsername' )
-		: null
-String hibernatePublishPassword = project.hasProperty( 'hibernatePublishPassword' )
-		? project.property( 'hibernatePublishPassword' )
-		: null
 
 publishing {
 	publications {
@@ -58,15 +48,6 @@ publishing {
 
 			}
 
-		}
-	}
-}
-
-nexusPublishing {
-	repositories {
-		sonatype {
-			username = hibernatePublishUsername
-			password = hibernatePublishPassword
 		}
 	}
 }

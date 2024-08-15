@@ -1,0 +1,13 @@
+plugins {
+	id "published-java-module"
+}
+
+description = "Jandex support for hibernate-models (isolated dependency)"
+
+dependencies {
+	api project( ":hibernate-models" )
+
+	implementation libs.jandex
+
+	testImplementation project( ":hibernate-models-testing" )
+}

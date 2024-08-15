@@ -1,6 +1,7 @@
 pluginManagement {
 	plugins {
 		id "org.checkerframework" version "0.6.34" apply false
+		id "io.github.gradle-nexus.publish-plugin" version "2.0.0" apply false
 	}
 	repositories {
 		gradlePluginPortal()
@@ -12,7 +13,7 @@ plugins {
 	id 'com.gradle.develocity' version '3.17.4'
 }
 
-rootProject.name = "hibernate-models"
+rootProject.name = "hibernate-models-group"
 
 dependencyResolutionManagement {
 	repositories {
@@ -126,3 +127,6 @@ dependencyResolutionManagement {
 	}
 }
 
+include "hibernate-models"
+include "hibernate-models-jandex"
+include 'hibernate-models-testing'
