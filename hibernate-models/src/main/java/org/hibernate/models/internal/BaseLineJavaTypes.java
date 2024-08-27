@@ -52,8 +52,7 @@ import java.util.function.Function;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 
 /**
- * Base set of classes used to prime the {@link ClassDetailsRegistry}
- * and prime the Jandex {@link org.jboss.jandex.Indexer} (if we are creating the index).
+ * Base set of classes used to prime the {@link ClassDetailsRegistry}..
  *
  * @author Steve Ebersole
  */

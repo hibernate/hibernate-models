@@ -13,7 +13,6 @@ import org.hibernate.models.internal.WildcardTypeDetailsImpl;
  * Models a wildcard type declaration.
  *
  * @see java.lang.reflect.WildcardType
- * @see org.jboss.jandex.WildcardType
  *
  * @author Steve Ebersole
  */

@@ -13,7 +13,6 @@ import org.hibernate.models.internal.PrimitiveKind;
  * Models a primitive type
  *
  * @see Class#isPrimitive
- * @see org.jboss.jandex.PrimitiveType
  *
  * @author Steve Ebersole
  */

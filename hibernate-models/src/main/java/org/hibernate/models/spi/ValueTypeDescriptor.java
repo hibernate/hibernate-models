@@ -13,7 +13,7 @@ import org.hibernate.models.rendering.spi.RenderingTarget;
 
 /**
  * Descriptor for the annotation attribute types, acting as a producer for
- * {@link AttributeDescriptor}, {@link JandexValueConverter} and {@link JandexValueExtractor} references
+ * {@link AttributeDescriptor}, {@link JdkValueConverter} and {@link JdkValueExtractor} references
  *
  * @author Steve Ebersole
  */

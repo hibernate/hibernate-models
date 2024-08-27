@@ -29,8 +29,6 @@ package org.hibernate.models.spi;
  * @apiNote This split between {@linkplain TypeVariableDetails} and {@linkplain TypeVariableReferenceDetails}
  * helps protect against stack overflows while processing generics.
  *
- * @see org.jboss.jandex.TypeVariableReference
- *
  * @author Steve Ebersole
  */
 public interface TypeVariableReferenceDetails extends TypeDetails {

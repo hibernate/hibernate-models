@@ -9,8 +9,6 @@ package org.hibernate.models.spi;
 /**
  * Context object used while building references for {@link AnnotationDescriptor},
  * {@link ClassDetails} and friends.
- * <p/>
- * Acts as the global {@linkplain SharedAnnotationScope}
  *
  * @author Steve Ebersole
  */

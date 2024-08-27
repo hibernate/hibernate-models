@@ -11,7 +11,6 @@ package org.hibernate.models.spi;
  * Models a class type.
  *
  * @see Class
- * @see org.jboss.jandex.ClassType
  *
  * @author Steve Ebersole
  */

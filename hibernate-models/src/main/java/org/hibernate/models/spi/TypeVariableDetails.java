@@ -23,7 +23,6 @@ import java.util.List;
  * In this case, the identifier is {@code T}, while the name is {@code java.lang.Number}.
  *
  * @see java.lang.reflect.TypeVariable
- * @see org.jboss.jandex.TypeVariable
  *
  * @author Steve Ebersole
  */

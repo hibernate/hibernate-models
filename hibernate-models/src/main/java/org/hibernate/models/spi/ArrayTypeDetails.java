@@ -10,8 +10,6 @@ package org.hibernate.models.spi;
 /**
  * Models a Java array type.
  *
- * @see org.jboss.jandex.ArrayType
- *
  * @author Steve Ebersole
  */
 public interface ArrayTypeDetails extends ClassBasedTypeDetails {

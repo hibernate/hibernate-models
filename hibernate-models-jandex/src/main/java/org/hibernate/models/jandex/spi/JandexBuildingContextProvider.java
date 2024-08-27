@@ -41,7 +41,8 @@ public class JandexBuildingContextProvider implements SourceModelBuildingContext
 	}
 
 	private IndexView resolveJandexIndex(Map<Object, Object> configProperties) {
-		// todo : here is where we need to figure out the best way to have the Jandex Index to available
+		// todo : do we want to have the ability to create the Jandex index or resolve one from another source?
+		//		- note: if building, be sure to apply BaseLineJavaTypes
 		return (IndexView) configProperties.get( INDEX_PARAM );
 	}
 }

@@ -18,7 +18,6 @@ import java.util.List;
  * </ol>
  *
  * @see java.lang.reflect.ParameterizedType
- * @see org.jboss.jandex.ParameterizedType
  *
  * @author Steve Ebersole
  */
