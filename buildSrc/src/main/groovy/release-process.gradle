@@ -164,6 +164,10 @@ tasks.register( "completeRelease" ) {
 }
 
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Helpers
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 void updateVersionFile(String version) {
 	logger.lifecycle( "Updating `version.txt` version to `${version}`" )
 	project.ext.versionFile.text = "${version}"
