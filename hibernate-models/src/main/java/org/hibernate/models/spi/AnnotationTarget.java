@@ -17,7 +17,6 @@ import java.util.function.Consumer;
 
 import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.IllegalCastException;
-import org.hibernate.models.internal.RenderingCollectorImpl;
 
 /**
  * Abstract for something where an annotation can be used.
@@ -353,16 +352,6 @@ public interface AnnotationTarget {
 	 * @throws IllegalCastException If the target is not a record component
 	 */
 	RecordComponentDetails asRecordComponentDetails();
-
-	void render(SourceModelBuildingContext modelContext);
-
-	default String renderToString(SourceModelBuildingContext modelContext) {
-		final RenderingCollectorImpl renderingCollector = new RenderingCollectorImpl();
-		render( renderingCollector, modelContext );
-		return renderingCollector.toString();
-	}
-
-	void render(RenderingCollector collector, SourceModelBuildingContext modelContext);
 
 	/**
 	 * Subset of {@linkplain ElementType annotation targets} supported for mapping annotations

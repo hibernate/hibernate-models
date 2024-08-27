@@ -17,8 +17,10 @@ import org.hibernate.models.internal.jdk.JdkPassThruExtractor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.spi.RenderingCollector;
+import org.hibernate.models.rendering.spi.Renderer;
+import org.hibernate.models.rendering.spi.RenderingTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 /**
@@ -97,31 +99,36 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue, SourceModelBuildingContext modelContext) {
+	public void render(
+			String name,
+			Object attributeValue,
+			RenderingTarget target,
+			Renderer renderer,
+			SourceModelContext modelContext) {
 		assert attributeValue != null : "Annotation value was null - " + name;
 
 		//noinspection unchecked
 		final V[] values = (V[]) attributeValue;
 
-		collector.addLine( "%s = {", name );
-		collector.indent( 2 );
+		target.addLine( "%s = {", name );
+		target.indent( 2 );
 		for ( V value : values ) {
-			elementTypeDescriptor.render( collector, value, modelContext );
+			elementTypeDescriptor.render( value, target, renderer, modelContext );
 		}
-		collector.unindent( 2 );
-		collector.addLine( "}" );
+		target.unindent( 2 );
+		target.addLine( "}" );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
+	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, SourceModelContext modelContext) {
 		//noinspection unchecked
 		final List<V> values = (List<V>) attributeValue;
 
-		collector.addLine( "{" );
-		collector.indent( 2 );
-		values.forEach( (value) -> elementTypeDescriptor.render( collector, value, modelContext ) );
-		collector.unindent( 2 );
-		collector.addLine( "}" );
+		target.addLine( "{" );
+		target.indent( 2 );
+		values.forEach( (value) -> elementTypeDescriptor.render( value, target, renderer, modelContext ) );
+		target.unindent( 2 );
+		target.addLine( "}" );
 	}
 
 	@Override

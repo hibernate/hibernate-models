@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.UnknownAnnotationAttributeException;
-import org.hibernate.models.internal.AnnotationHelper;
 import org.hibernate.models.internal.AnnotationProxy;
 
 /**
@@ -148,21 +147,4 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to a RecordComponentDetails" );
 	}
 
-	@Override
-	default void render(SourceModelBuildingContext modelContext) {
-		throw new UnsupportedOperationException( "Rendering of annotation classes not implemented" );
-	}
-
-	@Override
-	default void render(RenderingCollector collector, SourceModelBuildingContext modelContext) {
-		throw new UnsupportedOperationException( "Rendering of annotation classes not implemented" );
-	}
-
-	default void renderUsage(RenderingCollector collector, A usage, SourceModelBuildingContext modelContext) {
-		AnnotationHelper.render( collector, usage, this, modelContext );
-	}
-
-	default void renderUsage(RenderingCollector collector, String name, A usage, SourceModelBuildingContext modelContext) {
-		AnnotationHelper.render( collector, name, usage, modelContext );
-	}
 }

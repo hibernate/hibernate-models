@@ -14,8 +14,10 @@ import org.hibernate.models.internal.jdk.JdkPassThruExtractor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.spi.RenderingCollector;
+import org.hibernate.models.rendering.spi.Renderer;
+import org.hibernate.models.rendering.spi.RenderingTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 /**
@@ -42,13 +44,18 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue, SourceModelBuildingContext modelContext) {
-		collector.addLine( "%s = %s", name, attributeValue );
+	public void render(
+			String name,
+			Object attributeValue,
+			RenderingTarget target,
+			Renderer renderer,
+			SourceModelContext modelContext) {
+		target.addLine( "%s = %s", name, attributeValue );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
-		collector.addLine( "%s", attributeValue );
+	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, SourceModelContext modelContext) {
+		target.addLine( "%s", attributeValue );
 	}
 
 	@Override
