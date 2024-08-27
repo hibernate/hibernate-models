@@ -10,8 +10,6 @@ import java.beans.Introspector;
 import java.util.List;
 
 import org.hibernate.models.IllegalCastException;
-import org.hibernate.models.internal.AnnotationHelper;
-import org.hibernate.models.internal.RenderingCollectorImpl;
 
 import static org.hibernate.models.internal.ModifierUtils.hasPersistableMethodModifiers;
 
@@ -73,29 +71,4 @@ public interface MethodDetails extends MemberDetails {
 		throw new IllegalCastException( "MethodDetails cannot be cast to RecordComponentDetails" );
 	}
 
-	@Override
-	default void render(SourceModelBuildingContext modelContext) {
-		final RenderingCollectorImpl renderingCollector = new RenderingCollectorImpl();
-		render( renderingCollector, modelContext );
-		renderingCollector.render();
-	}
-
-	@Override
-	default void render(RenderingCollector collector, SourceModelBuildingContext modelContext) {
-		forEachDirectAnnotationUsage( (usage) -> AnnotationHelper.render( collector, usage, modelContext ) );
-
-		// todo : would be nice to render the type-details to include generics, etc
-		collector.addLine(
-				"%s %s (%s)",
-				getType() == null
-						? "void"
-						: getType().determineRawClass().getName(),
-				getName(),
-				getMethodKind().name()
-		);
-
-		collector.indent( 2 );
-		getArgumentTypes().forEach( (arg) -> collector.addLine( " - %s", arg.getName() ) );
-		collector.unindent( 2 );
-	}
 }

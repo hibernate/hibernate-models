@@ -15,8 +15,10 @@ import org.hibernate.models.internal.jdk.JdkNestedValueExtractor;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.spi.RenderingCollector;
+import org.hibernate.models.rendering.spi.Renderer;
+import org.hibernate.models.rendering.spi.RenderingTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 
 /**
  * Descriptor for nested annotation values
@@ -40,7 +42,7 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 		return annotationType;
 	}
 
-	private AnnotationDescriptor<A> resolveDescriptor(SourceModelBuildingContext context) {
+	private AnnotationDescriptor<A> resolveDescriptor(SourceModelContext context) {
 		if ( descriptor == null ) {
 			descriptor = context.getAnnotationDescriptorRegistry().getDescriptor( annotationType );
 		}
@@ -77,15 +79,20 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue, SourceModelBuildingContext modelContext) {
+	public void render(
+			String name,
+			Object attributeValue,
+			RenderingTarget target,
+			Renderer renderer,
+			SourceModelContext modelContext) {
 		//noinspection unchecked
-		resolveDescriptor( modelContext ).renderUsage( collector, name, (A) attributeValue, modelContext );
+		renderer.renderNestedAnnotation( name, (A) attributeValue, modelContext );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
+	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, SourceModelContext modelContext) {
 		//noinspection unchecked
-		resolveDescriptor( modelContext ).renderUsage( collector, (A) attributeValue, modelContext );
+		renderer.renderNestedAnnotation( (A) attributeValue, modelContext );
 	}
 
 	@Override

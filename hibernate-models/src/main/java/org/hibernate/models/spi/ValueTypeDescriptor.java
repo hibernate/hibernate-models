@@ -8,6 +8,9 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 
+import org.hibernate.models.rendering.spi.Renderer;
+import org.hibernate.models.rendering.spi.RenderingTarget;
+
 /**
  * Descriptor for the annotation attribute types, acting as a producer for
  * {@link AttributeDescriptor}, {@link JandexValueConverter} and {@link JandexValueExtractor} references
@@ -34,12 +37,17 @@ public interface ValueTypeDescriptor<V> {
 	V[] makeArray(int size, SourceModelBuildingContext modelContext);
 
 	default void render(
-			RenderingCollector collector,
 			String name,
 			Object attributeValue,
-			SourceModelBuildingContext modelContext) {
-		collector.addLine( "%s=%s", name, "..." );
+			RenderingTarget target,
+			Renderer renderer,
+			SourceModelContext modelContext) {
+		target.addLine( "%s = %s", name, "..." );
 	}
 
-	void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext);
+	void render(
+			Object attributeValue,
+			RenderingTarget target,
+			Renderer renderer,
+			SourceModelContext modelContext);
 }

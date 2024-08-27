@@ -6,8 +6,10 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.spi.RenderingCollector;
+import org.hibernate.models.rendering.spi.Renderer;
+import org.hibernate.models.rendering.spi.RenderingTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 
 /**
  * Descriptor for string values
@@ -29,16 +31,14 @@ public class StringTypeDescriptor extends AbstractTypeDescriptor<String> {
 
 	@Override
 	public void render(
-			RenderingCollector collector,
-			String name,
-			Object attributeValue,
-			SourceModelBuildingContext modelContext) {
-		collector.addLine( "%s = \"%s\"", name, attributeValue );
+			String name, Object attributeValue, RenderingTarget target,
+			Renderer renderer, SourceModelContext modelContext) {
+		target.addLine( "%s = \"%s\"", name, attributeValue );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
-		collector.addLine( "\"%s\"", attributeValue );
+	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, SourceModelContext modelContext) {
+		target.addLine( "\"%s\"", attributeValue );
 	}
 
 	@Override

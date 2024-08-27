@@ -6,8 +6,10 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.spi.RenderingCollector;
+import org.hibernate.models.rendering.spi.Renderer;
+import org.hibernate.models.rendering.spi.RenderingTarget;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 
 /**
  * Descriptor for long values
@@ -28,13 +30,16 @@ public class LongTypeDescriptor extends AbstractTypeDescriptor<Long> {
 	}
 
 	@Override
-	public void render(RenderingCollector collector, String name, Object attributeValue, SourceModelBuildingContext modelContext) {
-		collector.addLine( "%s = %sL", name, attributeValue );
+	public void render(
+			String name, Object attributeValue, RenderingTarget target,
+			Renderer renderer,
+			SourceModelContext modelContext) {
+		target.addLine( "%s = %sL", name, attributeValue );
 	}
 
 	@Override
-	public void render(RenderingCollector collector, Object attributeValue, SourceModelBuildingContext modelContext) {
-		collector.addLine( "%sL", attributeValue );
+	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, SourceModelContext modelContext) {
+		target.addLine( "%sL", attributeValue );
 	}
 
 	@Override
