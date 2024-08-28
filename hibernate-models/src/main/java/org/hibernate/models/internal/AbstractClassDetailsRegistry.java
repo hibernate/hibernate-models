@@ -123,4 +123,40 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 			subTypes.add( classDetails );
 		}
 	}
+
+	@Override
+	public ClassDetails resolveClassDetails(String name, ClassDetailsCreator creator) {
+		if ( name == null ) {
+			throw new IllegalArgumentException( "`name` cannot be null" );
+		}
+
+		if ( "void".equals( name ) ) {
+			return null;
+		}
+
+		final ClassDetails existing = classDetailsMap.get( name );
+		if ( existing != null ) {
+			return existing;
+		}
+
+		return createClassDetails( name, creator );
+	}
+
+	protected ClassDetails createClassDetails(String name, ClassDetailsCreator creator) {
+		try {
+			final ClassDetails created = creator.createClassDetails( name );
+			addClassDetails( name, created );
+			return created;
+		}
+		catch (UnknownClassException e) {
+			// see if it might be a package name...
+			try {
+				return creator.createClassDetails( name + ".package-info" );
+			}
+			catch (UnknownClassException noPackage) {
+				throw e;
+			}
+		}
+	}
+
 }

@@ -87,6 +87,64 @@ public class SimpleDynamicModelTests {
 		checkPersistability( entityDetails.getFields().get( 1 ) );
 	}
 
+
+	@Test
+	void testResolveClassDetails() {
+		final SourceModelBuildingContext buildingContext = SourceModelTestHelper.createBuildingContext( (Index) null );
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+
+		final ClassDetails integerClassDetails = classDetailsRegistry.getClassDetails( Integer.class.getName() );
+		final ClassTypeDetailsImpl integerTypeDetails = new ClassTypeDetailsImpl( integerClassDetails, TypeDetails.Kind.CLASS );
+
+		final ClassDetails stringClassDetails = classDetailsRegistry.getClassDetails( String.class.getName() );
+		final ClassTypeDetailsImpl stringTypeDetails = new ClassTypeDetailsImpl( stringClassDetails, TypeDetails.Kind.CLASS );
+
+		classDetailsRegistry.as( MutableClassDetailsRegistry.class )
+				.resolveClassDetails( "TheEntity", (name) -> new DynamicClassDetails( name, buildingContext ) );
+
+		final DynamicClassDetails entityDetails = (DynamicClassDetails) classDetailsRegistry.resolveClassDetails( "TheEntity" );
+		final Entity created = entityDetails.applyAnnotationUsage(
+				JpaAnnotations.ENTITY,
+				buildingContext
+		);
+		final Entity preExisting = entityDetails.applyAnnotationUsage(
+				JpaAnnotations.ENTITY,
+				buildingContext
+		);
+		assertThat( created ).isSameAs( preExisting );
+
+		final DynamicFieldDetails idMember = entityDetails.applyAttribute(
+				"id",
+				integerTypeDetails,
+				false,
+				false,
+				buildingContext
+		);
+		final Id first = idMember.applyAnnotationUsage(
+				JpaAnnotations.ID,
+				buildingContext
+		);
+		final Id second = idMember.applyAnnotationUsage(
+				JpaAnnotations.ID,
+				buildingContext
+		);
+		assertThat( first ).isSameAs( second );
+
+		entityDetails.applyAttribute(
+				"name",
+				stringTypeDetails,
+				false,
+				false,
+				buildingContext
+		);
+
+		assertThat( entityDetails.getFields() ).hasSize( 2 );
+		assertThat( entityDetails.getFields().get( 0 ).getName() ).isEqualTo( "id" );
+		assertThat( entityDetails.getFields().get( 0 ).hasDirectAnnotationUsage( Id.class ) ).isTrue();
+		checkPersistability( entityDetails.getFields().get( 0 ) );
+		checkPersistability( entityDetails.getFields().get( 1 ) );
+	}
+
 	private void checkPersistability(FieldDetails fieldDetails) {
 		assertThat( fieldDetails.isPersistable() ).isTrue();
 
