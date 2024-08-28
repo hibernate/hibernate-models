@@ -24,6 +24,8 @@ import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.PrimaryKeyJoinColumns;
 import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.SecondaryTables;
 import jakarta.persistence.SequenceGenerator;
@@ -59,6 +61,9 @@ public interface JpaAnnotations {
 	AnnotationDescriptor<Table> TABLE = new OrmAnnotationDescriptor<>( Table.class, TableAnnotation.class );
 	AnnotationDescriptor<SecondaryTables> SECONDARY_TABLES = new OrmAnnotationDescriptor<>( SecondaryTables.class, SecondaryTablesAnnotation.class );
 	AnnotationDescriptor<SecondaryTable> SECONDARY_TABLE = new OrmAnnotationDescriptor<>( SecondaryTable.class, SecondaryTableAnnotation.class, SECONDARY_TABLES );
+
+	AnnotationDescriptor<PrimaryKeyJoinColumns> PRIMARY_KEY_JOIN_COLUMNS = new OrmAnnotationDescriptor<>( PrimaryKeyJoinColumns.class, PrimaryKeyJoinColumnsJpaAnnotation.class );
+	AnnotationDescriptor<PrimaryKeyJoinColumn> PRIMARY_KEY_JOIN_COLUMN = new OrmAnnotationDescriptor<>( PrimaryKeyJoinColumn.class, PrimaryKeyJoinColumnJpaAnnotation.class, PRIMARY_KEY_JOIN_COLUMNS );
 
 	AnnotationDescriptor<CheckConstraint> CHECK_CONSTRAINT = new OrmAnnotationDescriptor<>( CheckConstraint.class, CheckConstraintAnnotation.class );
 	AnnotationDescriptor<ForeignKey> FOREIGN_KEY = new OrmAnnotationDescriptor<>( ForeignKey.class, ForeignKeyAnnotation.class );

@@ -22,6 +22,7 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.Index;
+import org.jboss.jandex.IndexView;
 import org.jboss.jandex.Indexer;
 
 import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOADING;
@@ -30,6 +31,10 @@ import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOAD
  * @author Steve Ebersole
  */
 public class SourceModelTestHelper {
+
+	public static SourceModelBuildingContext createBuildingContext(Class<?> modelClass) {
+		return createBuildingContext( SIMPLE_CLASS_LOADING, modelClass );
+	}
 
 	public static SourceModelBuildingContext createBuildingContext(Class<?>... modelClasses) {
 		return createBuildingContext( SIMPLE_CLASS_LOADING, modelClasses );
@@ -40,12 +45,16 @@ public class SourceModelTestHelper {
 		return createBuildingContext( jandexIndex, modelClasses );
 	}
 
-	public static SourceModelBuildingContext createBuildingContext(Index jandexIndex, Class<?>... modelClasses) {
+	public static SourceModelBuildingContext createBuildingContext(IndexView jandexIndex, Class<?> modelClass) {
+		return createBuildingContext( jandexIndex, SIMPLE_CLASS_LOADING, modelClass );
+	}
+
+	public static SourceModelBuildingContext createBuildingContext(IndexView jandexIndex, Class<?>... modelClasses) {
 		return createBuildingContext( jandexIndex, SIMPLE_CLASS_LOADING, modelClasses );
 	}
 
 	public static SourceModelBuildingContext createBuildingContext(
-			Index jandexIndex,
+			IndexView jandexIndex,
 			ClassLoading classLoadingAccess,
 			Class<?>... modelClasses) {
 		final SourceModelBuildingContext ctx;
