@@ -41,6 +41,11 @@ public interface MemberDetails extends AnnotationTarget {
 	 */
 	TypeDetails getType();
 
+	@Override
+	default ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext) {
+		return getDeclaringType();
+	}
+
 	/**
 	 * For plural members, the {@linkplain #getElementType "element type"};
 	 * otherwise, the member's {@linkplain #getType() type}

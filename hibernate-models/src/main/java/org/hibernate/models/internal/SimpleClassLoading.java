@@ -34,6 +34,17 @@ public class SimpleClassLoading implements ClassLoading {
 	}
 
 	@Override
+	public <T> Class<T> findClassForName(String name) {
+		try {
+			//noinspection unchecked
+			return (Class<T>) getClass().getClassLoader().loadClass( name );
+		}
+		catch (ClassNotFoundException e) {
+			return null;
+		}
+	}
+
+	@Override
 	public Package packageForName(String name) {
 		return getClass().getClassLoader().getDefinedPackage( name );
 	}

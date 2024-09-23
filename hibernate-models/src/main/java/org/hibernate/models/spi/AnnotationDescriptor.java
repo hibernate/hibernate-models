@@ -35,6 +35,13 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 		return (S) type;
 	}
 
+	@Override
+	default ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext) {
+		final ClassDetails annotationClassDetails = modelBuildingContext
+				.getClassDetailsRegistry()
+				.resolveClassDetails( getAnnotationType().getName() );
+		return annotationClassDetails.getContainer( modelBuildingContext );
+	}
 	/**
 	 * Create an empty usage.  Used when there is no source form, such as XML processing.
 	 */

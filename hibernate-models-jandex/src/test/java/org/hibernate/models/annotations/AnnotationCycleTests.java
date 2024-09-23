@@ -29,7 +29,7 @@ import static org.hibernate.models.SourceModelTestHelper.createBuildingContext;
 public class AnnotationCycleTests {
 	@Test
 	void testWithJandex() {
-		testAnnotationCycle( buildJandexIndex( SelfReferenceTests.SimpleClass.class ) );
+		testAnnotationCycle( buildJandexIndex( SimpleClass.class ) );
 	}
 
 	@Test

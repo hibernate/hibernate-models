@@ -27,6 +27,12 @@ public interface ClassLoading {
 	 */
 	<T> Class<T> classForName(String name);
 
+	/**
+	 * Like {@linkplain #classForName(String)}, except here we simply return {@code null} if
+	 * there is not a matching class.  This is often useful, e.g., when looking for a package-info.
+	 */
+	<T> Class<T> findClassForName(String name);
+
 	Package packageForName(String name);
 
 	/**

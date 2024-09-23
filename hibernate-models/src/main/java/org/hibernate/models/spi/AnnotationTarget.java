@@ -35,6 +35,18 @@ public interface AnnotationTarget {
 	String getName();
 
 	/**
+	 * Get the ClassDetails for the class which is the "container" for this target.<ul>
+	 *     <li>For a member ({@code org.hib.Thing#id}), this will be the declaring type ({@code org.hib.Thing}).
+	 *     <li>For a class ({@code org.hib.Thing}), this will be the ClassDetails for its package ({@code org.hib.package-info})
+	 *     <li>For a package ({@code org.hib.package-info}), this will be the ClassDetails for the containing package ({@code org.package-info})
+	 * </ul>
+	 *
+	 * @apiNote If not already, this resolution should be registered into the context's
+	 * {@linkplain SourceModelBuildingContext#getClassDetailsRegistry() class registry}
+	 */
+	ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext);
+
+	/**
 	 * Access to all the annotations used on this target.
 	 *
 	 * @apiNote This returns the usages directly available on the target; it does not

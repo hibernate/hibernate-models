@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
 
@@ -89,6 +90,11 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 * Where the class is a Java record
 	 */
 	boolean isRecord();
+
+	@Override
+	default ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext) {
+		return AnnotationTargetHelper.resolvePackageInfo( this, modelBuildingContext );
+	}
 
 	/**
 	 * Details for the class that is the super type for this class.

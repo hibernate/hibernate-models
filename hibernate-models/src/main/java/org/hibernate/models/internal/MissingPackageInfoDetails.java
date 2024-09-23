@@ -1,0 +1,200 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright: Red Hat Inc. and Hibernate Authors
+ */
+
+package org.hibernate.models.internal;
+
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
+
+import org.hibernate.models.internal.util.IndexedConsumer;
+import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
+import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
+
+/**
+ * ClassDetails implementation used to represent a {@code package-info} details when
+ * there is not a physical {@code package-info} class.
+ *
+ * @author Steve Ebersole
+ */
+public record MissingPackageInfoDetails(String packageName, String packageInfoClassName) implements ClassDetails {
+
+	@Override
+	public String getName() {
+		return packageInfoClassName;
+	}
+
+	@Override
+	public Collection<? extends Annotation> getDirectAnnotationUsages() {
+		return List.of();
+	}
+
+	@Override
+	public <A extends Annotation> boolean hasDirectAnnotationUsage(Class<A> type) {
+		return false;
+	}
+
+	@Override
+	public <A extends Annotation> A getDirectAnnotationUsage(AnnotationDescriptor<A> descriptor) {
+		return null;
+	}
+
+	@Override
+	public <A extends Annotation> A getDirectAnnotationUsage(Class<A> type) {
+		return null;
+	}
+
+	@Override
+	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
+		return false;
+	}
+
+	@Override
+	public <A extends Annotation> A getAnnotationUsage(
+			AnnotationDescriptor<A> descriptor,
+			SourceModelBuildingContext modelContext) {
+		return null;
+	}
+
+	@Override
+	public <A extends Annotation> A locateAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
+		return null;
+	}
+
+	@Override
+	public <A extends Annotation> A[] getRepeatedAnnotationUsages(
+			AnnotationDescriptor<A> type,
+			SourceModelBuildingContext modelContext) {
+		return null;
+	}
+
+	@Override
+	public <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
+			Class<A> repeatable,
+			Class<C> container,
+			SourceModelBuildingContext modelContext,
+			Consumer<A> consumer) {
+
+	}
+
+	@Override
+	public <A extends Annotation> List<? extends Annotation> getMetaAnnotated(
+			Class<A> metaAnnotationType,
+			SourceModelBuildingContext modelContext) {
+		return List.of();
+	}
+
+	@Override
+	public <X extends Annotation> X getNamedAnnotationUsage(
+			AnnotationDescriptor<X> type,
+			String matchName,
+			String attributeToMatch,
+			SourceModelBuildingContext modelContext) {
+		return null;
+	}
+
+	@Override
+	public <X extends Annotation> X getNamedAnnotationUsage(
+			Class<X> type,
+			String matchName,
+			String attributeToMatch,
+			SourceModelBuildingContext modelContext) {
+		return null;
+	}
+
+	@Override
+	public String getClassName() {
+		return packageInfoClassName;
+	}
+
+	@Override
+	public boolean isResolved() {
+		return true;
+	}
+
+	@Override
+	public boolean isAbstract() {
+		return false;
+	}
+
+	@Override
+	public boolean isInterface() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnum() {
+		return false;
+	}
+
+	@Override
+	public boolean isRecord() {
+		return false;
+	}
+
+	@Override
+	public ClassDetails getSuperClass() {
+		return null;
+	}
+
+	@Override
+	public TypeDetails getGenericSuperType() {
+		return null;
+	}
+
+	@Override
+	public List<TypeDetails> getImplementedInterfaces() {
+		return List.of();
+	}
+
+	@Override
+	public List<TypeVariableDetails> getTypeParameters() {
+		return List.of();
+	}
+
+	@Override
+	public boolean isImplementor(Class<?> checkType) {
+		return false;
+	}
+
+	@Override
+	public List<FieldDetails> getFields() {
+		return List.of();
+	}
+
+	@Override
+	public void forEachField(IndexedConsumer<FieldDetails> consumer) {
+	}
+
+	@Override
+	public List<MethodDetails> getMethods() {
+		return List.of();
+	}
+
+	@Override
+	public void forEachMethod(IndexedConsumer<MethodDetails> consumer) {
+	}
+
+	@Override
+	public List<RecordComponentDetails> getRecordComponents() {
+		return List.of();
+	}
+
+	@Override
+	public void forEachRecordComponent(IndexedConsumer<RecordComponentDetails> consumer) {
+	}
+
+	@Override
+	public <X> Class<X> toJavaClass() {
+		throw new UnsupportedOperationException( "Missing package-info [" + packageInfoClassName + "] cannot be converted to a Java Class" );
+	}
+}
