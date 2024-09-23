@@ -1,10 +1,7 @@
 /*
- * Hibernate, Relational Persistence for Idiomatic Java
- *
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-
 package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
@@ -28,7 +25,9 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  */
 public class StandardAnnotationDescriptor<A extends Annotation> extends AbstractAnnotationDescriptor<A> {
 	private final List<AttributeDescriptor<?>> attributeDescriptors;
-	private final Map<Class<? extends Annotation>, ? extends Annotation> usagesMap;
+	private final SourceModelBuildingContext buildingContext;
+
+	private Map<Class<? extends Annotation>, ? extends Annotation> usagesMap;
 
 	public StandardAnnotationDescriptor(
 			Class<A> annotationType,
@@ -42,12 +41,15 @@ public class StandardAnnotationDescriptor<A extends Annotation> extends Abstract
 			SourceModelBuildingContext buildingContext) {
 		super( annotationType, AnnotationHelper.extractTargets( annotationType ), AnnotationHelper.isInherited( annotationType ), repeatableContainer );
 
+		this.buildingContext = buildingContext;
 		this.attributeDescriptors = AnnotationDescriptorBuilding.extractAttributeDescriptors( annotationType );
-		this.usagesMap = buildUsagesMap( annotationType, buildingContext );
 	}
 
 	@Override
 	public Map<Class<? extends Annotation>, ? extends Annotation> getUsageMap() {
+		if ( usagesMap == null ) {
+			usagesMap = buildUsagesMap( getAnnotationType(), buildingContext );
+		}
 		return usagesMap;
 	}
 
