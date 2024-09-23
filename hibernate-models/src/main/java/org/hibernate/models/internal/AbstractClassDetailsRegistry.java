@@ -1,6 +1,4 @@
 /*
- * Hibernate, Relational Persistence for Idiomatic Java
- *
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
@@ -15,7 +13,6 @@ import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.VoidTypeDetails;
 
 /**
  * @author Steve Ebersole

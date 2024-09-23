@@ -1,6 +1,4 @@
 /*
- * Hibernate, Relational Persistence for Idiomatic Java
- *
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
@@ -11,7 +9,7 @@ import java.util.Locale;
 
 /**
  * Indicates an attempt to access a non-existent annotation attribute
- * 
+ *
  * @see org.hibernate.models.spi.AnnotationDescriptor#getAttribute
  *
  * @author Steve Ebersole

@@ -2,7 +2,9 @@ plugins {
 	id "base-information"
 	id "java-library"
 
+	id "com.diffplug.spotless"
 	id "checkstyle"
+
 	id "jacoco"
 }
 
@@ -50,6 +52,9 @@ tasks.withType( JavaCompile ).configureEach {javaCompile->
 	options.warnings false
 }
 
+tasks.named( "checkstyleMain" ) {
+	dependsOn( tasks.named( "spotlessJavaApply" ) )
+}
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Javadoc
@@ -68,6 +73,23 @@ tasks.named( "javadoc", Javadoc ) {
 				"implSpec:a:Implementation Specification:",
 				"implNote:a:Implementation Note:"
 		)
+	}
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Spotless
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+spotless {
+	//Don't fail during the check: rather than enforcing guidelines, we use this plugin to fix mistakes automatically.
+	enforceCheck false
+	java {
+		licenseHeaderFile rootProject.file( 'config/spotless/license.java' )
+		removeUnusedImports()
+		indentWithTabs( 4 )
+		trimTrailingWhitespace()
+		endWithNewline()
 	}
 }
 
