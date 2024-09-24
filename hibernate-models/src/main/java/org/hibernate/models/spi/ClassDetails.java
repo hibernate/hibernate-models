@@ -63,6 +63,14 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 */
 	String getClassName();
 
+	@Override
+	default ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext) {
+		if ( getClassName() == null || getClassName().indexOf( "." ) <= 0 ) {
+			return null;
+		}
+		return AnnotationTargetHelper.resolvePackageInfo( this, modelBuildingContext );
+	}
+
 	/**
 	 * Whether the {@linkplain Class}, if one, represented by this ClassDetails is
 	 * already loaded on the {@linkplain ClassLoader} used for {@linkplain ClassLoading loading}.
@@ -90,11 +98,6 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 * Where the class is a Java record
 	 */
 	boolean isRecord();
-
-	@Override
-	default ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext) {
-		return AnnotationTargetHelper.resolvePackageInfo( this, modelBuildingContext );
-	}
 
 	/**
 	 * Details for the class that is the super type for this class.

@@ -12,9 +12,11 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.internal.AnnotationTargetHelper;
 
 /**
  * Abstract for something where an annotation can be used.
@@ -45,6 +47,62 @@ public interface AnnotationTarget {
 	 * {@linkplain SourceModelBuildingContext#getClassDetailsRegistry() class registry}
 	 */
 	ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext);
+
+	/**
+	 * Walk "up" {@linkplain #getContainer containers} from this target.
+	 *
+	 * @param crossPackageBoundaries If this target is a package, should we walk to its container?
+	 * @param modelContext Access to useful stuff.
+	 * @param consumer Consumer of the containers
+	 */
+	default void walkContainers(
+			boolean crossPackageBoundaries,
+			SourceModelBuildingContext modelContext,
+			Consumer<ClassDetails> consumer) {
+		AnnotationTargetHelper.walkContainers( this, crossPackageBoundaries, modelContext, consumer );
+	}
+
+	/**
+	 * Walk "up" {@linkplain #getContainer containers} from this target.
+	 *
+	 * @param crossPackageBoundaries If this target is a package, should we walk to its container?
+	 * @param modelContext Access to useful stuff.
+	 * @param consumer Consumer of the containers
+	 */
+	default void walkSelfAndContainers(
+			boolean crossPackageBoundaries,
+			SourceModelBuildingContext modelContext,
+			Consumer<AnnotationTarget> consumer) {
+		AnnotationTargetHelper.walkSelfAndContainers( this, crossPackageBoundaries, modelContext, consumer );
+	}
+
+	/**
+	 * Walk "up" {@linkplain #getContainer containers} from this target.
+	 *
+	 * @param crossPackageBoundaries If this target is a package, should we walk to its container?
+	 * @param modelContext Access to useful stuff.
+	 * @param matchingExtractor A function that acts as an extractor against a container.  A non-null return indicates a match, which will be the return from this method.
+	 */
+	default <T> T fromContainers(
+			boolean crossPackageBoundaries,
+			SourceModelBuildingContext modelContext,
+			Function<ClassDetails,T> matchingExtractor) {
+		return AnnotationTargetHelper.fromContainers( this, crossPackageBoundaries, modelContext, matchingExtractor );
+	}
+
+	/**
+	 * Walk "up" {@linkplain #getContainer containers} from this target.
+	 *
+	 * @param crossPackageBoundaries If this target is a package, should we walk to its container?
+	 * @param modelContext Access to useful stuff.
+	 * @param matchingExtractor A function that acts as an extractor against a container.  A non-null return indicates a match, which will be the return from this method.
+	 */
+	default <T> T fromSelfAndContainers(
+			boolean crossPackageBoundaries,
+			SourceModelBuildingContext modelContext,
+			Function<AnnotationTarget,T> matchingExtractor) {
+		return AnnotationTargetHelper.fromSelfAndContainers( this, crossPackageBoundaries, modelContext, matchingExtractor );
+	}
 
 	/**
 	 * Access to all the annotations used on this target.

@@ -2,16 +2,14 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright: Red Hat Inc. and Hibernate Authors
- */
-
 package org.hibernate.models.internal;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.models.internal.jdk.JdkClassDetails;
 import org.hibernate.models.internal.util.StringHelper;
+import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
@@ -35,6 +33,10 @@ public class AnnotationTargetHelper {
 			return null;
 		}
 		final String containingPackageName = determineContainingPackageName( classDetails );
+		if ( containingPackageName == null ) {
+			return null;
+		}
+
 		final String packageInfoClassName = containingPackageName + ".package-info";
 
 		return modelBuildingContext.getClassDetailsRegistry()
@@ -75,5 +77,87 @@ public class AnnotationTargetHelper {
 	}
 
 	private AnnotationTargetHelper() {
+	}
+
+	public static void walkContainers(
+			AnnotationTarget annotationTarget,
+			boolean crossPackageBoundaries,
+			SourceModelBuildingContext modelContext,
+			Consumer<ClassDetails> consumer) {
+		if ( isPackage( annotationTarget ) ) {
+			if ( !crossPackageBoundaries ) {
+				return;
+			}
+		}
+
+		final ClassDetails container = annotationTarget.getContainer( modelContext );
+		if ( container == null ) {
+			return;
+		}
+
+		consumer.accept( container );
+		container.walkContainers( crossPackageBoundaries, modelContext, consumer );
+	}
+
+	@SuppressWarnings("RedundantIfStatement")
+	private static boolean isPackage(AnnotationTarget annotationTarget) {
+		if ( annotationTarget.getKind() == AnnotationTarget.Kind.PACKAGE ) {
+			return true;
+		}
+
+		if ( annotationTarget.getKind() == AnnotationTarget.Kind.CLASS
+				&& annotationTarget.getName().endsWith( ".package-info" ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static void walkSelfAndContainers(
+			AnnotationTarget self,
+			boolean crossPackageBoundaries,
+			SourceModelBuildingContext modelContext,
+			Consumer<AnnotationTarget> consumer) {
+		if ( self == null ) {
+			return;
+		}
+
+		consumer.accept( self );
+		self.walkContainers( crossPackageBoundaries, modelContext, consumer::accept );
+	}
+
+	public static <T> T fromContainers(
+			AnnotationTarget annotationTarget,
+			boolean crossPackageBoundaries,
+			SourceModelBuildingContext modelContext,
+			Function<ClassDetails, T> matchingExtractor) {
+		if ( isPackage( annotationTarget ) && !crossPackageBoundaries ) {
+			return null;
+		}
+
+		final ClassDetails container = annotationTarget.getContainer( modelContext );
+		final T matchedExtraction = matchingExtractor.apply( container );
+		if ( matchedExtraction != null ) {
+			return matchedExtraction;
+		}
+
+		return container.fromContainers( crossPackageBoundaries, modelContext, matchingExtractor );
+	}
+
+	public static <T> T fromSelfAndContainers(
+			AnnotationTarget self,
+			boolean crossPackageBoundaries,
+			SourceModelBuildingContext modelContext,
+			Function<AnnotationTarget, T> matchingExtractor) {
+		if ( self == null ) {
+			return null;
+		}
+
+		final T fromSelf = matchingExtractor.apply( self );
+		if ( fromSelf != null ) {
+			return fromSelf;
+		}
+
+		return self.fromContainers( crossPackageBoundaries, modelContext, matchingExtractor::apply );
 	}
 }
