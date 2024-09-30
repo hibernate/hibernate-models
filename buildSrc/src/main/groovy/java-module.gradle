@@ -3,8 +3,6 @@ plugins {
 	id "java-library"
 
 	id "com.diffplug.spotless"
-	id "checkstyle"
-
 	id "jacoco"
 }
 
@@ -52,9 +50,6 @@ tasks.withType( JavaCompile ).configureEach {javaCompile->
 	options.warnings false
 }
 
-tasks.named( "checkstyleMain" ) {
-	dependsOn( tasks.named( "spotlessJavaApply" ) )
-}
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Javadoc
@@ -95,13 +90,44 @@ spotless {
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Checkstyle
+// Enforced rules
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-checkstyle {
-	sourceSets = [ project.sourceSets.main ]
-	showViolations = false
+def enforceRulesTask = tasks.register( "enforceRules" ) {
+	description "Enforces some formatting rules to src/main/java files"
+	doLast {
+		def illegalImport = ~/^import (sun|java.awt|org.slf4j)/
+		def missingNewline = ~/^\s*}\s*(else|catch|finally)/
+		def lowerEll = ~/\b\d+l\b/
+		def errors = 0
+		def tree = fileTree( "src/main/java/" )
+		tree.include "**/*.java"
+		tree.each { file ->
+			def lineNum = 0
+			def shortName = file.path.substring( rootDir.path.length() )
+			file.eachLine { line ->
+				lineNum++
+				if ( line =~ illegalImport ) {
+					errors++
+					logger.error( "Illegal import in ${shortName}\n${lineNum}: ${line}" )
+				}
+				if ( line =~ missingNewline ) {
+					errors++
+					logger.error( "Missing newline in ${shortName}\n${lineNum}: ${line}" )
+				}
+				if ( line =~ lowerEll ) {
+					errors++
+					logger.error( "Lowercase long literal in ${shortName}\n${lineNum}: ${line}" )
+				}
+			}
+		}
+		if ( errors > 0 ) {
+			throw new GradleException( "Code rules were violated ($errors problems)" )
+		}
+	}
 }
+
+
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -121,5 +147,7 @@ jacocoTestReport {
 }
 
 tasks.named( "check" ) {
+	dependsOn enforceRulesTask
+	dependsOn tasks.named( "spotlessCheck" )
 	dependsOn jacocoReportTask
 }

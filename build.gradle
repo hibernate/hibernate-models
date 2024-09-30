@@ -2,6 +2,8 @@ plugins {
 	id "io.github.gradle-nexus.publish-plugin"
 	id "release-process"
 	id 'com.diffplug.spotless' version '6.25.0' apply false
+
+	id "com.dorongold.task-tree" version "4.0.0"
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
