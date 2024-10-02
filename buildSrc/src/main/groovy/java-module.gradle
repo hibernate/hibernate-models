@@ -50,6 +50,12 @@ tasks.withType( JavaCompile ).configureEach {javaCompile->
 	options.warnings false
 }
 
+// To force the build produce the same byte-for-byte archives and hence make Hibernate Models build reproducible.
+// See also https://docs.gradle.org/current/userguide/working_with_files.html#sec:reproducible_archives
+tasks.withType( AbstractArchiveTask ).configureEach {
+	preserveFileTimestamps = false
+	reproducibleFileOrder = true
+}
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Javadoc
