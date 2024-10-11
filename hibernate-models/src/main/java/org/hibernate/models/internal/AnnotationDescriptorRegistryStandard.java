@@ -4,8 +4,12 @@
  */
 package org.hibernate.models.internal;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
+import java.util.Map;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
@@ -17,7 +21,9 @@ import static org.hibernate.models.internal.ModelsAnnotationLogging.MODELS_ANNOT
  *
  * @author Steve Ebersole
  */
-public class AnnotationDescriptorRegistryStandard extends AbstractAnnotationDescriptorRegistry implements MutableAnnotationDescriptorRegistry {
+public class AnnotationDescriptorRegistryStandard
+		extends AbstractAnnotationDescriptorRegistry
+		implements MutableAnnotationDescriptorRegistry {
 	private final SourceModelBuildingContext modelBuildingContext;
 
 	public AnnotationDescriptorRegistryStandard(SourceModelBuildingContext modelBuildingContext) {
@@ -83,4 +89,20 @@ public class AnnotationDescriptorRegistryStandard extends AbstractAnnotationDesc
 				modelBuildingContext
 		);
 	}
+
+	public void serialize(ObjectOutputStream outputStream, BasicModelBuildingContextImpl context) throws IOException {
+		outputStream.writeInt( descriptorMap.size() );
+		for ( Map.Entry<Class<? extends Annotation>, AnnotationDescriptor<?>> entry : descriptorMap.entrySet() ) {
+			outputStream.writeObject( entry.getValue().toSerialForm( context ) );
+		}
+	}
+
+	public void deserialize(ObjectInputStream inputStream, SourceModelBuildingContext context) throws IOException, ClassNotFoundException {
+		final int count = inputStream.readInt();
+		for ( int i = 0; i < count; i++ ) {
+			final SerialAnnotationDescriptor<?> serialForm = (SerialAnnotationDescriptor<?>) inputStream.readObject();
+			register( serialForm.fromSerialForm( context ) );
+		}
+	}
+
 }

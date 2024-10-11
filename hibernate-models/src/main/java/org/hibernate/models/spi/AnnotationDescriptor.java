@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.spi;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.util.EnumSet;
@@ -13,13 +16,15 @@ import java.util.Map;
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
+import org.hibernate.models.internal.SerialAnnotationDescriptor;
 
 /**
  * Describes an annotation type (the Class)
  *
  * @author Steve Ebersole
  */
-public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTarget {
+public interface AnnotationDescriptor<A extends Annotation>
+		extends AnnotationTarget, Storable<AnnotationDescriptor<A>, SerialAnnotationDescriptor<A>> {
 	@Override
 	default Kind getKind() {
 		return Kind.ANNOTATION;
@@ -152,4 +157,8 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to a RecordComponentDetails" );
 	}
 
+	@Override
+	default SerialAnnotationDescriptor<A> toSerialForm(SourceModelBuildingContext context) {
+		return new SerialAnnotationDescriptor<>( getAnnotationType() );
+	}
 }

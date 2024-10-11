@@ -22,6 +22,8 @@ import org.jboss.jandex.IndexView;
 import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
 
 /**
+ * SourceModelBuildingContext implementation based on Jandex
+ *
  * @author Steve Ebersole
  */
 public class JandexModelBuildingContextImpl extends AbstractModelBuildingContext implements JandexModelBuildingContext {

@@ -3,3 +3,7 @@ plugins {
 }
 
 description = "A de-typed abstraction over reflection and annotations"
+
+dependencies {
+	testImplementation project( ":hibernate-models-testing" )
+}

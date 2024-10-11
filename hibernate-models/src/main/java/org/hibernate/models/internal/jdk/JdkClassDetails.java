@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
+import org.hibernate.models.internal.SerialCassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -229,5 +230,10 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	@Override
 	public String toString() {
 		return "JdkClassDetails(" + name + ")";
+	}
+
+	@Override
+	public SerialCassDetails toSerialForm(SourceModelBuildingContext context) {
+		return new SerialJdkCassDetails( name, managedClass );
 	}
 }

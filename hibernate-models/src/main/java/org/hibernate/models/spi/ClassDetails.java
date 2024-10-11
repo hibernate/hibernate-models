@@ -4,6 +4,7 @@
  */
 package org.hibernate.models.spi;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.function.Consumer;
@@ -11,6 +12,7 @@ import java.util.function.Predicate;
 
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.internal.AnnotationTargetHelper;
+import org.hibernate.models.internal.SerialCassDetails;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
 
@@ -21,7 +23,7 @@ import org.hibernate.models.internal.util.IndexedConsumer;
  * @author Steve Ebersole
  * @see ClassDetailsRegistry
  */
-public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
+public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Storable<ClassDetails, SerialCassDetails> {
 	/**
 	 * Details for {@code Object.class}
 	 */
@@ -321,5 +323,4 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	default RecordComponentDetails asRecordComponentDetails() {
 		throw new IllegalCastException( "ClassDetails cannot be cast to RecordComponentDetails" );
 	}
-
 }

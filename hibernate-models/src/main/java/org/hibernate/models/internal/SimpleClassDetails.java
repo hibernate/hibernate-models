@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.hibernate.models.internal.jdk.SerialJdkCassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
@@ -227,5 +228,10 @@ public class SimpleClassDetails implements ClassDetails {
 			String attributeToMatch,
 			SourceModelBuildingContext modelContext) {
 		return null;
+	}
+
+	@Override
+	public SerialCassDetails toSerialForm(SourceModelBuildingContext context) {
+		return new SerialJdkCassDetails( null, clazz );
 	}
 }

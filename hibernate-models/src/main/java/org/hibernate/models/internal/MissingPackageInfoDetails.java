@@ -196,4 +196,24 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	public <X> Class<X> toJavaClass() {
 		throw new UnsupportedOperationException( "Missing package-info [" + packageInfoClassName + "] cannot be converted to a Java Class" );
 	}
+
+	@Override
+	public SerialCassDetails toSerialForm(SourceModelBuildingContext context) {
+		return new SerialFormImpl( packageName, packageInfoClassName );
+	}
+
+	private static class SerialFormImpl implements SerialCassDetails {
+		private final String packageName;
+		private final String packageInfoClassName;
+
+		public SerialFormImpl(String packageName, String packageInfoClassName) {
+			this.packageName = packageName;
+			this.packageInfoClassName = packageInfoClassName;
+		}
+
+		@Override
+		public ClassDetails fromSerialForm(SourceModelBuildingContext context) {
+			return new MissingPackageInfoDetails( packageName, packageInfoClassName );
+		}
+	}
 }

@@ -4,10 +4,12 @@
  */
 package org.hibernate.models.spi;
 
+import java.io.Serializable;
+
 /**
  * @author Steve Ebersole
  */
-public interface SourceModelContext {
+public interface SourceModelContext extends Serializable {
 	/**
 	 * The registry of annotation descriptors
 	 */
