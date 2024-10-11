@@ -4,6 +4,7 @@
  */
 package org.hibernate.models.internal.jdk;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.reflect.Method;
@@ -29,7 +30,7 @@ import org.hibernate.models.spi.TypeDetails;
  *
  * @author Steve Ebersole
  */
-public class JdkBuilders implements ClassDetailsBuilder {
+public class JdkBuilders implements ClassDetailsBuilder, Serializable {
 	/**
 	 * Singleton access
 	 */

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.models.internal.util.IndexedConsumer;
+import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
@@ -195,5 +196,35 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	@Override
 	public <X> Class<X> toJavaClass() {
 		throw new UnsupportedOperationException( "Missing package-info [" + packageInfoClassName + "] cannot be converted to a Java Class" );
+	}
+
+	@Override
+	public SerialClassDetails toStorableForm() {
+		return new SerialFormImpl( packageName, packageInfoClassName );
+	}
+
+	private static class SerialFormImpl implements SerialClassDetails {
+		private final String packageName;
+		private final String packageInfoClassName;
+
+		public SerialFormImpl(String packageName, String packageInfoClassName) {
+			this.packageName = packageName;
+			this.packageInfoClassName = packageInfoClassName;
+		}
+
+		@Override
+		public String getName() {
+			return packageName;
+		}
+
+		@Override
+		public String getClassName() {
+			return packageInfoClassName;
+		}
+
+		@Override
+		public ClassDetails fromStorableForm(SourceModelBuildingContext context) {
+			return new MissingPackageInfoDetails( packageName, packageInfoClassName );
+		}
 	}
 }

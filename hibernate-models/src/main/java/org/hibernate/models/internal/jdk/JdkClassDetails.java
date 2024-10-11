@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.util.CollectionHelper;
+import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
@@ -183,6 +184,9 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 			this.fields = arrayList( reflectionFields.length );
 			for ( int i = 0; i < reflectionFields.length; i++ ) {
 				final Field reflectionField = reflectionFields[i];
+				if ( reflectionField.isSynthetic() ) {
+					continue;
+				}
 				fields.add( new JdkFieldDetails( reflectionField, this, getModelContext() ) );
 			}
 		}
@@ -200,6 +204,9 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 			final Method[] reflectionMethods = managedClass.getDeclaredMethods();
 			this.methods = arrayList( reflectionMethods.length );
 			for ( int i = 0; i < reflectionMethods.length; i++ ) {
+				if ( reflectionMethods[i].isSynthetic() ) {
+					continue;
+				}
 				this.methods.add( buildMethodDetails( reflectionMethods[i], this, getModelContext() ) );
 			}
 		}
@@ -229,5 +236,10 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	@Override
 	public String toString() {
 		return "JdkClassDetails(" + name + ")";
+	}
+
+	@Override
+	public SerialClassDetails toStorableForm() {
+		return new SerialJdkClassDetails( name, managedClass );
 	}
 }

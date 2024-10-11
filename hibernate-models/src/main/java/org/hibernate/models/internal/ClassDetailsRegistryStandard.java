@@ -15,7 +15,9 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  *
  * @author Steve Ebersole
  */
-public class ClassDetailsRegistryStandard extends AbstractClassDetailsRegistry implements MutableClassDetailsRegistry {
+public class ClassDetailsRegistryStandard
+		extends AbstractClassDetailsRegistry
+		implements MutableClassDetailsRegistry {
 	private final ClassDetailsBuilder classDetailsBuilder;
 
 	public ClassDetailsRegistryStandard(SourceModelBuildingContext context) {
@@ -35,5 +37,4 @@ public class ClassDetailsRegistryStandard extends AbstractClassDetailsRegistry i
 	protected ClassDetailsBuilder getClassDetailsBuilder() {
 		return classDetailsBuilder;
 	}
-
 }

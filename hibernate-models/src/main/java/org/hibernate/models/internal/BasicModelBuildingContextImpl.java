@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.internal;
 
+import org.hibernate.models.serial.internal.StorableContextImpl;
+import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 
@@ -37,5 +39,10 @@ public class BasicModelBuildingContextImpl extends AbstractModelBuildingContext 
 	@Override
 	public MutableClassDetailsRegistry getClassDetailsRegistry() {
 		return classDetailsRegistry;
+	}
+
+	@Override
+	public StorableContext toStorableForm() {
+		return new StorableContextImpl( classDetailsRegistry.classDetailsMap, descriptorRegistry.descriptorMap );
 	}
 }
