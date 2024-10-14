@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.spi;
 
+import org.hibernate.models.serial.spi.StorableContext;
+
 /**
  * Context object used while building references for {@link AnnotationDescriptor},
  * {@link ClassDetails} and friends.
@@ -22,4 +24,6 @@ public interface SourceModelBuildingContext extends SourceModelContext { //, Sha
 		//noinspection unchecked
 		return (S) this;
 	}
+
+	StorableContext toStorableForm();
 }

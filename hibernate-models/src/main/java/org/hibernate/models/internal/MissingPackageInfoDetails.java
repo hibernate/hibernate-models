@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.models.internal.util.IndexedConsumer;
+import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
@@ -198,11 +199,11 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	}
 
 	@Override
-	public SerialCassDetails toSerialForm(SourceModelBuildingContext context) {
+	public SerialClassDetails toStorableForm() {
 		return new SerialFormImpl( packageName, packageInfoClassName );
 	}
 
-	private static class SerialFormImpl implements SerialCassDetails {
+	private static class SerialFormImpl implements SerialClassDetails {
 		private final String packageName;
 		private final String packageInfoClassName;
 
@@ -212,7 +213,17 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 		}
 
 		@Override
-		public ClassDetails fromSerialForm(SourceModelBuildingContext context) {
+		public String getName() {
+			return packageName;
+		}
+
+		@Override
+		public String getClassName() {
+			return packageInfoClassName;
+		}
+
+		@Override
+		public ClassDetails fromStorableForm(SourceModelBuildingContext context) {
 			return new MissingPackageInfoDetails( packageName, packageInfoClassName );
 		}
 	}

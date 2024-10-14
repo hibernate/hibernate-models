@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
-import org.hibernate.models.internal.SerialCassDetails;
+import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -236,7 +236,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
-	public SerialCassDetails toSerialForm(SourceModelBuildingContext context) {
+	public SerialClassDetails toStorableForm() {
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 }

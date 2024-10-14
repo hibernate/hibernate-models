@@ -2,13 +2,15 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models;
+package org.hibernate.models.serialization;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.models.SerializationHelper;
+import org.hibernate.models.SourceModelTestHelper;
 import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
@@ -27,6 +29,7 @@ public class SimpleSerializationTests {
 	@Test
 	void serializeSimpleClass() {
 		final SourceModelBuildingContext buildingContext = createModelContext( SimpleClass.class );
+
 		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().findClassDetails( SimpleClass.class.getName() );
 		assertThat( classDetails ).isNotNull();
 
@@ -35,12 +38,13 @@ public class SimpleSerializationTests {
 		assertThat( serialContext ).isNotSameAs( clonedSerialContext );
 
 		final SourceModelContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
+		assertThat( buildingContext ).isNotSameAs( restored );
 		assertThat( buildingContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
 		assertThat( buildingContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
 
-		final ClassDetails restoredClassDetails = restored.getClassDetailsRegistry().findClassDetails( SimpleClass.class.getName() );
-		assertThat( restoredClassDetails ).isNotNull();
-		assertThat( classDetails ).isNotSameAs( restoredClassDetails );
+		final ClassDetails cloneCassDetails = restored.getClassDetailsRegistry().findClassDetails( SimpleClass.class.getName() );
+		assertThat( cloneCassDetails ).isNotNull();
+		assertThat( classDetails ).isNotSameAs( cloneCassDetails );
 	}
 
 	@Test
@@ -63,10 +67,9 @@ public class SimpleSerializationTests {
 
 		final ClassDetails cloneCassDetails = restored.getClassDetailsRegistry().findClassDetails( SimpleClassWithMembers.class.getName() );
 		assertThat( cloneCassDetails ).isNotNull();
+		assertThat( classDetails ).isNotSameAs( cloneCassDetails );
 		assertThat( cloneCassDetails.getFields() ).hasSize( 1 );
 		assertThat( cloneCassDetails.getMethods() ).hasSize( 3 );
-
-		assertThat( classDetails ).isNotSameAs( cloneCassDetails );
 	}
 
 	@Test
@@ -86,6 +89,7 @@ public class SimpleSerializationTests {
 		assertThat( serialContext ).isNotSameAs( clonedSerialContext );
 
 		final SourceModelContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
+		assertThat( restored ).isNotNull();
 		assertThat( buildingContext ).isNotSameAs( restored );
 		assertThat( buildingContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
 		assertThat( buildingContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
@@ -97,6 +101,7 @@ public class SimpleSerializationTests {
 		assertThat( cloneCassDetails.getFields().iterator().next().getDirectAnnotationUsages() ).hasSize( 1 );
 		assertThat( cloneCassDetails.getMethods() ).hasSize( 1 );
 		assertThat( cloneCassDetails.getMethods().iterator().next().getDirectAnnotationUsages() ).hasSize( 1 );
+
 	}
 
 	public static class SimpleClass {

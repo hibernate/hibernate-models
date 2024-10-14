@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
-import org.hibernate.models.internal.SerialCassDetails;
-import org.hibernate.models.internal.jdk.SerialJdkCassDetails;
+import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
+import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -280,8 +280,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
-	public SerialCassDetails toSerialForm(SourceModelBuildingContext context) {
-		final Class<Object> classForName = context.getClassLoading().classForName( getClassName() );
-		return new SerialJdkCassDetails( classForName.getName(), classForName );
+	public SerialClassDetails toStorableForm() {
+		return new SerialJdkClassDetails( getName(), toJavaClass() );
 	}
 }

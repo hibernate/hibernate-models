@@ -7,6 +7,7 @@ package org.hibernate.models.internal.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -16,6 +17,8 @@ import java.util.function.Consumer;
  */
 public class CollectionHelper {
 	public static final int DEFAULT_LIST_CAPACITY = 10;
+	public static final int MINIMUM_INITIAL_CAPACITY = 16;
+	public static final float LOAD_FACTOR = 0.75f;
 
 	public static boolean isEmpty(@SuppressWarnings("rawtypes") Collection collection) {
 		return collection == null || collection.isEmpty();
@@ -85,5 +88,31 @@ public class CollectionHelper {
 				consumer.accept( values[i] );
 			}
 		}
+	}
+
+	/**
+	 * Determine the proper initial size for a new collection in order for it to hold the given a number of elements.
+	 * Specifically we want to account for load size and load factor to prevent immediate resizing.
+	 *
+	 * @param numberOfElements The number of elements to be stored.
+	 *
+	 * @return The proper size.
+	 */
+	public static int determineProperSizing(int numberOfElements) {
+		int actual = ( (int) ( numberOfElements / LOAD_FACTOR ) ) + 1;
+		return Math.max( actual, MINIMUM_INITIAL_CAPACITY );
+	}
+
+	/**
+	 * Build a properly sized linked map, especially handling load size and load factor to prevent immediate resizing.
+	 * <p>
+	 * Especially helpful for copy map contents.
+	 *
+	 * @param size The size to make the map.
+	 *
+	 * @return The sized linked map.
+	 */
+	public static <K, V> LinkedHashMap<K, V> linkedMapOfSize(int size) {
+		return new LinkedHashMap<>( determineProperSizing( size ), LOAD_FACTOR );
 	}
 }

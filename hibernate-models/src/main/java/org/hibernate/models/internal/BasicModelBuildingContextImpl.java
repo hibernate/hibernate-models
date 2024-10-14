@@ -4,12 +4,8 @@
  */
 package org.hibernate.models.internal;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serial;
-
-import org.hibernate.models.spi.ClassDetailsBuilder;
+import org.hibernate.models.serial.internal.StorableContextImpl;
+import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 
@@ -19,8 +15,8 @@ import org.hibernate.models.spi.RegistryPrimer;
  * @author Steve Ebersole
  */
 public class BasicModelBuildingContextImpl extends AbstractModelBuildingContext {
-	private transient AnnotationDescriptorRegistryStandard descriptorRegistry;
-	private transient ClassDetailsRegistryStandard classDetailsRegistry;
+	private final AnnotationDescriptorRegistryStandard descriptorRegistry;
+	private final ClassDetailsRegistryStandard classDetailsRegistry;
 
 	public BasicModelBuildingContextImpl(ClassLoading classLoadingAccess) {
 		this( classLoadingAccess, null );
@@ -45,23 +41,8 @@ public class BasicModelBuildingContextImpl extends AbstractModelBuildingContext 
 		return classDetailsRegistry;
 	}
 
-	@Serial
-	private void writeObject(ObjectOutputStream outputStream) throws IOException {
-		outputStream.writeObject( classDetailsRegistry.getClassDetailsBuilder() );
-
-		descriptorRegistry.serialize( outputStream, this );
-		classDetailsRegistry.serialize( outputStream, this );
-
-		outputStream.flush();
-	}
-
-
-	@Serial
-	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
-		descriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
-		classDetailsRegistry = new ClassDetailsRegistryStandard( (ClassDetailsBuilder) inputStream.readObject(), this );
-
-		descriptorRegistry.deserialize( inputStream, this );
-		classDetailsRegistry.deserialize( inputStream, this );
+	@Override
+	public StorableContext toStorableForm() {
+		return new StorableContextImpl( classDetailsRegistry.classDetailsMap, descriptorRegistry.descriptorMap );
 	}
 }

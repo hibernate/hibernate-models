@@ -4,7 +4,6 @@
  */
 package org.hibernate.models.spi;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.function.Consumer;
@@ -12,9 +11,10 @@ import java.util.function.Predicate;
 
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.internal.AnnotationTargetHelper;
-import org.hibernate.models.internal.SerialCassDetails;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
+import org.hibernate.models.serial.spi.SerialClassDetails;
+import org.hibernate.models.serial.spi.Storable;
 
 /**
  * Abstraction for what Hibernate understands about a "class", generally before it has access to
@@ -23,7 +23,7 @@ import org.hibernate.models.internal.util.IndexedConsumer;
  * @author Steve Ebersole
  * @see ClassDetailsRegistry
  */
-public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Storable<ClassDetails, SerialCassDetails> {
+public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Storable<ClassDetails, SerialClassDetails> {
 	/**
 	 * Details for {@code Object.class}
 	 */

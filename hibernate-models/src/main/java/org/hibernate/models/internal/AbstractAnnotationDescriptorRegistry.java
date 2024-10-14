@@ -16,8 +16,8 @@ import org.hibernate.models.spi.AnnotationDescriptorRegistry;
  * @author Steve Ebersole
  */
 public abstract class AbstractAnnotationDescriptorRegistry implements AnnotationDescriptorRegistry {
-	protected final Map<Class<? extends Annotation>, AnnotationDescriptor<?>> descriptorMap;
-	protected final Map<AnnotationDescriptor<?>, AnnotationDescriptor<?>> repeatableByContainerMap;
+	protected final Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> descriptorMap;
+	protected final Map<AnnotationDescriptor<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> repeatableByContainerMap;
 
 	public AbstractAnnotationDescriptorRegistry() {
 		this( new ConcurrentHashMap<>(), new ConcurrentHashMap<>() );

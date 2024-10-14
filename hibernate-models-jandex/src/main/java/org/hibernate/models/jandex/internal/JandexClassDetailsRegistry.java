@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.jandex.internal;
 
+import java.util.Map;
+
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.AbstractClassDetailsRegistry;
 import org.hibernate.models.internal.jdk.JdkBuilders;
@@ -49,5 +51,9 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 		}
 
 		throw new UnknownClassException( "Unable to resolve ClassDetails for `" + name + "`" );
+	}
+
+	protected Map<String, ClassDetails> getClassDetailsMap() {
+		return classDetailsMap;
 	}
 }

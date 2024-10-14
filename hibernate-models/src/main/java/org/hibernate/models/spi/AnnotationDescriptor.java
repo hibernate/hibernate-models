@@ -4,9 +4,6 @@
  */
 package org.hibernate.models.spi;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.util.EnumSet;
@@ -16,7 +13,9 @@ import java.util.Map;
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
-import org.hibernate.models.internal.SerialAnnotationDescriptor;
+import org.hibernate.models.serial.internal.SerialAnnotationDescriptorImpl;
+import org.hibernate.models.serial.spi.SerialAnnotationDescriptor;
+import org.hibernate.models.serial.spi.Storable;
 
 /**
  * Describes an annotation type (the Class)
@@ -158,7 +157,7 @@ public interface AnnotationDescriptor<A extends Annotation>
 	}
 
 	@Override
-	default SerialAnnotationDescriptor<A> toSerialForm(SourceModelBuildingContext context) {
-		return new SerialAnnotationDescriptor<>( getAnnotationType() );
+	default SerialAnnotationDescriptor<A> toStorableForm() {
+		return new SerialAnnotationDescriptorImpl<>( getAnnotationType() );
 	}
 }
