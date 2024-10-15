@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
+import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
+import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
@@ -275,5 +277,10 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 			result.add( (TypeVariableDetails) JandexTypeSwitchStandard.switchType( jandexTypeVariable, current, buildingContext ) );
 		}
 		return result;
+	}
+
+	@Override
+	public SerialClassDetails toStorableForm() {
+		return new SerialJdkClassDetails( getName(), toJavaClass() );
 	}
 }

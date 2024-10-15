@@ -4,6 +4,7 @@
  */
 package org.hibernate.models.internal;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ import org.hibernate.models.spi.ClassLoading;
  *
  * @author Steve Ebersole
  */
-public class SimpleClassLoading implements ClassLoading {
+public class SimpleClassLoading implements ClassLoading, Serializable {
 	public static final SimpleClassLoading SIMPLE_CLASS_LOADING = new SimpleClassLoading();
 
 	@Override

@@ -17,7 +17,9 @@ import static org.hibernate.models.internal.ModelsAnnotationLogging.MODELS_ANNOT
  *
  * @author Steve Ebersole
  */
-public class AnnotationDescriptorRegistryStandard extends AbstractAnnotationDescriptorRegistry implements MutableAnnotationDescriptorRegistry {
+public class AnnotationDescriptorRegistryStandard
+		extends AbstractAnnotationDescriptorRegistry
+		implements MutableAnnotationDescriptorRegistry {
 	private final SourceModelBuildingContext modelBuildingContext;
 
 	public AnnotationDescriptorRegistryStandard(SourceModelBuildingContext modelBuildingContext) {
