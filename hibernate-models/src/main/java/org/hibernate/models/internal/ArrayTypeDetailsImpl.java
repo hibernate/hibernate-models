@@ -43,29 +43,7 @@ public class ArrayTypeDetailsImpl implements ArrayTypeDetails {
 
 	@Override
 	public String getName() {
-		StringBuilder builder = new StringBuilder();
-
-		TypeDetails type = this;
-		while ( type.getTypeKind() == Kind.ARRAY ) {
-			int dimensions = type.asArrayType().getDimensions();
-			while ( dimensions-- > 0 ) {
-				builder.append( '[' );
-			}
-			type = type.asArrayType().getConstituentType();
-		}
-
-		// here, `type` is an element type of the array, i.e., never array
-		if ( type.getTypeKind() == Kind.PRIMITIVE ) {
-			builder.append( type.asPrimitiveType().toCode() );
-		}
-		else {
-			// This relies on name() representing the erased type name
-			// For historical 1.x reasons, we follow the Java reflection format
-			// instead of the Java descriptor format.
-			builder.append( 'L' ).append( type.getName() ).append( ';' );
-		}
-
-		return builder.toString();
+		return arrayClassDetails.getName();
 	}
 
 	@Override
