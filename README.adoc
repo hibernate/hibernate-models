@@ -1,6 +1,10 @@
 :fn-managed: footnote:[The application's domain and related classes]
 == Hibernate models
 
+link:https://central.sonatype.com/search?namespace=org.hibernate.models&sort=name[image:https://img.shields.io/maven-central/v/org.hibernate.models/hibernate-models.svg?label=Maven%20Central&style=for-the-badge[Maven Central]]
+link:https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/hibernate/models/hibernate-models/README.md[image:https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/org/hibernate/models/hibernate-models/badge.json&style=for-the-badge[Reproducible Builds]]
+link:https://ge.hibernate.org/scans?search.rootProjectNames=hibernate-models-group[image:https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?style=for-the-badge&logo=gradle[Develocity]]
+
 Provides support for dealing with an application's managed resources{fn-managed} as a de-typed abstraction model
 backed by one or more sources.  Consumers can then access details from that abstraction model in a unified way,
 regardless of the underlying source.
