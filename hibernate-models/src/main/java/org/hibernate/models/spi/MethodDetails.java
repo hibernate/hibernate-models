@@ -5,6 +5,7 @@
 package org.hibernate.models.spi;
 
 import java.beans.Introspector;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.hibernate.models.IllegalCastException;
@@ -53,6 +54,12 @@ public interface MethodDetails extends MemberDetails {
 
 		return null;
 	}
+
+	@Override
+	Method toJavaMember();
+
+	@Override
+	Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext);
 
 	@Override
 	default FieldDetails asFieldDetails() {

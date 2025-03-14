@@ -8,14 +8,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -221,10 +224,16 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 
 	@Override
 	public <X> Class<X> toJavaClass() {
+		return toJavaClass( getModelContext().getClassLoading(), getModelContext() );
+	}
+
+	@Override
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
 		if ( javaType == null ) {
-			if ( className != null ) {
-				javaType = getModelContext().getClassLoading().classForName( className );
+			if ( className == null ) {
+				throw new DynamicClassException( "ClassDetails (name=" + name + ") did not specify a class-name" );
 			}
+			javaType = getModelContext().getClassLoading().classForName( className );
 		}
 		//noinspection unchecked
 		return (Class<X>) javaType;

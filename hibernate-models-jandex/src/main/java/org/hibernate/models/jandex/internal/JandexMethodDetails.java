@@ -13,7 +13,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.internal.util.ReflectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
@@ -23,6 +25,7 @@ import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableScope;
@@ -126,16 +129,6 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 		return methodInfo.flags();
 	}
 
-	private Method underlyingMethod;
-
-	@Override
-	public Method toJavaMember() {
-		if ( underlyingMethod == null ) {
-			underlyingMethod = resolveJavaMember();
-		}
-		return underlyingMethod;
-	}
-
 	@Override
 	public TypeDetails resolveRelativeType(TypeVariableScope container) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
@@ -152,36 +145,31 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 		throw new IllegalStateException( "Method does not have a type - " + this );
 	}
 
-	private Method resolveJavaMember() {
-		final Class<?> declaringTypeClass = declaringType.toJavaClass();
-		methods: for ( Method method : declaringTypeClass.getDeclaredMethods() ) {
-			if ( !method.getName().equals( methodInfo.name() ) ) {
-				continue;
-			}
+	private Method underlyingMethod;
 
-			if ( method.getParameterCount() != methodInfo.parametersCount() ) {
-				continue;
-			}
-
-			for ( int i = 0; i < method.getParameterTypes().length; i++ ) {
-				final Class<?> methodParameterType = method.getParameterTypes()[i];
-				final Type expectedType = methodInfo.parameterType( i );
-				if ( !methodParameterType.getName().equals( expectedType.name().toString() ) ) {
-					continue methods;
-				}
-			}
-
-			// if we get here, we've found it
-			return method;
+	@Override
+	public Method toJavaMember() {
+		if ( underlyingMethod == null ) {
+			final Class<?> declaringClass = declaringType.toJavaClass();
+			underlyingMethod = ReflectionHelper.resolveJavaMember(
+					this,
+					declaringClass,
+					getModelContext().getClassLoading(),
+					getModelContext()
+			);
 		}
+		return underlyingMethod;
+	}
 
-		throw new RuntimeException(
-				String.format(
-						"Jandex FieldInfo had no corresponding Field : %s.%s",
-						declaringType.getName(),
-						methodInfo.name()
-				)
-		);	}
+	@Override
+	public Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+		return ReflectionHelper.resolveJavaMember(
+				this,
+				declaringClass,
+				getModelContext().getClassLoading(),
+				getModelContext()
+		);
+	}
 
 	@Override
 	public ClassDetails getReturnType() {

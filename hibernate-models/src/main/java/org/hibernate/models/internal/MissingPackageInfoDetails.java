@@ -13,10 +13,12 @@ import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -196,6 +198,11 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	@Override
 	public <X> Class<X> toJavaClass() {
 		throw new UnsupportedOperationException( "Missing package-info [" + packageInfoClassName + "] cannot be converted to a Java Class" );
+	}
+
+	@Override
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+		return toJavaClass();
 	}
 
 	@Override

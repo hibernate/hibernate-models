@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
@@ -23,10 +24,12 @@ import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableScope;
 
+import static org.hibernate.models.internal.util.ReflectionHelper.resolveJavaMember;
 import static org.hibernate.models.spi.MethodDetails.MethodKind.GETTER;
 import static org.hibernate.models.spi.MethodDetails.MethodKind.SETTER;
 
@@ -126,6 +129,14 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 	@Override
 	public Method toJavaMember() {
 		return method;
+	}
+
+	@Override
+	public Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+		if ( declaringClass == method.getDeclaringClass() ) {
+			return method;
+		}
+		return resolveJavaMember( this, declaringClass, classLoading, modelContext );
 	}
 
 	@Override
