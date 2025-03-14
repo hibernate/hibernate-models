@@ -1,0 +1,16 @@
+plugins {
+    id "published-java-module"
+    id "shared-testing"
+}
+
+description = "Support for hibernate-models based on ByteBuddy (isolated dependency)"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project( ":hibernate-models" )
+
+    implementation libs.byteBuddy
+}

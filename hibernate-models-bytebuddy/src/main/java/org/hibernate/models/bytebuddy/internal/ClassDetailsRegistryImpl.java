@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.jandex.internal;
+package org.hibernate.models.bytebuddy.internal;
 
 import java.util.Map;
 
@@ -12,27 +12,16 @@ import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.internal.jdk.JdkClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-
-import org.jboss.jandex.IndexView;
 
 /**
- * ClassDetailsRegistry using Jandex
- *
  * @author Steve Ebersole
  */
-public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
-	private final IndexView jandexIndex;
-	private final ClassDetailsBuilder classDetailsBuilder;
+public class ClassDetailsRegistryImpl extends AbstractClassDetailsRegistry {
+	private final ClassDetailsBuilderImpl classDetailsBuilder;
 
-	public JandexClassDetailsRegistry(IndexView jandexIndex, SourceModelBuildingContext context) {
+	public ClassDetailsRegistryImpl(ByteBuddyModelContextImpl context) {
 		super( context );
-		this.jandexIndex = jandexIndex;
-		this.classDetailsBuilder = new JandexClassDetailsBuilderImpl( jandexIndex, context );
-	}
-
-	public IndexView getJandexIndex() {
-		return jandexIndex;
+		this.classDetailsBuilder = new ClassDetailsBuilderImpl( context );
 	}
 
 	@Override
@@ -42,10 +31,10 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 
 	@Override
 	protected ClassDetails createClassDetails(String name) {
-		final ClassDetails fromJandex = classDetailsBuilder.buildClassDetails( name, context );
-		if ( fromJandex != null ) {
-			addClassDetails( name, fromJandex );
-			return fromJandex;
+		final ClassDetails fromByteBuddy = classDetailsBuilder.buildClassDetails( name, context );
+		if ( fromByteBuddy != null ) {
+			addClassDetails( name, fromByteBuddy );
+			return fromByteBuddy;
 		}
 
 		final JdkClassDetails jdkClassDetails = JdkBuilders.DEFAULT_BUILDER.buildClassDetails( name, context );
@@ -60,4 +49,5 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 	protected Map<String, ClassDetails> getClassDetailsMap() {
 		return classDetailsMap;
 	}
+
 }

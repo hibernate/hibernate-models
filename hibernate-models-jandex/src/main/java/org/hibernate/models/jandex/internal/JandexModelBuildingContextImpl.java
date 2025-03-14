@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.hibernate.models.internal.AbstractModelBuildingContext;
 import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
-import org.hibernate.models.internal.MutableClassDetailsRegistry;
 import org.hibernate.models.jandex.spi.JandexModelBuildingContext;
 import org.hibernate.models.jandex.spi.JandexValueConverter;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;
@@ -60,7 +59,7 @@ public class JandexModelBuildingContextImpl extends AbstractModelBuildingContext
 	}
 
 	@Override
-	public MutableClassDetailsRegistry getClassDetailsRegistry() {
+	public JandexClassDetailsRegistry getClassDetailsRegistry() {
 		return classDetailsRegistry;
 	}
 

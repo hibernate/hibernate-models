@@ -23,8 +23,10 @@ public record WildcardTypeDetailsImpl(TypeDetails bound, boolean isExtends) impl
 	}
 
 	/**
-	 * Whether the {@linkplain #bound() bound} is an extends - i.e. {@code ? extends Something}.
-	 * False would imply a super - i.e. {@code ? super Something}.
+	 * Indicates the type of {@linkplain #bound() bound} -<ol>
+	 *     <li>{@code true} -> {@code ? extends Something}</li>
+	 *     <li>{@code false} -> {@code ? super Something}</li>
+	 * </ol>
 	 */
 	@Override
 	public boolean isExtends() {

@@ -3,7 +3,7 @@ plugins {
 	id "shared-testing"
 }
 
-description = "Jandex support for hibernate-models (isolated dependency)"
+description = "Support for hibernate-models based on Jandex (isolated dependency)"
 
 dependencies {
 	api project( ":hibernate-models" )

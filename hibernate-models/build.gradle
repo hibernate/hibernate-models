@@ -13,27 +13,26 @@ dependencies {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 configurations {
-	exposedTestClasses {
+	exportedTestClasses {
 		canBeConsumed = true
 		canBeResolved = false
 	}
-	exposedTestResources {
+	exportedTestResources {
 		canBeConsumed = true
 		canBeResolved = false
 	}
-	exposedTestRuntimeClasspath {
+	exportedTestRuntimeClasspath {
 		canBeConsumed = true
 		canBeResolved = false
 	}
 }
 
 artifacts {
-	exposedTestClasses(sourceSets.test.output.classesDirs.files) {
+	exportedTestClasses(sourceSets.test.output.classesDirs.files) {
 		builtBy(compileTestJava)
 	}
-	exposedTestResources(sourceSets.test.output.resourcesDir) {
+	exportedTestResources(sourceSets.test.output.resourcesDir) {
 		builtBy(processTestResources)
-
 	}
-	exposedTestRuntimeClasspath sourceSets.test.runtimeClasspath.files
+	exportedTestRuntimeClasspath sourceSets.test.runtimeClasspath.files
 }
