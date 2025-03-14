@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.spi;
 
+import java.lang.reflect.Member;
+
 import org.hibernate.models.IllegalCastException;
 
 import static org.hibernate.models.spi.AnnotationTarget.Kind.RECORD_COMPONENT;
@@ -28,6 +30,12 @@ public interface RecordComponentDetails extends MemberDetails {
 	default boolean isPersistable() {
 		return true;
 	}
+
+	@Override
+	Member toJavaMember();
+
+	@Override
+	Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext);
 
 	@Override
 	default FieldDetails asFieldDetails() {

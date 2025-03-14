@@ -46,11 +46,6 @@ public class SimpleClassLoading implements ClassLoading, Serializable {
 	}
 
 	@Override
-	public Package packageForName(String name) {
-		return getClass().getClassLoader().getDefinedPackage( name );
-	}
-
-	@Override
 	public URL locateResource(String resourceName) {
 		return getClass().getClassLoader().getResource( resourceName );
 	}

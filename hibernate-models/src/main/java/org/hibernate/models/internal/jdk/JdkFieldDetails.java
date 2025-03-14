@@ -7,10 +7,13 @@ package org.hibernate.models.internal.jdk;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.ModelsException;
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
@@ -18,6 +21,7 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 
 
@@ -62,6 +66,29 @@ public class JdkFieldDetails extends AbstractJdkAnnotationTarget implements Fiel
 	@Override
 	public Field toJavaMember() {
 		return field;
+	}
+
+	@Override
+	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+		if ( declaringClass == field.getDeclaringClass() ) {
+			return field;
+		}
+		try {
+			// make sure the type ends up on the given class-loading
+			type.determineRawClass().toJavaClass( classLoading, modelContext );
+			return declaringClass.getDeclaredField( getName() );
+		}
+		catch (NoSuchFieldException e) {
+			throw new ModelsException(
+					String.format(
+							Locale.ROOT,
+							"Unable to locate field `%s` on %s",
+							getName(),
+							declaringClass.getName()
+					),
+					e
+			);
+		}
 	}
 
 	@Override
