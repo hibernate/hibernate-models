@@ -43,11 +43,14 @@ test {
 // create a single "compile" task
 tasks.register( "compile" ).configure {
 	dependsOn tasks.withType( JavaCompile )
+	dependsOn tasks.withType( ProcessResources )
 }
 
 tasks.withType( JavaCompile ).configureEach {javaCompile->
 	options.encoding = "UTF-8"
 	options.warnings false
+
+	dependsOn tasks.named( "spotlessApply" )
 }
 
 // To force the build produce the same byte-for-byte archives and hence make Hibernate Models build reproducible.
