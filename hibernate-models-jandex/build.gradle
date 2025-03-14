@@ -2,7 +2,7 @@ plugins {
 	id "published-java-module"
 }
 
-description = "Jandex support for hibernate-models (isolated dependency)"
+description = "Support for hibernate-models based on Jandex (isolated dependency)"
 
 dependencies {
 	api project( ":hibernate-models" )
