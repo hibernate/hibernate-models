@@ -12,12 +12,14 @@ import java.util.Map;
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import org.jboss.jandex.AnnotationTarget;
@@ -85,6 +87,12 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 
 	@Override
 	public Member toJavaMember() {
+		// we could maybe resolve the corresponding method...
+		return null;
+	}
+
+	@Override
+	public Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
 		// we could maybe resolve the corresponding method...
 		return null;
 	}

@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
@@ -290,9 +291,28 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	}
 
 	/**
-	 * Know what you are doing before calling this method
+	 * Load the corresponding {@linkplain Class} using standard
+	 * {@linkplain ClassLoading}.
+	 *
+	 * @see SourceModelBuildingContext#getClassLoading()
+	 *
+	 * @apiNote Know what you are doing before calling this method
+	 *
+	 * @throws DynamicClassException If this ClassDetails does not correspond to a Java class
+	 * (generally meaning {@linkplain #getClassName()} returns {@code null}).
 	 */
 	<X> Class<X> toJavaClass();
+
+	/**
+	 * Load the corresponding {@linkplain Class} using the specified{@linkplain ClassLoading}.
+	 *
+	 * @param classLoading Where to load the class from/into
+	 * @param modelContext The model context
+	 *
+	 * @throws DynamicClassException If this ClassDetails does not correspond to a Java class
+	 * (generally meaning {@linkplain #getClassName()} returns {@code null}).
+	 */
+	<X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext);
 
 	@Override
 	default ClassDetails asClassDetails() {

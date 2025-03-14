@@ -19,10 +19,12 @@ import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -92,6 +94,11 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	public <X> Class<X> toJavaClass() {
 		//noinspection unchecked
 		return (Class<X>) managedClass;
+	}
+
+	@Override
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+		return classLoading.classForName( getClassName() );
 	}
 
 	@Override

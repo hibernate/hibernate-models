@@ -6,20 +6,22 @@ package org.hibernate.models.jandex.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.ModelsException;
 import org.hibernate.models.internal.AnnotationTargetSupport;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import org.jboss.jandex.AnnotationTarget;
@@ -86,25 +88,32 @@ public class JandexFieldDetails extends AbstractAnnotationTarget
 		return fieldInfo.flags();
 	}
 
-	private Member underlyingMember;
+	private Field underlyingMember;
 
 	@Override
-	public Member toJavaMember() {
+	public Field toJavaMember() {
 		if ( underlyingMember == null ) {
-			underlyingMember = resolveJavaMember();
+			final Class<?> declaringJavaClass = declaringType.toJavaClass();
+			underlyingMember = resolveJavaMember( declaringJavaClass);
 		}
 		return underlyingMember;
 	}
 
-	private Field resolveJavaMember() {
-		final Class<?> declaringJavaClass = declaringType.toJavaClass();
+	@Override
+	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+		// make sure the type ends up on the given class-loading
+		type.determineRawClass().toJavaClass( classLoading, modelContext );
+		return resolveJavaMember( declaringClass );
+	}
+
+	private Field resolveJavaMember(Class<?> declaringJavaClass) {
 		try {
 			return declaringJavaClass.getField( fieldInfo.name() );
 		}
 		catch (NoSuchFieldException e) {
-			throw new RuntimeException(
+			throw new ModelsException(
 					String.format(
-							"Jandex FieldInfo had no corresponding Field : %s.%s",
+							"Unable to locate field `%s` on %s",
 							declaringType.getName(),
 							fieldInfo.name()
 					),

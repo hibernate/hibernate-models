@@ -33,8 +33,6 @@ public interface ClassLoading {
 	 */
 	<T> Class<T> findClassForName(String name);
 
-	Package packageForName(String name);
-
 	/**
 	 * Locate a resource by name
 	 *

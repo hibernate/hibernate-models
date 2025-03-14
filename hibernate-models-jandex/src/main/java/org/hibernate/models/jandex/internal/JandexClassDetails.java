@@ -8,15 +8,18 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -212,14 +215,19 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	@Override
 	public <X> Class<X> toJavaClass() {
 		if ( javaClass == null ) {
-			if ( getClassName() == null ) {
-				throw new UnsupportedOperationException( "Not supported" );
-			}
-			MODELS_CLASS_LOGGER.debugf( "Loading `%s` on to classloader from Jandex ClassDetails", getClassName() );
-			javaClass = getModelContext().getClassLoading().classForName( getClassName() );
+			javaClass = toJavaClass( getModelContext().getClassLoading(), getModelContext() );
 		}
 		//noinspection unchecked
 		return (Class<X>) javaClass;
+	}
+
+	@Override
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+		if ( getClassName() == null ) {
+			throw new DynamicClassException( "ClassDetails (name=" + getName() + ") did not specify a class-name" );
+		}
+		MODELS_CLASS_LOGGER.debugf( "Loading `%s` on to classloader from Jandex ClassDetails", getClassName() );
+		return classLoading.classForName( getClassName() );
 	}
 
 	@Override

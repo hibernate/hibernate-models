@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.spi;
 
+import java.lang.reflect.Field;
+
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.internal.ModifierUtils;
 
@@ -27,6 +29,12 @@ public interface FieldDetails extends MemberDetails {
 	default boolean isPersistable() {
 		return ModifierUtils.hasPersistableFieldModifiers( getModifiers() );
 	}
+
+	@Override
+	Field toJavaMember();
+
+	@Override
+	Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext);
 
 	@Override
 	default FieldDetails asFieldDetails() {
