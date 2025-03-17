@@ -1,3 +1,8 @@
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Sets up shared testing
+// 		to execute tests from hibernate-models in the context of other modules.
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 plugins {
 	id "testing"
 }
@@ -24,7 +29,7 @@ configurations {
 }
 
 dependencies {
-	testImplementation project( path: ":hibernate-models", configuration: "exposedTestClasses" )
+	testImplementation project( ":hibernate-models-testing" )
 
 	sharedTestClasses project(path: ':hibernate-models', configuration: 'exposedTestClasses')
 	sharedTestResources project(path: ':hibernate-models', configuration: 'exposedTestResources')
