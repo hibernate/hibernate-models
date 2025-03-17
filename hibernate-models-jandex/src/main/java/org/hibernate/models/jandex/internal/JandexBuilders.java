@@ -317,7 +317,7 @@ public class JandexBuilders {
 		if ( isDouble( valueTypeDescriptor ) ) {
 			converterCollector.accept( valueTypeDescriptor,  (JandexValueConverter<V>) DoubleValueConverter.JANDEX_DOUBLE_VALUE_WRAPPER );
 			extractorCollector.accept( valueTypeDescriptor, (JandexValueExtractor<V>) DoubleValueExtractor.JANDEX_DOUBLE_EXTRACTOR );
-			return (JandexValueExtractor<V>) DoubleValueConverter.JANDEX_DOUBLE_VALUE_WRAPPER;
+			return (JandexValueExtractor<V>) DoubleValueExtractor.JANDEX_DOUBLE_EXTRACTOR;
 		}
 
 		if ( isFloat( valueTypeDescriptor ) ) {

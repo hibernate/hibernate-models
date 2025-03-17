@@ -1,0 +1,76 @@
+plugins {
+	id "base-information"
+	id "java-library"
+
+	id "com.diffplug.spotless"
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Spotless
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+spotless {
+	//Don't fail during the check: rather than enforcing guidelines, we use this plugin to fix mistakes automatically.
+	enforceCheck false
+	java {
+		licenseHeaderFile rootProject.file( 'config/spotless/license.java' )
+		removeUnusedImports()
+		indentWithTabs( 4 )
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Enforced rules
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def enforceRulesTask = tasks.register( "enforceRules" ) {
+	description "Enforces some formatting rules to src/main/java files"
+	doLast {
+		def illegalImport = ~/^import (sun|java.awt|org.slf4j)/
+		def missingNewline = ~/^\s*}\s*(else|catch|finally)/
+		def lowerEll = ~/\b\d+l\b/
+		def errors = 0
+		def tree = fileTree( "src/main/java/" )
+		tree.include "**/*.java"
+		tree.each { file ->
+			def lineNum = 0
+			def shortName = file.path.substring( rootDir.path.length() )
+			file.eachLine { line ->
+				lineNum++
+				if ( line =~ illegalImport ) {
+					errors++
+					logger.error( "Illegal import in ${shortName}\n${lineNum}: ${line}" )
+				}
+				if ( line =~ missingNewline ) {
+					errors++
+					logger.error( "Missing newline in ${shortName}\n${lineNum}: ${line}" )
+				}
+				if ( line =~ lowerEll ) {
+					errors++
+					logger.error( "Lowercase long literal in ${shortName}\n${lineNum}: ${line}" )
+				}
+			}
+		}
+		if ( errors > 0 ) {
+			throw new GradleException( "Code rules were violated ($errors problems)" )
+		}
+	}
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Lifecycle
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+tasks.named( "check" ) {
+	dependsOn enforceRulesTask
+	dependsOn tasks.named( "spotlessCheck" )
+}
+
+tasks.withType( JavaCompile ).configureEach {javaCompile->
+	dependsOn tasks.named( "spotlessApply" )
+}
+

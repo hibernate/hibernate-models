@@ -4,6 +4,33 @@ plugins {
 
 description = "A de-typed abstraction over reflection and annotations"
 
-dependencies {
-	testImplementation project( ":hibernate-models-testing" )
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Export testing
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+configurations {
+	exposedTestClasses {
+		canBeConsumed = true
+		canBeResolved = false
+	}
+	exposedTestResources {
+		canBeConsumed = true
+		canBeResolved = false
+	}
+	exposedTestRuntimeClasspath {
+		canBeConsumed = true
+		canBeResolved = false
+	}
+}
+
+artifacts {
+	exposedTestClasses(sourceSets.test.output.classesDirs.files) {
+		builtBy(compileTestJava)
+	}
+	exposedTestResources(sourceSets.test.output.resourcesDir) {
+		builtBy(processTestResources)
+
+	}
+	exposedTestRuntimeClasspath sourceSets.test.runtimeClasspath.files
 }

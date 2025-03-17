@@ -1,0 +1,39 @@
+plugins {
+	id "java-module"
+	id "jacoco"
+}
+
+dependencies {
+	testImplementation jakartaLibs.jpa
+	testImplementation testLibs.junit5Api
+	testImplementation testLibs.assertjCore
+
+	testImplementation testLibs.junit5Engine
+	testImplementation testLibs.log4j
+}
+
+test {
+	useJUnitPlatform()
+}
+
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// JaCoCo
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def jacocoReportTask = tasks.named( "jacocoTestReport" ) {
+	dependsOn tasks.named( "test" )
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = false
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir( "jacocoHtml" )
+	}
+}
+
+tasks.named( "check" ) {
+	dependsOn jacocoReportTask
+}
