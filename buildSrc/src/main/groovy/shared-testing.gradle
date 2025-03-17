@@ -1,0 +1,40 @@
+plugins {
+	id "testing"
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Wire in the shared-tests
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// link the
+configurations {
+	sharedTestClasses {
+		canBeConsumed = false
+		canBeResolved = true
+	}
+	sharedTestResources {
+		canBeConsumed = false
+		canBeResolved = true
+	}
+	sharedTestRuntimeClasspath {
+		canBeConsumed = false
+		canBeResolved = true
+		extendsFrom testRuntimeClasspath
+	}
+}
+
+dependencies {
+	testImplementation project( path: ":hibernate-models", configuration: "exposedTestClasses" )
+
+	sharedTestClasses project(path: ':hibernate-models', configuration: 'exposedTestClasses')
+	sharedTestResources project(path: ':hibernate-models', configuration: 'exposedTestResources')
+	sharedTestRuntimeClasspath project(path: ':hibernate-models', configuration: 'exposedTestRuntimeClasspath')
+}
+
+tasks.named( "test", Test ) {
+	// use the configurations defined above, which depends on the configurations in `:architecture-tests`
+	testClassesDirs += configurations.sharedTestClasses
+
+	classpath += configurations.sharedTestResources
+	classpath += configurations.sharedTestRuntimeClasspath
+}

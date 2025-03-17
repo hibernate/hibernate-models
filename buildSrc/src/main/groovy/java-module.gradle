@@ -1,9 +1,6 @@
 plugins {
 	id "base-information"
 	id "java-library"
-
-	id "com.diffplug.spotless"
-	id "jacoco"
 }
 
 dependencies {
@@ -14,13 +11,6 @@ dependencies {
 	annotationProcessor libs.loggingProcessor
 	annotationProcessor libs.logging
 	annotationProcessor libs.loggingAnnotations
-
-	testImplementation jakartaLibs.jpa
-	testImplementation testLibs.junit5Api
-	testImplementation testLibs.assertjCore
-
-	testRuntimeOnly testLibs.junit5Engine
-	testRuntimeOnly testLibs.log4j
 }
 
 
@@ -31,13 +21,6 @@ dependencies {
 java {
 	sourceCompatibility = jdks.versions.baseline.get() as int
 	targetCompatibility = jdks.versions.baseline.get() as int
-
-	withJavadocJar()
-	withSourcesJar()
-}
-
-test {
-	useJUnitPlatform()
 }
 
 // create a single "compile" task
@@ -49,8 +32,6 @@ tasks.register( "compile" ).configure {
 tasks.withType( JavaCompile ).configureEach {javaCompile->
 	options.encoding = "UTF-8"
 	options.warnings false
-
-	dependsOn tasks.named( "spotlessApply" )
 }
 
 // To force the build produce the same byte-for-byte archives and hence make Hibernate Models build reproducible.
@@ -60,103 +41,3 @@ tasks.withType( AbstractArchiveTask ).configureEach {
 	reproducibleFileOrder = true
 }
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Javadoc
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-tasks.named( "javadoc", Javadoc ) {
-	options {
-		use = true
-		encoding = "UTF-8"
-
-		addStringOption( "Xdoclint:none", "-quiet" )
-
-		tags(
-				"todo:X",
-				"apiNote:a:API Note:",
-				"implSpec:a:Implementation Specification:",
-				"implNote:a:Implementation Note:"
-		)
-	}
-}
-
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Spotless
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-spotless {
-	//Don't fail during the check: rather than enforcing guidelines, we use this plugin to fix mistakes automatically.
-	enforceCheck false
-	java {
-		licenseHeaderFile rootProject.file( 'config/spotless/license.java' )
-		removeUnusedImports()
-		indentWithTabs( 4 )
-		trimTrailingWhitespace()
-		endWithNewline()
-	}
-}
-
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Enforced rules
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-def enforceRulesTask = tasks.register( "enforceRules" ) {
-	description "Enforces some formatting rules to src/main/java files"
-	doLast {
-		def illegalImport = ~/^import (sun|java.awt|org.slf4j)/
-		def missingNewline = ~/^\s*}\s*(else|catch|finally)/
-		def lowerEll = ~/\b\d+l\b/
-		def errors = 0
-		def tree = fileTree( "src/main/java/" )
-		tree.include "**/*.java"
-		tree.each { file ->
-			def lineNum = 0
-			def shortName = file.path.substring( rootDir.path.length() )
-			file.eachLine { line ->
-				lineNum++
-				if ( line =~ illegalImport ) {
-					errors++
-					logger.error( "Illegal import in ${shortName}\n${lineNum}: ${line}" )
-				}
-				if ( line =~ missingNewline ) {
-					errors++
-					logger.error( "Missing newline in ${shortName}\n${lineNum}: ${line}" )
-				}
-				if ( line =~ lowerEll ) {
-					errors++
-					logger.error( "Lowercase long literal in ${shortName}\n${lineNum}: ${line}" )
-				}
-			}
-		}
-		if ( errors > 0 ) {
-			throw new GradleException( "Code rules were violated ($errors problems)" )
-		}
-	}
-}
-
-
-
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// JaCoCo
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-def jacocoReportTask = tasks.named( "jacocoTestReport" ) {
-	dependsOn tasks.named( "test" )
-}
-
-jacocoTestReport {
-	reports {
-		xml.required = false
-		csv.required = false
-		html.outputLocation = layout.buildDirectory.dir( "jacocoHtml" )
-	}
-}
-
-tasks.named( "check" ) {
-	dependsOn enforceRulesTask
-	dependsOn tasks.named( "spotlessCheck" )
-	dependsOn jacocoReportTask
-}
