@@ -11,7 +11,7 @@ import org.hibernate.models.internal.BasicModelBuildingContextImpl;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.testing.intg.TestingModelContextFactory;
+import org.hibernate.models.testing.intg.ModelContextFactory;
 import org.hibernate.models.testing.orm.OrmAnnotationHelper;
 
 import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOADING;
@@ -45,10 +45,10 @@ public class TestHelper {
 	private static SourceModelBuildingContext buildModelContext(
 			RegistryPrimer additionalPrimer,
 			Class<?>... modelClasses) {
-		final ServiceLoader<TestingModelContextFactory> loader = ServiceLoader.load( TestingModelContextFactory.class );
-		final Iterator<TestingModelContextFactory> serviceImpls = loader.iterator();
+		final ServiceLoader<ModelContextFactory> loader = ServiceLoader.load( ModelContextFactory.class );
+		final Iterator<ModelContextFactory> serviceImpls = loader.iterator();
 		if ( serviceImpls.hasNext() ) {
-			final TestingModelContextFactory contextFactory = serviceImpls.next();
+			final ModelContextFactory contextFactory = serviceImpls.next();
 			if ( serviceImpls.hasNext() ) {
 				throw new IllegalStateException( "Found more than one TestingModelContextFactory" );
 			}

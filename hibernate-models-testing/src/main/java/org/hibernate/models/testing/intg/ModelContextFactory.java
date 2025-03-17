@@ -13,6 +13,6 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  *
  * @author Steve Ebersole
  */
-public interface TestingModelContextFactory {
+public interface ModelContextFactory {
 	SourceModelBuildingContext createModelContext(RegistryPrimer registryPrimer, Class<?>... modelClasses);
 }

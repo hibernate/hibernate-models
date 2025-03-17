@@ -13,7 +13,7 @@ import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.testing.intg.TestingModelContextFactory;
+import org.hibernate.models.testing.intg.ModelContextFactory;
 import org.hibernate.models.testing.orm.JpaAnnotations;
 
 import org.jboss.jandex.Index;
@@ -24,7 +24,7 @@ import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOAD
 /**
  * @author Steve Ebersole
  */
-public class JandexTestingModelContextFactoryImpl implements TestingModelContextFactory {
+public class JandexModelContextFactoryImpl implements ModelContextFactory {
 	@Override
 	public SourceModelBuildingContext createModelContext(
 			RegistryPrimer registryPrimer,

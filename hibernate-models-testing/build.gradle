@@ -1,0 +1,10 @@
+plugins {
+    id 'java-module'
+}
+
+description = "Test fixtures for modules performing tests"
+
+dependencies {
+    implementation project( ":hibernate-models" )
+    implementation jakartaLibs.jpa
+}
