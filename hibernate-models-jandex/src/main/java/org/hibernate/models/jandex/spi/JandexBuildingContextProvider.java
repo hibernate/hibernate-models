@@ -7,6 +7,7 @@ package org.hibernate.models.jandex.spi;
 import java.util.Map;
 
 import org.hibernate.models.internal.BasicModelBuildingContextImpl;
+import org.hibernate.models.jandex.Settings;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.spi.SourceModelBuildingContext;
@@ -20,7 +21,7 @@ import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
  * @author Steve Ebersole
  */
 public class JandexBuildingContextProvider implements SourceModelBuildingContextProvider {
-	public static final String INDEX_PARAM = "hibernate.models.jandex.index";
+	public static final JandexBuildingContextProvider JANDEX_PROVIDER = new JandexBuildingContextProvider();
 
 	@Override
 	public SourceModelBuildingContext produceContext(
@@ -40,6 +41,6 @@ public class JandexBuildingContextProvider implements SourceModelBuildingContext
 	private IndexView resolveJandexIndex(Map<Object, Object> configProperties) {
 		// todo : do we want to have the ability to create the Jandex index or resolve one from another source?
 		//		- note: if building, be sure to apply BaseLineJavaTypes
-		return (IndexView) configProperties.get( INDEX_PARAM );
+		return (IndexView) configProperties.get( Settings.INDEX_PARAM );
 	}
 }

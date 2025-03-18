@@ -6,6 +6,7 @@ package org.hibernate.models.bytebuddy.internal;
 
 import java.lang.annotation.Annotation;
 
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.internal.StandardAnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
@@ -29,7 +30,7 @@ public class AnnotationDescriptorImpl<A extends Annotation> extends StandardAnno
 		super( annotationType, repeatableContainer, buildingContext );
 	}
 
-	public A createUsage(AnnotationDescription annotationDescription, SourceModelBuildingContextImpl context) {
+	public A createUsage(AnnotationDescription annotationDescription, ByteBuddyModelsContext context) {
 		return AnnotationUsageBuilder.makeUsage( annotationDescription, this, context );
 	}
 }

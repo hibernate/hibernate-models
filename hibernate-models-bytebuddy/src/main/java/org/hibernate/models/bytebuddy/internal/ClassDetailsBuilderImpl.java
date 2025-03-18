@@ -4,6 +4,7 @@
  */
 package org.hibernate.models.bytebuddy.internal;
 
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.SourceModelBuildingContext;
@@ -12,9 +13,9 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  * @author Steve Ebersole
  */
 public class ClassDetailsBuilderImpl implements ClassDetailsBuilder {
-	private final SourceModelBuildingContextImpl modelContext;
+	private final ByteBuddyModelsContext modelContext;
 
-	public ClassDetailsBuilderImpl(SourceModelBuildingContextImpl modelContext) {
+	public ClassDetailsBuilderImpl(ByteBuddyModelsContext modelContext) {
 		this.modelContext = modelContext;
 	}
 

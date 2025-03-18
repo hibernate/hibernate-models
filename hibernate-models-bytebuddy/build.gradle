@@ -1,5 +1,6 @@
 plugins {
     id "published-java-module"
+    id "shared-testing"
 }
 
 description = "Support for hibernate-models based on ByteBuddy (isolated dependency)"
@@ -12,6 +13,4 @@ dependencies {
     api project( ":hibernate-models" )
 
     implementation libs.byteBuddy
-
-    testImplementation project( ":hibernate-models-testing" )
 }

@@ -12,7 +12,7 @@ import net.bytebuddy.pool.TypePool;
 /**
  * @author Steve Ebersole
  */
-public interface ByteBuddyModelsBuildingContext extends SourceModelBuildingContext {
+public interface ByteBuddyModelsContext extends SourceModelBuildingContext {
 	TypePool getTypePool();
 
 	<V> ValueConverter<V> getValueConverter(ValueTypeDescriptor<V> valueTypeDescriptor);

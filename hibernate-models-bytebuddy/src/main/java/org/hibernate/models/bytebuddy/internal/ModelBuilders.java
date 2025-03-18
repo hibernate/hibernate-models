@@ -33,6 +33,7 @@ import org.hibernate.models.bytebuddy.internal.values.ShortValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.ShortValueExtractor;
 import org.hibernate.models.bytebuddy.internal.values.StringValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.StringValueExtractor;
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
 import org.hibernate.models.internal.ArrayTypeDescriptor;
@@ -51,7 +52,7 @@ import net.bytebuddy.pool.TypePool;
  * @author Steve Ebersole
  */
 public class ModelBuilders {
-	public static ClassDetails buildDetails(String name, SourceModelBuildingContextImpl modelContext) {
+	public static ClassDetails buildDetails(String name, ByteBuddyModelsContext modelContext) {
 		if ( StringHelper.isEmpty( name ) ) {
 			return null;
 		}
@@ -154,7 +155,7 @@ public class ModelBuilders {
 	public static MethodDetails buildMethodDetails(
 			MethodDescription.InDefinedShape method,
 			ClassDetailsImpl declaringType,
-			SourceModelBuildingContextImpl modelContext) {
+			ByteBuddyModelsContext modelContext) {
 		if ( method.getParameters().isEmpty() ) {
 			// could be a getter
 			final TypeDescription.Generic returnType = method.getReturnType();
@@ -217,7 +218,7 @@ public class ModelBuilders {
 			ValueTypeDescriptor<V> valueTypeDescriptor,
 			BiConsumer<ValueTypeDescriptor<V>,ValueConverter<V>> converterCollector,
 			BiConsumer<ValueTypeDescriptor<V>, ValueExtractor<V>> extractorCollector,
-			SourceModelBuildingContextImpl sourceModelBuildingContext) {
+			ByteBuddyModelContextImpl sourceModelBuildingContext) {
 		if ( valueTypeDescriptor.getValueType().isArray() ) {
 			final ValueTypeDescriptor<?> elementTypeDescriptor = ( (ArrayTypeDescriptor<?>) valueTypeDescriptor ).getElementTypeDescriptor();
 			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( elementTypeDescriptor );
@@ -316,7 +317,7 @@ public class ModelBuilders {
 			ValueTypeDescriptor<V> valueTypeDescriptor,
 			BiConsumer<ValueTypeDescriptor<V>,ValueConverter<V>> converterCollector,
 			BiConsumer<ValueTypeDescriptor<V>, ValueExtractor<V>> extractorCollector,
-			SourceModelBuildingContextImpl sourceModelBuildingContext) {
+			ByteBuddyModelContextImpl sourceModelBuildingContext) {
 		if ( valueTypeDescriptor.getValueType().isArray() ) {
 			final ValueTypeDescriptor<?> elementTypeDescriptor = ( (ArrayTypeDescriptor<?>) valueTypeDescriptor ).getElementTypeDescriptor();
 			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( elementTypeDescriptor );

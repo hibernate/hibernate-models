@@ -17,12 +17,10 @@ import org.hibernate.models.spi.ClassDetailsBuilder;
  * @author Steve Ebersole
  */
 public class ClassDetailsRegistryImpl extends AbstractClassDetailsRegistry {
-	private final SourceModelBuildingContextImpl modelContext;
 	private final ClassDetailsBuilderImpl classDetailsBuilder;
 
-	public ClassDetailsRegistryImpl(SourceModelBuildingContextImpl context) {
+	public ClassDetailsRegistryImpl(ByteBuddyModelContextImpl context) {
 		super( context );
-		this.modelContext = context;
 		this.classDetailsBuilder = new ClassDetailsBuilderImpl( context );
 	}
 

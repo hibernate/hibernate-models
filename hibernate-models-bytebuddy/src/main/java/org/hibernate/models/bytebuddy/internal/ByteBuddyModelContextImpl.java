@@ -7,7 +7,7 @@ package org.hibernate.models.bytebuddy.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsBuildingContext;
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
 import org.hibernate.models.internal.AbstractModelBuildingContext;
@@ -28,9 +28,9 @@ import net.bytebuddy.pool.TypePool;
  *
  * @author Steve Ebersole
  */
-public class SourceModelBuildingContextImpl
+public class ByteBuddyModelContextImpl
 		extends AbstractModelBuildingContext
-		implements ByteBuddyModelsBuildingContext {
+		implements ByteBuddyModelsContext {
 	private final TypePool typePool;
 
 	private final ClassDetailsRegistryImpl classDetailsRegistry;
@@ -39,13 +39,13 @@ public class SourceModelBuildingContextImpl
 	private final Map<ValueTypeDescriptor, ValueConverter> valueConverters = new HashMap<>();
 	private final Map<ValueTypeDescriptor, ValueExtractor> valueExtractors = new HashMap<>();
 
-	public SourceModelBuildingContextImpl(
+	public ByteBuddyModelContextImpl(
 			TypePool typePool,
 			RegistryPrimer registryPrimer) {
 		this( typePool, SimpleClassLoading.SIMPLE_CLASS_LOADING, registryPrimer );
 	}
 
-	public SourceModelBuildingContextImpl(
+	public ByteBuddyModelContextImpl(
 			TypePool typePool,
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer) {

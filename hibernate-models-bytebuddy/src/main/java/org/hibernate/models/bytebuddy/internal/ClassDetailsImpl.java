@@ -7,6 +7,7 @@ package org.hibernate.models.bytebuddy.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
@@ -49,7 +50,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	private List<MethodDetails> methods;
 	private List<RecordComponentDetails> recordComponents;
 
-	public ClassDetailsImpl(TypeDescription typeDescription, SourceModelBuildingContextImpl modelContext) {
+	public ClassDetailsImpl(TypeDescription typeDescription, ByteBuddyModelsContext modelContext) {
 		super( modelContext );
 		this.typeDescription = typeDescription;
 		this.superClassDetails = determineSuperType( typeDescription, modelContext );
