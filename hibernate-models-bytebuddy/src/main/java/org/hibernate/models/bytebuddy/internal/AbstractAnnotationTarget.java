@@ -7,6 +7,7 @@ package org.hibernate.models.bytebuddy.internal;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.internal.AnnotationTargetSupport;
 
 import net.bytebuddy.description.annotation.AnnotationSource;
@@ -15,15 +16,15 @@ import net.bytebuddy.description.annotation.AnnotationSource;
  * @author Steve Ebersole
  */
 public abstract class AbstractAnnotationTarget implements AnnotationTargetSupport {
-	private final SourceModelBuildingContextImpl modelContext;
+	private final ByteBuddyModelsContext modelContext;
 
 	private Map<Class<? extends Annotation>, ? extends Annotation> usageMap;
 
-	public AbstractAnnotationTarget(SourceModelBuildingContextImpl modelContext) {
+	public AbstractAnnotationTarget(ByteBuddyModelsContext modelContext) {
 		this.modelContext = modelContext;
 	}
 
-	public SourceModelBuildingContextImpl getModelContext() {
+	public ByteBuddyModelsContext getModelContext() {
 		return modelContext;
 	}
 

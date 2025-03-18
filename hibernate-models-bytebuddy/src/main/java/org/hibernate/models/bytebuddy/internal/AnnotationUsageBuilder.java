@@ -15,11 +15,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.annotation.AnnotationList;
@@ -35,7 +37,7 @@ public class AnnotationUsageBuilder {
 	public static <A extends Annotation> A makeUsage(
 			AnnotationDescription annotationDescription,
 			AnnotationDescriptor<A> annotationDescriptor,
-			SourceModelBuildingContextImpl modelContext) {
+			SourceModelBuildingContext modelContext) {
 		final Map<String, Object> attributeValues = extractAttributeValues(
 				annotationDescription,
 				annotationDescriptor,
@@ -47,7 +49,7 @@ public class AnnotationUsageBuilder {
 	private static <A extends Annotation> Map<String, Object> extractAttributeValues(
 			AnnotationDescription annotationDescription,
 			AnnotationDescriptor<A> annotationDescriptor,
-			SourceModelBuildingContextImpl modelContext) {
+			SourceModelBuildingContext modelContext) {
 
 		if ( CollectionHelper.isEmpty( annotationDescriptor.getAttributes() ) ) {
 			return Collections.emptyMap();
@@ -57,7 +59,7 @@ public class AnnotationUsageBuilder {
 		for ( int i = 0; i < annotationDescriptor.getAttributes().size(); i++ ) {
 			final AttributeDescriptor<?> attributeDescriptor = annotationDescriptor.getAttributes().get( i );
 			final ValueExtractor<?> extractor = modelContext
-					.as( SourceModelBuildingContextImpl.class )
+					.as( ByteBuddyModelContextImpl.class )
 					.getValueExtractor( attributeDescriptor.getTypeDescriptor() );
 			final Object attributeValue = extractor.extractValue(
 					annotationDescription,
@@ -71,7 +73,7 @@ public class AnnotationUsageBuilder {
 
 	public static Map<Class<? extends Annotation>, ? extends Annotation> collectUsages(
 			AnnotationSource annotationSource,
-			SourceModelBuildingContextImpl modelContext) {
+			ByteBuddyModelsContext modelContext) {
 		if ( annotationSource == null ) {
 			return Collections.emptyMap();
 		}
@@ -90,7 +92,7 @@ public class AnnotationUsageBuilder {
 	public static void processAnnotations(
 			AnnotationList annotations,
 			BiConsumer<Class<? extends Annotation>, Annotation> consumer,
-			SourceModelBuildingContextImpl buildingContext) {
+			ByteBuddyModelsContext buildingContext) {
 		final AnnotationDescriptorRegistry annotationDescriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
 
 		for ( AnnotationDescription annotation : annotations ) {

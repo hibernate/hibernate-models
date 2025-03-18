@@ -33,32 +33,36 @@ public class ModelsConfiguration {
 		return configValues;
 	}
 
-	public Object configValue(Object key, Object value) {
-		return configValues.put( key, value );
+	public ModelsConfiguration configValue(Object key, Object value) {
+		configValues.put( key, value );
+		return this;
 	}
 
 	public ClassLoading getClassLoading() {
 		return classLoading;
 	}
 
-	public void setClassLoading(ClassLoading classLoading) {
+	public ModelsConfiguration setClassLoading(ClassLoading classLoading) {
 		this.classLoading = classLoading;
+		return this;
 	}
 
 	public RegistryPrimer getRegistryPrimer() {
 		return registryPrimer;
 	}
 
-	public void setRegistryPrimer(RegistryPrimer registryPrimer) {
+	public ModelsConfiguration setRegistryPrimer(RegistryPrimer registryPrimer) {
 		this.registryPrimer = registryPrimer;
+		return this;
 	}
 
 	public SourceModelBuildingContextProvider getExplicitContextProvider() {
 		return explicitContextProvider;
 	}
 
-	public void setExplicitContextProvider(SourceModelBuildingContextProvider explicitContextProvider) {
+	public ModelsConfiguration setExplicitContextProvider(SourceModelBuildingContextProvider explicitContextProvider) {
 		this.explicitContextProvider = explicitContextProvider;
+		return this;
 	}
 
 	public SourceModelBuildingContext bootstrap() {

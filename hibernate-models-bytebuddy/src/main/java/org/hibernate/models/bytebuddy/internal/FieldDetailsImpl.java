@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.internal.AnnotationTargetSupport;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
@@ -40,7 +41,7 @@ public class FieldDetailsImpl
 	public FieldDetailsImpl(
 			FieldDescription.InDefinedShape underlyingField,
 			ClassDetailsImpl declaringClassDetails,
-			SourceModelBuildingContextImpl modelContext) {
+			ByteBuddyModelsContext modelContext) {
 		super( modelContext );
 		this.underlyingField = underlyingField;
 		this.declaringClassDetails = declaringClassDetails;

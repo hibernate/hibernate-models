@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -47,7 +48,7 @@ public class MethodDetailsImpl extends AbstractAnnotationTarget implements Metho
 			MethodKind methodKind,
 			TypeDetails type,
 			ClassDetails declaringType,
-			SourceModelBuildingContextImpl modelContext) {
+			ByteBuddyModelsContext modelContext) {
 		super( modelContext );
 		this.methodDescription = methodDescription;
 		this.methodKind = methodKind;
