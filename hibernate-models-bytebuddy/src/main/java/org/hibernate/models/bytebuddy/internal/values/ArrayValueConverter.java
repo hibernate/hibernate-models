@@ -14,7 +14,6 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
-import net.bytebuddy.pool.TypePool;
 
 /**
  * Support for converting array values
