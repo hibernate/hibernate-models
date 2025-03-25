@@ -16,11 +16,13 @@ import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import net.bytebuddy.description.annotation.AnnotationSource;
@@ -31,7 +33,9 @@ import net.bytebuddy.description.type.TypeDescription;
 /**
  * @author Steve Ebersole
  */
-public class MethodDetailsImpl extends AbstractAnnotationTarget implements MethodDetails, MutableMemberDetails {
+public class MethodDetailsImpl
+		extends AbstractAnnotationTarget
+		implements MethodDetails, MutableMemberDetails {
 	private final MethodDescription methodDescription;
 	private final MethodKind methodKind;
 	private final TypeDetails type;
@@ -137,9 +141,48 @@ public class MethodDetailsImpl extends AbstractAnnotationTarget implements Metho
 	@Override
 	public Method toJavaMember() {
 		if ( underlyingMethod == null ) {
-			underlyingMethod = resolveJavaMember();
+			underlyingMethod = toJavaMember(
+					declaringType.toJavaClass(),
+					getModelContext().getClassLoading(),
+					getModelContext()
+			);
 		}
 		return underlyingMethod;
+	}
+
+	@Override
+	public Method toJavaMember(
+			Class<?> declaringJavaClass,
+			ClassLoading classLoading,
+			SourceModelContext modelContext) {
+		methods: for ( Method method : declaringJavaClass.getDeclaredMethods() ) {
+			if ( !method.getName().equals( getName() ) ) {
+				continue;
+			}
+
+			if ( method.getParameterCount() != methodDescription.getParameters().size() ) {
+				continue;
+			}
+
+			for ( int i = 0; i < method.getParameterTypes().length; i++ ) {
+				final Class<?> methodParameterType = method.getParameterTypes()[i];
+				final ParameterDescription parameterDescription = methodDescription.getParameters().get( i );
+				if ( !methodParameterType.getName().equals( parameterDescription.getType().getTypeName() ) ) {
+					continue methods;
+				}
+			}
+
+			// if we get here, we've found it
+			return method;
+		}
+
+		throw new RuntimeException(
+				String.format(
+						"Jandex FieldInfo had no corresponding Field : %s.%s",
+						declaringType.getName(),
+						getName()
+				)
+		);
 	}
 
 	@Override
@@ -170,38 +213,6 @@ public class MethodDetailsImpl extends AbstractAnnotationTarget implements Metho
 	@Override
 	public <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
 		throw new IllegalCastException( "MethodDetails cannot be cast as AnnotationDescriptor" );
-	}
-
-	private Method resolveJavaMember() {
-		final Class<?> declaringTypeClass = declaringType.toJavaClass();
-		methods: for ( Method method : declaringTypeClass.getDeclaredMethods() ) {
-			if ( !method.getName().equals( getName() ) ) {
-				continue;
-			}
-
-			if ( method.getParameterCount() != methodDescription.getParameters().size() ) {
-				continue;
-			}
-
-			for ( int i = 0; i < method.getParameterTypes().length; i++ ) {
-				final Class<?> methodParameterType = method.getParameterTypes()[i];
-				final ParameterDescription parameterDescription = methodDescription.getParameters().get( i );
-				if ( !methodParameterType.getName().equals( parameterDescription.getType().getTypeName() ) ) {
-					continue methods;
-				}
-			}
-
-			// if we get here, we've found it
-			return method;
-		}
-
-		throw new RuntimeException(
-				String.format(
-						"Jandex FieldInfo had no corresponding Field : %s.%s",
-						declaringType.getName(),
-						getName()
-				)
-		);
 	}
 
 	@Override

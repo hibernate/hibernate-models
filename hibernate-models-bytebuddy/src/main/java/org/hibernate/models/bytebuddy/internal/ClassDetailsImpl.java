@@ -13,10 +13,12 @@ import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -31,7 +33,6 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeList;
 
 import static java.util.Collections.emptyList;
-import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOADING;
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
 import static org.hibernate.models.internal.util.CollectionHelper.isEmpty;
 
@@ -197,7 +198,12 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 
 	@Override
 	public <X> Class<X> toJavaClass() {
-		return SIMPLE_CLASS_LOADING.classForName( getClassName() );
+		return toJavaClass( getModelContext().getClassLoading(), getModelContext() );
+	}
+
+	@Override
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+		return classLoading.classForName( getClassName() );
 	}
 
 	@Override

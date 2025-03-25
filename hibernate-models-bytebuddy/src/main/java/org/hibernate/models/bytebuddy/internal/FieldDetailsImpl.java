@@ -6,7 +6,6 @@ package org.hibernate.models.bytebuddy.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Map;
 
@@ -15,11 +14,13 @@ import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.internal.AnnotationTargetSupport;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
+import org.hibernate.models.spi.SourceModelContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import net.bytebuddy.description.annotation.AnnotationSource;
@@ -88,18 +89,25 @@ public class FieldDetailsImpl
 	}
 
 
-	private Member underlyingMember;
+	private Field underlyingMember;
 
 	@Override
-	public Member toJavaMember() {
+	public Field toJavaMember() {
 		if ( underlyingMember == null ) {
-			underlyingMember = resolveJavaMember();
+			underlyingMember = toJavaMember(
+					declaringClassDetails.toJavaClass(),
+					getModelContext().getClassLoading(),
+					getModelContext()
+			);
 		}
 		return underlyingMember;
 	}
 
-	private Field resolveJavaMember() {
-		final Class<?> declaringJavaClass = declaringClassDetails.toJavaClass();
+	@Override
+	public Field toJavaMember(
+			Class<?> declaringJavaClass,
+			ClassLoading classLoading,
+			SourceModelContext modelContext) {
 		try {
 			return declaringJavaClass.getField( getName() );
 		}
