@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 import org.hibernate.models.internal.util.CollectionHelper;
-import org.hibernate.models.jandex.spi.JandexModelBuildingContext;
+import org.hibernate.models.jandex.spi.JandexModelContext;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
@@ -116,7 +116,7 @@ public class AnnotationUsageBuilder {
 		for ( int i = 0; i < annotationDescriptor.getAttributes().size(); i++ ) {
 			final AttributeDescriptor attributeDescriptor = annotationDescriptor.getAttributes().get( i );
 			final JandexValueExtractor<?> extractor = modelContext
-					.as( JandexModelBuildingContext.class )
+					.as( JandexModelContext.class )
 					.getJandexValueExtractor( attributeDescriptor.getTypeDescriptor() );
 			final Object attributeValue = extractor.extractValue(
 					annotationInstance,

@@ -13,6 +13,9 @@ import org.jboss.jandex.AnnotationInstance;
  * Support for extracting attribute values from Jandex
  * {@linkplain org.jboss.jandex.AnnotationInstance} references.
  *
+ * @implSpec Coordinates with {@linkplain JandexValueConverter} for
+ * handling the raw extracted value.
+ *
  * @param <V> The value type
  *
  * @author Steve Ebersole

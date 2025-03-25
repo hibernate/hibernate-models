@@ -7,7 +7,7 @@ package org.hibernate.models.bytebuddy.internal.values;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.bytebuddy.internal.AnnotationUsageBuilder;
+import org.hibernate.models.bytebuddy.internal.ByteBuddyBuilders;
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
@@ -186,7 +186,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 		for ( int i = 0; i < resolved.length; i++ ) {
 			final AnnotationDescription annotationDescription = resolved[i];
-			final Annotation usage = AnnotationUsageBuilder.makeUsage(
+			final Annotation usage = ByteBuddyBuilders.makeUsage(
 					annotationDescription,
 					annotationDescriptor,
 					modelContext

@@ -4,4 +4,4 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright: Red Hat Inc. and Hibernate Authors
 #
-org.hibernate.models.jandex.spi.JandexBuildingContextProvider
+org.hibernate.models.jandex.internal.JandexBuildingContextProvider

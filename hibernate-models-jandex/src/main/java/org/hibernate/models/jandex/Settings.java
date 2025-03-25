@@ -10,5 +10,8 @@ package org.hibernate.models.jandex;
  * @author Steve Ebersole
  */
 public interface Settings {
+	/**
+	 * Used to pass the Jandex {@linkplain org.jboss.jandex.IndexView index}.
+	 */
 	String INDEX_PARAM = "hibernate.models.jandex.index";
 }

@@ -6,7 +6,7 @@ package org.hibernate.models.testing.tests;
 
 import org.hibernate.models.internal.BasicModelBuildingContextImpl;
 import org.hibernate.models.jandex.Settings;
-import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
+import org.hibernate.models.jandex.internal.JandexModelContextImpl;
 import org.hibernate.models.spi.ModelsConfiguration;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.testing.shared.intg.JandexModelContextFactoryImpl;
@@ -17,7 +17,7 @@ import org.jboss.jandex.Index;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOADING;
-import static org.hibernate.models.jandex.spi.JandexBuildingContextProvider.JANDEX_PROVIDER;
+import static org.hibernate.models.jandex.internal.JandexBuildingContextProvider.JANDEX_PROVIDER;
 
 /**
  * @author Steve Ebersole
@@ -48,6 +48,6 @@ public class ProviderTests {
 				.configValue( Settings.INDEX_PARAM, index )
 				.bootstrap();
 		assertThat( context ).isNotNull();
-		assertThat( context ).isInstanceOf( JandexModelBuildingContextImpl.class );
+		assertThat( context ).isInstanceOf( JandexModelContextImpl.class );
 	}
 }

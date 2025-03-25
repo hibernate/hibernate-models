@@ -19,6 +19,7 @@ import org.hibernate.models.internal.VoidTypeDetailsImpl;
 import org.hibernate.models.internal.WildcardTypeDetailsImpl;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.jandex.spi.JandexTypeSwitch;
+import org.hibernate.models.jandex.spi.JandexTypeSwitcher;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;

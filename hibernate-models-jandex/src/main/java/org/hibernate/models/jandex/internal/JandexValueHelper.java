@@ -6,7 +6,7 @@ package org.hibernate.models.jandex.internal;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.jandex.spi.JandexModelBuildingContext;
+import org.hibernate.models.jandex.spi.JandexModelContext;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
@@ -31,7 +31,7 @@ public class JandexValueHelper {
 			AnnotationInstance usage,
 			AttributeDescriptor<V> attributeDescriptor,
 			SourceModelBuildingContext modelContext) {
-		return modelContext.as( JandexModelBuildingContext.class )
+		return modelContext.as( JandexModelContext.class )
 				.getJandexValueExtractor( attributeDescriptor.getTypeDescriptor() )
 				.extractValue( usage, attributeDescriptor, modelContext );
 //		final AnnotationValue value = usage.value( attributeDescriptor.getName() );
@@ -64,7 +64,7 @@ public class JandexValueHelper {
 			return (V) attributeDescriptor.getAttributeMethod().getDefaultValue();
 		}
 
-		return modelContext.as( JandexModelBuildingContext.class )
+		return modelContext.as( JandexModelContext.class )
 				.getJandexValueExtractor( attributeDescriptor.getTypeDescriptor() )
 				.extractValue( usage, attributeDescriptor, modelContext );
 	}

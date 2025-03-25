@@ -19,13 +19,6 @@ public class JandexAnnotationDescriptorRegistry extends AnnotationDescriptorRegi
 		super( modelBuildingContext );
 	}
 
-	@Override
-	protected <A extends Annotation> AnnotationDescriptor<A> buildAnnotationDescriptor(
-			Class<A> javaType,
-			AnnotationDescriptor<? extends Annotation> containerDescriptor) {
-		return new JandexAnnotationDescriptorImpl<>( javaType, containerDescriptor, getModelBuildingContext() );
-	}
-
 	public Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> getDescriptorMap() {
 		return descriptorMap;
 	}

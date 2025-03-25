@@ -9,11 +9,15 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.jboss.jandex.AnnotationValue;
 
 /**
- * Used in processing Jandex references.
- * Given a Jandex {@linkplain AnnotationValue}, converts to the corresponding "value type".
+ * Used in processing Jandex references. Given a Jandex
+ * {@linkplain AnnotationValue}, converts to the corresponding
+ * {@linkplain org.hibernate.models.spi.ValueTypeDescriptor value type}.
  *
  * @author Steve Ebersole
  */
 public interface JandexValueConverter<V> {
+	/**
+	 * Perform the conversion.
+	 */
 	V convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext);
 }

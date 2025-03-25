@@ -169,7 +169,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 			if ( declaredMethod.isConstructor() || declaredMethod.isTypeInitializer() ) {
 				continue;
 			}
-			result.add( ModelBuilders.buildMethodDetails( declaredMethod, this, getModelContext() ) );
+			result.add( ByteBuddyBuilders.buildMethodDetails( declaredMethod, this, getModelContext() ) );
 		}
 		return result;
 	}

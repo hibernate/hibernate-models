@@ -6,7 +6,7 @@ package org.hibernate.models.bytebuddy.internal.values;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.bytebuddy.internal.AnnotationUsageBuilder;
+import org.hibernate.models.bytebuddy.internal.ByteBuddyBuilders;
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
@@ -30,6 +30,6 @@ public class NestedValueConverter<A extends Annotation> implements ValueConverte
 	@Override
 	public A convert(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext modelContext) {
 		final AnnotationDescription resolved = byteBuddyValue.resolve( AnnotationDescription.class );
-		return AnnotationUsageBuilder.makeUsage( resolved, descriptor, modelContext );
+		return ByteBuddyBuilders.makeUsage( resolved, descriptor, modelContext );
 	}
 }

@@ -22,6 +22,6 @@ public class ClassDetailsBuilderImpl implements ClassDetailsBuilder {
 	@Override
 	public ClassDetails buildClassDetails(String name, SourceModelBuildingContext buildingContext) {
 		assert buildingContext == modelContext;
-		return ModelBuilders.buildDetails( name, modelContext );
+		return ByteBuddyBuilders.buildDetails( name, modelContext );
 	}
 }

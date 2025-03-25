@@ -10,6 +10,32 @@ import java.util.function.BiConsumer;
 import org.hibernate.models.internal.ArrayTypeDescriptor;
 import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.internal.util.StringHelper;
+import org.hibernate.models.jandex.internal.values.ArrayValueConverter;
+import org.hibernate.models.jandex.internal.values.ArrayValueExtractor;
+import org.hibernate.models.jandex.internal.values.BooleanValueConverter;
+import org.hibernate.models.jandex.internal.values.BooleanValueExtractor;
+import org.hibernate.models.jandex.internal.values.ByteValueConverter;
+import org.hibernate.models.jandex.internal.values.ByteValueExtractor;
+import org.hibernate.models.jandex.internal.values.CharacterValueConverter;
+import org.hibernate.models.jandex.internal.values.CharacterValueExtractor;
+import org.hibernate.models.jandex.internal.values.ClassValueConverter;
+import org.hibernate.models.jandex.internal.values.ClassValueExtractor;
+import org.hibernate.models.jandex.internal.values.DoubleValueConverter;
+import org.hibernate.models.jandex.internal.values.DoubleValueExtractor;
+import org.hibernate.models.jandex.internal.values.EnumValueConverter;
+import org.hibernate.models.jandex.internal.values.EnumValueExtractor;
+import org.hibernate.models.jandex.internal.values.FloatValueConverter;
+import org.hibernate.models.jandex.internal.values.FloatValueExtractor;
+import org.hibernate.models.jandex.internal.values.IntegerValueConverter;
+import org.hibernate.models.jandex.internal.values.IntegerValueExtractor;
+import org.hibernate.models.jandex.internal.values.JandexNestedValueConverter;
+import org.hibernate.models.jandex.internal.values.JandexNestedValueExtractor;
+import org.hibernate.models.jandex.internal.values.LongValueConverter;
+import org.hibernate.models.jandex.internal.values.LongValueExtractor;
+import org.hibernate.models.jandex.internal.values.ShortValueConverter;
+import org.hibernate.models.jandex.internal.values.ShortValueExtractor;
+import org.hibernate.models.jandex.internal.values.StringValueConverter;
+import org.hibernate.models.jandex.internal.values.StringValueExtractor;
 import org.hibernate.models.jandex.spi.JandexValueConverter;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -23,16 +49,31 @@ import org.jboss.jandex.IndexView;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.Type;
 
+import static org.hibernate.models.internal.util.PrimitiveTypeHelper.resolvePrimitiveClass;
+
 /**
  * Jandex based ClassDetailsBuilder
  *
  * @author Steve Ebersole
  */
 public class JandexBuilders {
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Models - ClassDetails, MemberDetails
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	/**
+	 * Build a ClassDetails.
+	 *
+	 * @param name The class name
+	 * @param jandexIndex Jandex index
+	 * @param modelsContext The hibernate-models context
+	 *
+	 * @return The created ClassDetails; may be {@code null}.
+	 */
 	public static ClassDetails buildDetailsFromIndex(
 			String name,
 			IndexView jandexIndex,
-			SourceModelBuildingContext processingContext) {
+			SourceModelBuildingContext modelsContext) {
 		if ( StringHelper.isEmpty( name ) ) {
 			return null;
 		}
@@ -43,81 +84,20 @@ public class JandexBuilders {
 
 		final ClassInfo classInfo = jandexIndex.getClassByName( name );
 		if ( classInfo != null ) {
-			return new JandexClassDetails( classInfo, processingContext );
+			return new JandexClassDetails( classInfo, modelsContext );
 		}
 
 		// potentially handle primitives
 		final Class<?> primitiveClass = resolvePrimitiveClass( name );
 		if ( primitiveClass != null ) {
-			return JdkBuilders.buildClassDetailsStatic( primitiveClass, processingContext );
+			return JdkBuilders.buildClassDetailsStatic( primitiveClass, modelsContext );
 		}
 
 		// potentially handle package names
 		final ClassInfo packageInfo = jandexIndex.getClassByName( name + ".package-info" );
 		if ( packageInfo != null ) {
 			// package-info is safe to load through using Class
-			return JdkBuilders.buildClassDetailsStatic( name + ".package-info", processingContext );
-		}
-
-		return null;
-	}
-
-
-	public static Class<?> resolvePrimitiveClass(String className) {
-		if ( "boolean".equals( className ) ) {
-			return boolean.class;
-		}
-
-		if ( Boolean.class.getSimpleName().equalsIgnoreCase( className ) || Boolean.class.getName().equals( className ) ) {
-			return Boolean.class;
-		}
-
-		if ( "byte".equals( className ) ) {
-			return byte.class;
-		}
-
-		if ( Byte.class.getSimpleName().equals( className ) || Byte.class.getName().equals( className ) ) {
-			return Byte.class;
-		}
-
-		if ( "short".equals( className ) ) {
-			return short.class;
-		}
-
-		if ( Short.class.getSimpleName().equals( className ) || Short.class.getName().equals( className ) ) {
-			return Short.class;
-		}
-
-		if ( "int".equals( className ) ) {
-			return int.class;
-		}
-
-		if ( Integer.class.getSimpleName().equals( className ) || Integer.class.getName().equals( className ) ) {
-			return Integer.class;
-		}
-
-		if ( "long".equals( className ) ) {
-			return long.class;
-		}
-
-		if ( Long.class.getSimpleName().equals( className ) || Long.class.getName().equals( className ) ) {
-			return Long.class;
-		}
-
-		if ( "double".equals( className ) ) {
-			return double.class;
-		}
-
-		if ( Double.class.getSimpleName().equals( className ) || Double.class.getName().equals( className ) ) {
-			return Double.class;
-		}
-
-		if ( "float".equals( className ) ) {
-			return float.class;
-		}
-
-		if ( Float.class.getSimpleName().equals( className ) || Float.class.getName().equals( className ) ) {
-			return Float.class;
+			return JdkBuilders.buildClassDetailsStatic( name + ".package-info", modelsContext );
 		}
 
 		return null;

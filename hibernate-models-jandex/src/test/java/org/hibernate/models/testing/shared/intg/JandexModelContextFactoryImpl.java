@@ -9,7 +9,7 @@ import java.io.IOException;
 import org.hibernate.models.internal.BaseLineJavaTypes;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.jandex.internal.JandexIndexerHelper;
-import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
+import org.hibernate.models.jandex.internal.JandexModelContextImpl;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.testing.intg.ModelContextFactory;
@@ -27,11 +27,11 @@ public class JandexModelContextFactoryImpl implements ModelContextFactory {
 	public static final JandexModelContextFactoryImpl CONTEXT_FACTORY = new JandexModelContextFactoryImpl();
 
 	@Override
-	public JandexModelBuildingContextImpl createModelContext(
+	public JandexModelContextImpl createModelContext(
 			RegistryPrimer registryPrimer,
 			Class<?>... modelClasses) {
 		final Index jandexIndex = buildJandexIndex( SIMPLE_CLASS_LOADING, modelClasses );
-		return new JandexModelBuildingContextImpl( jandexIndex, SIMPLE_CLASS_LOADING, registryPrimer );
+		return new JandexModelContextImpl( jandexIndex, SIMPLE_CLASS_LOADING, registryPrimer );
 	}
 
 	public static Index buildJandexIndex(ClassLoading classLoadingAccess, Class<?>... modelClasses) {

@@ -87,7 +87,7 @@ public class ByteBuddyModelContextImpl
 			return existing;
 		}
 
-		return ModelBuilders.buildValueHandlersReturnConverter(
+		return ByteBuddyBuilders.buildValueHandlersReturnConverter(
 				valueTypeDescriptor,
 				valueConverters::put,
 				valueExtractors::put,
@@ -103,7 +103,7 @@ public class ByteBuddyModelContextImpl
 			return existing;
 		}
 
-		return ModelBuilders.buildValueHandlersReturnExtractor(
+		return ByteBuddyBuilders.buildValueHandlersReturnExtractor(
 				valueTypeDescriptor,
 				valueConverters::put,
 				valueExtractors::put,

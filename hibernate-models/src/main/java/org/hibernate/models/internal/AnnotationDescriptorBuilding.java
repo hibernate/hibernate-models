@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.models.internal.util.AnnotationAttributeTypeHelper;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
@@ -32,7 +33,7 @@ public class AnnotationDescriptorBuilding {
 		//noinspection unchecked
 		final Class<X> attributeType = (Class<X>) method.getReturnType();
 
-		final ValueTypeDescriptor<X> typeDescriptor = TypeDescriptors.resolveTypeDescriptor( attributeType );
+		final ValueTypeDescriptor<X> typeDescriptor = AnnotationAttributeTypeHelper.resolveTypeDescriptor( attributeType );
 		return typeDescriptor.createAttributeDescriptor( annotationType, method.getName() );
 	}
 }

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import net.bytebuddy.pool.TypePool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.models.bytebuddy.spi.ByteBuddyContextProvider.BYTEBUDDY_PROVIDER;
+import static org.hibernate.models.bytebuddy.internal.ByteBuddyContextProvider.BYTEBUDDY_PROVIDER;
 import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOADING;
 
 /**

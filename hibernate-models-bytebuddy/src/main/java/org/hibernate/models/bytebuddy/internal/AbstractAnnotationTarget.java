@@ -33,7 +33,7 @@ public abstract class AbstractAnnotationTarget implements AnnotationTargetSuppor
 	@Override
 	public Map<Class<? extends Annotation>, ? extends Annotation> getUsageMap() {
 		if ( usageMap == null ) {
-			usageMap = AnnotationUsageBuilder.collectUsages( getAnnotationSource(), modelContext );
+			usageMap = ByteBuddyBuilders.collectUsages( getAnnotationSource(), modelContext );
 		}
 		return usageMap;
 	}
