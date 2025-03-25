@@ -25,7 +25,7 @@ public class ClassDetailsRegistryImpl extends AbstractClassDetailsRegistry {
 	}
 
 	@Override
-	protected ClassDetailsBuilder getClassDetailsBuilder() {
+	public ClassDetailsBuilder getClassDetailsBuilder() {
 		return classDetailsBuilder;
 	}
 

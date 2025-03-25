@@ -57,6 +57,11 @@ public class ModelBuilders {
 			return null;
 		}
 
+		if ( name.startsWith( "[" ) ) {
+			// always handle arrays via the JDK builder
+			return null;
+		}
+
 		if ( "void".equals( name ) ) {
 			name = Void.class.getName();
 		}
@@ -147,6 +152,14 @@ public class ModelBuilders {
 
 		if ( Float.class.getSimpleName().equals( className ) || Float.class.getName().equals( className ) ) {
 			return Float.class;
+		}
+
+		if ( "char".equals( className ) ) {
+			return char.class;
+		}
+
+		if ( Character.class.getSimpleName().equals( className ) || Character.class.getName().equals( className ) ) {
+			return Character.class;
 		}
 
 		return null;

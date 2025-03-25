@@ -10,9 +10,9 @@ import java.net.URL;
 
 import org.hibernate.models.ModelsException;
 import org.hibernate.models.bytebuddy.internal.ByteBuddyModelContextImpl;
+import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.testing.intg.ModelContextFactory;
 
 import net.bytebuddy.dynamic.ClassFileLocator;
@@ -27,7 +27,7 @@ public class ByteBuddyModelContextFactory implements ModelContextFactory {
 	public static final ByteBuddyModelContextFactory CONTEXT_FACTORY = new ByteBuddyModelContextFactory();
 
 	@Override
-	public SourceModelBuildingContext createModelContext(
+	public ByteBuddyModelsContext createModelContext(
 			RegistryPrimer registryPrimer,
 			Class<?>... modelClasses) {
 		final TypePool byteBuddyTypePool = buildTypePool( modelClasses );

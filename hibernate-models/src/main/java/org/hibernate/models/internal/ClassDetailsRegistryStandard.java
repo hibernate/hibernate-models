@@ -34,7 +34,7 @@ public class ClassDetailsRegistryStandard
 	}
 
 	@Override
-	protected ClassDetailsBuilder getClassDetailsBuilder() {
+	public ClassDetailsBuilder getClassDetailsBuilder() {
 		return classDetailsBuilder;
 	}
 }

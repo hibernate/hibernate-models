@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
@@ -42,8 +41,6 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		classDetailsMap.put( ClassDetails.VOID_CLASS_DETAILS.getName(), ClassDetails.VOID_CLASS_DETAILS );
 		classDetailsMap.put( ClassDetails.VOID_OBJECT_CLASS_DETAILS.getName(), ClassDetails.VOID_OBJECT_CLASS_DETAILS );
 	}
-
-	protected abstract ClassDetailsBuilder getClassDetailsBuilder();
 
 	@Override
 	public List<ClassDetails> getDirectSubTypes(String superTypeName) {

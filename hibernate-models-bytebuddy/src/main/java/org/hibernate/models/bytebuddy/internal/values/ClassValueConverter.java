@@ -8,6 +8,7 @@ import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
+import net.bytebuddy.description.type.TypeDescription;
 
 
 /**
@@ -20,6 +21,12 @@ public class ClassValueConverter implements ValueConverter<Class<?>> {
 
 	@Override
 	public Class<?> convert(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext modelContext) {
-		return byteBuddyValue.resolve( Class.class );
+		final TypeDescription typeDescription = byteBuddyValue.resolve( TypeDescription.class );
+		final String typeName = typeDescription.getName();
+		if ( "void".equals( typeName ) ) {
+			return void.class;
+		}
+		return modelContext.getClassLoading().classForName( typeDescription.getTypeName() );
+//		return byteBuddyValue.resolve( Class.class );
 	}
 }

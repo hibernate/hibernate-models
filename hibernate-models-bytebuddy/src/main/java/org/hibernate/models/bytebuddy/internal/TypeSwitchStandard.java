@@ -6,6 +6,7 @@ package org.hibernate.models.bytebuddy.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.hibernate.models.bytebuddy.spi.TypeSwitch;
@@ -97,23 +98,45 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 		final TypeList.Generic bound;
 		final boolean isExtends;
 
-		if ( ! (upperBounds instanceof TypeList.Generic.Empty) ) {
+		if ( isExtends( upperBounds, lowerBounds ) ) {
 			bound = upperBounds;
 			isExtends = true;
 		}
-		else if ( ! (lowerBounds instanceof TypeList.Generic.Empty) ) {
+		else {
 			bound = lowerBounds;
 			isExtends = false;
-		}
-		else {
-			throw new IllegalArgumentException( "What?" );
 		}
 
 		return new WildcardTypeDetailsImpl( TypeSwitcher.switchType( bound.get( 0 ), this, buildingContext ), isExtends );
 	}
 
+	private boolean isExtends(TypeList.Generic upperBounds, TypeList.Generic lowerBounds) {
+		if ( lowerBounds.isEmpty() ) {
+			return true;
+		}
+
+		return upperBounds.isEmpty();
+	}
+
+	private HashSet<String> typeVariableIdentifiers;
+
 	@Override
 	public TypeDetails caseTypeVariable(TypeDefinition typeDescription, SourceModelBuildingContext buildingContext) {
+		final boolean isTypeVariableRef;
+		if ( typeVariableIdentifiers == null ) {
+			typeVariableIdentifiers = new HashSet<>();
+			typeVariableIdentifiers.add( typeDescription.getActualName() );
+			isTypeVariableRef = false;
+		}
+		else {
+			final boolean newlyAdded = typeVariableIdentifiers.add( typeDescription.getActualName() );
+			isTypeVariableRef = !newlyAdded;
+		}
+
+		if ( isTypeVariableRef ) {
+			return new TypeVariableReferenceDetailsImpl( typeDescription.getActualName() );
+		}
+
 		return new TypeVariableDetailsImpl(
 				typeDescription.getActualName(),
 				declaringType,
@@ -125,6 +148,12 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 	public TypeDetails caseTypeVariableReference(
 			TypeDefinition typeDescription,
 			SourceModelBuildingContext buildingContext) {
+		// todo : This is not actually correct I think.  From the Byte Buddy javadocs:
+		//		> Represents a type variable that is merely symbolic and is not
+		//		> attached to a net.bytebuddy.description.TypeVariableSource and does
+		//		> not defined bounds.
+		//   - but I am unsure of an actual scenario this is attempting to describe
+		//		to be able to test it out
 		return new TypeVariableReferenceDetailsImpl( typeDescription.getActualName() );
 	}
 

@@ -31,8 +31,12 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 		this.classDetailsBuilder = new JandexClassDetailsBuilderImpl( jandexIndex, context );
 	}
 
+	public IndexView getJandexIndex() {
+		return jandexIndex;
+	}
+
 	@Override
-	protected ClassDetailsBuilder getClassDetailsBuilder() {
+	public ClassDetailsBuilder getClassDetailsBuilder() {
 		return classDetailsBuilder;
 	}
 

@@ -52,6 +52,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 
 	public ClassDetailsImpl(TypeDescription typeDescription, ByteBuddyModelsContext modelContext) {
 		super( modelContext );
+		assert !typeDescription.isPrimitive();
 		this.typeDescription = typeDescription;
 		this.superClassDetails = determineSuperType( typeDescription, modelContext );
 	}

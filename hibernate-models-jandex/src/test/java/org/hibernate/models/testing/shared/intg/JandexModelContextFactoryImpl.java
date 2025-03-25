@@ -12,7 +12,6 @@ import org.hibernate.models.jandex.internal.JandexIndexerHelper;
 import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.testing.intg.ModelContextFactory;
 import org.hibernate.models.testing.orm.JpaAnnotations;
 
@@ -25,8 +24,10 @@ import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOAD
  * @author Steve Ebersole
  */
 public class JandexModelContextFactoryImpl implements ModelContextFactory {
+	public static final JandexModelContextFactoryImpl CONTEXT_FACTORY = new JandexModelContextFactoryImpl();
+
 	@Override
-	public SourceModelBuildingContext createModelContext(
+	public JandexModelBuildingContextImpl createModelContext(
 			RegistryPrimer registryPrimer,
 			Class<?>... modelClasses) {
 		final Index jandexIndex = buildJandexIndex( SIMPLE_CLASS_LOADING, modelClasses );

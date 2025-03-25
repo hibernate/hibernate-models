@@ -70,6 +70,11 @@ public interface ClassDetailsRegistry {
 		return (S) this;
 	}
 
+	/**
+	 * Access to the ClassDetailsBuilder used in this registry
+	 */
+	ClassDetailsBuilder getClassDetailsBuilder();
+
 	@FunctionalInterface
 	interface ClassDetailsConsumer {
 		void consume(ClassDetails classDetails);
