@@ -17,7 +17,7 @@ import net.bytebuddy.description.annotation.AnnotationValue;
 public class ArrayValueExtractor<V> extends AbstractValueExtractor<V[]> {
 	private final ValueConverter<V[]> wrapper;
 
-	public ArrayValueExtractor(ValueConverter wrapper) {
+	public ArrayValueExtractor(ValueConverter<V[]> wrapper) {
 		this.wrapper = wrapper;
 	}
 
