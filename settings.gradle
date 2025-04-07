@@ -56,7 +56,7 @@ dependencyResolutionManagement {
 			library( "jacksonXml", "com.fasterxml.jackson.dataformat", "jackson-dataformat-xml" ).versionRef( jacksonVersion )
 			library( "jacksonJsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310" ).versionRef( jacksonVersion )
 
-			def jandexVersion = version "jandex", "3.1.2"
+			def jandexVersion = version "jandex", "3.3.0"
 			library( "jandex", "io.smallrye", "jandex" ).versionRef( jandexVersion )
 
 			def jbossLoggingVersion = version "jbossLogging", "3.5.0.Final"
