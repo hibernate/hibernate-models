@@ -44,7 +44,7 @@ pipeline {
                         throw new IllegalArgumentException("Missing value for parameter DEVELOPMENT_VERSION.")
                     }
 
-                    def releaseVersion = Version.parseReleaseVersion(params.RELEASE_VERSION)
+                    def releaseVersion = Version.parseReleaseVersion(params.RELEASE_VERSION, Version.Scheme.JBOSS_NO_FINAL)
                     def developmentVersion = Version.parseDevelopmentVersion(params.DEVELOPMENT_VERSION)
                     echo "Performing full release for version ${releaseVersion.toString()}"
 
