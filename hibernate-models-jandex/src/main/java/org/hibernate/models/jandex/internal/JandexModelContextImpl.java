@@ -102,6 +102,6 @@ public class JandexModelContextImpl extends AbstractModelBuildingContext impleme
 
 	@Override
 	public StorableContext toStorableForm() {
-		return new StorableContextImpl( classDetailsRegistry.getClassDetailsMap(), descriptorRegistry.getDescriptorMap() );
+		return new StorableContextImpl( classDetailsRegistry.classDetailsMap(), descriptorRegistry.descriptorMap() );
 	}
 }

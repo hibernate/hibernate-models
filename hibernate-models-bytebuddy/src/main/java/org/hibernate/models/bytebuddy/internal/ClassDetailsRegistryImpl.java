@@ -4,7 +4,6 @@
  */
 package org.hibernate.models.bytebuddy.internal;
 
-import java.util.Map;
 
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.AbstractClassDetailsRegistry;
@@ -44,10 +43,6 @@ public class ClassDetailsRegistryImpl extends AbstractClassDetailsRegistry {
 		}
 
 		throw new UnknownClassException( "Unable to resolve ClassDetails for `" + name + "`" );
-	}
-
-	protected Map<String, ClassDetails> getClassDetailsMap() {
-		return classDetailsMap;
 	}
 
 }

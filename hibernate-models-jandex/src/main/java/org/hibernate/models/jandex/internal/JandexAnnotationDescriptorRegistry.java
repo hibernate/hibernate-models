@@ -4,11 +4,7 @@
  */
 package org.hibernate.models.jandex.internal;
 
-import java.lang.annotation.Annotation;
-import java.util.Map;
-
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
-import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
@@ -17,9 +13,5 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
 public class JandexAnnotationDescriptorRegistry extends AnnotationDescriptorRegistryStandard {
 	public JandexAnnotationDescriptorRegistry(SourceModelBuildingContext modelBuildingContext) {
 		super( modelBuildingContext );
-	}
-
-	public Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> getDescriptorMap() {
-		return descriptorMap;
 	}
 }

@@ -6,6 +6,7 @@ package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,5 +51,17 @@ public abstract class AbstractAnnotationDescriptorRegistry implements Annotation
 	@Override
 	public <A extends Annotation> AnnotationDescriptor<A> getContainedRepeatableDescriptor(Class<A> containerJavaType) {
 		return getContainedRepeatableDescriptor( getDescriptor( containerJavaType ) );
+	}
+
+	public Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> descriptorMap() {
+		return descriptorMap;
+	}
+
+	public Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> getDescriptorMap() {
+		return Collections.unmodifiableMap( descriptorMap );
+	}
+
+	public Map<AnnotationDescriptor<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> getRepeatableByContainerMap() {
+		return Collections.unmodifiableMap( repeatableByContainerMap );
 	}
 }

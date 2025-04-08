@@ -26,10 +26,6 @@ public class AnnotationDescriptorRegistryStandard
 		this.modelBuildingContext = modelBuildingContext;
 	}
 
-	protected SourceModelBuildingContext getModelBuildingContext() {
-		return modelBuildingContext;
-	}
-
 	public void register(AnnotationDescriptor<?> descriptor) {
 		MODELS_ANNOTATION_LOGGER.tracef( "Registering AnnotationDescriptor - %s", descriptor );
 		descriptorMap.put( descriptor.getAnnotationType(), descriptor );

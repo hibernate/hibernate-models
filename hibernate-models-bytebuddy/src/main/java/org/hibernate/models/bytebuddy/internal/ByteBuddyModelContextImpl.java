@@ -11,6 +11,7 @@ import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
 import org.hibernate.models.internal.AbstractModelBuildingContext;
+import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
 import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
 import org.hibernate.models.internal.MutableClassDetailsRegistry;
 import org.hibernate.models.internal.SimpleClassLoading;
@@ -34,7 +35,7 @@ public class ByteBuddyModelContextImpl
 	private final TypePool typePool;
 
 	private final ClassDetailsRegistryImpl classDetailsRegistry;
-	private final AnnotationDescriptorRegistryImpl descriptorRegistry;
+	private final AnnotationDescriptorRegistryStandard descriptorRegistry;
 
 	private final Map<ValueTypeDescriptor, ValueConverter> valueConverters = new HashMap<>();
 	private final Map<ValueTypeDescriptor, ValueExtractor> valueExtractors = new HashMap<>();
@@ -54,7 +55,7 @@ public class ByteBuddyModelContextImpl
 		this.typePool = typePool;
 
 		this.classDetailsRegistry = new ClassDetailsRegistryImpl( this );
-		this.descriptorRegistry = new AnnotationDescriptorRegistryImpl( this );
+		this.descriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
 
 		primeRegistries( registryPrimer );
 	}
@@ -76,7 +77,7 @@ public class ByteBuddyModelContextImpl
 
 	@Override
 	public StorableContext toStorableForm() {
-		return new StorableContextImpl( classDetailsRegistry.getClassDetailsMap(), descriptorRegistry.getDescriptorMap() );
+		return new StorableContextImpl( classDetailsRegistry.classDetailsMap(), descriptorRegistry.descriptorMap() );
 	}
 
 	@Override

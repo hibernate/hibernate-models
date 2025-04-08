@@ -5,6 +5,7 @@
 package org.hibernate.models.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +14,14 @@ import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 
+import static org.hibernate.models.spi.ClassDetails.CLASS_CLASS_DETAILS;
+import static org.hibernate.models.spi.ClassDetails.OBJECT_CLASS_DETAILS;
+import static org.hibernate.models.spi.ClassDetails.VOID_CLASS_DETAILS;
+import static org.hibernate.models.spi.ClassDetails.VOID_OBJECT_CLASS_DETAILS;
+
 /**
+ * Base ClassDetailsRegistry implementation support
+ *
  * @author Steve Ebersole
  */
 public abstract class AbstractClassDetailsRegistry implements MutableClassDetailsRegistry {
@@ -36,10 +44,10 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		this.subTypeClassDetailsMap = subTypeClassDetailsMap;
 		this.context = context;
 
-		classDetailsMap.put( ClassDetails.OBJECT_CLASS_DETAILS.getName(), ClassDetails.OBJECT_CLASS_DETAILS );
-		classDetailsMap.put( ClassDetails.CLASS_CLASS_DETAILS.getName(), ClassDetails.CLASS_CLASS_DETAILS );
-		classDetailsMap.put( ClassDetails.VOID_CLASS_DETAILS.getName(), ClassDetails.VOID_CLASS_DETAILS );
-		classDetailsMap.put( ClassDetails.VOID_OBJECT_CLASS_DETAILS.getName(), ClassDetails.VOID_OBJECT_CLASS_DETAILS );
+		classDetailsMap.put( CLASS_CLASS_DETAILS.getName(), CLASS_CLASS_DETAILS );
+		classDetailsMap.put( OBJECT_CLASS_DETAILS.getClassName(), OBJECT_CLASS_DETAILS );
+		classDetailsMap.put( VOID_CLASS_DETAILS.getClassName(), VOID_CLASS_DETAILS );
+		classDetailsMap.put( VOID_OBJECT_CLASS_DETAILS.getClassName(), VOID_OBJECT_CLASS_DETAILS );
 	}
 
 	@Override
@@ -156,4 +164,15 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		}
 	}
 
+	public Map<String, ClassDetails> classDetailsMap() {
+		return classDetailsMap;
+	}
+
+	public Map<String, ClassDetails> getClassDetailsMap() {
+		return Collections.unmodifiableMap( classDetailsMap );
+	}
+
+	public Map<String, List<ClassDetails>> getSubTypeClassDetailsMap() {
+		return Collections.unmodifiableMap( subTypeClassDetailsMap );
+	}
 }
