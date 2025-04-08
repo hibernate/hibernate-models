@@ -11,7 +11,7 @@ plugins {
 //		- prepareForRelease 				(this script)
 //		- publishToSonatype					(io.github.gradle-nexus.publish-plugin)
 //		- closeSonatypeStagingRepository	(io.github.gradle-nexus.publish-plugin)
-//		- completeRelease 					(this script)
+//		- releasePerform 					(this script)
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def releaseVersion = project.ext.releaseVersion as String
@@ -30,7 +30,7 @@ def gitBranch = determineGitBranch( project )
 // Processes should execute `prepareForRelease`
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def releasePreparationTask = tasks.register( "releasePreparation" ) {
+def releasePreparationTask = tasks.register( "releasePrepare" ) {
 	doFirst {
 		logger.lifecycle "Release version     : {}", releaseVersion
 		logger.lifecycle "Development version : {}", developmentVersion
@@ -98,13 +98,12 @@ tasks.register( "prepareForRelease" ) {
 //			- commit the version change
 //
 //
-// Processes should execute `completeRelease`
+// Processes should execute `releasePerform`
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def tagReleaseTask = tasks.register( "tagRelease" ) {
 	onlyIf {
-		changeToReleaseVersionTask.get().didWork
-				&& releaseVersion != developmentVersion
+		releaseVersion != developmentVersion
 	}
 
 	doLast {
@@ -120,8 +119,7 @@ def changeToDevelopmentVersionTask = tasks.register( 'changeToDevelopmentVersion
 	dependsOn tagReleaseTask
 
 	onlyIf {
-		changeToReleaseVersionTask.get().didWork
-				&& releaseVersion != developmentVersion
+		releaseVersion != developmentVersion
 	}
 
 	doFirst {
@@ -140,8 +138,7 @@ def pushToGitTask = tasks.register( 'pushToGit' ) {
 	dependsOn changeToDevelopmentVersionTask
 
 	onlyIf {
-		changeToReleaseVersionTask.get().didWork
-				&& releaseVersion != developmentVersion
+		releaseVersion != developmentVersion
 	}
 
 	doLast {
@@ -154,7 +151,7 @@ def pushToGitTask = tasks.register( 'pushToGit' ) {
 	}
 }
 
-tasks.register( "completeRelease" ) {
+tasks.register( "releasePerform" ) {
 	dependsOn tagReleaseTask
 	dependsOn changeToDevelopmentVersionTask
 	dependsOn pushToGitTask
