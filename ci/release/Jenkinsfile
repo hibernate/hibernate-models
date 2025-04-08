@@ -55,13 +55,12 @@ pipeline {
                                          string(credentialsId: 'release.gpg.passphrase', variable: 'JRELEASER_GPG_PASSPHRASE'),
                                          usernamePassword(credentialsId: 'ossrh.sonatype.org', passwordVariable: 'JRELEASER_NEXUS2_PASSWORD', usernameVariable: 'JRELEASER_NEXUS2_USERNAME'),
                                          string(credentialsId: 'Hibernate-CI.github.com', variable: 'JRELEASER_GITHUB_TOKEN')]) {
-
                             sshagent(['ed25519.Hibernate-CI.github.com']) {
                                 sh 'cat $HOME/.ssh/config'
                                 sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git'
                                 env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
                                 sh """
-                                    bash -xe hibernate-release-scripts/release.sh ${params.RELEASE_DRY_RUN ? '-d' : ''} \
+                                    bash -xe hibernate-release-scripts/release.sh ${params.RELEASE_DRY_RUN ? '-d' : ''} -b ${env.BRANCH_NAME} \
                                             models ${releaseVersion.toString()} ${developmentVersion.toString()}
                                 """
                             }
