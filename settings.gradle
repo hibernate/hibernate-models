@@ -100,7 +100,7 @@ dependencyResolutionManagement {
 	}
 
 	develocity {
-		server = 'https://ge.hibernate.org'
+		server = 'https://develocity.commonhaus.dev'
 
 		buildScan {
 			capture {
