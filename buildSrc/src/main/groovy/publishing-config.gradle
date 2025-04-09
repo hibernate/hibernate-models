@@ -47,7 +47,11 @@ publishing {
 				}
 
 			}
-
+		}
+	}
+	repositories {
+		maven {
+			url = rootProject.layout.buildDirectory.dir('staging-deploy')
 		}
 	}
 }
