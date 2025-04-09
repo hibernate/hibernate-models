@@ -51,7 +51,7 @@ publishing {
 	}
 	repositories {
 		maven {
-			url = rootProject.layout.buildDirectory.dir('staging-deploy')
+			url = rootProject.layout.buildDirectory.dir("staging-deploy${File.separator}maven")
 		}
 	}
 }
