@@ -60,7 +60,7 @@ pipeline {
                                 sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git'
                                 env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
                                 sh """
-                                    bash -xe hibernate-release-scripts/release.sh ${params.RELEASE_DRY_RUN ? '-d' : ''} -b ${env.BRANCH_NAME} \
+                                    bash -xe hibernate-release-scripts/release.sh ${params.RELEASE_DRY_RUN ? '-d' : ''} \
                                             models ${releaseVersion.toString()} ${developmentVersion.toString()}
                                 """
                             }

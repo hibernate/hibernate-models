@@ -8,7 +8,7 @@ plugins {
 // Release processing
 //
 // Processes should execute the following tasks in order
-//		- prepareForRelease 				(this script)
+//		- releasePrepare 				(this script)
 //		- publishToSonatype					(io.github.gradle-nexus.publish-plugin)
 //		- closeSonatypeStagingRepository	(io.github.gradle-nexus.publish-plugin)
 //		- releasePerform 					(this script)
@@ -27,10 +27,10 @@ def gitBranch = determineGitBranch( project )
 //			- change version in `/version.txt` to the release version
 //			- commit the version change
 //
-// Processes should execute `prepareForRelease`
+// Processes should execute `releasePrepare`
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def releasePreparationTask = tasks.register( "releasePrepare" ) {
+def releasePreparationTask = tasks.register( "releasePreparation" ) {
 	doFirst {
 		logger.lifecycle "Release version     : {}", releaseVersion
 		logger.lifecycle "Development version : {}", developmentVersion
@@ -45,7 +45,7 @@ def releasePreparationTask = tasks.register( "releasePrepare" ) {
 //		String diffWithUpstream = executeGitCommand( 'diff', '@{u}' )
 //		if ( !diffWithUpstream.isEmpty() ) {
 //			throw new GradleException(
-//					"Cannot perform `prepareForRelease` tasks because there are un-pushed local commits .\n" +
+//					"Cannot perform `releasePrepare` tasks because there are un-pushed local commits .\n" +
 //							"Push your commits first."
 //			);
 //		}
@@ -74,7 +74,7 @@ def changeToReleaseVersionTask = tasks.register( "changeToReleaseVersion" ) {
 	}
 }
 
-tasks.register( "prepareForRelease" ) {
+tasks.register( "releasePrepare" ) {
 	dependsOn releasePreparationTask
 	dependsOn changeToReleaseVersionTask
 }
