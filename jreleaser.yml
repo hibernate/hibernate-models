@@ -12,7 +12,7 @@ release:
 # File signing is always active
 signing:
   mode: COMMAND
-  active: ALWAYS
+  active: RELEASE
   armored: true
 
 # Deploy JARs and POMs to Maven Central
@@ -20,10 +20,20 @@ deploy:
   maven:
     nexus2:
       maven-central:
-        active: ALWAYS
+        active: RELEASE
         url: https://oss.sonatype.org/service/local
         snapshotUrl: https://oss.sonatype.org/content/repositories/snapshots/
         closeRepository: true
-        releaseRepository: true
         stagingRepositories:
           - build/staging-deploy/maven
+    mavenCentral:
+      maven-central:
+        # TODO: Change to RELEASE once switching to Maven-Central:
+        active: NEVER
+        url: https://central.sonatype.com/api/v1/publisher
+        snapshotSupported: false
+        applyMavenCentralRules: true
+        stagingRepositories:
+          - build/staging-deploy/maven
+        # Deployment identifier used for publication.
+        # deploymentId: dd9991b0-18a7-41e7-b1fe-37b8ea936f85
