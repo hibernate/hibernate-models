@@ -6,7 +6,7 @@ package org.hibernate.models.internal.jdk;
 
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
@@ -24,7 +24,7 @@ public class JdkPassThruExtractor<V> extends AbstractJdkValueExtractor<V> {
 	protected V wrap(
 			V rawValue,
 			AttributeDescriptor<V> attributeDescriptor,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		return rawValue;
 	}
 }

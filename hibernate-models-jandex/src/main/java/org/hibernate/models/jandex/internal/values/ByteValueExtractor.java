@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.jandex.internal.values;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -17,8 +17,8 @@ public class ByteValueExtractor extends AbstractValueExtractor<Byte> {
 	public static final ByteValueExtractor JANDEX_BYTE_EXTRACTOR = new ByteValueExtractor();
 
 	@Override
-	protected Byte extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
+	protected Byte extractAndWrap(AnnotationValue jandexValue, ModelsContext modelsContext) {
 		assert jandexValue != null;
-		return ByteValueConverter.JANDEX_BYTE_VALUE_WRAPPER.convert( jandexValue, buildingContext );
+		return ByteValueConverter.JANDEX_BYTE_VALUE_WRAPPER.convert( jandexValue, modelsContext );
 	}
 }

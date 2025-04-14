@@ -9,20 +9,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationTargetSupport;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
  */
 public abstract class AbstractAnnotationTarget implements AnnotationTargetSupport {
-	private final SourceModelBuildingContext modelContext;
+	private final ModelsContext modelContext;
 	private final Map<Class<? extends Annotation>, ? extends Annotation> usageMap = new HashMap<>();
 
-	public AbstractAnnotationTarget(SourceModelBuildingContext modelContext) {
+	public AbstractAnnotationTarget(ModelsContext modelContext) {
 		this.modelContext = modelContext;
 	}
 
-	public SourceModelBuildingContext getModelContext() {
+	public ModelsContext getModelContext() {
 		return modelContext;
 	}
 

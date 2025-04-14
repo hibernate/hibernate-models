@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationUsageHelper;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
@@ -22,15 +22,15 @@ import static org.hibernate.models.testing.orm.JpaAnnotations.NAMED_NATIVE_QUERI
 public class NamedNativeQueriesAnnotation implements NamedNativeQueries, RepeatableContainer<NamedNativeQuery> {
 	private NamedNativeQuery[] value;
 
-	public NamedNativeQueriesAnnotation(SourceModelBuildingContext modelContext) {
+	public NamedNativeQueriesAnnotation(ModelsContext modelContext) {
 		value = new NamedNativeQuery[0];
 	}
 
-	public NamedNativeQueriesAnnotation(NamedNativeQueries usage, SourceModelBuildingContext modelContext) {
+	public NamedNativeQueriesAnnotation(NamedNativeQueries usage, ModelsContext modelContext) {
 		value = AnnotationUsageHelper.extractRepeatedValues( usage, NAMED_NATIVE_QUERIES, modelContext );
 	}
 
-	public NamedNativeQueriesAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public NamedNativeQueriesAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		value = (NamedNativeQuery[]) attributeValues.get( "value" );
 	}
 

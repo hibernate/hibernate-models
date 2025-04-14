@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
@@ -17,21 +17,22 @@ import jakarta.persistence.JoinColumns;
 /**
  * @author Steve Ebersole
  */
+@SuppressWarnings({ "ClassExplicitlyAnnotation", "unused" })
 public class JoinColumnsAnnotation implements JoinColumns, RepeatableContainer<JoinColumn> {
 	private JoinColumn[] value;
 	private ForeignKey foreignKey;
 
-	public JoinColumnsAnnotation(SourceModelBuildingContext modelContext) {
+	public JoinColumnsAnnotation(ModelsContext modelContext) {
 		value = new JoinColumn[0];
 		foreignKey = new ForeignKeyAnnotation( modelContext );
 	}
 
-	public JoinColumnsAnnotation(JoinColumns usage, SourceModelBuildingContext modelContext) {
+	public JoinColumnsAnnotation(JoinColumns usage, ModelsContext modelContext) {
 		value = usage.value();
 		foreignKey = usage.foreignKey();
 	}
 
-	public JoinColumnsAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public JoinColumnsAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		value = (JoinColumn[]) attributeValues.get( "value" );
 		foreignKey = (ForeignKey) attributeValues.get( "foreignKey" );
 	}

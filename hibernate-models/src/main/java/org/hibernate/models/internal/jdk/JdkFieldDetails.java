@@ -20,8 +20,7 @@ import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 
@@ -36,11 +35,11 @@ public class JdkFieldDetails extends AbstractJdkAnnotationTarget implements Fiel
 	private final boolean isArray;
 	private final boolean isPlural;
 
-	public JdkFieldDetails(Field field, JdkClassDetails declaringType, SourceModelBuildingContext buildingContext) {
-		super( field::getAnnotations, buildingContext );
+	public JdkFieldDetails(Field field, JdkClassDetails declaringType, ModelsContext modelsContext) {
+		super( field::getAnnotations, modelsContext );
 		this.field = field;
 		this.declaringType = declaringType;
-		this.type = new JdkTrackingTypeSwitcher( buildingContext ).switchType( field.getGenericType() );
+		this.type = new JdkTrackingTypeSwitcher( modelsContext ).switchType( field.getGenericType() );
 
 		this.isArray = field.getType().isArray();
 		this.isPlural = isArray
@@ -69,7 +68,7 @@ public class JdkFieldDetails extends AbstractJdkAnnotationTarget implements Fiel
 	}
 
 	@Override
-	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
 		if ( declaringClass == field.getDeclaringClass() ) {
 			return field;
 		}

@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.models.bytebuddy.internal.ByteBuddyBuilders;
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.annotation.AnnotationValue;
@@ -28,7 +28,7 @@ public class NestedValueConverter<A extends Annotation> implements ValueConverte
 	}
 
 	@Override
-	public A convert(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext modelContext) {
+	public A convert(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelContext) {
 		final AnnotationDescription resolved = byteBuddyValue.resolve( AnnotationDescription.class );
 		return ByteBuddyBuilders.makeUsage( resolved, descriptor, modelContext );
 	}

@@ -41,7 +41,7 @@ import org.hibernate.models.jandex.spi.JandexValueExtractor;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 import org.jboss.jandex.ClassInfo;
@@ -73,7 +73,7 @@ public class JandexBuilders {
 	public static ClassDetails buildDetailsFromIndex(
 			String name,
 			IndexView jandexIndex,
-			SourceModelBuildingContext modelsContext) {
+			ModelsContext modelsContext) {
 		if ( StringHelper.isEmpty( name ) ) {
 			return null;
 		}
@@ -106,7 +106,7 @@ public class JandexBuilders {
 	public static JandexMethodDetails buildMethodDetails(
 			MethodInfo method,
 			ClassDetails declaringType,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		if ( method.parametersCount() == 0 ) {
 			// could be a getter
 			final Type returnType = method.returnType();
@@ -116,9 +116,9 @@ public class JandexBuilders {
 					return new JandexMethodDetails(
 							method,
 							MethodDetails.MethodKind.GETTER,
-							JandexTypeSwitchStandard.switchType( returnType, declaringType, buildingContext ),
+							JandexTypeSwitchStandard.switchType( returnType, declaringType, modelsContext ),
 							declaringType,
-							buildingContext
+							modelsContext
 					);
 				}
 				else if ( isBoolean( returnType ) && ( methodName.startsWith( "is" )
@@ -127,9 +127,9 @@ public class JandexBuilders {
 					return new JandexMethodDetails(
 							method,
 							MethodDetails.MethodKind.GETTER,
-							JandexTypeSwitchStandard.switchType( returnType, declaringType, buildingContext ),
+							JandexTypeSwitchStandard.switchType( returnType, declaringType, modelsContext ),
 							declaringType,
-							buildingContext
+							modelsContext
 					);
 				}
 			}
@@ -141,9 +141,9 @@ public class JandexBuilders {
 			return new JandexMethodDetails(
 					method,
 					MethodDetails.MethodKind.SETTER,
-					JandexTypeSwitchStandard.switchType( method.parameterType( 0 ), declaringType, buildingContext ),
+					JandexTypeSwitchStandard.switchType( method.parameterType( 0 ), declaringType, modelsContext ),
 					declaringType,
-					buildingContext
+					modelsContext
 			);
 		}
 
@@ -152,7 +152,7 @@ public class JandexBuilders {
 				MethodDetails.MethodKind.OTHER,
 				null,
 				declaringType,
-				buildingContext
+				modelsContext
 		);
 	}
 
@@ -168,7 +168,7 @@ public class JandexBuilders {
 			ValueTypeDescriptor<V> valueTypeDescriptor,
 			BiConsumer<ValueTypeDescriptor<V>,JandexValueConverter<V>> converterCollector,
 			BiConsumer<ValueTypeDescriptor<V>, JandexValueExtractor<V>> extractorCollector,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		if ( valueTypeDescriptor.getValueType().isArray() ) {
 			final ValueTypeDescriptor<?> elementTypeDescriptor = ( (ArrayTypeDescriptor<?>) valueTypeDescriptor ).getElementTypeDescriptor();
 			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( elementTypeDescriptor );
@@ -233,7 +233,7 @@ public class JandexBuilders {
 		}
 
 		if ( valueTypeDescriptor.getValueType().isAnnotation() ) {
-			final AnnotationDescriptor<? extends Annotation> annotationDescriptor = buildingContext.getAnnotationDescriptorRegistry()
+			final AnnotationDescriptor<? extends Annotation> annotationDescriptor = modelsContext.getAnnotationDescriptorRegistry()
 					.getDescriptor( (Class<? extends Annotation>) valueTypeDescriptor.getValueType() );
 			final JandexNestedValueConverter<? extends Annotation> jandexNestedValueConverter = new JandexNestedValueConverter<>( annotationDescriptor );
 			final JandexNestedValueExtractor<? extends Annotation> jandexNestedValueExtractor = new JandexNestedValueExtractor<>( jandexNestedValueConverter );
@@ -266,7 +266,7 @@ public class JandexBuilders {
 			ValueTypeDescriptor<V> valueTypeDescriptor,
 			BiConsumer<ValueTypeDescriptor<V>,JandexValueConverter<V>> converterCollector,
 			BiConsumer<ValueTypeDescriptor<V>,JandexValueExtractor<V>> extractorCollector,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		if ( valueTypeDescriptor.getValueType().isArray() ) {
 			final ValueTypeDescriptor<?> elementTypeDescriptor = ( (ArrayTypeDescriptor<?>) valueTypeDescriptor ).getElementTypeDescriptor();
 			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( elementTypeDescriptor );
@@ -331,7 +331,7 @@ public class JandexBuilders {
 		}
 
 		if ( valueTypeDescriptor.getValueType().isAnnotation() ) {
-			final AnnotationDescriptor<? extends Annotation> annotationDescriptor = buildingContext.getAnnotationDescriptorRegistry()
+			final AnnotationDescriptor<? extends Annotation> annotationDescriptor = modelsContext.getAnnotationDescriptorRegistry()
 					.getDescriptor( (Class<? extends Annotation>) valueTypeDescriptor.getValueType() );
 			final JandexNestedValueConverter<? extends Annotation> jandexNestedValueConverter = new JandexNestedValueConverter<>( annotationDescriptor );
 			final JandexNestedValueExtractor<? extends Annotation> jandexNestedValueExtractor = new JandexNestedValueExtractor<>( jandexNestedValueConverter );

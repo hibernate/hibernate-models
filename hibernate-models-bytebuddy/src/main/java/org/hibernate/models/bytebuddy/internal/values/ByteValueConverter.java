@@ -5,7 +5,7 @@
 package org.hibernate.models.bytebuddy.internal.values;
 
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -18,7 +18,7 @@ public class ByteValueConverter implements ValueConverter<Byte> {
 	public static final ByteValueConverter BYTE_VALUE_WRAPPER = new ByteValueConverter();
 
 	@Override
-	public Byte convert(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext modelContext) {
+	public Byte convert(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelContext) {
 		assert byteBuddyValue != null;
 		return byteBuddyValue.resolve( Byte.class );
 	}

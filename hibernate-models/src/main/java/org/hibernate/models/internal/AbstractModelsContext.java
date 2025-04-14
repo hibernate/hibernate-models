@@ -9,18 +9,18 @@ import java.lang.annotation.Annotation;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.RegistryPrimer;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
- * Base support for SourceModelBuildingContext implementations
+ * Base support for ModelsContext implementations
  *
  * @author Steve Ebersole
  */
-public abstract class AbstractModelBuildingContext implements SourceModelBuildingContext {
+public abstract class AbstractModelsContext implements ModelsContext {
 	private final ClassLoading classLoadingAccess;
 
-	public AbstractModelBuildingContext(ClassLoading classLoadingAccess) {
+	public AbstractModelsContext(ClassLoading classLoadingAccess) {
 		this.classLoadingAccess = classLoadingAccess;
 	}
 

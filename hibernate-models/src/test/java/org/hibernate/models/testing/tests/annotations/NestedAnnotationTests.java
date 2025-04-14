@@ -7,7 +7,7 @@ package org.hibernate.models.testing.tests.annotations;
 import java.lang.reflect.Proxy;
 
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +31,9 @@ public class NestedAnnotationTests {
 
 	@Test
 	void testNestedAnnotationsNotProxy() {
-		final SourceModelBuildingContext buildingContext = createModelContext( Person.class );
+		final ModelsContext modelsContext = createModelContext( Person.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Person.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Person.class.getName() );
 		final SecondaryTable secondaryTable = classDetails.getDirectAnnotationUsage( SecondaryTable.class );
 		assertThat( secondaryTable.name() ).isEqualTo( SECOND_TABLE );
 
@@ -48,6 +48,7 @@ public class NestedAnnotationTests {
 		assertThat( secondaryTable.pkJoinColumns()[0].foreignKey().options() ).isEqualTo( "things" );
 	}
 
+	@SuppressWarnings("unused")
 	@Entity(name="Person")
 	@Table(name="Person")
 	@SecondaryTable( name = SECOND_TABLE,

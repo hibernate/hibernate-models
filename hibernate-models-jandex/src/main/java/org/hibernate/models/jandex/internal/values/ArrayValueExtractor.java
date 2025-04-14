@@ -7,7 +7,7 @@ package org.hibernate.models.jandex.internal.values;
 import java.util.List;
 
 import org.hibernate.models.jandex.spi.JandexValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -22,12 +22,12 @@ public class ArrayValueExtractor<V> extends AbstractValueExtractor<V[]> {
 	}
 
 	@Override
-	protected V[] extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
+	protected V[] extractAndWrap(AnnotationValue jandexValue, ModelsContext modelsContext) {
 		assert jandexValue != null;
 
 		final List<AnnotationValue> values = jandexValue.asArrayList();
 		assert values != null;
 
-		return wrapper.convert( jandexValue, buildingContext );
+		return wrapper.convert( jandexValue, modelsContext );
 	}
 }

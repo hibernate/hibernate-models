@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.Transient;
 
@@ -16,11 +16,11 @@ import jakarta.persistence.Transient;
  */
 @SuppressWarnings({ "ClassExplicitlyAnnotation", "unused" })
 public class TransientAnnotation implements Transient {
-	public TransientAnnotation(SourceModelBuildingContext modelContext) {
+	public TransientAnnotation(ModelsContext modelContext) {
 	}
-	public TransientAnnotation(Transient source, SourceModelBuildingContext modelContext) {
+	public TransientAnnotation(Transient source, ModelsContext modelContext) {
 	}
-	public TransientAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public TransientAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 	}
 
 	@Override

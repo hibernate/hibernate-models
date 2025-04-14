@@ -5,7 +5,7 @@
 package org.hibernate.models.internal.jdk;
 
 import org.hibernate.models.spi.JdkValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 /**
@@ -19,7 +19,7 @@ public class JdkArrayValueConverter<V> implements JdkValueConverter<V[]> {
 	}
 
 	@Override
-	public V[] convert(V[] rawValue, SourceModelBuildingContext modelContext) {
+	public V[] convert(V[] rawValue, ModelsContext modelContext) {
 		final V[] result = elementTypeDescriptor.makeArray( rawValue.length, modelContext );
 		final JdkValueConverter<V> elementWrapper = elementTypeDescriptor.createJdkValueConverter( modelContext );
 		for ( int i = 0; i < rawValue.length; i++ ) {

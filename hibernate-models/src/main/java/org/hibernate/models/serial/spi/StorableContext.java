@@ -7,13 +7,12 @@ package org.hibernate.models.serial.spi;
 import java.io.Serializable;
 
 import org.hibernate.models.spi.ClassLoading;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
- * Form of {@linkplain SourceModelContext} which is serializable.
+ * Form of {@linkplain ModelsContext} which is serializable.
  *
- * @see SourceModelBuildingContext#toStorableForm()
+ * @see ModelsContext#toStorableForm()
  *
  * @author Steve Ebersole
  */
@@ -21,5 +20,5 @@ public interface StorableContext extends Serializable {
 	/**
 	 * "Re-construct" the model context from the serial form
 	 */
-	SourceModelContext fromStorableForm(ClassLoading classLoading);
+	ModelsContext fromStorableForm(ClassLoading classLoading);
 }

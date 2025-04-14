@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Descriptor for char values
@@ -25,7 +25,7 @@ public class CharacterTypeDescriptor extends AbstractTypeDescriptor<Character> {
 	}
 
 	@Override
-	public Character[] makeArray(int size, SourceModelBuildingContext modelContext) {
+	public Character[] makeArray(int size, ModelsContext modelContext) {
 		return new Character[size];
 	}
 }

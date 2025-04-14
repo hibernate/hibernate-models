@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
@@ -25,9 +25,9 @@ public class UnboundWildcardTests {
 
 	@Test
 	void testWildcardMembers() {
-		final SourceModelBuildingContext buildingContext = createModelContext( Thing.class );
+		final ModelsContext modelsContext = createModelContext( Thing.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry()
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry()
 				.getClassDetails( Thing.class.getName() );
 
 		{

@@ -19,8 +19,7 @@ import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 /**
@@ -38,11 +37,11 @@ public class JdkRecordComponentDetails extends AbstractJdkAnnotationTarget
 	public JdkRecordComponentDetails(
 			RecordComponent recordComponent,
 			ClassDetails declaringType,
-			SourceModelBuildingContext buildingContext) {
-		super( recordComponent::getAnnotations, buildingContext );
+			ModelsContext modelsContext) {
+		super( recordComponent::getAnnotations, modelsContext );
 		this.recordComponent = recordComponent;
 		this.declaringType = declaringType;
-		this.type = JdkTrackingTypeSwitcher.standardSwitchType( recordComponent.getGenericType(), buildingContext );
+		this.type = JdkTrackingTypeSwitcher.standardSwitchType( recordComponent.getGenericType(), modelsContext );
 
 		this.isArray = recordComponent.getType().isArray();
 		this.isPlural = isArray
@@ -82,7 +81,7 @@ public class JdkRecordComponentDetails extends AbstractJdkAnnotationTarget
 	}
 
 	@Override
-	public Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+	public Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
 		return null;
 	}
 

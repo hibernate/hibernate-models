@@ -6,8 +6,7 @@ package org.hibernate.models.internal;
 
 import org.hibernate.models.rendering.spi.Renderer;
 import org.hibernate.models.rendering.spi.RenderingTarget;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Descriptor for class values
@@ -34,17 +33,17 @@ public class ClassTypeDescriptor extends AbstractTypeDescriptor<Class<?>> {
 			Object attributeValue,
 			RenderingTarget target,
 			Renderer renderer,
-			SourceModelContext modelContext) {
+			ModelsContext modelContext) {
 		super.render( name, ( (Class<?>) attributeValue ).getName(), target, renderer, modelContext );
 	}
 
 	@Override
-	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, SourceModelContext modelContext) {
+	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, ModelsContext modelContext) {
 		super.render( ( (Class<?>) attributeValue ).getName(), target, renderer, modelContext );
 	}
 
 	@Override
-	public Class<?>[] makeArray(int size, SourceModelBuildingContext modelContext) {
+	public Class<?>[] makeArray(int size, ModelsContext modelContext) {
 		return new Class<?>[size];
 	}
 }

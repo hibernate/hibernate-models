@@ -34,7 +34,7 @@ public interface FieldDetails extends MemberDetails {
 	Field toJavaMember();
 
 	@Override
-	Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext);
+	Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
 
 	@Override
 	default FieldDetails asFieldDetails() {

@@ -20,7 +20,7 @@ import org.hibernate.models.internal.VoidTypeDetailsImpl;
 import org.hibernate.models.internal.WildcardTypeDetailsImpl;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeDetailsHelper;
 
@@ -35,13 +35,13 @@ import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
  */
 public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 
-	public static TypeDetails switchType(TypeDefinition typeDescription, SourceModelBuildingContext buildingContext) {
-		return switchType( typeDescription, null, buildingContext );
+	public static TypeDetails switchType(TypeDefinition typeDescription, ModelsContext modelsContext) {
+		return switchType( typeDescription, null, modelsContext );
 	}
 
-	public static TypeDetails switchType(TypeDefinition typeDescription, ClassDetails declaringType, SourceModelBuildingContext buildingContext) {
+	public static TypeDetails switchType(TypeDefinition typeDescription, ClassDetails declaringType, ModelsContext modelsContext) {
 		final TypeSwitchStandard switchImpl = new TypeSwitchStandard( declaringType );
-		return TypeSwitcher.switchType( typeDescription, switchImpl, buildingContext );
+		return TypeSwitcher.switchType( typeDescription, switchImpl, modelsContext );
 	}
 
 
@@ -52,24 +52,24 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 	}
 
 	@Override
-	public TypeDetails caseClass(TypeDefinition typeDescription, SourceModelBuildingContext buildingContext) {
-		final ClassDetails classDetails = buildingContext
+	public TypeDetails caseClass(TypeDefinition typeDescription, ModelsContext modelsContext) {
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( typeDescription.getTypeName() );
 		return new ClassTypeDetailsImpl( classDetails, TypeDetails.Kind.CLASS );
 	}
 
 	@Override
-	public TypeDetails casePrimitive(TypeDefinition typeDescription, SourceModelBuildingContext buildingContext) {
-		final ClassDetails classDetails = buildingContext
+	public TypeDetails casePrimitive(TypeDefinition typeDescription, ModelsContext modelsContext) {
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( typeDescription.getTypeName() );
 		return new PrimitiveTypeDetailsImpl( classDetails );
 	}
 
 	@Override
-	public TypeDetails caseVoid(TypeDefinition typeDescription, SourceModelBuildingContext buildingContext) {
-		final ClassDetails classDetails = buildingContext
+	public TypeDetails caseVoid(TypeDefinition typeDescription, ModelsContext modelsContext) {
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				// allows for void or Void
 				.resolveClassDetails( typeDescription.getTypeName() );
@@ -79,19 +79,19 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 	@Override
 	public TypeDetails caseParameterizedType(
 			TypeDefinition typeDescription,
-			SourceModelBuildingContext buildingContext) {
-		final ClassDetails classDetails = buildingContext
+			ModelsContext modelsContext) {
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( typeDescription.asErasure().getName() );
 		return new ParameterizedTypeDetailsImpl(
 				classDetails,
-				resolveTypes( typeDescription.asGenericType().getTypeArguments(), this, buildingContext ),
+				resolveTypes( typeDescription.asGenericType().getTypeArguments(), this, modelsContext ),
 				null
 		);
 	}
 
 	@Override
-	public TypeDetails caseWildcardType(TypeDefinition typeDescription, SourceModelBuildingContext buildingContext) {
+	public TypeDetails caseWildcardType(TypeDefinition typeDescription, ModelsContext modelsContext) {
 		final TypeList.Generic upperBounds = typeDescription.asGenericType().getUpperBounds();
 		final TypeList.Generic lowerBounds = typeDescription.asGenericType().getLowerBounds();
 
@@ -107,7 +107,7 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 			isExtends = false;
 		}
 
-		return new WildcardTypeDetailsImpl( TypeSwitcher.switchType( bound.get( 0 ), this, buildingContext ), isExtends );
+		return new WildcardTypeDetailsImpl( TypeSwitcher.switchType( bound.get( 0 ), this, modelsContext ), isExtends );
 	}
 
 	private boolean isExtends(TypeList.Generic upperBounds, TypeList.Generic lowerBounds) {
@@ -121,7 +121,7 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 	private HashSet<String> typeVariableIdentifiers;
 
 	@Override
-	public TypeDetails caseTypeVariable(TypeDefinition typeDescription, SourceModelBuildingContext buildingContext) {
+	public TypeDetails caseTypeVariable(TypeDefinition typeDescription, ModelsContext modelsContext) {
 		final boolean isTypeVariableRef;
 		if ( typeVariableIdentifiers == null ) {
 			typeVariableIdentifiers = new HashSet<>();
@@ -140,14 +140,14 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 		return new TypeVariableDetailsImpl(
 				typeDescription.getActualName(),
 				declaringType,
-				resolveTypes( typeDescription.asGenericType().getUpperBounds(), this, buildingContext )
+				resolveTypes( typeDescription.asGenericType().getUpperBounds(), this, modelsContext )
 		);
 	}
 
 	@Override
 	public TypeDetails caseTypeVariableReference(
 			TypeDefinition typeDescription,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		// todo : This is not actually correct I think.  From the Byte Buddy javadocs:
 		//		> Represents a type variable that is merely symbolic and is not
 		//		> attached to a net.bytebuddy.description.TypeVariableSource and does
@@ -158,27 +158,27 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 	}
 
 	@Override
-	public TypeDetails caseArrayType(TypeDefinition typeDescription, SourceModelBuildingContext buildingContext) {
-		final TypeDetails constituentType = TypeSwitcher.switchType( typeDescription.getComponentType(), this, buildingContext );
-		return TypeDetailsHelper.arrayOf( constituentType, buildingContext );
+	public TypeDetails caseArrayType(TypeDefinition typeDescription, ModelsContext modelsContext) {
+		final TypeDetails constituentType = TypeSwitcher.switchType( typeDescription.getComponentType(), this, modelsContext );
+		return TypeDetailsHelper.arrayOf( constituentType, modelsContext );
 	}
 
 	@Override
-	public TypeDetails defaultCase(TypeDefinition typeDescription, SourceModelBuildingContext buildingContext) {
+	public TypeDetails defaultCase(TypeDefinition typeDescription, ModelsContext modelsContext) {
 		throw new UnsupportedOperationException( "Unexpected Type kind - " + typeDescription );
 	}
 
 	public static List<TypeDetails> resolveTypes(
 			TypeList.Generic generics,
 			TypeSwitchStandard typeSwitch,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		if ( CollectionHelper.isEmpty( generics ) ) {
 			return Collections.emptyList();
 		}
 
 		final ArrayList<TypeDetails> result = arrayList( generics.size() );
 		for ( TypeDescription.Generic bound : generics ) {
-			final TypeDetails switchedType = TypeSwitcher.switchType( bound, typeSwitch, buildingContext );
+			final TypeDetails switchedType = TypeSwitcher.switchType( bound, typeSwitch, modelsContext );
 			result.add( switchedType );
 		}
 

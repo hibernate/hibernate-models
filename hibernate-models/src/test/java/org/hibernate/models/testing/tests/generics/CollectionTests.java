@@ -17,8 +17,8 @@ import org.hibernate.models.spi.ArrayTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
@@ -35,9 +35,9 @@ public class CollectionTests {
 
 	@Test
 	void testCollections() {
-		final SourceModelBuildingContext buildingContext = createModelContext( ClassOfCollections.class );
+		final ModelsContext modelsContext = createModelContext( ClassOfCollections.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( ClassOfCollections.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( ClassOfCollections.class.getName() );
 
 		{
 			final FieldDetails listOfString = classDetails.findFieldByName( "listOfString" );
@@ -138,9 +138,9 @@ public class CollectionTests {
 
 	@Test
 	void testArrays() {
-		final SourceModelBuildingContext buildingContext = createModelContext( ClassOfArrays.class );
+		final ModelsContext modelsContext = createModelContext( ClassOfArrays.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( ClassOfArrays.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( ClassOfArrays.class.getName() );
 
 		{
 			final FieldDetails intArrayField = classDetails.findFieldByName( "intArray" );
@@ -170,9 +170,9 @@ public class CollectionTests {
 
 	@Test
 	void testWildcard() {
-		final SourceModelBuildingContext buildingContext = createModelContext( Things.class );
+		final ModelsContext modelsContext = createModelContext( Things.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Things.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Things.class.getName() );
 
 		final FieldDetails extendsStuffField = classDetails.findFieldByName( "extendsStuff" );
 		final TypeDetails extendsStuffFieldType = extendsStuffField.getType();
@@ -241,23 +241,23 @@ public class CollectionTests {
 
 	@Test
 	void testListSubclasses() {
-		final SourceModelBuildingContext buildingContext = createModelContext(
+		final ModelsContext modelsContext = createModelContext(
 				SpecialList.class,
 				SpecialArrayList.class,
 				SuperSpecialArrayList.class,
 				SpecialListContainer.class
 		);
 
-		final ClassDetails specialListDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SpecialList.class.getName() );
+		final ClassDetails specialListDetails = modelsContext.getClassDetailsRegistry().getClassDetails( SpecialList.class.getName() );
 		assertThat( specialListDetails.isImplementor( List.class ) ).isTrue();
 
-		final ClassDetails specialArrayListDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SpecialArrayList.class.getName() );
+		final ClassDetails specialArrayListDetails = modelsContext.getClassDetailsRegistry().getClassDetails( SpecialArrayList.class.getName() );
 		assertThat( specialArrayListDetails.isImplementor( List.class ) ).isTrue();
 
-		final ClassDetails superSpecialArrayListDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SuperSpecialArrayList.class.getName() );
+		final ClassDetails superSpecialArrayListDetails = modelsContext.getClassDetailsRegistry().getClassDetails( SuperSpecialArrayList.class.getName() );
 		assertThat( superSpecialArrayListDetails.isImplementor( List.class ) ).isTrue();
 
-		final ClassDetails containerDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SpecialListContainer.class.getName() );
+		final ClassDetails containerDetails = modelsContext.getClassDetailsRegistry().getClassDetails( SpecialListContainer.class.getName() );
 
 		final FieldDetails specialListField = containerDetails.findFieldByName( "specialList" );
 		assertThat( specialListField.getAssociatedType() ).isEqualTo( specialListField.getElementType() );
@@ -274,14 +274,14 @@ public class CollectionTests {
 
 	@Test
 	void testMapSubclasses() {
-		final SourceModelBuildingContext buildingContext = createModelContext(
+		final ModelsContext modelsContext = createModelContext(
 				SpecialMap.class,
 				SpecialHashMap.class,
 				SuperSpecialHashMap.class,
 				SpecialMapContainer.class
 		);
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SpecialMapContainer.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( SpecialMapContainer.class.getName() );
 
 		final FieldDetails standardMapField = classDetails.findFieldByName( "standardMap" );
 		assertThat( standardMapField.getType().isImplementor( Map.class ) ).isTrue();
@@ -362,6 +362,7 @@ public class CollectionTests {
 		Map<String, ? extends Stuff> namedStuff;
 	}
 
+	@SuppressWarnings("unused")
 	static class SpecialListContainer {
 		private SpecialList specialList;
 		private SpecialArrayList specialArrayList;
@@ -495,6 +496,7 @@ public class CollectionTests {
 
 
 
+	@SuppressWarnings("unused")
 	static class SpecialMapContainer<T> {
 		private Map<String,String> standardMap;
 		private Map<String,T> parameterizedMap;

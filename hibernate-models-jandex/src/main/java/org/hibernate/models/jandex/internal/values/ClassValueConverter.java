@@ -5,7 +5,7 @@
 package org.hibernate.models.jandex.internal.values;
 
 import org.hibernate.models.jandex.spi.JandexValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.Type;
@@ -20,7 +20,7 @@ public class ClassValueConverter implements JandexValueConverter<Class<?>> {
 	public static final ClassValueConverter JANDEX_CLASS_VALUE_WRAPPER = new ClassValueConverter();
 
 	@Override
-	public Class<?> convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext) {
+	public Class<?> convert(AnnotationValue jandexValue, ModelsContext modelContext) {
 		final Type classReference = jandexValue.asClass();
 		if ( classReference == VoidType.VOID ) {
 			return void.class;

@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Descriptor for byte values
@@ -25,7 +25,7 @@ public class ByteTypeDescriptor extends AbstractTypeDescriptor<Byte> {
 	}
 
 	@Override
-	public Byte[] makeArray(int size, SourceModelBuildingContext modelContext) {
+	public Byte[] makeArray(int size, ModelsContext modelContext) {
 		return new Byte[size];
 	}
 }

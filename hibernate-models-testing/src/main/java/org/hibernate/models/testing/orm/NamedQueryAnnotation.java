@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.NamedQuery;
@@ -26,18 +26,18 @@ public class NamedQueryAnnotation implements NamedQuery, Named {
 	private LockModeType lockModeType;
 	private QueryHint[] hints;
 
-	public NamedQueryAnnotation(SourceModelBuildingContext modelContext) {
+	public NamedQueryAnnotation(ModelsContext modelContext) {
 		lockModeType = LockModeType.NONE;
 		hints = new QueryHint[0];
 	}
 
-	public NamedQueryAnnotation(NamedQuery usage, SourceModelBuildingContext modelContext) {
+	public NamedQueryAnnotation(NamedQuery usage, ModelsContext modelContext) {
 		name = usage.name();
 		query = usage.query();
 		hints = extractRepeatedValues( usage, NAMED_QUERY.getAttribute( "hints" ), modelContext );
 	}
 
-	public NamedQueryAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public NamedQueryAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		query = attributeValues.get( "query" ).toString();
 		hints = (QueryHint[]) attributeValues.get( "hints" );

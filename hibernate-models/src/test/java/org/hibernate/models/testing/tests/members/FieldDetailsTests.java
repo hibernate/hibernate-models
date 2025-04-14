@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MemberDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,9 +24,9 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class FieldDetailsTests {
 	@Test
 	void testFields() {
-		final SourceModelBuildingContext buildingContext = createModelContext( RandomClass.class );
+		final ModelsContext modelsContext = createModelContext( RandomClass.class );
 
-		final ClassDetails classDetails = buildingContext
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.findClassDetails( RandomClass.class.getName() );
 		assertThat( classDetails ).isNotNull();
@@ -114,6 +114,7 @@ public class FieldDetailsTests {
 		final FieldDetails transientFieldField = classDetails.findFieldByName( "transientField" );
 		assertThat( transientFieldField.isPersistable() ).isFalse();
 
+		//noinspection CodeBlock2Expr
 		classDetails.forEachField( (position, fieldDetails) -> {
 			System.out.printf( "  > Field (%s) : %s\n", position, fieldDetails );
 		} );

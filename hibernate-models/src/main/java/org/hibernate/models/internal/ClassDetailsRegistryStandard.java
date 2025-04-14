@@ -7,7 +7,7 @@ package org.hibernate.models.internal;
 
 import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.spi.ClassDetailsBuilder;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Standard ClassDetailsRegistry implementation.
@@ -18,11 +18,11 @@ public class ClassDetailsRegistryStandard
 		extends AbstractClassDetailsRegistry {
 	private final ClassDetailsBuilder classDetailsBuilder;
 
-	public ClassDetailsRegistryStandard(SourceModelBuildingContext context) {
+	public ClassDetailsRegistryStandard(ModelsContext context) {
 		this( JdkBuilders.DEFAULT_BUILDER , context );
 	}
 
-	public ClassDetailsRegistryStandard(ClassDetailsBuilder classDetailsBuilder, SourceModelBuildingContext context) {
+	public ClassDetailsRegistryStandard(ClassDetailsBuilder classDetailsBuilder, ModelsContext context) {
 		super( context );
 		this.classDetailsBuilder = classDetailsBuilder;
 	}

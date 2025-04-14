@@ -34,7 +34,7 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	 */
 	default <A extends Annotation> A applyAnnotationUsage(
 			AnnotationDescriptor<A> annotationType,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final A existing = getAnnotationUsage( annotationType, modelContext );
 		if ( existing != null ) {
 			return existing;
@@ -48,18 +48,18 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	/**
 	 * Creates and replaces (if any) an existing usage of the given annotation.
 	 * <p/>
-	 * For repeatable annotations, use {@linkplain #replaceAnnotationUsage(AnnotationDescriptor, AnnotationDescriptor, SourceModelBuildingContext)}
+	 * For repeatable annotations, use {@linkplain #replaceAnnotationUsage(AnnotationDescriptor, AnnotationDescriptor, ModelsContext)}
 	 * instead.
 	 *
 	 * @apiNote Generally replacement is used with XML processing and, again generally,
 	 * only for repeatable annotations using
-	 * {@linkplain #replaceAnnotationUsage(AnnotationDescriptor, AnnotationDescriptor, SourceModelBuildingContext)}
+	 * {@linkplain #replaceAnnotationUsage(AnnotationDescriptor, AnnotationDescriptor, ModelsContext)}
 	 *
-	 * @see #replaceAnnotationUsage(AnnotationDescriptor, AnnotationDescriptor, SourceModelBuildingContext)
+	 * @see #replaceAnnotationUsage(AnnotationDescriptor, AnnotationDescriptor, ModelsContext)
 	 */
 	default <A extends Annotation> A replaceAnnotationUsage(
 			AnnotationDescriptor<A> annotationType,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final A usage = annotationType.createUsage( modelContext );
 		// effectively overwrites any previous registration
 		addAnnotationUsage( usage );
@@ -73,12 +73,12 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	 * Applies a usage of the given {@code annotationType} to this target.  Will return
 	 * an existing usage, if one, or create a new usage.
 	 *
-	 * @see #replaceAnnotationUsage(AnnotationDescriptor, SourceModelBuildingContext)
+	 * @see #replaceAnnotationUsage(AnnotationDescriptor, ModelsContext)
 	 */
 	<S extends Annotation, P extends Annotation> P replaceAnnotationUsage(
 			AnnotationDescriptor<S> repeatableType,
 			AnnotationDescriptor<P> containerType,
-			SourceModelBuildingContext modelContext);
+			ModelsContext modelContext);
 
 	@Override
 	MutableClassDetails asClassDetails();

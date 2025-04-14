@@ -5,7 +5,7 @@
 package org.hibernate.models.jandex.internal.values;
 
 import org.hibernate.models.jandex.spi.JandexValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -18,7 +18,7 @@ public class CharacterValueConverter implements JandexValueConverter<Character> 
 	public static final CharacterValueConverter JANDEX_CHARACTER_VALUE_WRAPPER = new CharacterValueConverter();
 
 	@Override
-	public Character convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext) {
+	public Character convert(AnnotationValue jandexValue, ModelsContext modelContext) {
 		assert jandexValue != null;
 		return jandexValue.asChar();
 	}

@@ -42,7 +42,7 @@ public interface MemberDetails extends AnnotationTarget {
 	TypeDetails getType();
 
 	@Override
-	default ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext) {
+	default ClassDetails getContainer(ModelsContext modelsContext) {
 		return getDeclaringType();
 	}
 
@@ -220,7 +220,7 @@ public interface MemberDetails extends AnnotationTarget {
 	 */
 	Member toJavaMember();
 
-	Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext);
+	Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
 
 	/**
 	 * Determine the type of the member relative to the given {@code container} type.

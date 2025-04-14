@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.bytebuddy.internal.values;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -17,8 +17,8 @@ public class BooleanValueExtractor extends AbstractValueExtractor<Boolean> {
 	public static final BooleanValueExtractor BOOLEAN_EXTRACTOR = new BooleanValueExtractor();
 
 	@Override
-	protected Boolean extractAndWrap(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext buildingContext) {
+	protected Boolean extractAndWrap(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelsContext) {
 		assert byteBuddyValue != null;
-		return BooleanValueConverter.BOOLEAN_VALUE_WRAPPER.convert( byteBuddyValue, buildingContext );
+		return BooleanValueConverter.BOOLEAN_VALUE_WRAPPER.convert( byteBuddyValue, modelsContext );
 	}
 }

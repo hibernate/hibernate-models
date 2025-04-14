@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,13 +24,13 @@ public class ClassRegistryTests {
 
 	@Test
 	void testResolveClassDetails() {
-		final SourceModelBuildingContext buildingContext = buildModelContext(
+		final ModelsContext modelsContext = buildModelContext(
 				RootClass.class,
 				TrunkClass.class,
 				BranchClass.class,
 				LeafClass.class
 		);
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails rootClassDetails = classDetailsRegistry.resolveClassDetails( RootClass.class.getName() );
 		assertThat( rootClassDetails ).isNotNull();
@@ -41,13 +41,13 @@ public class ClassRegistryTests {
 
 	@Test
 	void testResolveClassDetailsVoid() {
-		final SourceModelBuildingContext buildingContext = buildModelContext(
+		final ModelsContext modelsContext = buildModelContext(
 				RootClass.class,
 				TrunkClass.class,
 				BranchClass.class,
 				LeafClass.class
 		);
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails voidClassDetails = classDetailsRegistry.resolveClassDetails( void.class.getName() );
 		assertThat( voidClassDetails ).isNotNull();
@@ -58,13 +58,13 @@ public class ClassRegistryTests {
 
 	@Test
 	void testResolveClassDetailsNull() {
-		final SourceModelBuildingContext buildingContext = buildModelContext(
+		final ModelsContext modelsContext = buildModelContext(
 				RootClass.class,
 				TrunkClass.class,
 				BranchClass.class,
 				LeafClass.class
 		);
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		try {
 			classDetailsRegistry.resolveClassDetails( null );
@@ -76,18 +76,16 @@ public class ClassRegistryTests {
 
 	@Test
 	void testForEachClassDetails() {
-		final SourceModelBuildingContext buildingContext = buildModelContext(
+		final ModelsContext modelsContext = buildModelContext(
 				RootClass.class,
 				TrunkClass.class,
 				BranchClass.class,
 				LeafClass.class
 		);
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final Set<String> names = new HashSet<>();
-		classDetailsRegistry.forEachClassDetails( (classDetails) -> {
-			names.add( classDetails.getName() );
-		} );
+		classDetailsRegistry.forEachClassDetails( (classDetails) -> names.add( classDetails.getName() ) );
 		assertThat( names ).contains( RootClass.class.getName() );
 	}
 }

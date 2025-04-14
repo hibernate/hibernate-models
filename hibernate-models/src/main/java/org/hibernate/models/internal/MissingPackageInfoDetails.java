@@ -17,8 +17,7 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -56,26 +55,26 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	}
 
 	@Override
-	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
+	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type, ModelsContext modelContext) {
 		return false;
 	}
 
 	@Override
 	public <A extends Annotation> A getAnnotationUsage(
 			AnnotationDescriptor<A> descriptor,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return null;
 	}
 
 	@Override
-	public <A extends Annotation> A locateAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
+	public <A extends Annotation> A locateAnnotationUsage(Class<A> type, ModelsContext modelContext) {
 		return null;
 	}
 
 	@Override
 	public <A extends Annotation> A[] getRepeatedAnnotationUsages(
 			AnnotationDescriptor<A> type,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return null;
 	}
 
@@ -83,7 +82,7 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	public <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
 			Class<A> repeatable,
 			Class<C> container,
-			SourceModelBuildingContext modelContext,
+			ModelsContext modelContext,
 			Consumer<A> consumer) {
 
 	}
@@ -91,7 +90,7 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	@Override
 	public <A extends Annotation> List<? extends Annotation> getMetaAnnotated(
 			Class<A> metaAnnotationType,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return List.of();
 	}
 
@@ -100,7 +99,7 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 			AnnotationDescriptor<X> type,
 			String matchName,
 			String attributeToMatch,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return null;
 	}
 
@@ -109,7 +108,7 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 			Class<X> type,
 			String matchName,
 			String attributeToMatch,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return null;
 	}
 
@@ -201,7 +200,7 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	}
 
 	@Override
-	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext) {
 		return toJavaClass();
 	}
 
@@ -230,7 +229,7 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 		}
 
 		@Override
-		public ClassDetails fromStorableForm(SourceModelBuildingContext context) {
+		public ClassDetails fromStorableForm(ModelsContext context) {
 			return new MissingPackageInfoDetails( packageName, packageInfoClassName );
 		}
 	}

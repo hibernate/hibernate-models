@@ -5,13 +5,15 @@
 package org.hibernate.models.jandex.internal;
 
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
+ * AnnotationDescriptorRegistry implementation based on Jandex.
+ *
  * @author Steve Ebersole
  */
 public class JandexAnnotationDescriptorRegistry extends AnnotationDescriptorRegistryStandard {
-	public JandexAnnotationDescriptorRegistry(SourceModelBuildingContext modelBuildingContext) {
-		super( modelBuildingContext );
+	public JandexAnnotationDescriptorRegistry(ModelsContext modelsContext) {
+		super( modelsContext );
 	}
 }

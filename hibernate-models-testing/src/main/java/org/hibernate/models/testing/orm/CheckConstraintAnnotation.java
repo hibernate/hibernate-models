@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.CheckConstraint;
 
@@ -20,18 +20,18 @@ public class CheckConstraintAnnotation implements CheckConstraint {
 	private String constraint;
 	private String options;
 
-	public CheckConstraintAnnotation(SourceModelBuildingContext modelContext) {
+	public CheckConstraintAnnotation(ModelsContext modelContext) {
 		name = "";
 		options = "";
 	}
 
-	public CheckConstraintAnnotation(CheckConstraint usage, SourceModelBuildingContext modelContext) {
+	public CheckConstraintAnnotation(CheckConstraint usage, ModelsContext modelContext) {
 		this.name = usage.name();
 		this.constraint = usage.constraint();
 		this.options = usage.options();
 	}
 
-	public CheckConstraintAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public CheckConstraintAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		this.name = (String) attributeValues.get( "name" );
 		this.constraint = (String) attributeValues.get( "constraint" );
 		this.options = (String) attributeValues.get( "options" );

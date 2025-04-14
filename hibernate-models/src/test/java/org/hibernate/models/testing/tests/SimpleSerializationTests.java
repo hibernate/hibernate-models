@@ -11,8 +11,7 @@ import java.lang.annotation.Target;
 
 import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.util.SerializationHelper;
 
 import org.junit.jupiter.api.Test;
@@ -25,17 +24,17 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class SimpleSerializationTests {
 	@Test
 	void serializeSimpleClass() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleClass.class );
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().findClassDetails( SimpleClass.class.getName() );
+		final ModelsContext modelsContext = createModelContext( SimpleClass.class );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().findClassDetails( SimpleClass.class.getName() );
 		Assertions.assertThat( classDetails ).isNotNull();
 
-		final StorableContext serialContext = buildingContext.toStorableForm();
+		final StorableContext serialContext = modelsContext.toStorableForm();
 		final StorableContext clonedSerialContext = SerializationHelper.clone( serialContext );
 		Assertions.assertThat( serialContext ).isNotSameAs( clonedSerialContext );
 
-		final SourceModelContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
-		Assertions.assertThat( buildingContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
-		Assertions.assertThat( buildingContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
+		final ModelsContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
+		Assertions.assertThat( modelsContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
+		Assertions.assertThat( modelsContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
 
 		final ClassDetails restoredClassDetails = restored.getClassDetailsRegistry().findClassDetails( SimpleClass.class.getName() );
 		Assertions.assertThat( restoredClassDetails ).isNotNull();
@@ -44,21 +43,21 @@ public class SimpleSerializationTests {
 
 	@Test
 	void serializeSimpleClassWithMembers() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleClassWithMembers.class );
+		final ModelsContext modelsContext = createModelContext( SimpleClassWithMembers.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().findClassDetails( SimpleClassWithMembers.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().findClassDetails( SimpleClassWithMembers.class.getName() );
 		Assertions.assertThat( classDetails ).isNotNull();
 		Assertions.assertThat( classDetails.getFields() ).hasSize( 1 );
 		Assertions.assertThat( classDetails.getMethods() ).hasSize( 3 );
 
-		final StorableContext serialContext = buildingContext.toStorableForm();
+		final StorableContext serialContext = modelsContext.toStorableForm();
 		final StorableContext clonedSerialContext = SerializationHelper.clone( serialContext );
 		Assertions.assertThat( serialContext ).isNotSameAs( clonedSerialContext );
 
-		final SourceModelContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
-		Assertions.assertThat( buildingContext ).isNotSameAs( restored );
-		Assertions.assertThat( buildingContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
-		Assertions.assertThat( buildingContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
+		final ModelsContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
+		Assertions.assertThat( modelsContext ).isNotSameAs( restored );
+		Assertions.assertThat( modelsContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
+		Assertions.assertThat( modelsContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
 
 		final ClassDetails cloneCassDetails = restored.getClassDetailsRegistry().findClassDetails( SimpleClassWithMembers.class.getName() );
 		Assertions.assertThat( cloneCassDetails ).isNotNull();
@@ -70,9 +69,9 @@ public class SimpleSerializationTests {
 
 	@Test
 	void serializeSimpleClassWithAnnotations() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleClassWithAnnotations.class );
+		final ModelsContext modelsContext = createModelContext( SimpleClassWithAnnotations.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().findClassDetails( SimpleClassWithAnnotations.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().findClassDetails( SimpleClassWithAnnotations.class.getName() );
 		Assertions.assertThat( classDetails ).isNotNull();
 		Assertions.assertThat( classDetails.getDirectAnnotationUsages() ).hasSize( 1 );
 		Assertions.assertThat( classDetails.getFields() ).hasSize( 1 );
@@ -80,14 +79,14 @@ public class SimpleSerializationTests {
 		Assertions.assertThat( classDetails.getMethods() ).hasSize( 1 );
 		Assertions.assertThat( classDetails.getMethods().iterator().next().getDirectAnnotationUsages() ).hasSize( 1 );
 
-		final StorableContext serialContext = buildingContext.toStorableForm();
+		final StorableContext serialContext = modelsContext.toStorableForm();
 		final StorableContext clonedSerialContext = SerializationHelper.clone( serialContext );
 		Assertions.assertThat( serialContext ).isNotSameAs( clonedSerialContext );
 
-		final SourceModelContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
-		Assertions.assertThat( buildingContext ).isNotSameAs( restored );
-		Assertions.assertThat( buildingContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
-		Assertions.assertThat( buildingContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
+		final ModelsContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
+		Assertions.assertThat( modelsContext ).isNotSameAs( restored );
+		Assertions.assertThat( modelsContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
+		Assertions.assertThat( modelsContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
 
 		final ClassDetails cloneCassDetails = restored.getClassDetailsRegistry().findClassDetails( SimpleClassWithAnnotations.class.getName() );
 		Assertions.assertThat( classDetails ).isNotSameAs( cloneCassDetails );
@@ -101,6 +100,7 @@ public class SimpleSerializationTests {
 	public static class SimpleClass {
 	}
 
+	@SuppressWarnings("unused")
 	public static class SimpleClassWithMembers {
 		public int anInt;
 

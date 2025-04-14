@@ -8,7 +8,7 @@ import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -24,9 +24,9 @@ public class SimpleTypeVariableTests {
 
 	@Test
 	void testParameterizedClass() {
-		final SourceModelBuildingContext buildingContext = createModelContext( Simple.class );
+		final ModelsContext modelsContext = createModelContext( Simple.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Simple.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Simple.class.getName() );
 		assertThat( classDetails.getTypeParameters() ).hasSize( 1 );
 		assertThat( classDetails.getTypeParameters().get( 0 ) ).isInstanceOf( TypeVariableDetails.class );
 		final TypeVariableDetails typeParameter = classDetails.getTypeParameters().get( 0 );

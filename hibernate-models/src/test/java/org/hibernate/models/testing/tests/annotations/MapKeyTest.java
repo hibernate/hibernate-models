@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import org.junit.jupiter.api.Test;
@@ -29,12 +29,12 @@ public class MapKeyTest {
 
 	@Test
 	void testFieldsAreResolved() {
-		final SourceModelBuildingContext buildingContext = createModelContext(
+		final ModelsContext modelsContext = createModelContext(
 				School.class,
 				Person.class
 		);
 
-		final ClassDetails schoolClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( School.class.getName() );
+		final ClassDetails schoolClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( School.class.getName() );
 
 		final FieldDetails idField = schoolClassDetails.findFieldByName( "id" );
 		final TypeDetails idFieldType = idField.getType();
@@ -49,6 +49,7 @@ public class MapKeyTest {
 		assertThat( typeDetails2.isResolved() ).isFalse();
 	}
 
+	@SuppressWarnings({ "unused", "deprecation" })
 	@Entity
 	public static class School<T> {
 		@Id

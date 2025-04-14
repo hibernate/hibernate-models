@@ -5,7 +5,7 @@
 package org.hibernate.models.testing.tests.annotations;
 
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.annotations.EverythingBagel;
 import org.hibernate.models.testing.annotations.Nested;
 import org.hibernate.models.testing.annotations.Status;
@@ -21,9 +21,9 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class AttributeAccessTests {
 	@Test
 	void testAttributeAccess() {
-		final SourceModelBuildingContext buildingContext = createModelContext( TheClass.class );
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( TheClass.class.getName() );
-		final EverythingBagel annotationUsage = classDetails.getAnnotationUsage( EverythingBagel.class, buildingContext );
+		final ModelsContext modelsContext = createModelContext( TheClass.class );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( TheClass.class.getName() );
+		final EverythingBagel annotationUsage = classDetails.getAnnotationUsage( EverythingBagel.class, modelsContext );
 
 		assertThat( annotationUsage.theString() ).isEqualTo( "hello" );
 		assertThat( annotationUsage.theEnum() ).isEqualTo( Status.ACTIVE );

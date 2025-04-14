@@ -16,6 +16,8 @@ import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
@@ -44,6 +46,7 @@ import jakarta.persistence.UniqueConstraint;
 @SuppressWarnings("unused")
 public interface JpaAnnotations {
 	AnnotationDescriptor<Entity> ENTITY = new OrmAnnotationDescriptor<>( Entity.class, EntityAnnotation.class );
+	AnnotationDescriptor<Embeddable> EMBEDDABLE = new OrmAnnotationDescriptor<>( Embeddable.class, EmbeddableAnnotation.class );
 
 	AnnotationDescriptor<Id> ID = new OrmAnnotationDescriptor<>( Id.class, IdAnnotation.class );
 
@@ -51,6 +54,7 @@ public interface JpaAnnotations {
 	AnnotationDescriptor<SequenceGenerator> SEQUENCE_GENERATOR = new OrmAnnotationDescriptor<>( SequenceGenerator.class, SequenceGeneratorAnnotation.class, SEQUENCE_GENERATORS );
 
 	AnnotationDescriptor<Basic> BASIC = new OrmAnnotationDescriptor<>( Basic.class, BasicAnnotation.class );
+	AnnotationDescriptor<Embedded> EMBEDDED = new OrmAnnotationDescriptor<>( Embedded.class, EmbeddedAnnotation.class );
 	AnnotationDescriptor<ElementCollection> ELEMENT_COLLECTION = new OrmAnnotationDescriptor<>( ElementCollection.class, ElementCollectionJpaAnnotation.class );
 
 	AnnotationDescriptor<NamedQueries> NAMED_QUERIES = new OrmAnnotationDescriptor<>( NamedQueries.class, NamedQueriesAnnotation.class );

@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Descriptor for double values
@@ -25,7 +25,7 @@ public class DoubleTypeDescriptor extends AbstractTypeDescriptor<Double> {
 	}
 
 	@Override
-	public Double[] makeArray(int size, SourceModelBuildingContext modelContext) {
+	public Double[] makeArray(int size, ModelsContext modelContext) {
 		return new Double[size];
 	}
 }

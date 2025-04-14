@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.FetchType;
@@ -21,17 +21,17 @@ public class BasicAnnotation implements Basic {
 	private FetchType fetch;
 	private boolean optional;
 
-	public BasicAnnotation(SourceModelBuildingContext modelContext) {
+	public BasicAnnotation(ModelsContext modelContext) {
 		fetch = FetchType.EAGER;
 		optional = true;
 	}
 
-	public BasicAnnotation(Basic usage, SourceModelBuildingContext modelContext) {
+	public BasicAnnotation(Basic usage, ModelsContext modelContext) {
 		fetch = usage.fetch();
 		optional = usage.optional();
 	}
 
-	public BasicAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public BasicAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		fetch = (FetchType) attributeValues.get( "fetch" );
 		optional = (boolean) attributeValues.get( "optional" );
 	}

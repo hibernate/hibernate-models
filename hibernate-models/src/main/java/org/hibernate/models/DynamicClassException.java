@@ -6,7 +6,7 @@ package org.hibernate.models;
 
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Generally indicates an attempt to resolve a {@linkplain ClassDetails}
@@ -14,16 +14,12 @@ import org.hibernate.models.spi.SourceModelContext;
  * specify a {@linkplain ClassDetails#getClassName() class name}.
  *
  * @see ClassDetails#toJavaClass()
- * @see ClassDetails#toJavaClass(ClassLoading, SourceModelContext)
+ * @see ClassDetails#toJavaClass(ClassLoading, ModelsContext)
  *
  * @author Steve Ebersole
  */
 public class DynamicClassException extends ModelsException {
 	public DynamicClassException(String message) {
 		super( message );
-	}
-
-	public DynamicClassException(String message, Throwable cause) {
-		super( message, cause );
 	}
 }

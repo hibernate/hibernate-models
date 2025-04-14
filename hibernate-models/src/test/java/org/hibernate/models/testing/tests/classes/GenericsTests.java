@@ -7,7 +7,7 @@ package org.hibernate.models.testing.tests.classes;
 import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import org.junit.jupiter.api.Test;
@@ -25,13 +25,13 @@ import static org.hibernate.models.testing.TestHelper.buildModelContext;
 public class GenericsTests {
 	@Test
 	void testWrappedId() {
-		final SourceModelBuildingContext buildingContext = buildModelContext(
+		final ModelsContext modelsContext = buildModelContext(
 				Base.class,
 				Thing1.class,
 				Thing2.class
 		);
 
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails baseClassDetails = classDetailsRegistry.getClassDetails( Base.class.getName() );
 
@@ -59,13 +59,13 @@ public class GenericsTests {
 
 	@Test
 	void testId() {
-		final SourceModelBuildingContext buildingContext = buildModelContext(
+		final ModelsContext modelsContext = buildModelContext(
 				Base2.class,
 				Thing3.class,
 				Thing4.class
 		);
 
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails baseClassDetails = classDetailsRegistry.getClassDetails( Base2.class.getName() );
 		assertThat( baseClassDetails.getFields() ).hasSize( 2 );
@@ -84,12 +84,12 @@ public class GenericsTests {
 
 	@Test
 	void testArrays() {
-		final SourceModelBuildingContext buildingContext = buildModelContext(
+		final ModelsContext modelsContext = buildModelContext(
 				Base3.class,
 				Thing5.class
 		);
 
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 		final ClassDetails baseClassDetails = classDetailsRegistry.getClassDetails( Base3.class.getName() );
 		assertThat( baseClassDetails.getFields() ).hasSize( 2 );
 
@@ -110,10 +110,12 @@ public class GenericsTests {
 		assertThat( genericArrayType.determineRawClass().isResolved() ).isTrue();
 	}
 
-		public static class IdWrapper<T> {
+	@SuppressWarnings("unused")
+	public static class IdWrapper<T> {
 		T value;
 	}
 
+	@SuppressWarnings("unused")
 	@MappedSuperclass
 	public static class Base<I> {
 		@Id
@@ -129,6 +131,7 @@ public class GenericsTests {
 	public static class Thing2 extends Base<String> {
 	}
 
+	@SuppressWarnings("unused")
 	@MappedSuperclass
 	public static class Base2<I> {
 		@Id
@@ -144,6 +147,7 @@ public class GenericsTests {
 	public static class Thing4 extends Base2<String> {
 	}
 
+	@SuppressWarnings("unused")
 	public static class Base3<I> {
 		private String[] strings;
 		private I[] generics;

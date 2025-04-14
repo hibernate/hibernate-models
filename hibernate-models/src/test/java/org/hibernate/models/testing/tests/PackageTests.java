@@ -5,7 +5,7 @@
 package org.hibernate.models.testing.tests;
 
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.annotations.pkg.PackageAnnotation;
 
 import org.junit.jupiter.api.Test;
@@ -21,24 +21,24 @@ public class PackageTests {
 
 	@Test
 	void testExactReference() {
-		final SourceModelBuildingContext buildingContext = createModelContext();
+		final ModelsContext modelsContext = createModelContext();
 		final String packageInfoName = PACKAGE_NAME + ".package-info";
-		final ClassDetails classDetails = buildingContext
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( packageInfoName );
 		assertThat( classDetails ).isNotNull();
 		assertThat( classDetails.getClassName() ).endsWith( "package-info" );
-		assertThat( classDetails.getAnnotationUsage( PackageAnnotation.class, buildingContext ) ).isNotNull();
+		assertThat( classDetails.getAnnotationUsage( PackageAnnotation.class, modelsContext ) ).isNotNull();
 	}
 
 	@Test
 	void testPackageReference() {
-		final SourceModelBuildingContext buildingContext = createModelContext();
-		final ClassDetails classDetails = buildingContext
+		final ModelsContext modelsContext = createModelContext();
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( PACKAGE_NAME );
 		assertThat( classDetails ).isNotNull();
 		assertThat( classDetails.getClassName() ).endsWith( "package-info" );
-		assertThat( classDetails.getAnnotationUsage( PackageAnnotation.class, buildingContext ) ).isNotNull();
+		assertThat( classDetails.getAnnotationUsage( PackageAnnotation.class, modelsContext ) ).isNotNull();
 	}
 }

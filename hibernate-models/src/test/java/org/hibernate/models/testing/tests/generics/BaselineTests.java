@@ -7,7 +7,7 @@ package org.hibernate.models.testing.tests.generics;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import org.junit.jupiter.api.Test;
@@ -26,9 +26,9 @@ public class BaselineTests {
 
 	@Test
 	void testSimpleClass() {
-		final SourceModelBuildingContext buildingContext = createModelContext( Simple.class );
+		final ModelsContext modelsContext = createModelContext( Simple.class );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Simple.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Simple.class.getName() );
 		final FieldDetails idField = classDetails.findFieldByName( "id" );
 		final TypeDetails idFieldType = idField.getType();
 		assertThat( idFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.CLASS );

@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.bytebuddy.internal.values;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -17,8 +17,8 @@ public class ClassValueExtractor extends AbstractValueExtractor<Class<?>> {
 	public static final ClassValueExtractor CLASS_EXTRACTOR = new ClassValueExtractor();
 
 	@Override
-	protected Class<?> extractAndWrap(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext buildingContext) {
+	protected Class<?> extractAndWrap(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelsContext) {
 		assert byteBuddyValue != null;
-		return ClassValueConverter.CLASS_VALUE_WRAPPER.convert( byteBuddyValue, buildingContext );
+		return ClassValueConverter.CLASS_VALUE_WRAPPER.convert( byteBuddyValue, modelsContext );
 	}
 }

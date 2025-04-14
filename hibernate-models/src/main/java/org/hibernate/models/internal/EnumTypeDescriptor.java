@@ -6,7 +6,7 @@ package org.hibernate.models.internal;
 
 import java.lang.reflect.Array;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Descriptor for enum values
@@ -31,7 +31,7 @@ public class EnumTypeDescriptor<E extends Enum<E>> extends AbstractTypeDescripto
 	}
 
 	@Override
-	public E[] makeArray(int size, SourceModelBuildingContext modelContext) {
+	public E[] makeArray(int size, ModelsContext modelContext) {
 		//noinspection unchecked
 		return (E[]) Array.newInstance( enumType, size );
 	}

@@ -5,7 +5,7 @@
 package org.hibernate.models.bytebuddy.internal.values;
 
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 import net.bytebuddy.description.enumeration.EnumerationDescription;
@@ -23,7 +23,7 @@ public class EnumValueConverter<E extends Enum<E>> implements ValueConverter<E> 
 	}
 
 	@Override
-	public E convert(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext modelContext) {
+	public E convert(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelContext) {
 		assert byteBuddyValue != null;
 		final EnumerationDescription resolved = byteBuddyValue.resolve( EnumerationDescription.class );
 		return resolved.load( enumClass );

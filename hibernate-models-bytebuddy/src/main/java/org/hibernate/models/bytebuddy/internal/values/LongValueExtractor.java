@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.bytebuddy.internal.values;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -17,8 +17,8 @@ public class LongValueExtractor extends AbstractValueExtractor<Long> {
 	public static final LongValueExtractor LONG_EXTRACTOR = new LongValueExtractor();
 
 	@Override
-	protected Long extractAndWrap(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext buildingContext) {
+	protected Long extractAndWrap(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelsContext) {
 		assert byteBuddyValue != null;
-		return LongValueConverter.LONG_VALUE_WRAPPER.convert( byteBuddyValue, buildingContext );
+		return LongValueConverter.LONG_VALUE_WRAPPER.convert( byteBuddyValue, modelsContext );
 	}
 }

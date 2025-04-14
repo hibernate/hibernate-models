@@ -9,10 +9,10 @@ import java.io.IOException;
 import org.hibernate.models.internal.BaseLineJavaTypes;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.jandex.internal.JandexIndexerHelper;
-import org.hibernate.models.jandex.internal.JandexModelContextImpl;
+import org.hibernate.models.jandex.internal.JandexModelsContextImpl;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
-import org.hibernate.models.testing.intg.ModelContextFactory;
+import org.hibernate.models.testing.intg.ModelsContextFactory;
 import org.hibernate.models.testing.orm.JpaAnnotations;
 
 import org.jboss.jandex.Index;
@@ -23,15 +23,13 @@ import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOAD
 /**
  * @author Steve Ebersole
  */
-public class JandexModelContextFactoryImpl implements ModelContextFactory {
-	public static final JandexModelContextFactoryImpl CONTEXT_FACTORY = new JandexModelContextFactoryImpl();
-
+public class JandexModelsContextFactoryImpl implements ModelsContextFactory {
 	@Override
-	public JandexModelContextImpl createModelContext(
+	public JandexModelsContextImpl createModelContext(
 			RegistryPrimer registryPrimer,
 			Class<?>... modelClasses) {
 		final Index jandexIndex = buildJandexIndex( SIMPLE_CLASS_LOADING, modelClasses );
-		return new JandexModelContextImpl( jandexIndex, SIMPLE_CLASS_LOADING, registryPrimer );
+		return new JandexModelsContextImpl( jandexIndex, SIMPLE_CLASS_LOADING, registryPrimer );
 	}
 
 	public static Index buildJandexIndex(ClassLoading classLoadingAccess, Class<?>... modelClasses) {

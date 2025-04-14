@@ -19,5 +19,5 @@ public interface ClassDetailsBuilder {
 	 *
 	 * @throws UnknownClassException To indicate that the given class name is not valid
 	 */
-	ClassDetails buildClassDetails(String name, SourceModelBuildingContext buildingContext);
+	ClassDetails buildClassDetails(String name, ModelsContext modelsContext);
 }

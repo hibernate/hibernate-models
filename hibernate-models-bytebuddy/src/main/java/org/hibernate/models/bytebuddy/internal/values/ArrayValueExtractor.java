@@ -5,7 +5,7 @@
 package org.hibernate.models.bytebuddy.internal.values;
 
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -22,7 +22,7 @@ public class ArrayValueExtractor<V> extends AbstractValueExtractor<V[]> {
 	}
 
 	@Override
-	protected V[] extractAndWrap(AnnotationValue<?, ?> byteBuddyValue, SourceModelBuildingContext buildingContext) {
-		return wrapper.convert( byteBuddyValue, buildingContext );
+	protected V[] extractAndWrap(AnnotationValue<?, ?> byteBuddyValue, ModelsContext modelsContext) {
+		return wrapper.convert( byteBuddyValue, modelsContext );
 	}
 }

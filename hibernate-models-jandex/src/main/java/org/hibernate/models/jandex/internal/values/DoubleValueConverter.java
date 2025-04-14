@@ -5,7 +5,7 @@
 package org.hibernate.models.jandex.internal.values;
 
 import org.hibernate.models.jandex.spi.JandexValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -18,7 +18,7 @@ public class DoubleValueConverter implements JandexValueConverter<Double> {
 	public static final DoubleValueConverter JANDEX_DOUBLE_VALUE_WRAPPER = new DoubleValueConverter();
 
 	@Override
-	public Double convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext) {
+	public Double convert(AnnotationValue jandexValue, ModelsContext modelContext) {
 		assert jandexValue != null;
 		return jandexValue.asDouble();
 	}

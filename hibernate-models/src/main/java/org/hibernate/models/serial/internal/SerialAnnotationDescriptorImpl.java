@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.models.internal.StandardAnnotationDescriptor;
 import org.hibernate.models.serial.spi.SerialAnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
@@ -22,7 +22,7 @@ public class SerialAnnotationDescriptorImpl<A extends Annotation> implements Ser
 	}
 
 	@Override
-	public AnnotationDescriptor<A> fromStorableForm(SourceModelBuildingContext context) {
+	public AnnotationDescriptor<A> fromStorableForm(ModelsContext context) {
 		return new StandardAnnotationDescriptor<>( annotationType, context );
 	}
 }

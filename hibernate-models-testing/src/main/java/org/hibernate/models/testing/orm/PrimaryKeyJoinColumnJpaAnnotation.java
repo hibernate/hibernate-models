@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.PrimaryKeyJoinColumn;
 
@@ -22,7 +22,7 @@ public class PrimaryKeyJoinColumnJpaAnnotation implements PrimaryKeyJoinColumn, 
 	/**
 	 * Used in creating dynamic annotation instances (e.g. from XML)
 	 */
-	public PrimaryKeyJoinColumnJpaAnnotation(SourceModelBuildingContext modelContext) {
+	public PrimaryKeyJoinColumnJpaAnnotation(ModelsContext modelContext) {
 		this.name = "";
 		this.referencedColumnName = "";
 		this.columnDefinition = "";
@@ -33,7 +33,7 @@ public class PrimaryKeyJoinColumnJpaAnnotation implements PrimaryKeyJoinColumn, 
 	/**
 	 * Used in creating annotation instances from JDK variant
 	 */
-	public PrimaryKeyJoinColumnJpaAnnotation(PrimaryKeyJoinColumn annotation, SourceModelBuildingContext modelContext) {
+	public PrimaryKeyJoinColumnJpaAnnotation(PrimaryKeyJoinColumn annotation, ModelsContext modelContext) {
 		this.name = annotation.name();
 		this.referencedColumnName = annotation.referencedColumnName();
 		this.columnDefinition = annotation.columnDefinition();
@@ -46,7 +46,7 @@ public class PrimaryKeyJoinColumnJpaAnnotation implements PrimaryKeyJoinColumn, 
 	 */
 	public PrimaryKeyJoinColumnJpaAnnotation(
 			Map<String, Object> attributeValues,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		this.name = (String) attributeValues.get( "name" );
 		this.referencedColumnName = (String) attributeValues.get( "referencedColumnName" );
 		this.columnDefinition = (String) attributeValues.get( "columnDefinition" );

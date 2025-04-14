@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationUsageHelper;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.SequenceGenerators;
@@ -22,16 +22,16 @@ import static org.hibernate.models.testing.orm.JpaAnnotations.SEQUENCE_GENERATOR
 public class SequenceGeneratorsAnnotation implements SequenceGenerators, RepeatableContainer<SequenceGenerator> {
 	private SequenceGenerator[] value;
 
-	public SequenceGeneratorsAnnotation(SourceModelBuildingContext modelContext) {
+	public SequenceGeneratorsAnnotation(ModelsContext modelContext) {
 		value = new SequenceGenerator[0];
 	}
 
-	public SequenceGeneratorsAnnotation(SequenceGenerators usage, SourceModelBuildingContext modelContext) {
+	public SequenceGeneratorsAnnotation(SequenceGenerators usage, ModelsContext modelContext) {
 		value = AnnotationUsageHelper.extractRepeatedValues( usage, SEQUENCE_GENERATORS, modelContext );
 	}
 
 
-	public SequenceGeneratorsAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public SequenceGeneratorsAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		value = (SequenceGenerator[]) attributeValues.get( "value" );
 	}
 

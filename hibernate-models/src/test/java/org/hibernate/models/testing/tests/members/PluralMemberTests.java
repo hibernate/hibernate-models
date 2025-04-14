@@ -13,7 +13,7 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +31,9 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class PluralMemberTests {
 	@Test
 	void testPluralMembers() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
 
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
 		{

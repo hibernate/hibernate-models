@@ -5,7 +5,7 @@
 package org.hibernate.models.bytebuddy.internal.values;
 
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -18,7 +18,7 @@ public class ShortValueConverter implements ValueConverter<Short> {
 	public static final ShortValueConverter SHORT_VALUE_WRAPPER = new ShortValueConverter();
 
 	@Override
-	public Short convert(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext modelContext) {
+	public Short convert(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelContext) {
 		assert byteBuddyValue != null;
 		return byteBuddyValue.resolve( Short.class );
 	}

@@ -23,8 +23,7 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableScope;
@@ -53,14 +52,14 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 			MethodKind methodKind,
 			TypeDetails type,
 			ClassDetails declaringType,
-			SourceModelBuildingContext buildingContext) {
-		super( method::getAnnotations, buildingContext );
+			ModelsContext modelsContext) {
+		super( method::getAnnotations, modelsContext );
 		this.method = method;
 		this.methodKind = methodKind;
 		this.type = type;
 		this.declaringType = declaringType;
 
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		this.returnType = classDetailsRegistry.resolveClassDetails( method.getReturnType().getName() );
 
@@ -132,7 +131,7 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 	}
 
 	@Override
-	public Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+	public Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
 		if ( declaringClass == method.getDeclaringClass() ) {
 			return method;
 		}

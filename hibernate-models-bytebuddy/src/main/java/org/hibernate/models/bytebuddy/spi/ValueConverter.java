@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.bytebuddy.spi;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -17,5 +17,5 @@ import net.bytebuddy.description.annotation.AnnotationValue;
  * @author Steve Ebersole
  */
 public interface ValueConverter<V> {
-	V convert(AnnotationValue<?,?> attributeValue, SourceModelBuildingContext modelContext);
+	V convert(AnnotationValue<?,?> attributeValue, ModelsContext modelContext);
 }

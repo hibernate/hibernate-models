@@ -5,7 +5,7 @@
 package org.hibernate.models.jandex.internal.values;
 
 import org.hibernate.models.jandex.spi.JandexValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -18,7 +18,7 @@ public class LongValueConverter implements JandexValueConverter<Long> {
 	public static final LongValueConverter JANDEX_LONG_VALUE_WRAPPER = new LongValueConverter();
 
 	@Override
-	public Long convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext) {
+	public Long convert(AnnotationValue jandexValue, ModelsContext modelContext) {
 		assert jandexValue != null;
 		return jandexValue.asLong();
 	}

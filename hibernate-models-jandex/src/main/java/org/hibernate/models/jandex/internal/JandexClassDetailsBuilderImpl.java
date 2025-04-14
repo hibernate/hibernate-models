@@ -6,7 +6,7 @@ package org.hibernate.models.jandex.internal;
 
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.IndexView;
 
@@ -16,12 +16,13 @@ import org.jboss.jandex.IndexView;
 public class JandexClassDetailsBuilderImpl implements ClassDetailsBuilder {
 	private final IndexView jandexIndex;
 
-	public JandexClassDetailsBuilderImpl(IndexView jandexIndex, SourceModelBuildingContext buildingContext) {
+	@SuppressWarnings("unused")
+	public JandexClassDetailsBuilderImpl(IndexView jandexIndex, ModelsContext modelsContext) {
 		this.jandexIndex = jandexIndex;
 	}
 
 	@Override
-	public ClassDetails buildClassDetails(String name, SourceModelBuildingContext buildingContext) {
-		return JandexBuilders.buildDetailsFromIndex( name, jandexIndex, buildingContext );
+	public ClassDetails buildClassDetails(String name, ModelsContext modelsContext) {
+		return JandexBuilders.buildDetailsFromIndex( name, jandexIndex, modelsContext );
 	}
 }

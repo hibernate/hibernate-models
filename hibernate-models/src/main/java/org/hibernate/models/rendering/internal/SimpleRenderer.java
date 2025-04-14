@@ -10,7 +10,7 @@ import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.rendering.spi.RenderingTarget;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * A Renderer with a simplified output format.
@@ -30,7 +30,7 @@ public class SimpleRenderer extends AbstractRenderer {
 	}
 
 	@Override
-	public void renderClassDetails(ClassDetails classDetails, SourceModelContext context) {
+	public void renderClassDetails(ClassDetails classDetails, ModelsContext context) {
 		final String typeDeclarationPattern;
 		if ( classDetails.isInterface() ) {
 			typeDeclarationPattern = "interface %s {";
@@ -75,13 +75,13 @@ public class SimpleRenderer extends AbstractRenderer {
 	}
 
 	@Override
-	public void renderFieldDetails(FieldDetails fieldDetails, SourceModelContext context) {
+	public void renderFieldDetails(FieldDetails fieldDetails, ModelsContext context) {
 		// todo : would be nice to render the type-details to include generics, etc
 		renderingTarget.addLine( "%s %s", fieldDetails.getType().determineRawClass().getName(), fieldDetails.getName() );
 	}
 
 	@Override
-	public void renderMethodDetails(MethodDetails methodDetails, SourceModelContext context) {
+	public void renderMethodDetails(MethodDetails methodDetails, ModelsContext context) {
 		// todo : would be nice to render the type-details to include generics, etc
 		renderingTarget.addLine(
 				"%s %s (%s)",
@@ -98,7 +98,7 @@ public class SimpleRenderer extends AbstractRenderer {
 	}
 
 	@Override
-	public void renderRecordComponentDetails(RecordComponentDetails recordComponentDetails, SourceModelContext context) {
+	public void renderRecordComponentDetails(RecordComponentDetails recordComponentDetails, ModelsContext context) {
 		// todo : would be nice to render the type-details to include generics, etc
 		renderingTarget.addLine( "%s %s", recordComponentDetails.getType().determineRawClass().getName(), recordComponentDetails.getName() );
 	}

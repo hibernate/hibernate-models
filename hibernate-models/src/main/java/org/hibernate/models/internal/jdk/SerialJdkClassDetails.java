@@ -6,7 +6,7 @@ package org.hibernate.models.internal.jdk;
 
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 public class SerialJdkClassDetails implements SerialClassDetails {
 	private final String name;
@@ -28,7 +28,7 @@ public class SerialJdkClassDetails implements SerialClassDetails {
 	}
 
 	@Override
-	public ClassDetails fromStorableForm(SourceModelBuildingContext context) {
+	public ClassDetails fromStorableForm(ModelsContext context) {
 		return new JdkClassDetails( name, javaType, context );
 	}
 }

@@ -8,7 +8,7 @@ import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -24,15 +24,15 @@ public class InheritanceTypeVariableTests {
 
 	@Test
 	void testParameterizedHierarchy() {
-		final SourceModelBuildingContext buildingContext = createModelContext(
+		final ModelsContext modelsContext = createModelContext(
 				Root.class,
 				Base1.class,
 				Base2.class
 		);
 
-		final ClassDetails rootClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Root.class.getName() );
-		final ClassDetails base1ClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Base1.class.getName() );
-		final ClassDetails base2ClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( Base2.class.getName() );
+		final ClassDetails rootClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Root.class.getName() );
+		final ClassDetails base1ClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Base1.class.getName() );
+		final ClassDetails base2ClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Base2.class.getName() );
 
 		final FieldDetails idField = rootClassDetails.findFieldByName( "id" );
 		final TypeDetails idFieldType = idField.getType();

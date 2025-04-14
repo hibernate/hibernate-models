@@ -4,7 +4,7 @@
  */
 
 /**
- * Support for serializing and deserializing {@linkplain org.hibernate.models.spi.SourceModelBuildingContext},
+ * Support for serializing and deserializing {@linkplain org.hibernate.models.spi.ModelsContext},
  * {@linkplain org.hibernate.models.spi.ClassDetailsRegistry},
  * {@linkplain org.hibernate.models.spi.AnnotationDescriptorRegistry}, etc.
  */

@@ -17,8 +17,7 @@ import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
 import org.hibernate.models.rendering.spi.Renderer;
 import org.hibernate.models.rendering.spi.RenderingTarget;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 /**
@@ -59,7 +58,7 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 	}
 
 	@Override
-	public JdkValueConverter<V[]> createJdkValueConverter(SourceModelBuildingContext modelContext) {
+	public JdkValueConverter<V[]> createJdkValueConverter(ModelsContext modelContext) {
 		if ( jdkValueConverter == null ) {
 			if ( !elementTypeDescriptor.getValueType().isAnnotation() ) {
 				// for arrays of anything other than nested annotations we can simply return the raw array
@@ -74,7 +73,7 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 	}
 
 	@Override
-	public JdkValueExtractor<V[]> createJdkValueExtractor(SourceModelBuildingContext modelContext) {
+	public JdkValueExtractor<V[]> createJdkValueExtractor(ModelsContext modelContext) {
 		if ( jdkValueExtractor == null ) {
 			if ( !elementTypeDescriptor.getValueType().isAnnotation() ) {
 				// for arrays of anything other than nested annotations we can simply return the raw array
@@ -102,7 +101,7 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 			Object attributeValue,
 			RenderingTarget target,
 			Renderer renderer,
-			SourceModelContext modelContext) {
+			ModelsContext modelContext) {
 		assert attributeValue != null : "Annotation value was null - " + name;
 
 		//noinspection unchecked
@@ -118,7 +117,7 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 	}
 
 	@Override
-	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, SourceModelContext modelContext) {
+	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, ModelsContext modelContext) {
 		//noinspection unchecked
 		final List<V> values = (List<V>) attributeValue;
 
@@ -130,7 +129,7 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 	}
 
 	@Override
-	public V[][] makeArray(int size, SourceModelBuildingContext modelContext) {
+	public V[][] makeArray(int size, ModelsContext modelContext) {
 		throw new UnsupportedOperationException( "Nested array creation not supported" );
 	}
 }

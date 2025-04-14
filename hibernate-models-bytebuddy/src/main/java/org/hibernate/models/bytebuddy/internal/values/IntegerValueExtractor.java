@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.bytebuddy.internal.values;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -17,8 +17,8 @@ public class IntegerValueExtractor extends AbstractValueExtractor<Integer> {
 	public static final IntegerValueExtractor INTEGER_EXTRACTOR = new IntegerValueExtractor();
 
 	@Override
-	protected Integer extractAndWrap(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext buildingContext) {
+	protected Integer extractAndWrap(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelsContext) {
 		assert byteBuddyValue != null;
-		return IntegerValueConverter.INTEGER_VALUE_WRAPPER.convert( byteBuddyValue, buildingContext );
+		return IntegerValueConverter.INTEGER_VALUE_WRAPPER.convert( byteBuddyValue, modelsContext );
 	}
 }

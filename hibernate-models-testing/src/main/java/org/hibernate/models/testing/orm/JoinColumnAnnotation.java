@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.orm.ColumnDetails.AlternateTableCapable;
 import org.hibernate.models.testing.orm.ColumnDetails.Definable;
 import org.hibernate.models.testing.orm.ColumnDetails.Mutable;
@@ -22,6 +22,7 @@ import jakarta.persistence.JoinColumn;
 /**
  * @author Steve Ebersole
  */
+@SuppressWarnings("ClassExplicitlyAnnotation")
 public class JoinColumnAnnotation
 		implements JoinColumn, Nullable, Uniqueable, Mutable, Definable, AlternateTableCapable {
 	private String name;
@@ -39,7 +40,7 @@ public class JoinColumnAnnotation
 
 	private String comment;
 
-	public JoinColumnAnnotation(SourceModelBuildingContext modelContext) {
+	public JoinColumnAnnotation(ModelsContext modelContext) {
 		name = "";
 		table = "";
 		referencedColumnName = "";
@@ -54,7 +55,7 @@ public class JoinColumnAnnotation
 		check = new CheckConstraint[0];
 	}
 
-	public JoinColumnAnnotation(JoinColumn usage, SourceModelBuildingContext modelContext) {
+	public JoinColumnAnnotation(JoinColumn usage, ModelsContext modelContext) {
 		name = usage.name();
 		table = usage.table();
 		referencedColumnName = usage.referencedColumnName();
@@ -69,7 +70,7 @@ public class JoinColumnAnnotation
 		check = usage.check();
 	}
 
-	public JoinColumnAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public JoinColumnAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		table = (String) attributeValues.get( "table" );
 		referencedColumnName = (String) attributeValues.get( "referencedColumnName" );

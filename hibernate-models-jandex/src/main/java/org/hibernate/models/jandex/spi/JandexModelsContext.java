@@ -4,18 +4,17 @@
  */
 package org.hibernate.models.jandex.spi;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 import org.jboss.jandex.IndexView;
 
 /**
- * SourceModelBuildingContext implementation using
- * <a href="https://github.com/smallrye/jandex">Jandex</a>.
+ * ModelsContext implementation using <a href="https://github.com/smallrye/jandex">Jandex</a>.
  *
  * @author Steve Ebersole
  */
-public interface JandexModelContext extends SourceModelBuildingContext {
+public interface JandexModelsContext extends ModelsContext {
 	/**
 	 * The Jandex index
 	 */

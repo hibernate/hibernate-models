@@ -7,7 +7,7 @@ package org.hibernate.models.bytebuddy.internal;
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
@@ -20,8 +20,8 @@ public class ClassDetailsBuilderImpl implements ClassDetailsBuilder {
 	}
 
 	@Override
-	public ClassDetails buildClassDetails(String name, SourceModelBuildingContext buildingContext) {
-		assert buildingContext == modelContext;
+	public ClassDetails buildClassDetails(String name, ModelsContext modelsContext) {
+		assert modelsContext == modelContext;
 		return ByteBuddyBuilders.buildDetails( name, modelContext );
 	}
 }

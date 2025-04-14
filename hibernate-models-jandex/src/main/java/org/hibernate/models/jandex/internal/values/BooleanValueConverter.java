@@ -5,7 +5,7 @@
 package org.hibernate.models.jandex.internal.values;
 
 import org.hibernate.models.jandex.spi.JandexValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -18,7 +18,7 @@ public class BooleanValueConverter implements JandexValueConverter<Boolean> {
 	public static final BooleanValueConverter JANDEX_BOOLEAN_VALUE_WRAPPER = new BooleanValueConverter();
 
 	@Override
-	public Boolean convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext) {
+	public Boolean convert(AnnotationValue jandexValue, ModelsContext modelContext) {
 		assert jandexValue != null;
 		return jandexValue.asBoolean();
 	}

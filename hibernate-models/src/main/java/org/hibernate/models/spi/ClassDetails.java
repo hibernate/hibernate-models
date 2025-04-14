@@ -67,11 +67,11 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	String getClassName();
 
 	@Override
-	default ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext) {
+	default ClassDetails getContainer(ModelsContext modelsContext) {
 		if ( getClassName() == null || getClassName().indexOf( "." ) <= 0 ) {
 			return null;
 		}
-		return AnnotationTargetHelper.resolvePackageInfo( this, modelBuildingContext );
+		return AnnotationTargetHelper.resolvePackageInfo( this, modelsContext );
 	}
 
 	/**
@@ -294,7 +294,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	 * Load the corresponding {@linkplain Class} using standard
 	 * {@linkplain ClassLoading}.
 	 *
-	 * @see SourceModelBuildingContext#getClassLoading()
+	 * @see ModelsContext#getClassLoading()
 	 *
 	 * @apiNote Know what you are doing before calling this method
 	 *
@@ -312,7 +312,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	 * @throws DynamicClassException If this ClassDetails does not correspond to a Java class
 	 * (generally meaning {@linkplain #getClassName()} returns {@code null}).
 	 */
-	<X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext);
+	<X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext);
 
 	@Override
 	default ClassDetails asClassDetails() {

@@ -14,7 +14,7 @@ import java.lang.annotation.Annotation;
  */
 @FunctionalInterface
 public interface RegistryPrimer {
-	void primeRegistries(Contributions contributions, SourceModelBuildingContext buildingContext);
+	void primeRegistries(Contributions contributions, ModelsContext modelsContext);
 
 	interface Contributions {
 		/**

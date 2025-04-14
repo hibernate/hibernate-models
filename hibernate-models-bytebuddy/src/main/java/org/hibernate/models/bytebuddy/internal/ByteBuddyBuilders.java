@@ -17,32 +17,21 @@ import java.util.function.BiConsumer;
 
 import org.hibernate.models.bytebuddy.internal.values.ArrayValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.ArrayValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.BooleanValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.BooleanValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.ByteValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.ByteValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.CharacterValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.CharacterValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.ClassValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.ClassValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.DoubleValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.DoubleValueExtractor;
 import org.hibernate.models.bytebuddy.internal.values.EnumValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.EnumValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.FloatValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.FloatValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.IntegerValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.IntegerValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.LongValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.LongValueExtractor;
 import org.hibernate.models.bytebuddy.internal.values.NestedValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.NestedValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.ShortValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.ShortValueExtractor;
-import org.hibernate.models.bytebuddy.internal.values.StringValueConverter;
 import org.hibernate.models.bytebuddy.internal.values.StringValueExtractor;
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
-import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
 import org.hibernate.models.internal.ArrayTypeDescriptor;
 import org.hibernate.models.internal.jdk.JdkBuilders;
@@ -53,7 +42,7 @@ import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 import net.bytebuddy.description.annotation.AnnotationDescription;
@@ -276,7 +265,7 @@ public class ByteBuddyBuilders {
 	public static <A extends Annotation> A makeUsage(
 			AnnotationDescription annotationDescription,
 			AnnotationDescriptor<A> annotationDescriptor,
-			SourceModelBuildingContext modelsContext) {
+			ModelsContext modelsContext) {
 		final Map<String, Object> attributeValues = extractAttributeValues(
 				annotationDescription,
 				annotationDescriptor,
@@ -288,7 +277,7 @@ public class ByteBuddyBuilders {
 	private static <A extends Annotation> Map<String, Object> extractAttributeValues(
 			AnnotationDescription annotationDescription,
 			AnnotationDescriptor<A> annotationDescriptor,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 
 		if ( CollectionHelper.isEmpty( annotationDescriptor.getAttributes() ) ) {
 			return Collections.emptyMap();
@@ -298,7 +287,7 @@ public class ByteBuddyBuilders {
 		for ( int i = 0; i < annotationDescriptor.getAttributes().size(); i++ ) {
 			final AttributeDescriptor<?> attributeDescriptor = annotationDescriptor.getAttributes().get( i );
 			final ValueExtractor<?> extractor = modelContext
-					.as( ByteBuddyModelContextImpl.class )
+					.as( ByteBuddyModelsContext.class )
 					.getValueExtractor( attributeDescriptor.getTypeDescriptor() );
 			final Object attributeValue = extractor.extractValue(
 					annotationDescription,
@@ -312,186 +301,62 @@ public class ByteBuddyBuilders {
 
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	// ValueConverter / ValueExtractor
+	// ValueExtractor
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	@SuppressWarnings("unchecked")
-	public static <V> ValueConverter<V> buildValueHandlersReturnConverter(
+	public static <V> ValueExtractor<V> buildValueExtractor(
 			ValueTypeDescriptor<V> valueTypeDescriptor,
-			BiConsumer<ValueTypeDescriptor<V>,ValueConverter<V>> converterCollector,
-			BiConsumer<ValueTypeDescriptor<V>, ValueExtractor<V>> extractorCollector,
-			ByteBuddyModelContextImpl sourceModelBuildingContext) {
+			ByteBuddyModelsContextImpl modelsContext) {
 		if ( valueTypeDescriptor.getValueType().isArray() ) {
 			final ValueTypeDescriptor<?> elementTypeDescriptor = ( (ArrayTypeDescriptor<?>) valueTypeDescriptor ).getElementTypeDescriptor();
 			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( elementTypeDescriptor );
 			final ArrayValueExtractor<?> valueExtractor = new ArrayValueExtractor<>( valueConverter );
-			converterCollector.accept( valueTypeDescriptor, (ValueConverter<V>) valueConverter );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) valueExtractor );
-			return (ValueConverter<V>) valueConverter;
-		}
-
-		if ( isBoolean( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor, (ValueConverter<V>) BooleanValueConverter.BOOLEAN_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) BooleanValueExtractor.BOOLEAN_EXTRACTOR );
-			return (ValueConverter<V>) BooleanValueConverter.BOOLEAN_VALUE_WRAPPER;
-		}
-
-		if ( isByte( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor, (ValueConverter<V>) ByteValueConverter.BYTE_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) ByteValueExtractor.BYTE_EXTRACTOR );
-			return (ValueConverter<V>) ByteValueConverter.BYTE_VALUE_WRAPPER;
-		}
-
-		if ( isChar( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) CharacterValueConverter.CHARACTER_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) CharacterValueExtractor.CHARACTER_EXTRACTOR );
-			return (ValueConverter<V>) CharacterValueConverter.CHARACTER_VALUE_WRAPPER;
-		}
-
-		if ( isDouble( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) DoubleValueConverter.DOUBLE_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) DoubleValueExtractor.DOUBLE_EXTRACTOR );
-			return (ValueConverter<V>) DoubleValueConverter.DOUBLE_VALUE_WRAPPER;
-		}
-
-		if ( isFloat( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) FloatValueConverter.FLOAT_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) FloatValueExtractor.FLOAT_EXTRACTOR );
-			return (ValueConverter<V>) FloatValueConverter.FLOAT_VALUE_WRAPPER;
-		}
-
-		if ( isInt( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) IntegerValueConverter.INTEGER_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) IntegerValueExtractor.INTEGER_EXTRACTOR );
-			return (ValueConverter<V>) IntegerValueConverter.INTEGER_VALUE_WRAPPER;
-		}
-
-		if ( isLong( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) LongValueConverter.LONG_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) LongValueExtractor.LONG_EXTRACTOR );
-			return (ValueConverter<V>) LongValueConverter.LONG_VALUE_WRAPPER;
-		}
-
-		if ( isShort( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) ShortValueConverter.SHORT_VALUE_WRAPPER  );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) ShortValueExtractor.SHORT_EXTRACTOR );
-			return (ValueConverter<V>) ShortValueConverter.SHORT_VALUE_WRAPPER;
-		}
-
-		if ( valueTypeDescriptor.getValueType() == String.class ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) StringValueConverter.STRING_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) StringValueExtractor.STRING_EXTRACTOR );
-			return (ValueConverter<V>) StringValueConverter.STRING_VALUE_WRAPPER;
-		}
-
-		if ( valueTypeDescriptor.getValueType().isAnnotation() ) {
-			final AnnotationDescriptor<? extends Annotation> annotationDescriptor = sourceModelBuildingContext
-					.getAnnotationDescriptorRegistry()
-					.getDescriptor( (Class<? extends Annotation>) valueTypeDescriptor.getValueType() );
-			final NestedValueConverter<? extends Annotation> jandexNestedValueConverter = new NestedValueConverter<>( annotationDescriptor );
-			final NestedValueExtractor<? extends Annotation> jandexNestedValueExtractor = new NestedValueExtractor<>( jandexNestedValueConverter );
-
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) jandexNestedValueConverter );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) jandexNestedValueExtractor );
-			return (ValueConverter<V>) jandexNestedValueConverter;
-		}
-
-		if ( valueTypeDescriptor.getValueType().isEnum() ) {
-			//noinspection rawtypes
-			final EnumValueConverter<? extends Enum> converter = new EnumValueConverter( valueTypeDescriptor.getValueType() );
-			converterCollector.accept( valueTypeDescriptor, (ValueConverter<V>) converter );
-			//noinspection rawtypes
-			extractorCollector.accept( valueTypeDescriptor, new EnumValueExtractor( converter ) );
-			return (ValueConverter<V>) converter;
-		}
-
-		if ( valueTypeDescriptor.getValueType() == Class.class ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) ClassValueConverter.CLASS_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) ClassValueExtractor.CLASS_EXTRACTOR );
-			return (ValueConverter<V>) ClassValueConverter.CLASS_VALUE_WRAPPER;
-		}
-
-		throw new UnsupportedOperationException( "Unhandled value type : " + valueTypeDescriptor );
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <V> ValueExtractor<V> buildValueHandlersReturnExtractor(
-			ValueTypeDescriptor<V> valueTypeDescriptor,
-			BiConsumer<ValueTypeDescriptor<V>,ValueConverter<V>> converterCollector,
-			BiConsumer<ValueTypeDescriptor<V>, ValueExtractor<V>> extractorCollector,
-			ByteBuddyModelContextImpl sourceModelBuildingContext) {
-		if ( valueTypeDescriptor.getValueType().isArray() ) {
-			final ValueTypeDescriptor<?> elementTypeDescriptor = ( (ArrayTypeDescriptor<?>) valueTypeDescriptor ).getElementTypeDescriptor();
-			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( elementTypeDescriptor );
-			final ArrayValueExtractor<?> valueExtractor = new ArrayValueExtractor<>( valueConverter );
-			converterCollector.accept( valueTypeDescriptor, (ValueConverter<V>) valueConverter );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) valueExtractor );
 			return (ValueExtractor<V>) valueExtractor;
 		}
 
 		if ( isBoolean( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor, (ValueConverter<V>) BooleanValueConverter.BOOLEAN_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) BooleanValueExtractor.BOOLEAN_EXTRACTOR );
 			return (ValueExtractor<V>) BooleanValueExtractor.BOOLEAN_EXTRACTOR;
 		}
 
 		if ( isByte( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor, (ValueConverter<V>) ByteValueConverter.BYTE_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) ByteValueExtractor.BYTE_EXTRACTOR );
 			return (ValueExtractor<V>) ByteValueExtractor.BYTE_EXTRACTOR;
 		}
 
 		if ( isChar( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) CharacterValueConverter.CHARACTER_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) CharacterValueExtractor.CHARACTER_EXTRACTOR );
 			return (ValueExtractor<V>) CharacterValueExtractor.CHARACTER_EXTRACTOR;
 		}
 
 		if ( isDouble( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) DoubleValueConverter.DOUBLE_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) DoubleValueExtractor.DOUBLE_EXTRACTOR );
 			return (ValueExtractor<V>) DoubleValueExtractor.DOUBLE_EXTRACTOR;
 		}
 
 		if ( isFloat( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) FloatValueConverter.FLOAT_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) FloatValueExtractor.FLOAT_EXTRACTOR );
 			return (ValueExtractor<V>) FloatValueExtractor.FLOAT_EXTRACTOR;
 		}
 
 		if ( isInt( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) IntegerValueConverter.INTEGER_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) IntegerValueExtractor.INTEGER_EXTRACTOR );
 			return (ValueExtractor<V>) IntegerValueExtractor.INTEGER_EXTRACTOR;
 		}
 
 		if ( isLong( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) LongValueConverter.LONG_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) LongValueExtractor.LONG_EXTRACTOR );
 			return (ValueExtractor<V>) LongValueExtractor.LONG_EXTRACTOR;
 		}
 
 		if ( isShort( valueTypeDescriptor ) ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) ShortValueConverter.SHORT_VALUE_WRAPPER  );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) ShortValueExtractor.SHORT_EXTRACTOR );
 			return (ValueExtractor<V>) ShortValueExtractor.SHORT_EXTRACTOR;
 		}
 
 		if ( valueTypeDescriptor.getValueType() == String.class ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) StringValueConverter.STRING_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) StringValueExtractor.STRING_EXTRACTOR );
 			return (ValueExtractor<V>) StringValueExtractor.STRING_EXTRACTOR;
 		}
 
 		if ( valueTypeDescriptor.getValueType().isAnnotation() ) {
-			final AnnotationDescriptor<? extends Annotation> annotationDescriptor = sourceModelBuildingContext
+			final AnnotationDescriptor<? extends Annotation> annotationDescriptor = modelsContext
 					.getAnnotationDescriptorRegistry()
 					.getDescriptor( (Class<? extends Annotation>) valueTypeDescriptor.getValueType() );
 			final NestedValueConverter<? extends Annotation> jandexNestedValueConverter = new NestedValueConverter<>( annotationDescriptor );
 			final NestedValueExtractor<? extends Annotation> jandexNestedValueExtractor = new NestedValueExtractor<>( jandexNestedValueConverter );
-
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) jandexNestedValueConverter );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) jandexNestedValueExtractor );
 			return (ValueExtractor<V>) jandexNestedValueExtractor;
 		}
 
@@ -500,14 +365,10 @@ public class ByteBuddyBuilders {
 			final EnumValueConverter<? extends Enum> converter = new EnumValueConverter( valueTypeDescriptor.getValueType() );
 			//noinspection rawtypes
 			final EnumValueExtractor extractor = new EnumValueExtractor<>( converter );
-			converterCollector.accept( valueTypeDescriptor, (ValueConverter<V>) converter );
-			extractorCollector.accept( valueTypeDescriptor, extractor );
 			return (ValueExtractor<V>) extractor;
 		}
 
 		if ( valueTypeDescriptor.getValueType() == Class.class ) {
-			converterCollector.accept( valueTypeDescriptor,  (ValueConverter<V>) ClassValueConverter.CLASS_VALUE_WRAPPER );
-			extractorCollector.accept( valueTypeDescriptor, (ValueExtractor<V>) ClassValueExtractor.CLASS_EXTRACTOR );
 			return (ValueExtractor<V>) ClassValueExtractor.CLASS_EXTRACTOR;
 		}
 

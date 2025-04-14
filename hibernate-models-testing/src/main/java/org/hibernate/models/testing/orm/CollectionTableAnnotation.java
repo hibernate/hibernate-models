@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ForeignKey;
@@ -18,6 +18,7 @@ import jakarta.persistence.UniqueConstraint;
 /**
  * @author Steve Ebersole
  */
+@SuppressWarnings({ "ClassExplicitlyAnnotation", "unused" })
 public class CollectionTableAnnotation implements CollectionTable, CommonTableDetails {
 	private String name;
 	private String catalog;
@@ -28,7 +29,7 @@ public class CollectionTableAnnotation implements CollectionTable, CommonTableDe
 	private UniqueConstraint[] uniqueConstraints;
 	private Index[] indexes;
 
-	public CollectionTableAnnotation(SourceModelBuildingContext modelContext) {
+	public CollectionTableAnnotation(ModelsContext modelContext) {
 		name = "";
 		catalog = "";
 		schema = "";
@@ -39,7 +40,7 @@ public class CollectionTableAnnotation implements CollectionTable, CommonTableDe
 		indexes = new Index[0];
 	}
 
-	public CollectionTableAnnotation(CollectionTable usage, SourceModelBuildingContext modelContext) {
+	public CollectionTableAnnotation(CollectionTable usage, ModelsContext modelContext) {
 		name = usage.name();
 		catalog = usage.catalog();
 		schema = usage.schema();
@@ -50,7 +51,7 @@ public class CollectionTableAnnotation implements CollectionTable, CommonTableDe
 		indexes = usage.indexes();
 	}
 
-	public CollectionTableAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public CollectionTableAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		catalog = (String) attributeValues.get( "catalog" );
 		schema = (String) attributeValues.get( "schema" );

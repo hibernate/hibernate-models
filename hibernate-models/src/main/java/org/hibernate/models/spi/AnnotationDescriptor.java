@@ -40,30 +40,30 @@ public interface AnnotationDescriptor<A extends Annotation>
 	}
 
 	@Override
-	default ClassDetails getContainer(SourceModelBuildingContext modelBuildingContext) {
-		final ClassDetails annotationClassDetails = modelBuildingContext
+	default ClassDetails getContainer(ModelsContext modelsContext) {
+		final ClassDetails annotationClassDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( getAnnotationType().getName() );
-		return annotationClassDetails.getContainer( modelBuildingContext );
+		return annotationClassDetails.getContainer( modelsContext );
 	}
 	/**
 	 * Create an empty usage.  Used when there is no source form, such as XML processing.
 	 */
-	A createUsage(SourceModelBuildingContext context);
+	A createUsage(ModelsContext context);
 
 	/**
 	 * Create a usage from the JDK representation.  This will often just return the passed annotation,
 	 * although for Hibernate and JPA annotations we generally want wrappers to be able to manipulate the
 	 * values.
 	 */
-	A createUsage(A jdkAnnotation, SourceModelBuildingContext context);
+	A createUsage(A jdkAnnotation, ModelsContext context);
 
 	/**
 	 * Create a usage from the JDK representation.  This will often just return the passed annotation,
 	 * although for Hibernate and JPA annotations we generally want wrappers to be able to manipulate the
 	 * values.
 	 */
-	default A createUsage(Map<String, Object> attributeValues, SourceModelBuildingContext context) {
+	default A createUsage(Map<String, Object> attributeValues, ModelsContext context) {
 		return AnnotationProxy.makeProxy( this, attributeValues );
 	}
 

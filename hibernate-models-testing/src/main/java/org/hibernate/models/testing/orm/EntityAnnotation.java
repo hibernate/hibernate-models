@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.Entity;
 
@@ -18,15 +18,15 @@ import jakarta.persistence.Entity;
 public class EntityAnnotation implements Entity {
 	private String name;
 
-	public EntityAnnotation(SourceModelBuildingContext modelContext) {
+	public EntityAnnotation(ModelsContext modelContext) {
 		name = "";
 	}
 
-	public EntityAnnotation(Entity jdkAnnotation, SourceModelBuildingContext modelContext) {
+	public EntityAnnotation(Entity jdkAnnotation, ModelsContext modelContext) {
 		this.name = jdkAnnotation.name();
 	}
 
-	public EntityAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public EntityAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		this.name = (String) attributeValues.get( "name" );
 	}
 

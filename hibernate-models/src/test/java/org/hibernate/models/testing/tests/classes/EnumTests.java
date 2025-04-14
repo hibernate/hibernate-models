@@ -6,7 +6,7 @@ package org.hibernate.models.testing.tests.classes;
 
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,8 +19,8 @@ import static org.hibernate.models.testing.TestHelper.buildModelContext;
 public class EnumTests {
 	@Test
 	void basicEnumTest() {
-		final SourceModelBuildingContext buildingContext = buildModelContext( AnEnum.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = buildModelContext( AnEnum.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails enumClassDetails = classDetailsRegistry.getClassDetails( AnEnum.class.getName() );
 		assertThat( enumClassDetails.isEnum() ).isTrue();

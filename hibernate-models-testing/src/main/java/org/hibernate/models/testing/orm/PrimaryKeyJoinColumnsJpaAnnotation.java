@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.PrimaryKeyJoinColumns;
@@ -21,7 +21,7 @@ public class PrimaryKeyJoinColumnsJpaAnnotation
 	/**
 	 * Used in creating dynamic annotation instances (e.g. from XML)
 	 */
-	public PrimaryKeyJoinColumnsJpaAnnotation(SourceModelBuildingContext modelContext) {
+	public PrimaryKeyJoinColumnsJpaAnnotation(ModelsContext modelContext) {
 		this.foreignKey = modelContext.getAnnotationDescriptorRegistry()
 				.getDescriptor( jakarta.persistence.ForeignKey.class )
 				.createUsage( modelContext );
@@ -32,7 +32,7 @@ public class PrimaryKeyJoinColumnsJpaAnnotation
 	 */
 	public PrimaryKeyJoinColumnsJpaAnnotation(
 			PrimaryKeyJoinColumns annotation,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		this.value = annotation.value();
 		this.foreignKey = new ForeignKeyAnnotation( annotation.foreignKey(), modelContext );
 	}
@@ -42,7 +42,7 @@ public class PrimaryKeyJoinColumnsJpaAnnotation
 	 */
 	public PrimaryKeyJoinColumnsJpaAnnotation(
 			Map<String, Object> attributeValues,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		this.value = (PrimaryKeyJoinColumn[]) attributeValues.get( "value" );
 		this.foreignKey = (jakarta.persistence.ForeignKey) attributeValues.get( "foreignKey" );
 	}

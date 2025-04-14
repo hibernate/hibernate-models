@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.SequenceGenerator;
 
@@ -24,7 +24,7 @@ public class SequenceGeneratorAnnotation implements SequenceGenerator, Named, Da
 	private int allocationSize;
 	private String options;
 
-	public SequenceGeneratorAnnotation(SourceModelBuildingContext modelContext) {
+	public SequenceGeneratorAnnotation(ModelsContext modelContext) {
 		name = "";
 		sequenceName = "";
 		catalog = "";
@@ -34,7 +34,7 @@ public class SequenceGeneratorAnnotation implements SequenceGenerator, Named, Da
 		options = "";
 	}
 
-	public SequenceGeneratorAnnotation(SequenceGenerator usage, SourceModelBuildingContext modelContext) {
+	public SequenceGeneratorAnnotation(SequenceGenerator usage, ModelsContext modelContext) {
 		name = usage.name();
 		sequenceName = usage.sequenceName();
 		catalog = usage.catalog();
@@ -44,7 +44,7 @@ public class SequenceGeneratorAnnotation implements SequenceGenerator, Named, Da
 		options = usage.options();
 	}
 
-	public SequenceGeneratorAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public SequenceGeneratorAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		sequenceName = (String) attributeValues.get( "sequenceName" );
 		catalog = (String) attributeValues.get( "catalog" );

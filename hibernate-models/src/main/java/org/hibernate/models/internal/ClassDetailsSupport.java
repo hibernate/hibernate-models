@@ -12,10 +12,10 @@ import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
  * @author Steve Ebersole
@@ -61,7 +61,7 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 	@Override
 	default <A extends Annotation> A getAnnotationUsage(
 			AnnotationDescriptor<A> descriptor,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final A localUsage = AnnotationUsageHelper.getUsage( descriptor, getUsageMap(),modelContext );
 		if ( localUsage != null ) {
 			return localUsage;
@@ -75,7 +75,7 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 	}
 
 	@Override
-	default <A extends Annotation> A getAnnotationUsage(Class<A> annotationType, SourceModelBuildingContext modelContext) {
+	default <A extends Annotation> A getAnnotationUsage(Class<A> annotationType, ModelsContext modelContext) {
 		return getAnnotationUsage(
 				modelContext.getAnnotationDescriptorRegistry().getDescriptor( annotationType ),
 				modelContext

@@ -12,10 +12,10 @@ import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
  * Base support for {@link AnnotationDescriptor} implementations
@@ -75,12 +75,12 @@ public abstract class AbstractAnnotationDescriptor<A extends Annotation>
 	@Override
 	public <X extends Annotation> X[] getRepeatedAnnotationUsages(
 			AnnotationDescriptor<X> type,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return AnnotationUsageHelper.getRepeatedUsages( type, getUsageMap(), modelContext );
 	}
 
 	@Override
-	public <X extends Annotation> X[] getRepeatedAnnotationUsages(Class<X> type, SourceModelBuildingContext modelContext) {
+	public <X extends Annotation> X[] getRepeatedAnnotationUsages(Class<X> type, ModelsContext modelContext) {
 		return getRepeatedAnnotationUsages( modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ), modelContext );
 	}
 
