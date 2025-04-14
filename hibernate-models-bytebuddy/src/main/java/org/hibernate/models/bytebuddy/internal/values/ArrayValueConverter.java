@@ -11,7 +11,7 @@ import org.hibernate.models.bytebuddy.internal.ByteBuddyBuilders;
 import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 import net.bytebuddy.description.annotation.AnnotationDescription;
@@ -30,7 +30,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 	}
 
 	@Override
-	public V[] convert(AnnotationValue<?,?> annotationValue, SourceModelBuildingContext modelContext) {
+	public V[] convert(AnnotationValue<?,?> annotationValue, ModelsContext modelContext) {
 		assert annotationValue != null;
 
 		final Class<?> elementValueType = elementTypeDescriptor.getValueType();
@@ -78,7 +78,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 	private V[] convertBooleanArray(
 			AnnotationValue<?, ?> annotationValue,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final boolean[] resolved = annotationValue.resolve( boolean[].class );
 		final Boolean[] result = (Boolean[]) elementTypeDescriptor.makeArray( resolved.length, modelContext );
 		for ( int i = 0; i < resolved.length; i++ ) {
@@ -90,7 +90,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 	private V[] convertByteArray(
 			AnnotationValue<?, ?> annotationValue,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final byte[] resolved = annotationValue.resolve( byte[].class );
 		final Byte[] result = (Byte[]) elementTypeDescriptor.makeArray( resolved.length, modelContext );
 		for ( int i = 0; i < resolved.length; i++ ) {
@@ -102,7 +102,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 	private V[] convertShortArray(
 			AnnotationValue<?, ?> annotationValue,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final short[] resolved = annotationValue.resolve( short[].class );
 		final Short[] result = (Short[]) elementTypeDescriptor.makeArray( resolved.length, modelContext );
 		for ( int i = 0; i < resolved.length; i++ ) {
@@ -114,7 +114,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 	private V[] convertIntArray(
 			AnnotationValue<?, ?> annotationValue,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final int[] resolved = annotationValue.resolve( int[].class );
 		final Integer[] result = (Integer[]) elementTypeDescriptor.makeArray( resolved.length, modelContext );
 		for ( int i = 0; i < resolved.length; i++ ) {
@@ -126,7 +126,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 	private V[] convertLongArray(
 			AnnotationValue<?, ?> annotationValue,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final long[] resolved = annotationValue.resolve( long[].class );
 		final Long[] result = (Long[]) elementTypeDescriptor.makeArray( resolved.length, modelContext );
 		for ( int i = 0; i < resolved.length; i++ ) {
@@ -138,7 +138,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 	private V[] convertDoubleArray(
 			AnnotationValue<?, ?> annotationValue,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final double[] resolved = annotationValue.resolve( double[].class );
 		final Double[] result = (Double[]) elementTypeDescriptor.makeArray( resolved.length, modelContext );
 		for ( int i = 0; i < resolved.length; i++ ) {
@@ -150,7 +150,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 	private V[] convertFloatArray(
 			AnnotationValue<?, ?> annotationValue,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final float[] resolved = annotationValue.resolve( float[].class );
 		final Float[] result = (Float[]) elementTypeDescriptor.makeArray( resolved.length, modelContext );
 		for ( int i = 0; i < resolved.length; i++ ) {
@@ -162,7 +162,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 	private V[] convertCharacterArray(
 			AnnotationValue<?, ?> annotationValue,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final char[] resolved = annotationValue.resolve( char[].class );
 		final Character[] result = (Character[]) elementTypeDescriptor.makeArray( resolved.length, modelContext );
 		for ( int i = 0; i < resolved.length; i++ ) {
@@ -174,7 +174,7 @@ public class ArrayValueConverter<V> implements ValueConverter<V[]> {
 
 	private V[] convertNestedAnnotationArray(
 			AnnotationValue<?, ?> annotationValue,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final AnnotationDescriptorRegistry descriptorRegistry = modelContext.getAnnotationDescriptorRegistry();
 
 		//noinspection unchecked

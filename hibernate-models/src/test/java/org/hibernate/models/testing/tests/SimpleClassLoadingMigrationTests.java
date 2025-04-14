@@ -13,14 +13,10 @@ import java.util.Map;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.TestHelper;
 
 import org.junit.jupiter.api.Test;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOADING;
@@ -29,13 +25,13 @@ import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOAD
  * @author Steve Ebersole
  */
 public class SimpleClassLoadingMigrationTests {
-	protected SourceModelBuildingContext createModelContext(Class<?>... classes) {
+	protected ModelsContext createModelContext(Class<?>... classes) {
 		return TestHelper.createModelContext( classes );
 	}
 
 	@Test
 	void testSimpleMigration() {
-		final SourceModelBuildingContext modelContext = createModelContext( SimpleSerializationTests.SimpleClassWithAnnotations.class );
+		final ModelsContext modelContext = createModelContext( SimpleSerializationTests.SimpleClassWithAnnotations.class );
 		final ClassDetails classDetails = modelContext.getClassDetailsRegistry().findClassDetails( SimpleSerializationTests.SimpleClassWithAnnotations.class.getName() );
 		assertThat( classDetails ).isNotNull();
 
@@ -47,7 +43,7 @@ public class SimpleClassLoadingMigrationTests {
 
 	@Test
 	void testSimpleMembersMigration() {
-		final SourceModelBuildingContext modelContext = createModelContext( SimpleSerializationTests.SimpleClassWithMembers.class );
+		final ModelsContext modelContext = createModelContext( SimpleSerializationTests.SimpleClassWithMembers.class );
 		final ClassDetails classDetails = modelContext.getClassDetailsRegistry().findClassDetails( SimpleSerializationTests.SimpleClassWithMembers.class.getName() );
 		assertThat( classDetails ).isNotNull();
 
@@ -59,30 +55,6 @@ public class SimpleClassLoadingMigrationTests {
 		final FieldDetails fieldByName = classDetails.findFieldByName( "anInt" );
 		final Field anIntField = fieldByName.toJavaMember( javaClass, collectingClassLoading, modelContext );
 		assertThat( anIntField.getDeclaringClass() ).isSameAs( javaClass );
-	}
-
-	@Entity(name="Thing")
-	@Table(name="Thing")
-	public static class Thing {
-		@Id
-		private Integer id;
-		private String name;
-
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
 	}
 
 	private static class CollectingClassLoading implements ClassLoading {

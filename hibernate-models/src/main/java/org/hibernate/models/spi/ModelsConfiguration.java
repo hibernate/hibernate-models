@@ -8,12 +8,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.models.internal.BasicModelBuildingContextImpl;
+import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.internal.ModelsLogging;
 import org.hibernate.models.internal.SimpleClassLoading;
 
 /**
- * Bootstrapping of {@linkplain SourceModelBuildingContext}
+ * Bootstrapping of {@linkplain ModelsContext}
  *
  * @author Steve Ebersole
  */
@@ -23,7 +23,7 @@ public class ModelsConfiguration {
 	private ClassLoading classLoading = SimpleClassLoading.SIMPLE_CLASS_LOADING;
 	private RegistryPrimer registryPrimer;
 
-	private SourceModelBuildingContextProvider explicitContextProvider;
+	private ModelsContextProvider explicitContextProvider;
 
 	public ModelsConfiguration() {
 	}
@@ -71,7 +71,7 @@ public class ModelsConfiguration {
 	/**
 	 * A primer for {@linkplain ClassDetailsRegistry} and
 	 * {@linkplain AnnotationDescriptorRegistry} applied when
-	 * the {@linkplain SourceModelBuildingContext} is first built.
+	 * the {@linkplain ModelsContext} is first built.
 	 */
 	public RegistryPrimer getRegistryPrimer() {
 		return registryPrimer;
@@ -86,32 +86,32 @@ public class ModelsConfiguration {
 	}
 
 	/**
-	 * An {@linkplain SourceModelBuildingContextProvider explicit provider} to use.
+	 * An {@linkplain ModelsContextProvider explicit provider} to use.
 	 *
 	 * @see #setExplicitContextProvider
 	 */
-	public SourceModelBuildingContextProvider getExplicitContextProvider() {
+	public ModelsContextProvider getExplicitContextProvider() {
 		return explicitContextProvider;
 	}
 
 	/**
 	 * Specify an {@linkplain #getExplicitContextProvider explicit provider} for
-	 * {@linkplain SourceModelBuildingContext} instances.
+	 * {@linkplain ModelsContext} instances.
 	 *
 	 * @implNote Prefer use of Java {@linkplain java.util.ServiceLoader service loading}
 	 * for supplying a specific provider.
 	 */
-	public ModelsConfiguration setExplicitContextProvider(SourceModelBuildingContextProvider explicitContextProvider) {
+	public ModelsConfiguration setExplicitContextProvider(ModelsContextProvider explicitContextProvider) {
 		this.explicitContextProvider = explicitContextProvider;
 		return this;
 	}
 
 	/**
-	 * Build the {@linkplain SourceModelBuildingContext} instance.
+	 * Build the {@linkplain ModelsContext} instance.
 	 */
-	public SourceModelBuildingContext bootstrap() {
+	public ModelsContext bootstrap() {
 		if ( explicitContextProvider != null ) {
-			final SourceModelBuildingContext context = explicitContextProvider.produceContext(
+			final ModelsContext context = explicitContextProvider.produceContext(
 					classLoading,
 					registryPrimer,
 					configValues
@@ -119,15 +119,15 @@ public class ModelsConfiguration {
 			if ( context != null ) {
 				return context;
 			}
-			ModelsLogging.MODELS_LOGGER.debugf( "Explicit SourceModelBuildingContextProvider returned null" );
+			ModelsLogging.MODELS_LOGGER.debugf( "Explicit ModelsContext returned null" );
 		}
 
-		final Collection<SourceModelBuildingContextProvider> discoveredProviders = classLoading.loadJavaServices( SourceModelBuildingContextProvider.class );
+		final Collection<ModelsContextProvider> discoveredProviders = classLoading.loadJavaServices( ModelsContextProvider.class );
 		if ( discoveredProviders.size() > 1 ) {
-			ModelsLogging.MODELS_LOGGER.debugf( "Multiple SourceModelBuildingContextProvider impls found" );
+			ModelsLogging.MODELS_LOGGER.debugf( "Multiple ModelsContext impls found" );
 		}
-		for ( SourceModelBuildingContextProvider provider : discoveredProviders ) {
-			final SourceModelBuildingContext context = provider.produceContext(
+		for ( ModelsContextProvider provider : discoveredProviders ) {
+			final ModelsContext context = provider.produceContext(
 					classLoading,
 					registryPrimer,
 					configValues
@@ -137,6 +137,6 @@ public class ModelsConfiguration {
 			}
 		}
 
-		return new BasicModelBuildingContextImpl( classLoading, registryPrimer );
+		return new BasicModelsContextImpl( classLoading, registryPrimer );
 	}
 }

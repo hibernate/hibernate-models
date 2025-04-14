@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.ForeignKey;
@@ -22,21 +22,21 @@ public class ForeignKeyAnnotation implements ForeignKey {
 	private String foreignKeyDefinition;
 	private String options;
 
-	public ForeignKeyAnnotation(SourceModelBuildingContext modelContext) {
+	public ForeignKeyAnnotation(ModelsContext modelContext) {
 		name = "";
 		value = ConstraintMode.CONSTRAINT;
 		foreignKeyDefinition = "";
 		options = "";
 	}
 
-	public ForeignKeyAnnotation(ForeignKey usage, SourceModelBuildingContext modelContext) {
+	public ForeignKeyAnnotation(ForeignKey usage, ModelsContext modelContext) {
 		name = usage.name();
 		value = usage.value();
 		foreignKeyDefinition = usage.foreignKeyDefinition();
 		options = usage.options();
 	}
 
-	public ForeignKeyAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public ForeignKeyAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		value = (ConstraintMode) attributeValues.get( "value" );
 		foreignKeyDefinition = (String) attributeValues.get( "foreignKeyDefinition" );

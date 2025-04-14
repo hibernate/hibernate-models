@@ -6,7 +6,7 @@ package org.hibernate.models.bytebuddy.internal.values;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -24,7 +24,7 @@ public class NestedValueExtractor<A extends Annotation> extends AbstractValueExt
 	}
 
 	@Override
-	protected A extractAndWrap(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext buildingContext) {
-		return wrapper.convert( byteBuddyValue, buildingContext );
+	protected A extractAndWrap(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelsContext) {
+		return wrapper.convert( byteBuddyValue, modelsContext );
 	}
 }

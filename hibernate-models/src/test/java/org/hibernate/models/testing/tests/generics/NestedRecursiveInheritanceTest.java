@@ -9,7 +9,7 @@ import java.util.Map;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class NestedRecursiveInheritanceTest {
 	@Test
 	void testNestedGenericHierarchy() {
-		final SourceModelBuildingContext buildingContext = createModelContext(
+		final ModelsContext modelsContext = createModelContext(
 				Child.class,
 				Parent.class,
 				ChildHierarchy1.class,
@@ -35,11 +35,11 @@ public class NestedRecursiveInheritanceTest {
 		);
 
 		{
-			final ClassDetails child = buildingContext.getClassDetailsRegistry()
+			final ClassDetails child = modelsContext.getClassDetailsRegistry()
 					.getClassDetails( Child.class.getName() );
-			final ClassDetails child2 = buildingContext.getClassDetailsRegistry()
+			final ClassDetails child2 = modelsContext.getClassDetailsRegistry()
 					.getClassDetails( ChildHierarchy2.class.getName() );
-			final ClassDetails child22 = buildingContext.getClassDetailsRegistry()
+			final ClassDetails child22 = modelsContext.getClassDetailsRegistry()
 					.getClassDetails( ChildHierarchy22.class.getName() );
 
 			final FieldDetails parentField = child.findFieldByName( "parent" );
@@ -57,11 +57,11 @@ public class NestedRecursiveInheritanceTest {
 		}
 
 		{
-			final ClassDetails parent = buildingContext.getClassDetailsRegistry()
+			final ClassDetails parent = modelsContext.getClassDetailsRegistry()
 					.getClassDetails( Parent.class.getName() );
-			final ClassDetails parent2 = buildingContext.getClassDetailsRegistry()
+			final ClassDetails parent2 = modelsContext.getClassDetailsRegistry()
 					.getClassDetails( ParentHierarchy2.class.getName() );
-			final ClassDetails parent22 = buildingContext.getClassDetailsRegistry()
+			final ClassDetails parent22 = modelsContext.getClassDetailsRegistry()
 					.getClassDetails( ParentHierarchy22.class.getName() );
 
 			final FieldDetails childrenField = parent.findFieldByName( "children" );
@@ -79,11 +79,15 @@ public class NestedRecursiveInheritanceTest {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	static abstract class Child<P extends Parent> {
+		@SuppressWarnings("unused")
 		P parent;
 	}
 
+	@SuppressWarnings("rawtypes")
 	static abstract class Parent<C extends Child> {
+		@SuppressWarnings("unused")
 		Map<Long, C> children;
 	}
 
@@ -93,9 +97,11 @@ public class NestedRecursiveInheritanceTest {
 	static class ChildHierarchy1 extends Child<ParentHierarchy1> {
 	}
 
+	@SuppressWarnings("rawtypes")
 	static class ChildHierarchy2<P extends ParentHierarchy2> extends Child<P> {
 	}
 
+	@SuppressWarnings("rawtypes")
 	static class ParentHierarchy2<C extends ChildHierarchy2> extends Parent<C> {
 	}
 

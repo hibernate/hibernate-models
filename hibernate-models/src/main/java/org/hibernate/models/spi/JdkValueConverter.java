@@ -8,5 +8,5 @@ package org.hibernate.models.spi;
  * @author Steve Ebersole
  */
 public interface JdkValueConverter<V> {
-	V convert(V rawValue, SourceModelBuildingContext modelContext);
+	V convert(V rawValue, ModelsContext modelContext);
 }

@@ -17,24 +17,20 @@ import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ClassLoading;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
- * SourceModelBuildingContext implementation used with serialization support.
+ * ModelsContext implementation used with serialization support.
  *
- * @implNote This implementation is considered immutable after construction.  It implements
- * {@linkplain SourceModelBuildingContext} instead of just {@linkplain SourceModelContext}
- * simply for ease of coding.  From the API point of view, via {@linkplain StorableContext#fromStorableForm},
- * this implementation is always treated as an immutable {@linkplain SourceModelContext}.
+ * @see StorableContext#fromStorableForm(ClassLoading)
  *
  * @author Steve Ebersole
  */
-public class RestoredModelContext implements SourceModelBuildingContext {
+public class RestoredModelContext implements ModelsContext {
 	private final MutableAnnotationDescriptorRegistry annotationDescriptorRegistry;
 	private final MutableClassDetailsRegistry classDetailsRegistry;
 
-	private ClassLoading classLoading;
+	private final ClassLoading classLoading;
 
 	public RestoredModelContext(StorableContextImpl serialContext, ClassLoading classLoading) {
 		this.classLoading = classLoading;
@@ -54,7 +50,6 @@ public class RestoredModelContext implements SourceModelBuildingContext {
 			annotationDescriptorRegistry.register( serialDescriptor.fromStorableForm( this ) );
 		}
 
-		classLoading = null;
 		classDetailsBuilder.invalidate();
 	}
 

@@ -5,7 +5,7 @@
 package org.hibernate.models.jandex.internal.values;
 
 import org.hibernate.models.jandex.spi.JandexValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -22,7 +22,7 @@ public class EnumValueConverter<E extends Enum<E>> implements JandexValueConvert
 	}
 
 	@Override
-	public E convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext) {
+	public E convert(AnnotationValue jandexValue, ModelsContext modelContext) {
 		assert jandexValue != null;
 		final String enumName = jandexValue.asEnum();
 		return Enum.valueOf( enumClass, enumName );

@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.jandex.spi;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.Type;
 
@@ -28,7 +28,7 @@ public class JandexTypeSwitcher {
 	public static <T> T switchType(
 			Type type,
 			JandexTypeSwitch<T> typeSwitch,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		switch( type.kind() ) {
 			case CLASS -> {
 				return typeSwitch.caseClass( type.asClassType(), modelContext );

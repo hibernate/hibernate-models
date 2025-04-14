@@ -6,35 +6,35 @@ package org.hibernate.models.jandex.internal;
 
 import java.util.Map;
 
-import org.hibernate.models.internal.BasicModelBuildingContextImpl;
+import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.jandex.Settings;
 import org.hibernate.models.spi.ClassLoading;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.RegistryPrimer;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelBuildingContextProvider;
+import org.hibernate.models.spi.ModelsContextProvider;
 
 import org.jboss.jandex.IndexView;
 
 /**
- * SourceModelBuildingContextProvider for {@code hibernate-models-jandex}
+ * ModelsContextProvider for {@code hibernate-models-jandex}
  *
  * @author Steve Ebersole
  */
-public class JandexBuildingContextProvider implements SourceModelBuildingContextProvider {
-	public static final JandexBuildingContextProvider JANDEX_PROVIDER = new JandexBuildingContextProvider();
+public class JandexModelsContextProvider implements ModelsContextProvider {
+	public static final JandexModelsContextProvider JANDEX_PROVIDER = new JandexModelsContextProvider();
 
 	@Override
-	public SourceModelBuildingContext produceContext(
+	public ModelsContext produceContext(
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer,
 			Map<Object, Object> configProperties) {
 		final IndexView jandexIndex = resolveJandexIndex( configProperties );
 
 		if ( jandexIndex != null ) {
-			return new JandexModelContextImpl( jandexIndex, classLoading, registryPrimer );
+			return new JandexModelsContextImpl( jandexIndex, classLoading, registryPrimer );
 		}
 
-		return new BasicModelBuildingContextImpl( classLoading, registryPrimer );
+		return new BasicModelsContextImpl( classLoading, registryPrimer );
 
 	}
 

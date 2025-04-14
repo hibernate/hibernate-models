@@ -13,8 +13,8 @@ import java.util.Map;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableAnnotationDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 
 /**
  * Specialized AnnotationDescriptor implementation intended for use in describing
@@ -68,7 +68,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	}
 
 	@Override
-	public C createUsage(SourceModelBuildingContext context) {
+	public C createUsage(ModelsContext context) {
 		if ( dynamicCreator == null ) {
 			dynamicCreator = new DynamicCreator<>( getAnnotationType(), concreteClass );
 		}
@@ -76,7 +76,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	}
 
 	@Override
-	public C createUsage(A jdkAnnotation, SourceModelBuildingContext context) {
+	public C createUsage(A jdkAnnotation, ModelsContext context) {
 		if ( jdkCreator == null ) {
 			jdkCreator = new JdkCreator<>( getAnnotationType(), concreteClass );
 		}
@@ -84,7 +84,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	}
 
 	@Override
-	public A createUsage(Map<String,Object> attributeValues, SourceModelBuildingContext context) {
+	public A createUsage(Map<String,Object> attributeValues, ModelsContext context) {
 		if ( deTypedCreator == null ) {
 			deTypedCreator = new DeTypedCreator<>( getAnnotationType(), concreteClass );
 		}
@@ -104,13 +104,13 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	public static class DynamicCreator<A extends Annotation, C extends A> {
 		private final Constructor<C> constructor;
 
-		public DynamicCreator(Class<A> annotationType, Class<C> concreteClass) {
+		public DynamicCreator(@SuppressWarnings("unused") Class<A> annotationType, Class<C> concreteClass) {
 			this( resolveConstructor( concreteClass ) );
 		}
 
 		private static <A extends Annotation, C extends A> Constructor<C> resolveConstructor(Class<C> concreteClass) {
 			try {
-				return concreteClass.getDeclaredConstructor( SourceModelBuildingContext.class );
+				return concreteClass.getDeclaredConstructor( ModelsContext.class );
 			}
 			catch (NoSuchMethodException e) {
 				throw new RuntimeException( e );
@@ -121,7 +121,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 			this.constructor = constructor;
 		}
 
-		public C createUsage(SourceModelBuildingContext context) {
+		public C createUsage(ModelsContext context) {
 			try {
 				return constructor.newInstance( context );
 			}
@@ -142,7 +142,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 				Class<A> annotationType,
 				Class<C> concreteClass) {
 			try {
-				return concreteClass.getDeclaredConstructor( annotationType, SourceModelBuildingContext.class );
+				return concreteClass.getDeclaredConstructor( annotationType, ModelsContext.class );
 			}
 			catch (NoSuchMethodException e) {
 				throw new RuntimeException( e );
@@ -153,7 +153,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 			this.constructor = constructor;
 		}
 
-		public C createUsage(A jdkAnnotation, SourceModelBuildingContext context) {
+		public C createUsage(A jdkAnnotation, ModelsContext context) {
 			try {
 				return constructor.newInstance( jdkAnnotation, context );
 			}
@@ -166,13 +166,13 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	public static class DeTypedCreator<A extends Annotation, C extends A> {
 		private final Constructor<C> constructor;
 
-		public DeTypedCreator(Class<A> annotationType, Class<C> concreteClass) {
+		public DeTypedCreator(@SuppressWarnings("unused") Class<A> annotationType, Class<C> concreteClass) {
 			this( resolveConstructor( concreteClass ) );
 		}
 
 		private static <A extends Annotation, C extends A> Constructor<C> resolveConstructor(Class<C> concreteClass) {
 			try {
-				return concreteClass.getDeclaredConstructor( Map.class, SourceModelBuildingContext.class );
+				return concreteClass.getDeclaredConstructor( Map.class, ModelsContext.class );
 			}
 			catch (NoSuchMethodException e) {
 				throw new RuntimeException( e );
@@ -183,7 +183,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 			this.constructor = constructor;
 		}
 
-		public C createUsage(Map<String,?> attributeValues, SourceModelBuildingContext context) {
+		public C createUsage(Map<String,?> attributeValues, ModelsContext context) {
 			try {
 				return constructor.newInstance( attributeValues, context );
 			}

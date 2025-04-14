@@ -8,7 +8,7 @@ import org.hibernate.models.rendering.internal.RenderingTargetCollectingImpl;
 import org.hibernate.models.rendering.internal.RenderingTargetStreamImpl;
 import org.hibernate.models.rendering.internal.SimpleRenderer;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.annotations.EverythingBagel;
 import org.hibernate.models.testing.annotations.Nested;
 import org.hibernate.models.testing.annotations.Status;
@@ -24,56 +24,56 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class RenderingSmokeTest {
 	@Test
 	void testStreamRendering1() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().resolveClassDetails( SimpleEntity.class.getName() );
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleEntity.class.getName() );
 
 		// simple stdout renderer with default (2) indentation
 		final SimpleRenderer renderer = new SimpleRenderer( new RenderingTargetStreamImpl( System.out ) );
-		renderer.renderClass( classDetails, buildingContext );
+		renderer.renderClass( classDetails, modelsContext );
 	}
 
 	@Test
 	void testStreamRendering2() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().resolveClassDetails( SimpleEntity.class.getName() );
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleEntity.class.getName() );
 
 		// simple stdout renderer with specified indentation
 		final SimpleRenderer renderer = new SimpleRenderer( new RenderingTargetStreamImpl( System.out, 4 ) );
-		renderer.renderClass( classDetails, buildingContext );
+		renderer.renderClass( classDetails, modelsContext );
 	}
 
 	@Test
 	void testCollectingRendering1() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleClass.class );
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
+		final ModelsContext modelsContext = createModelContext( SimpleClass.class );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
 
 		final RenderingTargetCollectingImpl collectingTarget = new RenderingTargetCollectingImpl();
 		final SimpleRenderer renderer = new SimpleRenderer( collectingTarget );
-		renderer.renderClass( classDetails, buildingContext );
+		renderer.renderClass( classDetails, modelsContext );
 
-		System.out.println( collectingTarget.toString() );
+		System.out.println( collectingTarget );
 	}
 
 	@Test
 	void testCollectingRendering2() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleClass.class );
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
+		final ModelsContext modelsContext = createModelContext( SimpleClass.class );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
 
 		final RenderingTargetCollectingImpl collectingTarget = new RenderingTargetCollectingImpl();
 		final SimpleRenderer renderer = new SimpleRenderer( collectingTarget );
-		renderer.renderClass( classDetails, buildingContext );
+		renderer.renderClass( classDetails, modelsContext );
 
 		collectingTarget.render( System.out );
 	}
 
 	@Test
 	void testCollectingRendering3() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleClass.class );
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
+		final ModelsContext modelsContext = createModelContext( SimpleClass.class );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
 
 		final RenderingTargetCollectingImpl collectingTarget = new RenderingTargetCollectingImpl( 4 );
 		final SimpleRenderer renderer = new SimpleRenderer( collectingTarget );
-		renderer.renderClass( classDetails, buildingContext );
+		renderer.renderClass( classDetails, modelsContext );
 
 		collectingTarget.render( System.out );
 	}

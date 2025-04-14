@@ -17,12 +17,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 import org.hibernate.models.internal.util.CollectionHelper;
-import org.hibernate.models.jandex.spi.JandexModelContext;
+import org.hibernate.models.jandex.spi.JandexModelsContext;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AttributeDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.DotName;
@@ -44,7 +44,7 @@ public class AnnotationUsageBuilder {
 	 */
 	public static Map<Class<? extends Annotation>, ? extends Annotation> collectUsages(
 			org.jboss.jandex.AnnotationTarget jandexAnnotationTarget,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		if ( jandexAnnotationTarget == null ) {
 			return Collections.emptyMap();
 		}
@@ -52,7 +52,7 @@ public class AnnotationUsageBuilder {
 		processAnnotations(
 				jandexAnnotationTarget.declaredAnnotations(),
 				result::put,
-				buildingContext
+				modelsContext
 		);
 		return result;
 	}
@@ -63,8 +63,8 @@ public class AnnotationUsageBuilder {
 	public static void processAnnotations(
 			Collection<AnnotationInstance> annotations,
 			BiConsumer<Class<? extends Annotation>, Annotation> consumer,
-			SourceModelBuildingContext buildingContext) {
-		final AnnotationDescriptorRegistry annotationDescriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
+			ModelsContext modelsContext) {
+		final AnnotationDescriptorRegistry annotationDescriptorRegistry = modelsContext.getAnnotationDescriptorRegistry();
 
 		for ( AnnotationInstance annotation : annotations ) {
 			if ( annotation.name().equals( DOCUMENTED )
@@ -74,7 +74,7 @@ public class AnnotationUsageBuilder {
 				continue;
 			}
 
-			final Class<? extends Annotation> annotationType = buildingContext
+			final Class<? extends Annotation> annotationType = modelsContext
 					.getClassLoading()
 					.classForName( annotation.name().toString() );
 
@@ -82,7 +82,7 @@ public class AnnotationUsageBuilder {
 			final Annotation usage = makeUsage(
 					annotation,
 					annotationDescriptor,
-					buildingContext
+					modelsContext
 			);
 			consumer.accept( annotationType, usage );
 		}
@@ -91,7 +91,7 @@ public class AnnotationUsageBuilder {
 	public static <A extends Annotation> A makeUsage(
 			AnnotationInstance jandexAnnotation,
 			AnnotationDescriptor<A> annotationDescriptor,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final Map<String, Object> attributeValues = extractAttributeValues(
 				jandexAnnotation,
 				annotationDescriptor,
@@ -107,7 +107,7 @@ public class AnnotationUsageBuilder {
 	public static <A extends Annotation> Map<String,Object> extractAttributeValues(
 		AnnotationInstance annotationInstance,
 		AnnotationDescriptor<A> annotationDescriptor,
-		SourceModelBuildingContext modelContext) {
+		ModelsContext modelContext) {
 		if ( CollectionHelper.isEmpty( annotationDescriptor.getAttributes() ) ) {
 			return Collections.emptyMap();
 		}
@@ -116,7 +116,7 @@ public class AnnotationUsageBuilder {
 		for ( int i = 0; i < annotationDescriptor.getAttributes().size(); i++ ) {
 			final AttributeDescriptor attributeDescriptor = annotationDescriptor.getAttributes().get( i );
 			final JandexValueExtractor<?> extractor = modelContext
-					.as( JandexModelContext.class )
+					.as( JandexModelsContext.class )
 					.getJandexValueExtractor( attributeDescriptor.getTypeDescriptor() );
 			final Object attributeValue = extractor.extractValue(
 					annotationInstance,

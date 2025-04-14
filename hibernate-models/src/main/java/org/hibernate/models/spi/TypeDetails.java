@@ -104,7 +104,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 */
 	default boolean isResolved() {
 		// IMPORTANT : Relies on the fact that `IsResolvedTypeSwitch` never uses the
-		// `SourceModelBuildingContext` passed to it as a `TypeDetailsSwitch` implementation.
+		// `ModelsContext` passed to it as a `TypeDetailsSwitch` implementation.
 		// Hence, the passing `null` here
 		return switchType( this, IsResolvedTypeSwitch.IS_RESOLVED_SWITCH, null );
 	}

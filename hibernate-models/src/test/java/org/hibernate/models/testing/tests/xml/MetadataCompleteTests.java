@@ -7,8 +7,8 @@ package org.hibernate.models.testing.tests.xml;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableMemberDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.testing.orm.JpaAnnotations;
 
 import org.junit.jupiter.api.Test;
@@ -26,9 +26,9 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class MetadataCompleteTests {
 	@Test
 	void testIt() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
 
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
 		// A metadata-complete XML mapping means that all "attributes" not explicitly listed in
@@ -37,7 +37,7 @@ public class MetadataCompleteTests {
 		// we will remove that annotation.
 
 		// mark them all transient...
-		classDetails.forEachPersistableMember( (member) -> ( (MutableMemberDetails) member ).applyAnnotationUsage( JpaAnnotations.TRANSIENT, buildingContext ) );
+		classDetails.forEachPersistableMember( (member) -> ( (MutableMemberDetails) member ).applyAnnotationUsage( JpaAnnotations.TRANSIENT, modelsContext ) );
 
 		checkFieldIsTransient( classDetails.findFieldByName( "id" ), true );
 		checkFieldIsTransient( classDetails.findFieldByName( "name" ), true );

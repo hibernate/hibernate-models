@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import static org.hibernate.models.spi.ClassDetails.CLASS_CLASS_DETAILS;
 import static org.hibernate.models.spi.ClassDetails.OBJECT_CLASS_DETAILS;
@@ -25,21 +25,21 @@ import static org.hibernate.models.spi.ClassDetails.VOID_OBJECT_CLASS_DETAILS;
  * @author Steve Ebersole
  */
 public abstract class AbstractClassDetailsRegistry implements MutableClassDetailsRegistry {
-	protected final SourceModelBuildingContext context;
+	protected final ModelsContext context;
 
 	protected final Map<String, ClassDetails> classDetailsMap;
 
 	// subtype per type
 	protected final Map<String, List<ClassDetails>> subTypeClassDetailsMap;
 
-	protected AbstractClassDetailsRegistry(SourceModelBuildingContext context) {
+	protected AbstractClassDetailsRegistry(ModelsContext context) {
 		this( new ConcurrentHashMap<>(), new ConcurrentHashMap<>(), context );
 	}
 
 	protected AbstractClassDetailsRegistry(
 			Map<String, ClassDetails> classDetailsMap,
 			Map<String, List<ClassDetails>> subTypeClassDetailsMap,
-			SourceModelBuildingContext context) {
+			ModelsContext context) {
 		this.classDetailsMap = classDetailsMap;
 		this.subTypeClassDetailsMap = subTypeClassDetailsMap;
 		this.context = context;

@@ -233,19 +233,19 @@ public class TypeDetailsHelper {
 	/**
 	 * Make an array type of the given component type
 	 */
-	public static ArrayTypeDetails arrayOf(TypeDetails constituentType, SourceModelBuildingContext buildingContext) {
+	public static ArrayTypeDetails arrayOf(TypeDetails constituentType, ModelsContext modelsContext) {
 		final ClassDetails arrayClassDetails;
 		if ( constituentType.getTypeKind() == TypeDetails.Kind.PRIMITIVE ) {
 			final PrimitiveTypeDetails primitiveType = constituentType.asPrimitiveType();
 			final PrimitiveKind primitiveKind = primitiveType.getPrimitiveKind();
-			arrayClassDetails = buildingContext
+			arrayClassDetails = modelsContext
 					.getClassDetailsRegistry()
 					.resolveClassDetails( "[" + primitiveKind.getJavaTypeChar() );
 		}
 		else {
 			final ClassDetails rawComponentType = constituentType.determineRawClass();
 			final String arrayClassName = "[L" + rawComponentType.getName().replace( '.', '/' ) + ";";
-			arrayClassDetails = buildingContext
+			arrayClassDetails = modelsContext
 					.getClassDetailsRegistry()
 					.resolveClassDetails( arrayClassName );
 		}

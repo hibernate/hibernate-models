@@ -20,7 +20,7 @@ import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import net.bytebuddy.description.annotation.AnnotationSource;
@@ -107,7 +107,7 @@ public class FieldDetailsImpl
 	public Field toJavaMember(
 			Class<?> declaringJavaClass,
 			ClassLoading classLoading,
-			SourceModelContext modelContext) {
+			ModelsContext modelContext) {
 		try {
 			return declaringJavaClass.getField( getName() );
 		}

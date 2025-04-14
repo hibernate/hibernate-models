@@ -17,8 +17,7 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -202,7 +201,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	}
 
 	@Override
-	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext) {
 		return classLoading.classForName( getClassName() );
 	}
 
@@ -218,27 +217,27 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 
 	private static ClassDetails determineSuperType(
 			TypeDescription typeDescription,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		if ( typeDescription.getSuperClass() == null ) {
 			return null;
 		}
 
-		return buildingContext
+		return modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( typeDescription.getSuperClass().asRawType().getTypeName() );
 	}
 
-	private static TypeDetails determineGenericSuperType(TypeDescription typeDescription, SourceModelBuildingContext buildingContext) {
+	private static TypeDetails determineGenericSuperType(TypeDescription typeDescription, ModelsContext modelsContext) {
 		if ( typeDescription.getSuperClass() == null ) {
 			return null;
 		}
 
-		return TypeSwitchStandard.switchType( typeDescription.getSuperClass(), buildingContext );
+		return TypeSwitchStandard.switchType( typeDescription.getSuperClass(), modelsContext );
 	}
 
 	private static List<TypeDetails> determineInterfaces(
 			TypeDescription typeDescription,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		final TypeList.Generic interfaceTypes = typeDescription.getInterfaces();
 		if ( isEmpty( interfaceTypes ) ) {
 			return emptyList();
@@ -248,7 +247,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 		for ( TypeDescription.Generic interfaceType : interfaceTypes ) {
 			final TypeDetails switchedType = TypeSwitchStandard.switchType(
 					interfaceType,
-					buildingContext
+					modelsContext
 			);
 			result.add( switchedType );
 		}
@@ -258,7 +257,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	private static List<TypeVariableDetails> determineTypeParameters(
 			TypeDescription typeDescription,
 			ClassDetailsImpl current,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		final TypeList.Generic typeArguments = typeDescription.getTypeVariables();
 		if ( CollectionHelper.isEmpty( typeArguments ) ) {
 			return emptyList();
@@ -266,7 +265,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 
 		final ArrayList<TypeVariableDetails> result = arrayList( typeArguments.size() );
 		for ( TypeDescription.Generic typeArgument : typeArguments ) {
-			result.add( (TypeVariableDetails) TypeSwitchStandard.switchType( typeArgument, current, buildingContext ) );
+			result.add( (TypeVariableDetails) TypeSwitchStandard.switchType( typeArgument, current, modelsContext ) );
 		}
 		return result;
 	}

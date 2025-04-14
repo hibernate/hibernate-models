@@ -7,7 +7,7 @@ package org.hibernate.models.testing.tests.classes;
 import org.hibernate.models.internal.jdk.JdkClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class PrimitiveTypeTests {
 	@Test
 	void testPrimitives() {
-		final SourceModelBuildingContext modelContext = createModelContext();
+		final ModelsContext modelContext = createModelContext();
 		final ClassDetailsRegistry classDetailsRegistry = modelContext.getClassDetailsRegistry();
 
 		final ClassDetails booleanDetails = classDetailsRegistry.resolveClassDetails( "boolean" );

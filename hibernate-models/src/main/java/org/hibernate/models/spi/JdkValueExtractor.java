@@ -13,7 +13,7 @@ public interface JdkValueExtractor<V> {
 	/**
 	 * Extract the value of the named attribute from the given annotation
 	 */
-	<A extends Annotation> V extractValue(A usage, String attributeName, SourceModelBuildingContext modelContext);
+	<A extends Annotation> V extractValue(A usage, String attributeName, ModelsContext modelContext);
 
 	/**
 	 * Extract the value of the described attribute from the given annotation
@@ -21,5 +21,5 @@ public interface JdkValueExtractor<V> {
 	<A extends Annotation> V extractValue(
 			A usage,
 			AttributeDescriptor<V> attributeDescriptor,
-			SourceModelBuildingContext modelContext);
+			ModelsContext modelContext);
 }

@@ -17,8 +17,7 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -42,16 +41,16 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 
 	private Class<?> javaType;
 
-	public DynamicClassDetails(String name, SourceModelBuildingContext buildingContext) {
-		this( name, null, null, buildingContext );
+	public DynamicClassDetails(String name, ModelsContext modelsContext) {
+		this( name, null, null, modelsContext );
 	}
 
 	public DynamicClassDetails(
 			String name,
 			ClassDetails superClass,
 			TypeDetails genericSuperType,
-			SourceModelBuildingContext buildingContext) {
-		this( name, null, false, superClass, genericSuperType, buildingContext );
+			ModelsContext modelsContext) {
+		this( name, null, false, superClass, genericSuperType, modelsContext );
 	}
 
 	public DynamicClassDetails(
@@ -60,8 +59,8 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 			boolean isAbstract,
 			ClassDetails superClass,
 			TypeDetails genericSuperType,
-			SourceModelBuildingContext buildingContext) {
-		this( name, className, null, isAbstract, superClass, genericSuperType, buildingContext );
+			ModelsContext modelsContext) {
+		this( name, className, null, isAbstract, superClass, genericSuperType, modelsContext );
 	}
 
 	public DynamicClassDetails(
@@ -71,8 +70,8 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 			boolean isAbstract,
 			ClassDetails superClass,
 			TypeDetails genericSuperType,
-			SourceModelBuildingContext buildingContext) {
-		super( buildingContext );
+			ModelsContext modelsContext) {
+		super( modelsContext );
 		this.name = name;
 		this.className = className;
 		this.isAbstract = isAbstract;
@@ -190,7 +189,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 			ClassDetails type,
 			boolean isArray,
 			boolean isPlural,
-			SourceModelBuildingContext context) {
+			ModelsContext context) {
 		return applyAttribute(
 				name,
 				new ClassTypeDetailsImpl( type, TypeDetails.Kind.CLASS ),
@@ -208,7 +207,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 			TypeDetails type,
 			boolean isArray,
 			boolean isPlural,
-			SourceModelBuildingContext context) {
+			ModelsContext context) {
 		final DynamicFieldDetails attribute = new DynamicFieldDetails(
 				name,
 				type,
@@ -228,7 +227,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
-	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext) {
 		if ( javaType == null ) {
 			if ( className == null ) {
 				throw new DynamicClassException( "ClassDetails (name=" + name + ") did not specify a class-name" );

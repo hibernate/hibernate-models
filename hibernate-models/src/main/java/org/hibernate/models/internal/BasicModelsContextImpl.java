@@ -10,19 +10,15 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 
 /**
- * Standard SourceModelBuildingContext implementation
+ * Standard ModelsContext implementation
  *
  * @author Steve Ebersole
  */
-public class BasicModelBuildingContextImpl extends AbstractModelBuildingContext {
+public class BasicModelsContextImpl extends AbstractModelsContext {
 	private final AnnotationDescriptorRegistryStandard descriptorRegistry;
 	private final ClassDetailsRegistryStandard classDetailsRegistry;
 
-	public BasicModelBuildingContextImpl(ClassLoading classLoadingAccess) {
-		this( classLoadingAccess, null );
-	}
-
-	public BasicModelBuildingContextImpl(ClassLoading classLoadingAccess, RegistryPrimer registryPrimer) {
+	public BasicModelsContextImpl(ClassLoading classLoadingAccess, RegistryPrimer registryPrimer) {
 		super( classLoadingAccess );
 
 		this.descriptorRegistry = new AnnotationDescriptorRegistryStandard( this );

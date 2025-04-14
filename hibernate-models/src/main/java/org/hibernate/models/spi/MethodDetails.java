@@ -59,7 +59,7 @@ public interface MethodDetails extends MemberDetails {
 	Method toJavaMember();
 
 	@Override
-	Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext);
+	Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
 
 	@Override
 	default FieldDetails asFieldDetails() {

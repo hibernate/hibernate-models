@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Descriptor for short values
@@ -25,7 +25,7 @@ public class ShortTypeDescriptor extends AbstractTypeDescriptor<Short> {
 	}
 
 	@Override
-	public Short[] makeArray(int size, SourceModelBuildingContext modelContext) {
+	public Short[] makeArray(int size, ModelsContext modelContext) {
 		return new Short[size];
 	}
 }

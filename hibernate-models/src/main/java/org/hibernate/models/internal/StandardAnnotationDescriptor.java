@@ -16,7 +16,7 @@ import java.util.Map;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.AttributeDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Simple implementation of {@link AnnotationDescriptor}.
@@ -25,41 +25,41 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  */
 public class StandardAnnotationDescriptor<A extends Annotation> extends AbstractAnnotationDescriptor<A> {
 	private final List<AttributeDescriptor<?>> attributeDescriptors;
-	private final SourceModelBuildingContext buildingContext;
+	private final ModelsContext modelsContext;
 
 	private Map<Class<? extends Annotation>, ? extends Annotation> usagesMap;
 
 	public StandardAnnotationDescriptor(
 			Class<A> annotationType,
-			SourceModelBuildingContext buildingContext) {
-		this( annotationType, null, buildingContext );
+			ModelsContext modelsContext) {
+		this( annotationType, null, modelsContext );
 	}
 
 	public StandardAnnotationDescriptor(
 			Class<A> annotationType,
 			AnnotationDescriptor<?> repeatableContainer,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		super( annotationType, AnnotationHelper.extractTargets( annotationType ), AnnotationHelper.isInherited( annotationType ), repeatableContainer );
 
-		this.buildingContext = buildingContext;
+		this.modelsContext = modelsContext;
 		this.attributeDescriptors = AnnotationDescriptorBuilding.extractAttributeDescriptors( annotationType );
 	}
 
 	@Override
 	public Map<Class<? extends Annotation>, ? extends Annotation> getUsageMap() {
 		if ( usagesMap == null ) {
-			usagesMap = buildUsagesMap( getAnnotationType(), buildingContext );
+			usagesMap = buildUsagesMap( getAnnotationType(), modelsContext );
 		}
 		return usagesMap;
 	}
 
 	@Override
-	public A createUsage(A jdkAnnotation, SourceModelBuildingContext context) {
+	public A createUsage(A jdkAnnotation, ModelsContext context) {
 		return jdkAnnotation;
 	}
 
 	@Override
-	public A createUsage(SourceModelBuildingContext context) {
+	public A createUsage(ModelsContext context) {
 		throw new UnsupportedOperationException(
 				"Creating empty annotation usage mot supported from StandardAnnotationDescriptor : " + getAnnotationType().getName()
 		);
@@ -75,10 +75,10 @@ public class StandardAnnotationDescriptor<A extends Annotation> extends Abstract
 	 */
 	private static <A extends Annotation> Map<Class<? extends Annotation>, ? extends Annotation> buildUsagesMap(
 			Class<A> annotationType,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		final Map<Class<? extends Annotation>, ? extends Annotation> result = new HashMap<>();
 
-		final AnnotationDescriptorRegistry annotationDescriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
+		final AnnotationDescriptorRegistry annotationDescriptorRegistry = modelsContext.getAnnotationDescriptorRegistry();
 
 		final Annotation[] annotationTypeAnnotations = annotationType.getAnnotations();
 		for ( int i = 0; i < annotationTypeAnnotations.length; i++ ) {
@@ -96,7 +96,7 @@ public class StandardAnnotationDescriptor<A extends Annotation> extends Abstract
 			//noinspection rawtypes
 			final AnnotationDescriptor annotationDescriptor = annotationDescriptorRegistry.getDescriptor( annotationTypeAnnotationType );
 			//noinspection unchecked
-			final Annotation annotationTypeAnnotationUsage = annotationDescriptor.createUsage( annotationTypeAnnotation, buildingContext );
+			final Annotation annotationTypeAnnotationUsage = annotationDescriptor.createUsage( annotationTypeAnnotation, modelsContext );
 
 			//noinspection rawtypes,unchecked
 			( (Map) result ).put( annotationTypeAnnotationType, annotationTypeAnnotationUsage );

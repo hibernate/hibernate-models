@@ -8,13 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
-import org.hibernate.models.bytebuddy.spi.ValueConverter;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
-import org.hibernate.models.internal.AbstractModelBuildingContext;
+import org.hibernate.models.internal.AbstractModelsContext;
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
 import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
 import org.hibernate.models.internal.MutableClassDetailsRegistry;
-import org.hibernate.models.internal.SimpleClassLoading;
 import org.hibernate.models.serial.internal.StorableContextImpl;
 import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.ClassLoading;
@@ -24,29 +22,22 @@ import org.hibernate.models.spi.ValueTypeDescriptor;
 import net.bytebuddy.pool.TypePool;
 
 /**
- * SourceModelBuildingContext implementation based on ByteBuddy, leveraging a
- * {@linkplain TypePool} to inspect
+ * Implementation of ByteBuddyModelsContext
  *
  * @author Steve Ebersole
  */
-public class ByteBuddyModelContextImpl
-		extends AbstractModelBuildingContext
+public class ByteBuddyModelsContextImpl
+		extends AbstractModelsContext
 		implements ByteBuddyModelsContext {
 	private final TypePool typePool;
 
 	private final ClassDetailsRegistryImpl classDetailsRegistry;
 	private final AnnotationDescriptorRegistryStandard descriptorRegistry;
 
-	private final Map<ValueTypeDescriptor, ValueConverter> valueConverters = new HashMap<>();
+	@SuppressWarnings("rawtypes")
 	private final Map<ValueTypeDescriptor, ValueExtractor> valueExtractors = new HashMap<>();
 
-	public ByteBuddyModelContextImpl(
-			TypePool typePool,
-			RegistryPrimer registryPrimer) {
-		this( typePool, SimpleClassLoading.SIMPLE_CLASS_LOADING, registryPrimer );
-	}
-
-	public ByteBuddyModelContextImpl(
+	public ByteBuddyModelsContextImpl(
 			TypePool typePool,
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer) {
@@ -81,22 +72,6 @@ public class ByteBuddyModelContextImpl
 	}
 
 	@Override
-	public <V> ValueConverter<V> getValueConverter(ValueTypeDescriptor<V> valueTypeDescriptor) {
-		//noinspection unchecked
-		final ValueConverter<V> existing = valueConverters.get( valueTypeDescriptor );
-		if ( existing != null ) {
-			return existing;
-		}
-
-		return ByteBuddyBuilders.buildValueHandlersReturnConverter(
-				valueTypeDescriptor,
-				valueConverters::put,
-				valueExtractors::put,
-				this
-		);
-	}
-
-	@Override
 	public <V> ValueExtractor<V> getValueExtractor(ValueTypeDescriptor<V> valueTypeDescriptor) {
 		//noinspection unchecked
 		final ValueExtractor<V> existing = valueExtractors.get( valueTypeDescriptor );
@@ -104,11 +79,11 @@ public class ByteBuddyModelContextImpl
 			return existing;
 		}
 
-		return ByteBuddyBuilders.buildValueHandlersReturnExtractor(
+		final ValueExtractor<V> valueExtractor = ByteBuddyBuilders.buildValueExtractor(
 				valueTypeDescriptor,
-				valueConverters::put,
-				valueExtractors::put,
 				this
 		);
+		valueExtractors.put( valueTypeDescriptor, valueExtractor );
+		return valueExtractor;
 	}
 }

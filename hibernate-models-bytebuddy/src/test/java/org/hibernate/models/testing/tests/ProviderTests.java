@@ -5,11 +5,11 @@
 package org.hibernate.models.testing.tests;
 
 import org.hibernate.models.bytebuddy.Settings;
-import org.hibernate.models.bytebuddy.internal.ByteBuddyModelContextImpl;
-import org.hibernate.models.internal.BasicModelBuildingContextImpl;
+import org.hibernate.models.bytebuddy.internal.ByteBuddyModelsContextImpl;
+import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.spi.ModelsConfiguration;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.testing.shared.intg.ByteBuddyModelContextFactory;
+import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.testing.shared.intg.ByteBuddyModelsContextFactory;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,29 +25,29 @@ import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOAD
 public class ProviderTests {
 	@Test
 	void testBasicBootstrap() {
-		final SourceModelBuildingContext context = new ModelsConfiguration()
+		final ModelsContext context = new ModelsConfiguration()
 				.bootstrap();
 		assertThat( context ).isNotNull();
-		assertThat( context ).isInstanceOf( BasicModelBuildingContextImpl.class );
+		assertThat( context ).isInstanceOf( BasicModelsContextImpl.class );
 	}
 
 	@Test
 	void testExplicitProvider() {
-		final SourceModelBuildingContext context = new ModelsConfiguration()
+		final ModelsContext context = new ModelsConfiguration()
 				.setExplicitContextProvider( BYTEBUDDY_PROVIDER )
 				.bootstrap();
 		assertThat( context ).isNotNull();
 		// without passing the TypePool, the basic one is used
-		assertThat( context ).isInstanceOf( BasicModelBuildingContextImpl.class );
+		assertThat( context ).isInstanceOf( BasicModelsContextImpl.class );
 	}
 
 	@Test
 	void testPassingJandexIndex() {
-		final TypePool typePool = ByteBuddyModelContextFactory.buildTypePool( SIMPLE_CLASS_LOADING );
-		final SourceModelBuildingContext context = new ModelsConfiguration()
+		final TypePool typePool = ByteBuddyModelsContextFactory.buildTypePool( SIMPLE_CLASS_LOADING );
+		final ModelsContext context = new ModelsConfiguration()
 				.configValue( Settings.TYPE_POOL_PARAM, typePool )
 				.bootstrap();
 		assertThat( context ).isNotNull();
-		assertThat( context ).isInstanceOf( ByteBuddyModelContextImpl.class );
+		assertThat( context ).isInstanceOf( ByteBuddyModelsContextImpl.class );
 	}
 }

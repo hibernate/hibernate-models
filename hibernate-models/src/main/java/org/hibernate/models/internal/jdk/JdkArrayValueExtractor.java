@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
@@ -24,20 +24,20 @@ public class JdkArrayValueExtractor<V> extends AbstractJdkValueExtractor<V[]> {
 	public <A extends Annotation> V[] extractValue(
 			A usage,
 			AttributeDescriptor<V[]> attributeDescriptor,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return super.extractValue( usage, attributeDescriptor, modelContext );
 	}
 
 	@Override
-	public V[] extractValue(Annotation annotation, String attributeName, SourceModelBuildingContext buildingContext) {
-		return super.extractValue( annotation, attributeName, buildingContext );
+	public V[] extractValue(Annotation annotation, String attributeName, ModelsContext modelsContext) {
+		return super.extractValue( annotation, attributeName, modelsContext );
 	}
 
 	@Override
 	protected V[] wrap(
 			V[] rawValue,
 			AttributeDescriptor<V[]> attributeDescriptor,
-			SourceModelBuildingContext buildingContext) {
-		return converter.convert( rawValue, buildingContext );
+			ModelsContext modelsContext) {
+		return converter.convert( rawValue, modelsContext );
 	}
 }

@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.models.jandex.internal.AnnotationUsageBuilder;
 import org.hibernate.models.jandex.spi.JandexValueConverter;
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationValue;
@@ -28,7 +28,7 @@ public class JandexNestedValueConverter<A extends Annotation> implements JandexV
 	}
 
 	@Override
-	public A convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext) {
+	public A convert(AnnotationValue jandexValue, ModelsContext modelContext) {
 		final AnnotationInstance nested = jandexValue.asNested();
 		assert nested.target() == null;
 		return AnnotationUsageBuilder.makeUsage( nested, descriptor, modelContext );

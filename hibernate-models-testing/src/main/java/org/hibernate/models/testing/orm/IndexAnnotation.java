@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.Index;
 
@@ -21,20 +21,20 @@ public class IndexAnnotation implements Index {
 	private boolean unique;
 	private String options;
 
-	public IndexAnnotation(SourceModelBuildingContext modelContext) {
+	public IndexAnnotation(ModelsContext modelContext) {
 		name = "";
 		unique = false;
 		options = "";
 	}
 
-	public IndexAnnotation(Index usage, SourceModelBuildingContext modelContext) {
+	public IndexAnnotation(Index usage, ModelsContext modelContext) {
 		name = usage.name();
 		columnList = usage.columnList();
 		unique = usage.unique();
 		options = usage.options();
 	}
 
-	public IndexAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public IndexAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		columnList = (String) attributeValues.get( "columnList" );
 		unique = (boolean) attributeValues.get( "unique" );

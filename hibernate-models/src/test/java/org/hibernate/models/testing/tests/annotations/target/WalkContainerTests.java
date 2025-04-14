@@ -11,7 +11,7 @@ import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,27 +26,27 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class WalkContainerTests {
 	@Test
 	void testNoPackageCrossing() {
-		final SourceModelBuildingContext buildingContext = createModelContext( NoGeneratorEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( NoGeneratorEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final List<AnnotationTarget> collected = new ArrayList<>();
 
 		// starting from the class, we should get 2 - the class and  the package
 		final ClassDetails entityClass = classDetailsRegistry.getClassDetails( NoGeneratorEntity.class.getName() );
-		entityClass.walkSelfAndContainers( false, buildingContext, collected::add );
+		entityClass.walkSelfAndContainers( false, modelsContext, collected::add );
 		assertThat( collected ).hasSize( 2 );
 
 		collected.clear();
 
 		// starting from the member, we should get 3 containers - this member, the class and the package
 		final FieldDetails idMember = entityClass.findFieldByName( "id" );
-		idMember.walkSelfAndContainers( false, buildingContext, collected::add );
+		idMember.walkSelfAndContainers( false, modelsContext, collected::add );
 		assertThat( collected ).hasSize( 3 );
 	}
 	@Test
 	void testPackageCrossing() {
-		final SourceModelBuildingContext buildingContext = createModelContext( NoGeneratorEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( NoGeneratorEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final List<AnnotationTarget> collected = new ArrayList<>();
 
@@ -60,7 +60,7 @@ public class WalkContainerTests {
 		//		* org.hibernate
 		//		* org
 		final ClassDetails entityClass = classDetailsRegistry.getClassDetails( NoGeneratorEntity.class.getName() );
-		entityClass.walkSelfAndContainers( true, buildingContext, collected::add );
+		entityClass.walkSelfAndContainers( true, modelsContext, collected::add );
 		assertThat( collected ).hasSize( 8 );
 
 		collected.clear();
@@ -76,7 +76,7 @@ public class WalkContainerTests {
 		//		* org.hibernate
 		//		* org
 		final FieldDetails idMember = entityClass.findFieldByName( "id" );
-		idMember.walkSelfAndContainers( true, buildingContext, collected::add );
+		idMember.walkSelfAndContainers( true, modelsContext, collected::add );
 		assertThat( collected ).hasSize( 9 );
 	}
 }

@@ -19,8 +19,7 @@ import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableScope;
 
@@ -50,7 +49,7 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	 * 		defining a field to be used as a {@linkplain MemberDetails#isPersistable() persistable} member.
 	 * @param isArray Whether the "field" is an array
 	 * @param isPlural Whether the "field" is plural
-	 * @param buildingContext Context for the creation (access to useful information).
+	 * @param modelsContext Context for the creation (access to useful information).
 	 */
 	public DynamicFieldDetails(
 			String name,
@@ -59,8 +58,8 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 			int modifierFlags,
 			boolean isArray,
 			boolean isPlural,
-			SourceModelBuildingContext buildingContext) {
-		super( buildingContext );
+			ModelsContext modelsContext) {
+		super( modelsContext );
 		this.name = name;
 		this.type = type;
 		this.declaringType = declaringType;
@@ -113,7 +112,7 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	}
 
 	@Override
-	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
 		try {
 			// make sure the type ends up on the given class-loading
 			type.determineRawClass().toJavaClass( classLoading, modelContext );

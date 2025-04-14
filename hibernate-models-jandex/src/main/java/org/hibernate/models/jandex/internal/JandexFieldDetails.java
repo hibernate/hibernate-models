@@ -20,8 +20,7 @@ import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import org.jboss.jandex.AnnotationTarget;
@@ -43,11 +42,11 @@ public class JandexFieldDetails extends AbstractAnnotationTarget
 	public JandexFieldDetails(
 			FieldInfo fieldInfo,
 			ClassDetails declaringType,
-			SourceModelBuildingContext buildingContext) {
-		super( buildingContext );
+			ModelsContext modelsContext) {
+		super( modelsContext );
 		this.fieldInfo = fieldInfo;
 		this.declaringType = declaringType;
-		this.type = JandexTypeSwitchStandard.switchType( fieldInfo.type(), declaringType, buildingContext );
+		this.type = JandexTypeSwitchStandard.switchType( fieldInfo.type(), declaringType, modelsContext );
 
 		this.isArray = fieldInfo.type().kind() == Type.Kind.ARRAY;
 		this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
@@ -100,7 +99,7 @@ public class JandexFieldDetails extends AbstractAnnotationTarget
 	}
 
 	@Override
-	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
 		// make sure the type ends up on the given class-loading
 		type.determineRawClass().toJavaClass( classLoading, modelContext );
 		return resolveJavaMember( declaringClass );

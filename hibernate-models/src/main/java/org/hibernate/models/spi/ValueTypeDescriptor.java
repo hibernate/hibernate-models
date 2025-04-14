@@ -26,20 +26,20 @@ public interface ValueTypeDescriptor<V> {
 	 */
 	AttributeDescriptor<V> createAttributeDescriptor(Class<? extends Annotation> annotationType, String attributeName);
 
-	JdkValueConverter<V> createJdkValueConverter(SourceModelBuildingContext modelContext);
+	JdkValueConverter<V> createJdkValueConverter(ModelsContext modelContext);
 
-	JdkValueExtractor<V> createJdkValueExtractor(SourceModelBuildingContext modelContext);
+	JdkValueExtractor<V> createJdkValueExtractor(ModelsContext modelContext);
 
 	Object unwrap(V value);
 
-	V[] makeArray(int size, SourceModelBuildingContext modelContext);
+	V[] makeArray(int size, ModelsContext modelContext);
 
 	default void render(
 			String name,
 			Object attributeValue,
 			RenderingTarget target,
 			Renderer renderer,
-			SourceModelContext modelContext) {
+			ModelsContext modelContext) {
 		target.addLine( "%s = %s", name, "..." );
 	}
 
@@ -47,5 +47,5 @@ public interface ValueTypeDescriptor<V> {
 			Object attributeValue,
 			RenderingTarget target,
 			Renderer renderer,
-			SourceModelContext modelContext);
+			ModelsContext modelContext);
 }

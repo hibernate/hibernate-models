@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.models.internal.AnnotationTargetSupport;
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * AnnotationTarget where we know the annotations up front, but
@@ -21,18 +21,18 @@ import org.hibernate.models.spi.SourceModelBuildingContext;
  */
 public abstract class AbstractJdkAnnotationTarget implements AnnotationTargetSupport {
 	private final Supplier<Annotation[]> annotationSupplier;
-	private final SourceModelBuildingContext modelContext;
+	private final ModelsContext modelContext;
 
 	private Map<Class<? extends Annotation>, ? extends Annotation> usagesMap;
 
 	public AbstractJdkAnnotationTarget(
 			Supplier<Annotation[]> annotationSupplier,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		this.annotationSupplier = annotationSupplier;
 		this.modelContext = modelContext;
 	}
 
-	public SourceModelBuildingContext getModelContext() {
+	public ModelsContext getModelContext() {
 		return modelContext;
 	}
 

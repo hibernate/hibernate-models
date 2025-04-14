@@ -4,8 +4,10 @@
  */
 package org.hibernate.models.serial.spi;
 
+import org.hibernate.models.spi.ModelsContext;
+
 /**
- * A part of the {@linkplain org.hibernate.models.spi.SourceModelContext model context} which can
+ * A part of the {@linkplain ModelsContext model context} which can
  * be stored in the context's {@linkplain StorableContext serial form}.
  *
  * @param <T> The storable's type

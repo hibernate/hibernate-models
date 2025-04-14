@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.hibernate.models.internal.TypeVariableReferenceDetailsImpl;
 import org.hibernate.models.internal.util.CollectionHelper;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -31,12 +31,12 @@ public class JdkTrackingTypeSwitcher implements JdkTypeSwitcher {
 
 	public static TypeDetails standardSwitchType(
 			Type type,
-			SourceModelBuildingContext buildingContext) {
-		return new JdkTrackingTypeSwitcher( buildingContext ).switchType( type );
+			ModelsContext modelsContext) {
+		return new JdkTrackingTypeSwitcher( modelsContext ).switchType( type );
 	}
 
-	public JdkTrackingTypeSwitcher(SourceModelBuildingContext buildingContext) {
-		typeSwitch = new JdkTrackingTypeSwitch( this, buildingContext );
+	public JdkTrackingTypeSwitcher(ModelsContext modelsContext) {
+		typeSwitch = new JdkTrackingTypeSwitch( this, modelsContext );
 	}
 
 	@Override

@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.Cacheable;
 
@@ -18,15 +18,15 @@ import jakarta.persistence.Cacheable;
 public class CacheableAnnotation implements Cacheable {
 	private boolean value;
 
-	public CacheableAnnotation(SourceModelBuildingContext modelContext) {
+	public CacheableAnnotation(ModelsContext modelContext) {
 		value = true;
 	}
 
-	public CacheableAnnotation(Cacheable usage, SourceModelBuildingContext modelContext) {
+	public CacheableAnnotation(Cacheable usage, ModelsContext modelContext) {
 		value = usage.value();
 	}
 
-	public CacheableAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public CacheableAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		value = (boolean) attributeValues.get( "value" );
 	}
 

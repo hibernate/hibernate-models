@@ -5,7 +5,7 @@
 package org.hibernate.models.internal.jdk;
 
 import org.hibernate.models.spi.JdkValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Common ValueWrapper support for implementations with the same raw and
@@ -23,7 +23,7 @@ public class JdkPassThruConverter<V> implements JdkValueConverter<V> {
 	}
 
 	@Override
-	public V convert(V rawValue, SourceModelBuildingContext modelContext) {
+	public V convert(V rawValue, ModelsContext modelContext) {
 		return rawValue;
 	}
 }

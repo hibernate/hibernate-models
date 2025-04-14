@@ -35,7 +35,7 @@ public interface RecordComponentDetails extends MemberDetails {
 	Member toJavaMember();
 
 	@Override
-	Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext);
+	Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
 
 	@Override
 	default FieldDetails asFieldDetails() {

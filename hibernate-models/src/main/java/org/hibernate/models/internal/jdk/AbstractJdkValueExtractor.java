@@ -12,7 +12,7 @@ import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
@@ -22,7 +22,7 @@ public abstract class AbstractJdkValueExtractor<V> implements JdkValueExtractor<
 	public <A extends Annotation> V extractValue(
 			A usage,
 			AttributeDescriptor<V> attributeDescriptor,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		try {
 			//noinspection unchecked
 			final V rawValue = (V) attributeDescriptor.getAttributeMethod().invoke( usage );
@@ -45,15 +45,15 @@ public abstract class AbstractJdkValueExtractor<V> implements JdkValueExtractor<
 	public V extractValue(
 			Annotation annotation,
 			String attributeName,
-			SourceModelBuildingContext buildingContext) {
-		final AnnotationDescriptor<? extends Annotation> annDescriptor = buildingContext
+			ModelsContext modelsContext) {
+		final AnnotationDescriptor<? extends Annotation> annDescriptor = modelsContext
 				.getAnnotationDescriptorRegistry()
 				.getDescriptor( annotation.annotationType() );
-		return extractValue( annotation, annDescriptor.getAttribute( attributeName ), buildingContext );
+		return extractValue( annotation, annDescriptor.getAttribute( attributeName ), modelsContext );
 	}
 
 	protected abstract V wrap(
 			V rawValue,
 			AttributeDescriptor<V> attributeDescriptor,
-			SourceModelBuildingContext buildingContext);
+			ModelsContext modelsContext);
 }

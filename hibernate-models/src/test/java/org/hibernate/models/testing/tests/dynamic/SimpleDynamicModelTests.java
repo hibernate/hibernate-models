@@ -12,12 +12,15 @@ import org.hibernate.models.internal.dynamic.DynamicFieldDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.testing.TestHelper;
 import org.hibernate.models.testing.orm.JpaAnnotations;
 
 import org.junit.jupiter.api.Test;
 
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -30,8 +33,8 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class SimpleDynamicModelTests {
 	@Test
 	void testSimpleBasics() {
-		final SourceModelBuildingContext buildingContext = createModelContext();
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails integerClassDetails = classDetailsRegistry.getClassDetails( Integer.class.getName() );
 		final ClassTypeDetailsImpl integerTypeDetails = new ClassTypeDetailsImpl( integerClassDetails, TypeDetails.Kind.CLASS );
@@ -40,16 +43,16 @@ public class SimpleDynamicModelTests {
 		final ClassTypeDetailsImpl stringTypeDetails = new ClassTypeDetailsImpl( stringClassDetails, TypeDetails.Kind.CLASS );
 
 		classDetailsRegistry.as( MutableClassDetailsRegistry.class )
-				.addClassDetails( "TheEntity", new DynamicClassDetails( "TheEntity", buildingContext ) );
+				.addClassDetails( "TheEntity", new DynamicClassDetails( "TheEntity", modelsContext ) );
 
 		final DynamicClassDetails entityDetails = (DynamicClassDetails) classDetailsRegistry.resolveClassDetails( "TheEntity" );
 		final Entity created = entityDetails.applyAnnotationUsage(
 				JpaAnnotations.ENTITY,
-				buildingContext
+				modelsContext
 		);
 		final Entity preExisting = entityDetails.applyAnnotationUsage(
 				JpaAnnotations.ENTITY,
-				buildingContext
+				modelsContext
 		);
 		assertThat( created ).isSameAs( preExisting );
 
@@ -58,15 +61,15 @@ public class SimpleDynamicModelTests {
 				integerTypeDetails,
 				false,
 				false,
-				buildingContext
+				modelsContext
 		);
 		final Id first = idMember.applyAnnotationUsage(
 				JpaAnnotations.ID,
-				buildingContext
+				modelsContext
 		);
 		final Id second = idMember.applyAnnotationUsage(
 				JpaAnnotations.ID,
-				buildingContext
+				modelsContext
 		);
 		assertThat( first ).isSameAs( second );
 
@@ -75,7 +78,7 @@ public class SimpleDynamicModelTests {
 				stringTypeDetails,
 				false,
 				false,
-				buildingContext
+				modelsContext
 		);
 
 		assertThat( entityDetails.getFields() ).hasSize( 2 );
@@ -88,8 +91,8 @@ public class SimpleDynamicModelTests {
 
 	@Test
 	void testResolveClassDetails() {
-		final SourceModelBuildingContext buildingContext = createModelContext();
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails integerClassDetails = classDetailsRegistry.getClassDetails( Integer.class.getName() );
 		final ClassTypeDetailsImpl integerTypeDetails = new ClassTypeDetailsImpl( integerClassDetails, TypeDetails.Kind.CLASS );
@@ -98,16 +101,16 @@ public class SimpleDynamicModelTests {
 		final ClassTypeDetailsImpl stringTypeDetails = new ClassTypeDetailsImpl( stringClassDetails, TypeDetails.Kind.CLASS );
 
 		classDetailsRegistry.as( MutableClassDetailsRegistry.class )
-				.resolveClassDetails( "TheEntity", (name) -> new DynamicClassDetails( name, buildingContext ) );
+				.resolveClassDetails( "TheEntity", (name) -> new DynamicClassDetails( name, modelsContext ) );
 
 		final DynamicClassDetails entityDetails = (DynamicClassDetails) classDetailsRegistry.resolveClassDetails( "TheEntity" );
 		final Entity created = entityDetails.applyAnnotationUsage(
 				JpaAnnotations.ENTITY,
-				buildingContext
+				modelsContext
 		);
 		final Entity preExisting = entityDetails.applyAnnotationUsage(
 				JpaAnnotations.ENTITY,
-				buildingContext
+				modelsContext
 		);
 		assertThat( created ).isSameAs( preExisting );
 
@@ -116,15 +119,15 @@ public class SimpleDynamicModelTests {
 				integerTypeDetails,
 				false,
 				false,
-				buildingContext
+				modelsContext
 		);
 		final Id first = idMember.applyAnnotationUsage(
 				JpaAnnotations.ID,
-				buildingContext
+				modelsContext
 		);
 		final Id second = idMember.applyAnnotationUsage(
 				JpaAnnotations.ID,
-				buildingContext
+				modelsContext
 		);
 		assertThat( first ).isSameAs( second );
 
@@ -133,7 +136,7 @@ public class SimpleDynamicModelTests {
 				stringTypeDetails,
 				false,
 				false,
-				buildingContext
+				modelsContext
 		);
 
 		assertThat( entityDetails.getFields() ).hasSize( 2 );
@@ -153,94 +156,93 @@ public class SimpleDynamicModelTests {
 		assertThat( ModifierUtils.isSynthetic( fieldDetails.getModifiers() ) ).isFalse();
 	}
 
-//	@Test
-//	void testSimpleEmbedded() {
-//		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext( (Index) null );
-//		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
-//
-//		final ClassDetails integerClassDetails = classDetailsRegistry.getClassDetails( Integer.class.getName() );
-//		final ClassTypeDetailsImpl integerTypeDetails = new ClassTypeDetailsImpl( integerClassDetails, TypeDetails.Kind.CLASS );
-//
-//		final ClassDetails stringClassDetails = classDetailsRegistry.getClassDetails( String.class.getName() );
-//		final ClassTypeDetailsImpl stringTypeDetails = new ClassTypeDetailsImpl( stringClassDetails, TypeDetails.Kind.CLASS );
-//
-//		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//		// EMBEDDABLE - TheName
-//
-//		final DynamicClassDetails nameEmbeddableDetails = (DynamicClassDetails) classDetailsRegistry.resolveClassDetails(
-//				"TheName",
-//				name -> {
-//					final DynamicClassDetails classDetails = new DynamicClassDetails( name, buildingContext );
-//					final Embeddable embeddableUsage = classDetails.applyAnnotationUsage( JpaAnnotations.EMBEDDABLE, buildingContext );
-//					assertThat( embeddableUsage ).isNotNull();
-//					return classDetails;
-//				}
-//		);
-//
-//		// NOTE : here we use the form accepting a ClassDetails for the attribute type
-//		// rather than the TypeDetails form used elsewhere for code coverage
-//
-//		final DynamicFieldDetails firstNameMember = nameEmbeddableDetails.applyAttribute(
-//				"first",
-//				stringClassDetails,
-//				false,
-//				false,
-//				buildingContext
-//		);
-//
-//		final DynamicFieldDetails lastNameMember = nameEmbeddableDetails.applyAttribute(
-//				"last",
-//				stringClassDetails,
-//				false,
-//				false,
-//				buildingContext
-//		);
-//
-//
-//		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//		// ENTITY - TheEntity
-//
-//		final DynamicClassDetails entityDetails = (DynamicClassDetails) classDetailsRegistry.resolveClassDetails(
-//				"TheEntity",
-//				name -> {
-//					final DynamicClassDetails classDetails = new DynamicClassDetails( name, buildingContext );
-//					final MutableAnnotationUsage<Entity> entityUsage = classDetails.applyAnnotationUsage( JpaAnnotations.ENTITY, buildingContext );
-//					assertThat( entityUsage ).isNotNull();
-//					return classDetails;
-//				}
-//		);
-//
-//		final DynamicFieldDetails idMember = entityDetails.applyAttribute(
-//				"id",
-//				integerTypeDetails,
-//				false,
-//				false,
-//				buildingContext
-//		);
-//		final MutableAnnotationUsage<Id> idUsage = idMember.applyAnnotationUsage( JpaAnnotations.ID, buildingContext );
-//		assertThat( idUsage ).isNotNull();
-//
-//		final DynamicFieldDetails nameMember = entityDetails.applyAttribute(
-//				"name",
-//				new ClassTypeDetailsImpl( nameEmbeddableDetails, TypeDetails.Kind.CLASS ),
-//				false,
-//				false,
-//				buildingContext
-//		);
-//		final MutableAnnotationUsage<Embedded> embeddedUsage = nameMember.applyAnnotationUsage( JpaAnnotations.EMBEDDED, buildingContext );
-//		assertThat( embeddedUsage ).isNotNull();
-//
-//
-//		// ASSERTIONS
-//
-//		assertThat( entityDetails.getFields() ).containsExactly( idMember, nameMember );
-//		checkPersistability( idMember );
-//		assertThat( idMember.hasDirectAnnotationUsage( Id.class ) ).isTrue();
-//		checkPersistability( nameMember );
-//		assertThat( nameMember.hasDirectAnnotationUsage( Embedded.class ) ).isTrue();
-//
-//		assertThat( nameEmbeddableDetails.getFields() ).containsExactly( firstNameMember, lastNameMember );
-//		checkPersistability( firstNameMember );
-//		checkPersistability( lastNameMember );
-//	}
+	@Test
+	void testSimpleEmbedded() {
+		final ModelsContext modelsContext = TestHelper.createModelContext();
+		final MutableClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry().as( MutableClassDetailsRegistry.class );
+
+		final ClassDetails integerClassDetails = classDetailsRegistry.getClassDetails( Integer.class.getName() );
+		final ClassTypeDetailsImpl integerTypeDetails = new ClassTypeDetailsImpl( integerClassDetails, TypeDetails.Kind.CLASS );
+
+		final ClassDetails stringClassDetails = classDetailsRegistry.getClassDetails( String.class.getName() );
+
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// EMBEDDABLE - TheName
+
+		final DynamicClassDetails nameEmbeddableDetails = (DynamicClassDetails) classDetailsRegistry.resolveClassDetails(
+				"TheName",
+				name -> {
+					final DynamicClassDetails classDetails = new DynamicClassDetails( name, modelsContext );
+					final Embeddable embeddableUsage = classDetails.applyAnnotationUsage( JpaAnnotations.EMBEDDABLE, modelsContext );
+					assertThat( embeddableUsage ).isNotNull();
+					return classDetails;
+				}
+		);
+
+		// NOTE : here we use the form accepting a ClassDetails for the attribute type
+		// rather than the TypeDetails form used elsewhere for code coverage
+
+		final DynamicFieldDetails firstNameMember = nameEmbeddableDetails.applyAttribute(
+				"first",
+				stringClassDetails,
+				false,
+				false,
+				modelsContext
+		);
+
+		final DynamicFieldDetails lastNameMember = nameEmbeddableDetails.applyAttribute(
+				"last",
+				stringClassDetails,
+				false,
+				false,
+				modelsContext
+		);
+
+
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// ENTITY - TheEntity
+
+		final DynamicClassDetails entityDetails = (DynamicClassDetails) classDetailsRegistry.resolveClassDetails(
+				"TheEntity",
+				name -> {
+					final DynamicClassDetails classDetails = new DynamicClassDetails( name, modelsContext );
+					final Entity entityUsage = classDetails.applyAnnotationUsage( JpaAnnotations.ENTITY, modelsContext );
+					assertThat( entityUsage ).isNotNull();
+					return classDetails;
+				}
+		);
+
+		final DynamicFieldDetails idMember = entityDetails.applyAttribute(
+				"id",
+				integerTypeDetails,
+				false,
+				false,
+				modelsContext
+		);
+		final Id idUsage = idMember.applyAnnotationUsage( JpaAnnotations.ID, modelsContext );
+		assertThat( idUsage ).isNotNull();
+
+		final DynamicFieldDetails nameMember = entityDetails.applyAttribute(
+				"name",
+				new ClassTypeDetailsImpl( nameEmbeddableDetails, TypeDetails.Kind.CLASS ),
+				false,
+				false,
+				modelsContext
+		);
+		final Embedded embeddedUsage = nameMember.applyAnnotationUsage( JpaAnnotations.EMBEDDED, modelsContext );
+		assertThat( embeddedUsage ).isNotNull();
+
+
+		// ASSERTIONS
+
+		assertThat( entityDetails.getFields() ).containsExactly( idMember, nameMember );
+		checkPersistability( idMember );
+		assertThat( idMember.hasDirectAnnotationUsage( Id.class ) ).isTrue();
+		checkPersistability( nameMember );
+		assertThat( nameMember.hasDirectAnnotationUsage( Embedded.class ) ).isTrue();
+
+		assertThat( nameEmbeddableDetails.getFields() ).containsExactly( firstNameMember, lastNameMember );
+		checkPersistability( firstNameMember );
+		checkPersistability( lastNameMember );
+	}
 }

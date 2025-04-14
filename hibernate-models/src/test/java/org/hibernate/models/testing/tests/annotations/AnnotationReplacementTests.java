@@ -4,8 +4,8 @@
  */
 package org.hibernate.models.testing.tests.annotations;
 
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.testing.domain.SimpleEntity;
 import org.hibernate.models.testing.orm.JpaAnnotations;
 import org.hibernate.models.testing.orm.SecondaryTableAnnotation;
@@ -25,16 +25,16 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class AnnotationReplacementTests {
 	@Test
 	void testBasicReplacement() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
 
-		final MutableClassDetails classDetails = (MutableClassDetails) buildingContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
+		final MutableClassDetails classDetails = (MutableClassDetails) modelsContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
 		assertThat( classDetails.hasDirectAnnotationUsage( SecondaryTable.class ) ).isTrue();
 		assertThat( classDetails.hasDirectAnnotationUsage( SecondaryTables.class ) ).isFalse();
 
 		final SecondaryTablesAnnotation replacement = (SecondaryTablesAnnotation) classDetails.replaceAnnotationUsage(
 				JpaAnnotations.SECONDARY_TABLE,
 				JpaAnnotations.SECONDARY_TABLES,
-				buildingContext
+				modelsContext
 		);
 
 		assertThat( classDetails.hasDirectAnnotationUsage( SecondaryTable.class ) ).isFalse();
@@ -46,18 +46,18 @@ public class AnnotationReplacementTests {
 		replacement.value( newValues );
 		assertThat( replacement.value() ).hasSize( 1 );
 
-		final SecondaryTableAnnotation fromXml = (SecondaryTableAnnotation) JpaAnnotations.SECONDARY_TABLE.createUsage( buildingContext );
+		final SecondaryTableAnnotation fromXml = (SecondaryTableAnnotation) JpaAnnotations.SECONDARY_TABLE.createUsage( modelsContext );
 		newValues[0] = fromXml;
 		fromXml.name( "from_xml" );
 
-		final SecondaryTable annotationUsage = classDetails.getAnnotationUsage( SecondaryTable.class, buildingContext );
+		final SecondaryTable annotationUsage = classDetails.getAnnotationUsage( SecondaryTable.class, modelsContext );
 		assertThat( annotationUsage.name() ).isEqualTo( "from_xml" );
 
-		final SecondaryTables annotationUsage1 = classDetails.getAnnotationUsage( SecondaryTables.class, buildingContext );
+		final SecondaryTables annotationUsage1 = classDetails.getAnnotationUsage( SecondaryTables.class, modelsContext );
 		assertThat( annotationUsage1.value() ).isSameAs( newValues );
 
 		// see #76
-		classDetails.locateAnnotationUsage( SecondaryTable.class, buildingContext );
+		classDetails.locateAnnotationUsage( SecondaryTable.class, modelsContext );
 	}
 
 }

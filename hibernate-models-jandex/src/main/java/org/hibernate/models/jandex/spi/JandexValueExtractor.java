@@ -5,7 +5,7 @@
 package org.hibernate.models.jandex.spi;
 
 import org.hibernate.models.spi.AttributeDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationInstance;
 
@@ -24,7 +24,7 @@ public interface JandexValueExtractor<V> {
 	/**
 	 * Extract the value of the named attribute from the given annotation
 	 */
-	V extractValue(AnnotationInstance annotation, String attributeName, SourceModelBuildingContext modelContext);
+	V extractValue(AnnotationInstance annotation, String attributeName, ModelsContext modelContext);
 
 	/**
 	 * Extract the value of the described attribute from the given annotation
@@ -32,7 +32,7 @@ public interface JandexValueExtractor<V> {
 	default V extractValue(
 			AnnotationInstance annotation,
 			AttributeDescriptor<V> attributeDescriptor,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return extractValue( annotation, attributeDescriptor.getName(), modelContext );
 	}
 }

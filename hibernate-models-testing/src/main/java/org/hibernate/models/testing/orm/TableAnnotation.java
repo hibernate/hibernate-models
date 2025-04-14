@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.Index;
@@ -31,7 +31,7 @@ public class TableAnnotation implements Table, CommonTableDetails {
 	private String comment;
 	private String options;
 
-	public TableAnnotation(SourceModelBuildingContext modelContext) {
+	public TableAnnotation(ModelsContext modelContext) {
 		name = "";
 		catalog = "";
 		schema = "";
@@ -42,7 +42,7 @@ public class TableAnnotation implements Table, CommonTableDetails {
 		check = new CheckConstraint[0];
 	}
 
-	public TableAnnotation(Table usage, SourceModelBuildingContext modelContext) {
+	public TableAnnotation(Table usage, ModelsContext modelContext) {
 		name = usage.name();
 		catalog = usage.catalog();
 		schema = usage.schema();
@@ -53,7 +53,7 @@ public class TableAnnotation implements Table, CommonTableDetails {
 		check = extractRepeatedValues( usage, TABLE.getAttribute( "check" ), modelContext );
 	}
 
-	public TableAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public TableAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		catalog = (String) attributeValues.get( "catalog" );
 		schema = (String) attributeValues.get( "schema" );

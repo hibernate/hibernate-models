@@ -11,7 +11,7 @@ import org.hibernate.models.internal.jdk.JdkClassDetails;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Utilities related to {@linkplain org.hibernate.models.spi.AnnotationTarget}
@@ -28,7 +28,7 @@ public class AnnotationTargetHelper {
 	 */
 	public static ClassDetails resolvePackageInfo(
 			ClassDetails classDetails,
-			SourceModelBuildingContext modelBuildingContext) {
+			ModelsContext modelsContext) {
 		if ( classDetails.getClassName() == null ) {
 			return null;
 		}
@@ -39,16 +39,16 @@ public class AnnotationTargetHelper {
 
 		final String packageInfoClassName = containingPackageName + ".package-info";
 
-		return modelBuildingContext.getClassDetailsRegistry()
+		return modelsContext.getClassDetailsRegistry()
 				.as( MutableClassDetailsRegistry.class )
 				.resolveClassDetails( packageInfoClassName, name -> {
 			// see if there is a physical package-info Class
-			final Class<Object> packageInfoClass = modelBuildingContext.getClassLoading().findClassForName( packageInfoClassName );
+			final Class<Object> packageInfoClass = modelsContext.getClassLoading().findClassForName( packageInfoClassName );
 			if ( packageInfoClass == null ) {
 				return new MissingPackageInfoDetails( containingPackageName, packageInfoClassName );
 			}
 			else {
-				return new JdkClassDetails( packageInfoClass, modelBuildingContext );
+				return new JdkClassDetails( packageInfoClass, modelsContext );
 			}
 		} );
 	}
@@ -82,7 +82,7 @@ public class AnnotationTargetHelper {
 	public static void walkContainers(
 			AnnotationTarget annotationTarget,
 			boolean crossPackageBoundaries,
-			SourceModelBuildingContext modelContext,
+			ModelsContext modelContext,
 			Consumer<ClassDetails> consumer) {
 		if ( isPackage( annotationTarget ) ) {
 			if ( !crossPackageBoundaries ) {
@@ -116,7 +116,7 @@ public class AnnotationTargetHelper {
 	public static void walkSelfAndContainers(
 			AnnotationTarget self,
 			boolean crossPackageBoundaries,
-			SourceModelBuildingContext modelContext,
+			ModelsContext modelContext,
 			Consumer<AnnotationTarget> consumer) {
 		if ( self == null ) {
 			return;
@@ -129,7 +129,7 @@ public class AnnotationTargetHelper {
 	public static <T> T fromContainers(
 			AnnotationTarget annotationTarget,
 			boolean crossPackageBoundaries,
-			SourceModelBuildingContext modelContext,
+			ModelsContext modelContext,
 			Function<ClassDetails, T> matchingExtractor) {
 		if ( isPackage( annotationTarget ) && !crossPackageBoundaries ) {
 			return null;
@@ -147,7 +147,7 @@ public class AnnotationTargetHelper {
 	public static <T> T fromSelfAndContainers(
 			AnnotationTarget self,
 			boolean crossPackageBoundaries,
-			SourceModelBuildingContext modelContext,
+			ModelsContext modelContext,
 			Function<AnnotationTarget, T> matchingExtractor) {
 		if ( self == null ) {
 			return null;

@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import static org.hibernate.models.internal.ModelsAnnotationLogging.MODELS_ANNOTATION_LOGGER;
 
@@ -20,10 +20,10 @@ import static org.hibernate.models.internal.ModelsAnnotationLogging.MODELS_ANNOT
 public class AnnotationDescriptorRegistryStandard
 		extends AbstractAnnotationDescriptorRegistry
 		implements MutableAnnotationDescriptorRegistry {
-	private final SourceModelBuildingContext modelBuildingContext;
+	private final ModelsContext modelsContext;
 
-	public AnnotationDescriptorRegistryStandard(SourceModelBuildingContext modelBuildingContext) {
-		this.modelBuildingContext = modelBuildingContext;
+	public AnnotationDescriptorRegistryStandard(ModelsContext modelsContext) {
+		this.modelsContext = modelsContext;
 	}
 
 	public void register(AnnotationDescriptor<?> descriptor) {
@@ -78,7 +78,7 @@ public class AnnotationDescriptorRegistryStandard
 		return new StandardAnnotationDescriptor<>(
 				javaType,
 				containerDescriptor,
-				modelBuildingContext
+				modelsContext
 		);
 	}
 }

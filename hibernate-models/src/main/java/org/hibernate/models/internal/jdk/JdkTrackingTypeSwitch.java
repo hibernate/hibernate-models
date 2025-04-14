@@ -26,8 +26,8 @@ import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ArrayTypeDetails;
 import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableDetails;
@@ -41,11 +41,11 @@ import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
  */
 public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 	private final JdkTypeSwitcher switcher;
-	private final SourceModelBuildingContext buildingContext;
+	private final ModelsContext modelsContext;
 
-	public JdkTrackingTypeSwitch(JdkTypeSwitcher switcher, SourceModelBuildingContext buildingContext) {
+	public JdkTrackingTypeSwitch(JdkTypeSwitcher switcher, ModelsContext modelsContext) {
 		this.switcher = switcher;
-		this.buildingContext = buildingContext;
+		this.modelsContext = modelsContext;
 	}
 
 	public ClassBasedTypeDetails caseClass(Class<?> classType) {
@@ -53,7 +53,7 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 			return asArrayType( classType );
 		}
 
-		final ClassDetails classDetails = buildingContext
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( classType.getName() );
 		if ( classType.isPrimitive() ) {
@@ -66,7 +66,7 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 	}
 
 	public ParameterizedTypeDetails caseParameterizedType(ParameterizedType parameterizedType) {
-		final ClassDetails classDetails = buildingContext
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( parameterizedType.getRawType().getTypeName() );
 		return new ParameterizedTypeDetailsImpl(
@@ -98,10 +98,10 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 		final GenericDeclaration genericDeclaration = typeVariable.getGenericDeclaration();
 		final ClassDetails declaringClass;
 		if ( genericDeclaration instanceof Class<?> genericClass ) {
-			declaringClass = buildingContext.getClassDetailsRegistry().getClassDetails( genericClass.getName() );
+			declaringClass = modelsContext.getClassDetailsRegistry().getClassDetails( genericClass.getName() );
 		}
 		else {
-			declaringClass = buildingContext.getClassDetailsRegistry()
+			declaringClass = modelsContext.getClassDetailsRegistry()
 					.getClassDetails( ( (Method) genericDeclaration ).getDeclaringClass().getName() );
 		}
 
@@ -114,7 +114,7 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 
 	public TypeDetails caseGenericArrayType(GenericArrayType genericArrayType) {
 		final TypeDetails componentType = switcher.switchType( genericArrayType.getGenericComponentType() );
-		return TypeDetailsHelper.arrayOf( componentType, buildingContext );
+		return TypeDetailsHelper.arrayOf( componentType, modelsContext );
 	}
 
 	public TypeDetails defaultCase(Type type) {
@@ -123,7 +123,7 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 
 	private ArrayTypeDetails asArrayType(Class<?> arrayClass) {
 		assert arrayClass.isArray();
-		final ClassDetails arrayClassDetails = buildingContext
+		final ClassDetails arrayClassDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( arrayClass.getName() );
 		return new ArrayTypeDetailsImpl(

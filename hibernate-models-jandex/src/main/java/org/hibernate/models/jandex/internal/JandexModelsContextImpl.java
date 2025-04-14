@@ -7,9 +7,9 @@ package org.hibernate.models.jandex.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.models.internal.AbstractModelBuildingContext;
+import org.hibernate.models.internal.AbstractModelsContext;
 import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
-import org.hibernate.models.jandex.spi.JandexModelContext;
+import org.hibernate.models.jandex.spi.JandexModelsContext;
 import org.hibernate.models.jandex.spi.JandexValueConverter;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;
 import org.hibernate.models.serial.internal.StorableContextImpl;
@@ -23,20 +23,22 @@ import org.jboss.jandex.IndexView;
 import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
 
 /**
- * SourceModelBuildingContext implementation based on Jandex
+ * Implementation of JandexModelsContext.
  *
  * @author Steve Ebersole
  */
-public class JandexModelContextImpl extends AbstractModelBuildingContext implements JandexModelContext {
+public class JandexModelsContextImpl extends AbstractModelsContext implements JandexModelsContext {
 	private final IndexView jandexIndex;
 
 	private final JandexAnnotationDescriptorRegistry descriptorRegistry;
 	private final JandexClassDetailsRegistry classDetailsRegistry;
 
+	@SuppressWarnings("rawtypes")
 	private final Map<ValueTypeDescriptor, JandexValueConverter> valueConverters = new HashMap<>();
+	@SuppressWarnings("rawtypes")
 	private final Map<ValueTypeDescriptor,JandexValueExtractor> valueExtractors = new HashMap<>();
 
-	public JandexModelContextImpl(
+	public JandexModelsContextImpl(
 			IndexView jandexIndex,
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer) {

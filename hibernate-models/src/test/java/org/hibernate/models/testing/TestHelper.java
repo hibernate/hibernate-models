@@ -7,11 +7,11 @@ package org.hibernate.models.testing;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-import org.hibernate.models.internal.BasicModelBuildingContextImpl;
+import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.internal.util.CollectionHelper;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.RegistryPrimer;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.testing.intg.ModelContextFactory;
+import org.hibernate.models.testing.intg.ModelsContextFactory;
 import org.hibernate.models.testing.orm.OrmAnnotationHelper;
 
 import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOADING;
@@ -20,18 +20,18 @@ import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOAD
  * @author Steve Ebersole
  */
 public class TestHelper {
-	public static SourceModelBuildingContext createModelContext(Class<?>... modelClasses) {
+	public static ModelsContext createModelContext(Class<?>... modelClasses) {
 		return createModelContext( null, modelClasses );
 	}
 
-	public static SourceModelBuildingContext buildModelContext(Class<?>... modelClasses) {
+	public static ModelsContext buildModelContext(Class<?>... modelClasses) {
 		return createModelContext( null, modelClasses );
 	}
 
-	public static SourceModelBuildingContext createModelContext(
+	public static ModelsContext createModelContext(
 			RegistryPrimer additionalPrimer,
 			Class<?>... modelClasses) {
-		final SourceModelBuildingContext builtContext = buildModelContext( additionalPrimer, modelClasses );
+		final ModelsContext builtContext = buildModelContext( additionalPrimer, modelClasses );
 
 		if ( CollectionHelper.isNotEmpty( modelClasses ) ) {
 			for ( Class<?> modelClass : modelClasses ) {
@@ -42,34 +42,34 @@ public class TestHelper {
 		return builtContext;
 	}
 
-	private static SourceModelBuildingContext buildModelContext(
+	private static ModelsContext buildModelContext(
 			RegistryPrimer additionalPrimer,
 			Class<?>... modelClasses) {
-		final ServiceLoader<ModelContextFactory> loader = ServiceLoader.load( ModelContextFactory.class );
-		final Iterator<ModelContextFactory> serviceImpls = loader.iterator();
+		final ServiceLoader<ModelsContextFactory> loader = ServiceLoader.load( ModelsContextFactory.class );
+		final Iterator<ModelsContextFactory> serviceImpls = loader.iterator();
 		if ( serviceImpls.hasNext() ) {
-			final ModelContextFactory contextFactory = serviceImpls.next();
+			final ModelsContextFactory contextFactory = serviceImpls.next();
 			if ( serviceImpls.hasNext() ) {
 				throw new IllegalStateException( "Found more than one TestingModelContextFactory" );
 			}
 			System.out.println( "Using TestingModelContextFactory: " + contextFactory );
 			return contextFactory.createModelContext(
-					(contributions, buildingContext) -> {
+					(contributions, modelsContext) -> {
 						OrmAnnotationHelper.forEachOrmAnnotation( contributions::registerAnnotation );
 						if ( additionalPrimer != null ) {
-							additionalPrimer.primeRegistries( contributions, buildingContext );
+							additionalPrimer.primeRegistries( contributions, modelsContext );
 						}
 					},
 					modelClasses
 			);
 		}
 
-		return new BasicModelBuildingContextImpl(
+		return new BasicModelsContextImpl(
 				SIMPLE_CLASS_LOADING,
-				(contributions, buildingContext) -> {
+				(contributions, modelsContext) -> {
 					OrmAnnotationHelper.forEachOrmAnnotation( contributions::registerAnnotation );
 					if ( additionalPrimer != null ) {
-						additionalPrimer.primeRegistries( contributions, buildingContext );
+						additionalPrimer.primeRegistries( contributions, modelsContext );
 					}
 				}
 		);

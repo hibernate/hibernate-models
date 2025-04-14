@@ -11,7 +11,7 @@ import java.util.Locale;
 import org.hibernate.models.ModelsException;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
@@ -21,7 +21,7 @@ public class ReflectionHelper {
 			MethodDetails methodDetails,
 			Class<?> declaringClass,
 			ClassLoading classLoading,
-			SourceModelContext modelContext) {
+			ModelsContext modelContext) {
 		final MethodDetails.MethodKind methodKind = methodDetails.getMethodKind();
 		try {
 			if ( methodKind == MethodDetails.MethodKind.GETTER ) {
@@ -35,9 +35,7 @@ public class ReflectionHelper {
 			}
 			else {
 				final List<Class<?>> argumentClasses = CollectionHelper.arrayList( methodDetails.getArgumentTypes().size() );
-				methodDetails.getArgumentTypes().forEach( (argumentClassDetails) -> {
-					argumentClasses.add( argumentClassDetails.toJavaClass( classLoading, modelContext ) );
-				} );
+				methodDetails.getArgumentTypes().forEach( (argumentClassDetails) -> argumentClasses.add( argumentClassDetails.toJavaClass( classLoading, modelContext ) ) );
 				return declaringClass.getDeclaredMethod( methodDetails.getName(), argumentClasses.toArray( new Class[0] ) );
 			}
 		}

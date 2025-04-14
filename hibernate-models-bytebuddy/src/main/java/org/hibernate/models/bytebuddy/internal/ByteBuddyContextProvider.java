@@ -7,32 +7,32 @@ package org.hibernate.models.bytebuddy.internal;
 import java.util.Map;
 
 import org.hibernate.models.bytebuddy.Settings;
-import org.hibernate.models.internal.BasicModelBuildingContextImpl;
+import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.spi.ClassLoading;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.RegistryPrimer;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelBuildingContextProvider;
+import org.hibernate.models.spi.ModelsContextProvider;
 
 import net.bytebuddy.pool.TypePool;
 
 /**
  * @author Steve Ebersole
  */
-public class ByteBuddyContextProvider implements SourceModelBuildingContextProvider {
+public class ByteBuddyContextProvider implements ModelsContextProvider {
 	public static final ByteBuddyContextProvider BYTEBUDDY_PROVIDER = new ByteBuddyContextProvider();
 
 	@Override
-	public SourceModelBuildingContext produceContext(
+	public ModelsContext produceContext(
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer,
 			Map<Object, Object> configProperties) {
 		final TypePool typePool = resolveTypePool( configProperties );
 
 		if ( typePool != null ) {
-			return new ByteBuddyModelContextImpl( typePool, classLoading, registryPrimer );
+			return new ByteBuddyModelsContextImpl( typePool, classLoading, registryPrimer );
 		}
 
-		return new BasicModelBuildingContextImpl( classLoading, registryPrimer );
+		return new BasicModelsContextImpl( classLoading, registryPrimer );
 	}
 
 	private TypePool resolveTypePool(Map<Object, Object> configProperties) {

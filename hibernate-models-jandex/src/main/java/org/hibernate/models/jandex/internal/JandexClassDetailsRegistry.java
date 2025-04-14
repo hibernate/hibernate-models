@@ -10,7 +10,7 @@ import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.internal.jdk.JdkClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.IndexView;
 
@@ -23,12 +23,13 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 	private final IndexView jandexIndex;
 	private final ClassDetailsBuilder classDetailsBuilder;
 
-	public JandexClassDetailsRegistry(IndexView jandexIndex, SourceModelBuildingContext context) {
+	public JandexClassDetailsRegistry(IndexView jandexIndex, ModelsContext context) {
 		super( context );
 		this.jandexIndex = jandexIndex;
 		this.classDetailsBuilder = new JandexClassDetailsBuilderImpl( jandexIndex, context );
 	}
 
+	@SuppressWarnings("unused")
 	public IndexView getJandexIndex() {
 		return jandexIndex;
 	}

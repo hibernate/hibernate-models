@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Descriptor for integer values
@@ -25,7 +25,7 @@ public class IntegerTypeDescriptor extends AbstractTypeDescriptor<Integer> {
 	}
 
 	@Override
-	public Integer[] makeArray(int size, SourceModelBuildingContext modelContext) {
+	public Integer[] makeArray(int size, ModelsContext modelContext) {
 		return new Integer[size];
 	}
 }

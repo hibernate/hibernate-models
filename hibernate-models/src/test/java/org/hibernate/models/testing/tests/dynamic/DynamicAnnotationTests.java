@@ -5,7 +5,7 @@
 package org.hibernate.models.testing.tests.dynamic;
 
 import org.hibernate.models.internal.dynamic.DynamicClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.orm.ForeignKeyAnnotation;
 import org.hibernate.models.testing.orm.JpaAnnotations;
 import org.hibernate.models.testing.orm.SecondaryTableAnnotation;
@@ -28,8 +28,8 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class DynamicAnnotationTests {
 	@Test
 	void testBasicUsage() {
-		final SourceModelBuildingContext buildingContext = createModelContext();
-		final SequenceGenerator generatorAnn = JpaAnnotations.SEQUENCE_GENERATOR.createUsage( buildingContext );
+		final ModelsContext modelsContext = createModelContext();
+		final SequenceGenerator generatorAnn = JpaAnnotations.SEQUENCE_GENERATOR.createUsage( modelsContext );
 		assertThat( generatorAnn.name() ).isEqualTo( "" );
 		assertThat( generatorAnn.sequenceName() ).isEqualTo( "" );
 		assertThat( generatorAnn.catalog() ).isEqualTo( "" );
@@ -38,24 +38,24 @@ public class DynamicAnnotationTests {
 		assertThat( generatorAnn.allocationSize() ).isEqualTo( 50 );
 		assertThat( generatorAnn.options() ).isEqualTo("" );
 
-		final SequenceGenerators generatorsAnn = JpaAnnotations.SEQUENCE_GENERATORS.createUsage( buildingContext );
+		final SequenceGenerators generatorsAnn = JpaAnnotations.SEQUENCE_GENERATORS.createUsage( modelsContext );
 		assertThat( generatorsAnn.value() ).isNotNull();
 		assertThat( generatorsAnn.value() ).isEmpty();
 	}
 
 	@Test
 	void testAnnotationWrapping() {
-		final SourceModelBuildingContext buildingContext = createModelContext();
-		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", buildingContext );
+		final ModelsContext modelsContext = createModelContext();
+		final DynamicClassDetails dynamicEntity = new DynamicClassDetails( "DynamicEntity", modelsContext );
 		final Table tableUsage = dynamicEntity.applyAnnotationUsage(
 				JpaAnnotations.TABLE,
-				buildingContext
+				modelsContext
 		);
 		assertThat( tableUsage ).isInstanceOf( TableAnnotation.class );
 
 		final SecondaryTable secondaryTableUsage = dynamicEntity.applyAnnotationUsage(
 				JpaAnnotations.SECONDARY_TABLE,
-				buildingContext
+				modelsContext
 		);
 		assertThat( secondaryTableUsage ).isInstanceOf( SecondaryTableAnnotation.class );
 

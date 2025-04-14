@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.ForeignKey;
@@ -35,7 +35,7 @@ public class SecondaryTableAnnotation implements SecondaryTable, CommonTableDeta
 	private PrimaryKeyJoinColumn[] primaryKeyJoinColumns;
 	private ForeignKey foreignKey;
 
-	public SecondaryTableAnnotation(SourceModelBuildingContext modelContext) {
+	public SecondaryTableAnnotation(ModelsContext modelContext) {
 		catalog = "";
 		schema = "";
 		comment = "";
@@ -47,7 +47,7 @@ public class SecondaryTableAnnotation implements SecondaryTable, CommonTableDeta
 		foreignKey = new ForeignKeyAnnotation( modelContext );
 	}
 
-	public SecondaryTableAnnotation(SecondaryTable usage, SourceModelBuildingContext modelContext) {
+	public SecondaryTableAnnotation(SecondaryTable usage, ModelsContext modelContext) {
 		name = usage.name();
 		catalog = usage.catalog();
 		schema = usage.schema();
@@ -60,7 +60,7 @@ public class SecondaryTableAnnotation implements SecondaryTable, CommonTableDeta
 		foreignKey = new ForeignKeyAnnotation( usage.foreignKey(), modelContext );
 	}
 
-	public SecondaryTableAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public SecondaryTableAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = attributeValues.get( "name" ).toString();
 		catalog = (String) attributeValues.get( "catalog" );
 		schema = (String) attributeValues.get( "schema" );

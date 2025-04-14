@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.jandex.spi;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -19,5 +19,5 @@ public interface JandexValueConverter<V> {
 	/**
 	 * Perform the conversion.
 	 */
-	V convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext);
+	V convert(AnnotationValue jandexValue, ModelsContext modelContext);
 }

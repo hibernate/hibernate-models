@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.ColumnResult;
 import jakarta.persistence.ConstructorResult;
@@ -34,7 +34,7 @@ public class NamedNativeQueryAnnotation implements NamedNativeQuery, Named {
 
 	private QueryHint[] hints;
 
-	public NamedNativeQueryAnnotation(SourceModelBuildingContext modelContext) {
+	public NamedNativeQueryAnnotation(ModelsContext modelContext) {
 		resultClass = void.class;
 		resultSetMapping = "";
 		entityResults = new EntityResult[0];
@@ -43,7 +43,7 @@ public class NamedNativeQueryAnnotation implements NamedNativeQuery, Named {
 		hints = new QueryHint[0];
 	}
 
-	public NamedNativeQueryAnnotation(NamedNativeQuery usage, SourceModelBuildingContext modelContext) {
+	public NamedNativeQueryAnnotation(NamedNativeQuery usage, ModelsContext modelContext) {
 		name = usage.name();
 		query = usage.query();
 
@@ -56,7 +56,7 @@ public class NamedNativeQueryAnnotation implements NamedNativeQuery, Named {
 		hints = extractRepeatedValues( usage, NAMED_NATIVE_QUERY.getAttribute( "hints" ), modelContext );
 	}
 
-	public NamedNativeQueryAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public NamedNativeQueryAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		query = (String) attributeValues.get( "query" );
 

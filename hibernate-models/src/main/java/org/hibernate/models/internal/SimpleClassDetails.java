@@ -19,8 +19,7 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -72,7 +71,7 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
-	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext) {
 		return classLoading.classForName( clazz.getName() );
 	}
 
@@ -178,31 +177,31 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
-	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
+	public <A extends Annotation> boolean hasAnnotationUsage(Class<A> type, ModelsContext modelContext) {
 		return false;
 	}
 
 	@Override
 	public <A extends Annotation> A getAnnotationUsage(
 			AnnotationDescriptor<A> descriptor,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return null;
 	}
 
 	@Override
-	public <A extends Annotation> A getAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
+	public <A extends Annotation> A getAnnotationUsage(Class<A> type, ModelsContext modelContext) {
 		return null;
 	}
 
 	@Override
-	public <A extends Annotation> A locateAnnotationUsage(Class<A> type, SourceModelBuildingContext modelContext) {
+	public <A extends Annotation> A locateAnnotationUsage(Class<A> type, ModelsContext modelContext) {
 		return null;
 	}
 
 	@Override
 	public <A extends Annotation> A[] getRepeatedAnnotationUsages(
 			AnnotationDescriptor<A> type,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return null;
 	}
 
@@ -210,13 +209,13 @@ public class SimpleClassDetails implements ClassDetails {
 	public <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
 			Class<A> repeatable,
 			Class<C> container,
-			SourceModelBuildingContext modelContext, Consumer<A> consumer) {
+			ModelsContext modelContext, Consumer<A> consumer) {
 	}
 
 	@Override
 	public <A extends Annotation> List<? extends Annotation> getMetaAnnotated(
 			Class<A> metaAnnotationType,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return Collections.emptyList();
 	}
 
@@ -225,7 +224,7 @@ public class SimpleClassDetails implements ClassDetails {
 			AnnotationDescriptor<X> type,
 			String matchName,
 			String attributeToMatch,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return null;
 	}
 
@@ -234,7 +233,7 @@ public class SimpleClassDetails implements ClassDetails {
 			Class<X> type,
 			String matchName,
 			String attributeToMatch,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return null;
 	}
 

@@ -7,7 +7,7 @@ package org.hibernate.models.testing.tests.members;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +20,9 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class ArrayTests {
 	@Test
 	void testArrays() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SomeClass.class );
+		final ModelsContext modelsContext = createModelContext( SomeClass.class );
 
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SomeClass.class.getName() );
 		assertThat( classDetails ).isNotNull();
 

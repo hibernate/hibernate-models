@@ -7,7 +7,7 @@ package org.hibernate.models.testing.tests.generics;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -22,7 +22,7 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class NestedInheritanceTest {
 	@Test
 	void testNestedGenericHierarchy() {
-		final SourceModelBuildingContext buildingContext = createModelContext(
+		final ModelsContext modelsContext = createModelContext(
 				BaseClass.class,
 				IntermediateOne.class,
 				IntermediateTwo.class,
@@ -30,9 +30,9 @@ public class NestedInheritanceTest {
 				LeafClass.class
 		);
 
-		final ClassDetails baseClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( BaseClass.class.getName() );
-		final ClassDetails intermediateClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( IntermediateOne.class.getName() );
-		final ClassDetails leafClassDetails = buildingContext.getClassDetailsRegistry().getClassDetails( LeafClass.class.getName() );
+		final ClassDetails baseClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( BaseClass.class.getName() );
+		final ClassDetails intermediateClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( IntermediateOne.class.getName() );
+		final ClassDetails leafClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( LeafClass.class.getName() );
 
 		final FieldDetails base = baseClassDetails.findFieldByName( "base" );
 		final TypeDetails baseFieldType = base.getType();
@@ -75,10 +75,12 @@ public class NestedInheritanceTest {
 	}
 
 	static class BaseClass<T> {
+		@SuppressWarnings("unused")
 		T base;
 	}
 
 	static class IntermediateOne<T> extends BaseClass<Integer> {
+		@SuppressWarnings("unused")
 		T one;
 	}
 

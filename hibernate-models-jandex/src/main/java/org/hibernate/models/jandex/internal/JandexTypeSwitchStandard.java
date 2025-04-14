@@ -21,7 +21,7 @@ import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.jandex.spi.JandexTypeSwitch;
 import org.hibernate.models.jandex.spi.JandexTypeSwitcher;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeDetailsHelper;
 
@@ -43,14 +43,14 @@ import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
  * @author Steve Ebersole
  */
 public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
-	public static TypeDetails switchType(Type type, SourceModelBuildingContext buildingContext) {
+	public static TypeDetails switchType(Type type, ModelsContext modelsContext) {
 		assert type.kind() != Type.Kind.TYPE_VARIABLE;
-		return switchType( type, null, buildingContext );
+		return switchType( type, null, modelsContext );
 	}
 
-	public static TypeDetails switchType(Type type, ClassDetails declaringType, SourceModelBuildingContext buildingContext) {
+	public static TypeDetails switchType(Type type, ClassDetails declaringType, ModelsContext modelsContext) {
 		final JandexTypeSwitchStandard genericVariableSwitch = new JandexTypeSwitchStandard( declaringType );
-		return JandexTypeSwitcher.switchType( type, genericVariableSwitch, buildingContext );
+		return JandexTypeSwitcher.switchType( type, genericVariableSwitch, modelsContext );
 	}
 
 	private final ClassDetails declaringType;
@@ -60,24 +60,24 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 	}
 
 	@Override
-	public TypeDetails caseClass(ClassType classType, SourceModelBuildingContext buildingContext) {
-		final ClassDetails classDetails = buildingContext
+	public TypeDetails caseClass(ClassType classType, ModelsContext modelsContext) {
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( classType.name().toString() );
 		return new ClassTypeDetailsImpl( classDetails, TypeDetails.Kind.CLASS );
 	}
 
 	@Override
-	public TypeDetails casePrimitive(PrimitiveType primitiveType, SourceModelBuildingContext buildingContext) {
-		final ClassDetails classDetails = buildingContext
+	public TypeDetails casePrimitive(PrimitiveType primitiveType, ModelsContext modelsContext) {
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( primitiveType.name().toString() );
 		return new PrimitiveTypeDetailsImpl( classDetails );
 	}
 
 	@Override
-	public TypeDetails caseVoid(VoidType voidType, SourceModelBuildingContext buildingContext) {
-		final ClassDetails classDetails = buildingContext
+	public TypeDetails caseVoid(VoidType voidType, ModelsContext modelsContext) {
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				// allows for void or Void
 				.resolveClassDetails( voidType.name().toString() );
@@ -87,23 +87,23 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 	@Override
 	public TypeDetails caseParameterizedType(
 			ParameterizedType parameterizedType,
-			SourceModelBuildingContext buildingContext) {
-		final ClassDetails classDetails = buildingContext
+			ModelsContext modelsContext) {
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( parameterizedType.name().toString() );
 		return new ParameterizedTypeDetailsImpl(
 				classDetails,
-				resolveTypes( parameterizedType.arguments(), this, buildingContext ),
+				resolveTypes( parameterizedType.arguments(), this, modelsContext ),
 				null
 		);
 	}
 
 	@Override
-	public TypeDetails caseWildcardType(WildcardType wildcardType, SourceModelBuildingContext buildingContext) {
+	public TypeDetails caseWildcardType(WildcardType wildcardType, ModelsContext modelsContext) {
 		try {
 			final Type bound = (Type) BOUND_METHOD.invoke( wildcardType );
 			final boolean isExtends = (boolean) IS_EXTENDS_METHOD.invoke( wildcardType );
-			return new WildcardTypeDetailsImpl( JandexTypeSwitcher.switchType( bound, this, buildingContext ), isExtends );
+			return new WildcardTypeDetailsImpl( JandexTypeSwitcher.switchType( bound, this, modelsContext ), isExtends );
 		}
 		catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException( e );
@@ -111,43 +111,43 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 	}
 
 	@Override
-	public TypeDetails caseTypeVariable(TypeVariable typeVariable, SourceModelBuildingContext buildingContext) {
+	public TypeDetails caseTypeVariable(TypeVariable typeVariable, ModelsContext modelsContext) {
 		return new TypeVariableDetailsImpl(
 				typeVariable.identifier(),
 				declaringType,
-				resolveTypes( typeVariable.bounds(), this, buildingContext )
+				resolveTypes( typeVariable.bounds(), this, modelsContext )
 		);
 	}
 
 	@Override
 	public TypeDetails caseTypeVariableReference(
 			TypeVariableReference typeVariableReference,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		return new TypeVariableReferenceDetailsImpl( typeVariableReference.identifier() );
 	}
 
 	@Override
-	public TypeDetails caseArrayType(ArrayType arrayType, SourceModelBuildingContext buildingContext) {
-		final TypeDetails componentTypeDetails = JandexTypeSwitcher.switchType( arrayType.componentType(), this, buildingContext );
-		return TypeDetailsHelper.arrayOf( componentTypeDetails, buildingContext );
+	public TypeDetails caseArrayType(ArrayType arrayType, ModelsContext modelsContext) {
+		final TypeDetails componentTypeDetails = JandexTypeSwitcher.switchType( arrayType.componentType(), this, modelsContext );
+		return TypeDetailsHelper.arrayOf( componentTypeDetails, modelsContext );
 	}
 
 	@Override
-	public TypeDetails defaultCase(Type type, SourceModelBuildingContext buildingContext) {
+	public TypeDetails defaultCase(Type type, ModelsContext modelsContext) {
 		throw new UnsupportedOperationException( "Unexpected Type kind - " + type );
 	}
 
 	public static List<TypeDetails> resolveTypes(
 			List<Type> types,
 			JandexTypeSwitch<TypeDetails> typeSwitch,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		if ( CollectionHelper.isEmpty( types ) ) {
 			return Collections.emptyList();
 		}
 
 		final ArrayList<TypeDetails> result = arrayList( types.size() );
 		for ( Type actualTypeArgument : types ) {
-			final TypeDetails switchedType = JandexTypeSwitcher.switchType( actualTypeArgument, typeSwitch, buildingContext );
+			final TypeDetails switchedType = JandexTypeSwitcher.switchType( actualTypeArgument, typeSwitch, modelsContext );
 			result.add( switchedType );
 		}
 		return result;

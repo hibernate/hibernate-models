@@ -18,8 +18,7 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -51,7 +50,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	private List<MethodDetails> methods;
 	private List<RecordComponentDetails> recordComponents;
 
-	public JandexClassDetails(ClassInfo classInfo, SourceModelBuildingContext modelContext) {
+	public JandexClassDetails(ClassInfo classInfo, ModelsContext modelContext) {
 		super( modelContext );
 		this.classInfo = classInfo;
 
@@ -222,7 +221,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
-	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext) {
 		if ( getClassName() == null ) {
 			throw new DynamicClassException( "ClassDetails (name=" + getName() + ") did not specify a class-name" );
 		}
@@ -237,27 +236,27 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 	private static ClassDetails determineSuperType(
 			ClassInfo classInfo,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		if ( classInfo.superClassType() == null ) {
 			return null;
 		}
 
-		return buildingContext
+		return modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( classInfo.superClassType().name().toString() );
 	}
 
-	private static TypeDetails determineGenericSuperType(ClassInfo classInfo, SourceModelBuildingContext buildingContext) {
+	private static TypeDetails determineGenericSuperType(ClassInfo classInfo, ModelsContext modelsContext) {
 		if ( classInfo.superClassType() == null ) {
 			return null;
 		}
 
-		return JandexTypeSwitchStandard.switchType( classInfo.superClassType(), buildingContext );
+		return JandexTypeSwitchStandard.switchType( classInfo.superClassType(), modelsContext );
 	}
 
 	private static List<TypeDetails> determineInterfaces(
 			ClassInfo classInfo,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		final List<Type> interfaceTypes = classInfo.interfaceTypes();
 		if ( isEmpty( interfaceTypes ) ) {
 			return emptyList();
@@ -267,14 +266,14 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		for ( Type interfaceType : interfaceTypes ) {
 			final TypeDetails switchedType = JandexTypeSwitchStandard.switchType(
 					interfaceType,
-					buildingContext
+					modelsContext
 			);
 			result.add( switchedType );
 		}
 		return result;
 	}
 
-	private static List<TypeVariableDetails> determineTypeParameters(ClassInfo classInfo, JandexClassDetails current, SourceModelBuildingContext buildingContext) {
+	private static List<TypeVariableDetails> determineTypeParameters(ClassInfo classInfo, JandexClassDetails current, ModelsContext modelsContext) {
 		final List<TypeVariable> jandexTypeVariables = classInfo.typeParameters();
 		if ( CollectionHelper.isEmpty( jandexTypeVariables ) ) {
 			return emptyList();
@@ -282,7 +281,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 		final ArrayList<TypeVariableDetails> result = arrayList( jandexTypeVariables.size() );
 		for ( TypeVariable jandexTypeVariable : jandexTypeVariables ) {
-			result.add( (TypeVariableDetails) JandexTypeSwitchStandard.switchType( jandexTypeVariable, current, buildingContext ) );
+			result.add( (TypeVariableDetails) JandexTypeSwitchStandard.switchType( jandexTypeVariable, current, modelsContext ) );
 		}
 		return result;
 	}

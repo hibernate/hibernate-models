@@ -14,8 +14,7 @@ import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
 import org.hibernate.models.rendering.spi.Renderer;
 import org.hibernate.models.rendering.spi.RenderingTarget;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 /**
@@ -32,12 +31,12 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 	}
 
 	@Override
-	public JdkValueConverter<V> createJdkValueConverter(SourceModelBuildingContext modelContext) {
+	public JdkValueConverter<V> createJdkValueConverter(ModelsContext modelContext) {
 		return JdkPassThruConverter.passThruConverter();
 	}
 
 	@Override
-	public JdkValueExtractor<V> createJdkValueExtractor(SourceModelBuildingContext modelContext) {
+	public JdkValueExtractor<V> createJdkValueExtractor(ModelsContext modelContext) {
 		return JdkPassThruExtractor.passThruExtractor();
 	}
 
@@ -47,12 +46,12 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 			Object attributeValue,
 			RenderingTarget target,
 			Renderer renderer,
-			SourceModelContext modelContext) {
+			ModelsContext modelContext) {
 		target.addLine( "%s = %s", name, attributeValue );
 	}
 
 	@Override
-	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, SourceModelContext modelContext) {
+	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, ModelsContext modelContext) {
 		target.addLine( "%s", attributeValue );
 	}
 

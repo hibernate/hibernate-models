@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.Column;
@@ -36,7 +36,7 @@ public class ColumnAnnotation implements Column, ColumnDetails {
 
 	private CheckConstraint[] check;
 
-	public ColumnAnnotation(SourceModelBuildingContext modelContext) {
+	public ColumnAnnotation(ModelsContext modelContext) {
 		name = "";
 		table = "";
 		nullable = true;
@@ -52,7 +52,7 @@ public class ColumnAnnotation implements Column, ColumnDetails {
 		check = new CheckConstraint[0];
 	}
 
-	public ColumnAnnotation(Column usage, SourceModelBuildingContext modelContext) {
+	public ColumnAnnotation(Column usage, ModelsContext modelContext) {
 		name = usage.name();
 		table = usage.table();
 		nullable = usage.nullable();
@@ -68,7 +68,7 @@ public class ColumnAnnotation implements Column, ColumnDetails {
 		check = extractRepeatedValues( usage, COLUMN.getAttribute( "check" ), modelContext );
 	}
 
-	public ColumnAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public ColumnAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		table = (String) attributeValues.get( "table" );
 		nullable = (boolean) attributeValues.get( "nullable" );

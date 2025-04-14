@@ -13,8 +13,7 @@ import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @see AnnotationHelper
@@ -35,7 +34,7 @@ public class AnnotationUsageHelper {
 	public static <A extends Annotation> A getUsage(
 			Class<A> type,
 			Map<Class<? extends Annotation>,? extends Annotation> usageMap,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return getUsage(
 				modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ),
 				usageMap,
@@ -46,14 +45,14 @@ public class AnnotationUsageHelper {
 	public static <A extends Annotation, C extends Annotation> A[] extractRepeatedValues(
 			C container,
 			AnnotationDescriptor<C> containerDescriptor,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return extractRepeatedValues( container, containerDescriptor.getAttribute( "value" ), modelContext );
 	}
 
 	public static <A extends Annotation, C extends Annotation> A[] extractRepeatedValues(
 			C container,
 			AttributeDescriptor<A[]> valuesAttribute,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		return valuesAttribute.getTypeDescriptor().createJdkValueExtractor( modelContext ).extractValue( container, valuesAttribute, modelContext );
 	}
 
@@ -63,7 +62,7 @@ public class AnnotationUsageHelper {
 	public static <A extends Annotation, C extends Annotation> A getUsage(
 			AnnotationDescriptor<A> type,
 			Map<Class<? extends Annotation>,? extends Annotation> usageMap,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		final A found = findUsage( type, usageMap );
 		if ( found == null ) {
 			//noinspection unchecked
@@ -90,7 +89,7 @@ public class AnnotationUsageHelper {
 			Class<C> containerType,
 			Consumer<A> consumer,
 			Map<Class<? extends Annotation>, ? extends Annotation> usageMap,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		//noinspection unchecked
 		final A repeatable = (A) usageMap.get( repeatableType );
 		if ( repeatable != null ) {
@@ -111,7 +110,7 @@ public class AnnotationUsageHelper {
 			AnnotationDescriptor<A> repeatableDescriptor,
 			Consumer<A> consumer,
 			Map<Class<? extends Annotation>, ? extends Annotation> usageMap,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		//noinspection unchecked
 		final A repeatable = (A) usageMap.get( repeatableDescriptor.getAnnotationType() );
 		if ( repeatable != null ) {
@@ -131,7 +130,7 @@ public class AnnotationUsageHelper {
 	public static <A extends Annotation> A[] getRepeatedUsages(
 			AnnotationDescriptor<A> type,
 			Map<Class<? extends Annotation>, ? extends Annotation> usageMap,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		// e.g. `@NamedQuery`
 		final A usage = findUsage( type, usageMap );
 		// e.g. `@NamedQueries`
@@ -172,7 +171,7 @@ public class AnnotationUsageHelper {
 			String matchValue,
 			String attributeToMatch,
 			Map<Class<? extends Annotation>, ?> usageMap,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		//noinspection unchecked
 		final A annotationUsage = (A) usageMap.get( descriptor.getAnnotationType() );
 		if ( annotationUsage != null ) {
@@ -206,7 +205,7 @@ public class AnnotationUsageHelper {
 			AnnotationDescriptor<A> descriptor,
 			String matchValue,
 			String attributeToMatch,
-			SourceModelContext modelContext) {
+			ModelsContext modelContext) {
 		final AttributeDescriptor<String> attributeDescriptor = descriptor.getAttribute( attributeToMatch );
 		final String usageName = AnnotationHelper.extractValue( annotationUsage, attributeDescriptor );
 		return matchValue.equals( usageName );

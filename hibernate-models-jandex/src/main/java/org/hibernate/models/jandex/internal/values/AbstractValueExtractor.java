@@ -4,9 +4,9 @@
  */
 package org.hibernate.models.jandex.internal.values;
 
-import org.hibernate.models.jandex.spi.JandexModelContext;
+import org.hibernate.models.jandex.spi.JandexModelsContext;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationValue;
@@ -16,27 +16,27 @@ import org.jboss.jandex.AnnotationValue;
  */
 public abstract class AbstractValueExtractor<W> implements JandexValueExtractor<W> {
 
-	protected abstract W extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext);
+	protected abstract W extractAndWrap(AnnotationValue jandexValue, ModelsContext modelsContext);
 
 	@Override
 	public W extractValue(
 			AnnotationInstance annotation,
 			String attributeName,
-			SourceModelBuildingContext buildingContext) {
-		final AnnotationValue jandexValue = resolveAnnotationValue( annotation, attributeName, buildingContext );
+			ModelsContext modelsContext) {
+		final AnnotationValue jandexValue = resolveAnnotationValue( annotation, attributeName, modelsContext );
 		assert jandexValue != null;
-		return extractAndWrap( jandexValue, buildingContext );
+		return extractAndWrap( jandexValue, modelsContext );
 	}
 
 	protected AnnotationValue resolveAnnotationValue(
 			AnnotationInstance annotation,
 			String attributeName,
-			SourceModelBuildingContext buildingContext) {
+			ModelsContext modelsContext) {
 		final AnnotationValue explicitValue = annotation.value( attributeName );
 		if ( explicitValue != null ) {
 			return explicitValue;
 		}
 
-		return annotation.valueWithDefault( buildingContext.as( JandexModelContext.class ).getJandexIndex(), attributeName );
+		return annotation.valueWithDefault( modelsContext.as( JandexModelsContext.class ).getJandexIndex(), attributeName );
 	}
 }

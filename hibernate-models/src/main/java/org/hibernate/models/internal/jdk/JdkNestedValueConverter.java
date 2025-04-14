@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
@@ -21,7 +21,7 @@ public class JdkNestedValueConverter<A extends Annotation> implements JdkValueCo
 	}
 
 	@Override
-	public A convert(A rawValue, SourceModelBuildingContext modelContext) {
+	public A convert(A rawValue, ModelsContext modelContext) {
 		return descriptor.createUsage( rawValue, modelContext );
 	}
 }

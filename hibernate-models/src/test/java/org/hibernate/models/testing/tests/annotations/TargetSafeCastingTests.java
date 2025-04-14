@@ -11,7 +11,7 @@ import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.domain.SimpleEntity;
 import org.hibernate.models.testing.orm.JpaAnnotations;
 
@@ -27,11 +27,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class TargetSafeCastingTests {
 	@Test
 	public void testSafeCasting() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
 
 		checkCasting( JpaAnnotations.ID );
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
 
 		checkCasting( classDetails );
 		checkCasting( classDetails.getFields().get( 0 ) );

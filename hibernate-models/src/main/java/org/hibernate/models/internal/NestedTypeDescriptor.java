@@ -15,8 +15,7 @@ import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
 import org.hibernate.models.rendering.spi.Renderer;
 import org.hibernate.models.rendering.spi.RenderingTarget;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * Descriptor for nested annotation values
@@ -40,7 +39,7 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 		return annotationType;
 	}
 
-	private AnnotationDescriptor<A> resolveDescriptor(SourceModelContext context) {
+	private AnnotationDescriptor<A> resolveDescriptor(ModelsContext context) {
 		if ( descriptor == null ) {
 			descriptor = context.getAnnotationDescriptorRegistry().getDescriptor( annotationType );
 		}
@@ -48,11 +47,11 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 	}
 
 	@Override
-	public JdkValueConverter<A> createJdkValueConverter(SourceModelBuildingContext modelContext) {
+	public JdkValueConverter<A> createJdkValueConverter(ModelsContext modelContext) {
 		return resolveJdkValueConverter( modelContext );
 	}
 
-	public JdkNestedValueConverter<A> resolveJdkValueConverter(SourceModelBuildingContext modelContext) {
+	public JdkNestedValueConverter<A> resolveJdkValueConverter(ModelsContext modelContext) {
 		if ( jdkConverter == null ) {
 			jdkConverter = new JdkNestedValueConverter<>( resolveDescriptor( modelContext ) );
 		}
@@ -60,11 +59,11 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 	}
 
 	@Override
-	public JdkValueExtractor<A> createJdkValueExtractor(SourceModelBuildingContext modelContext) {
+	public JdkValueExtractor<A> createJdkValueExtractor(ModelsContext modelContext) {
 		return resolveJdkValueExtractor( modelContext );
 	}
 
-	public JdkValueExtractor<A> resolveJdkValueExtractor(SourceModelBuildingContext modelContext) {
+	public JdkValueExtractor<A> resolveJdkValueExtractor(ModelsContext modelContext) {
 		if ( jdkExtractor == null ) {
 			jdkExtractor = new JdkNestedValueExtractor<>( resolveJdkValueConverter( modelContext ) );
 		}
@@ -82,19 +81,19 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 			Object attributeValue,
 			RenderingTarget target,
 			Renderer renderer,
-			SourceModelContext modelContext) {
+			ModelsContext modelContext) {
 		//noinspection unchecked
 		renderer.renderNestedAnnotation( name, (A) attributeValue, modelContext );
 	}
 
 	@Override
-	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, SourceModelContext modelContext) {
+	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, ModelsContext modelContext) {
 		//noinspection unchecked
 		renderer.renderNestedAnnotation( (A) attributeValue, modelContext );
 	}
 
 	@Override
-	public A[] makeArray(int size, SourceModelBuildingContext modelContext) {
+	public A[] makeArray(int size, ModelsContext modelContext) {
 		//noinspection unchecked
 		return (A[]) Array.newInstance( resolveDescriptor( modelContext ).getAnnotationType(), size );
 	}

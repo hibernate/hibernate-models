@@ -23,8 +23,7 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -51,21 +50,21 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 
 	public JdkClassDetails(
 			Class<?> managedClass,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		this( managedClass.getName(), managedClass, modelContext );
 	}
 
 	public JdkClassDetails(
 			String name,
 			Class<?> managedClass,
-			SourceModelBuildingContext modelContext) {
+			ModelsContext modelContext) {
 		super( managedClass::getAnnotations, modelContext );
 		this.name = name;
 		this.managedClass = managedClass;
 		this.superClass = determineSuperClass( managedClass, modelContext );
 	}
 
-	private static ClassDetails determineSuperClass(Class<?> managedClass, SourceModelBuildingContext modelContext) {
+	private static ClassDetails determineSuperClass(Class<?> managedClass, ModelsContext modelContext) {
 		final Class<?> superclass = managedClass.getSuperclass();
 		if ( superclass == null ) {
 			return null;
@@ -97,7 +96,7 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	}
 
 	@Override
-	public <X> Class<X> toJavaClass(ClassLoading classLoading, SourceModelContext modelContext) {
+	public <X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext) {
 		if ( managedClass.isPrimitive()
 				|| managedClass.isEnum()
 				|| managedClass.isAnnotation() ) {

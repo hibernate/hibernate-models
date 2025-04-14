@@ -11,7 +11,7 @@ import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.annotations.CustomAnnotation;
 import org.hibernate.models.testing.annotations.CustomMetaAnnotation;
 import org.hibernate.models.testing.domain.SimpleEntity;
@@ -46,19 +46,19 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class AnnotationUsageTests {
 	@Test
 	void testBasicUsage() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final AnnotationDescriptorRegistry descriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final AnnotationDescriptorRegistry descriptorRegistry = modelsContext.getAnnotationDescriptorRegistry();
 
 		final AnnotationDescriptor<CustomAnnotation> descriptor = descriptorRegistry.getDescriptor( CustomAnnotation.class );
 		final AnnotationDescriptor<CustomMetaAnnotation> metaDescriptor = descriptorRegistry.getDescriptor( CustomMetaAnnotation.class );
 		assertThat( descriptor ).isNotNull();
 		assertThat( metaDescriptor ).isNotNull();
 
-		final CustomMetaAnnotation metaUsage = descriptor.getAnnotationUsage( metaDescriptor, buildingContext );
+		final CustomMetaAnnotation metaUsage = descriptor.getAnnotationUsage( metaDescriptor, modelsContext );
 		assertThat( metaUsage ).isNotNull();
 		assertThat( Proxy.isProxyClass( metaUsage.getClass() ) ).isTrue();
 
-		final ClassDetails classDetails = buildingContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
+		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails( SimpleEntity.class.getName() );
 		// NOTE : the 2 @NamedQuery refs get bundled into 1 @NamedQueries
 		assertThat( classDetails.getDirectAnnotationUsages() ).hasSize( 7 );
 
@@ -76,7 +76,7 @@ public class AnnotationUsageTests {
 		assertThat( secondaryTableUsage ).isInstanceOf( SecondaryTableAnnotation .class );
 
 		assertThat( classDetails.getDirectAnnotationUsage( NamedQuery.class ) ).isNull();
-		final NamedQuery[] namedQueryUsages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class, buildingContext );
+		final NamedQuery[] namedQueryUsages = classDetails.getRepeatedAnnotationUsages( NamedQuery.class, modelsContext );
 		assertThat( namedQueryUsages ).hasSize( 2 );
 		assertThat( namedQueryUsages[0] ).isInstanceOf( NamedQueryAnnotation .class );
 		assertThat( namedQueryUsages[1] ).isInstanceOf( NamedQueryAnnotation.class );
@@ -84,34 +84,34 @@ public class AnnotationUsageTests {
 
 	@Test
 	void testUsageMutation() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
-		final EntityAnnotation entityAnn = (EntityAnnotation) classDetails.getAnnotationUsage( Entity.class, buildingContext );
+		final EntityAnnotation entityAnn = (EntityAnnotation) classDetails.getAnnotationUsage( Entity.class, modelsContext );
 		entityAnn.name( "SimpleEntity" );
 		assertThat( entityAnn.name() ).isEqualTo( "SimpleEntity" );
 	}
 
 	@Test
 	void testBaseline() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final AnnotationDescriptorRegistry descriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final AnnotationDescriptorRegistry descriptorRegistry = modelsContext.getAnnotationDescriptorRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
-		final CustomAnnotation annotationUsage = classDetails.getAnnotationUsage( CustomAnnotation.class, buildingContext );
+		final CustomAnnotation annotationUsage = classDetails.getAnnotationUsage( CustomAnnotation.class, modelsContext );
 		assertThat( annotationUsage ).isNotNull();
 		final AnnotationDescriptor<CustomAnnotation> descriptor = descriptorRegistry.getDescriptor( CustomAnnotation.class );
 		assertThat( descriptor ).isNotNull();
-		final CustomMetaAnnotation customMetaAnnotationUsage = descriptor.getAnnotationUsage( CustomMetaAnnotation.class, buildingContext );
+		final CustomMetaAnnotation customMetaAnnotationUsage = descriptor.getAnnotationUsage( CustomMetaAnnotation.class, modelsContext );
 		assertThat( customMetaAnnotationUsage ).isNotNull();
 		assertThat( customMetaAnnotationUsage.someValue() ).isEqualTo( "abc" );
 
 		assertThat( classDetails.hasDirectAnnotationUsage( Entity.class ) ).isTrue();
-		final Entity entityAnn = classDetails.getAnnotationUsage( Entity.class, buildingContext );
+		final Entity entityAnn = classDetails.getAnnotationUsage( Entity.class, modelsContext );
 		assertThat( entityAnn.name() ).isEqualTo( "SimpleColumnEntity" );
 
-		final Column columnAnn = classDetails.findFieldByName( "name" ).getAnnotationUsage( Column.class, buildingContext );
+		final Column columnAnn = classDetails.findFieldByName( "name" ).getAnnotationUsage( Column.class, modelsContext );
 		assertThat( columnAnn.name() ).isEqualTo( "description" );
 		assertThat( columnAnn.table() ).isEqualTo( "" );
 		assertThat( columnAnn.nullable() ).isFalse();
@@ -120,23 +120,23 @@ public class AnnotationUsageTests {
 
 	@Test
 	void testCompositions() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
 		assertThat( classDetails.hasDirectAnnotationUsage( CustomMetaAnnotation.class ) ).isFalse();
-		assertThat( classDetails.getAnnotationUsage( CustomMetaAnnotation.class, buildingContext ) ).isNull();
-		assertThat( classDetails.locateAnnotationUsage( CustomMetaAnnotation.class, buildingContext ) ).isNotNull();
+		assertThat( classDetails.getAnnotationUsage( CustomMetaAnnotation.class, modelsContext ) ).isNull();
+		assertThat( classDetails.locateAnnotationUsage( CustomMetaAnnotation.class, modelsContext ) ).isNotNull();
 
-		assertThat( classDetails.getMetaAnnotated( CustomMetaAnnotation.class, buildingContext ) ).hasSize( 1 );
-		assertThat( classDetails.getMetaAnnotated( CustomAnnotation.class, buildingContext ) ).isEmpty();
+		assertThat( classDetails.getMetaAnnotated( CustomMetaAnnotation.class, modelsContext ) ).hasSize( 1 );
+		assertThat( classDetails.getMetaAnnotated( CustomAnnotation.class, modelsContext ) ).isEmpty();
 	}
 
 	@Test
 	void testDynamicAttributeCreation() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final Column usage = JpaAnnotations.COLUMN.createUsage( buildingContext );
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final Column usage = JpaAnnotations.COLUMN.createUsage( modelsContext );
 		// check the attribute defaults
 		assertThat( usage.name() ).isEqualTo( "" );
 		assertThat( usage.table() ).isEqualTo( "" );
@@ -155,23 +155,23 @@ public class AnnotationUsageTests {
 
 	@Test
 	void testNamedAnnotationAccess() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails entityClassDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
-		final NamedQuery[] namedQueryAnns = entityClassDetails.getRepeatedAnnotationUsages( NamedQuery.class, buildingContext );
+		final NamedQuery[] namedQueryAnns = entityClassDetails.getRepeatedAnnotationUsages( NamedQuery.class, modelsContext );
 		assertThat( namedQueryAnns ).hasSize( 2 );
 
-		final NamedQuery abcAnn = entityClassDetails.getNamedAnnotationUsage( NamedQuery.class, "abc", buildingContext );
+		final NamedQuery abcAnn = entityClassDetails.getNamedAnnotationUsage( NamedQuery.class, "abc", modelsContext );
 		assertThat( abcAnn ).isNotNull();
 		assertThat( abcAnn.query() ).isEqualTo( "select me" );
 	}
 
 	@Test
 	void testFromAnnotations() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
@@ -184,7 +184,7 @@ public class AnnotationUsageTests {
 					}
 					return null;
 				},
-				buildingContext
+				modelsContext
 		);
 		assertThat( query ).isEqualTo( "select me" );
 
@@ -197,7 +197,7 @@ public class AnnotationUsageTests {
 					}
 					return null;
 				},
-				buildingContext
+				modelsContext
 		);
 		assertThat( query2 ).isEqualTo( "select you" );
 
@@ -210,15 +210,15 @@ public class AnnotationUsageTests {
 					}
 					return null;
 				},
-				buildingContext
+				modelsContext
 		);
 		assertThat( secondaryTable ).isNotNull();
 	}
 
 	@Test
 	void testHasAnnotation() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
@@ -229,41 +229,41 @@ public class AnnotationUsageTests {
 		assertThat( classDetails.hasDirectAnnotationUsage( SecondaryTables.class ) ).isFalse();
 
 		// with #hasRepeatableAnnotationUsage we get true regardless
-		assertThat( classDetails.hasAnnotationUsage( NamedQuery.class, buildingContext ) ).isTrue();
-		assertThat( classDetails.hasAnnotationUsage( NamedQueries.class, buildingContext ) ).isTrue();
-		assertThat( classDetails.hasAnnotationUsage( SecondaryTable.class, buildingContext ) ).isTrue();
-		assertThat( classDetails.hasAnnotationUsage( SecondaryTables.class, buildingContext ) ).isFalse();
+		assertThat( classDetails.hasAnnotationUsage( NamedQuery.class, modelsContext ) ).isTrue();
+		assertThat( classDetails.hasAnnotationUsage( NamedQueries.class, modelsContext ) ).isTrue();
+		assertThat( classDetails.hasAnnotationUsage( SecondaryTable.class, modelsContext ) ).isTrue();
+		assertThat( classDetails.hasAnnotationUsage( SecondaryTables.class, modelsContext ) ).isFalse();
 	}
 
 	@Test
 	void testForEachAnnotation() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
 		final MutableInteger counter = new MutableInteger();
 
-		classDetails.forEachAnnotationUsage( Entity.class, buildingContext, entityAnnotationUsage -> counter.increment() );
+		classDetails.forEachAnnotationUsage( Entity.class, modelsContext, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 1 );
 
 		counter.set( 0 );
-		classDetails.forEachAnnotationUsage( SecondaryTable.class, buildingContext, entityAnnotationUsage -> counter.increment() );
+		classDetails.forEachAnnotationUsage( SecondaryTable.class, modelsContext, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 1 );
 
 		counter.set( 0 );
-		classDetails.forEachAnnotationUsage( NamedQuery.class, buildingContext, entityAnnotationUsage -> counter.increment() );
+		classDetails.forEachAnnotationUsage( NamedQuery.class, modelsContext, entityAnnotationUsage -> counter.increment() );
 		assertThat( counter.get() ).isEqualTo( 2 );
 	}
 
 	@Test
 	void testGetSingleUsageW() {
-		final SourceModelBuildingContext buildingContext = createModelContext( SimpleEntity.class );
-		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 		final ClassDetails classDetails = classDetailsRegistry.getClassDetails( SimpleEntity.class.getName() );
 
 		try {
-			classDetails.getAnnotationUsage( NamedQuery.class, buildingContext );
+			classDetails.getAnnotationUsage( NamedQuery.class, modelsContext );
 			fail( "Expecting an AnnotationAccessException to be thrown" );
 		}
 		catch (AnnotationAccessException expected) {

@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.bytebuddy.internal.values;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -21,8 +21,8 @@ public class EnumValueExtractor<E extends Enum<E>> extends AbstractValueExtracto
 	}
 
 	@Override
-	protected E extractAndWrap(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext buildingContext) {
+	protected E extractAndWrap(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelsContext) {
 		assert byteBuddyValue != null;
-		return wrapper.convert( byteBuddyValue, buildingContext );
+		return wrapper.convert( byteBuddyValue, modelsContext );
 	}
 }

@@ -18,8 +18,7 @@ import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import org.jboss.jandex.AnnotationTarget;
@@ -40,11 +39,11 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 	public JandexRecordComponentDetails(
 			RecordComponentInfo recordComponentInfo,
 			ClassDetails declaringType,
-			SourceModelBuildingContext buildingContext) {
-		super( buildingContext );
+			ModelsContext modelsContext) {
+		super( modelsContext );
 		this.recordComponentInfo = recordComponentInfo;
 		this.declaringType = declaringType;
-		this.type = JandexTypeSwitchStandard.switchType( recordComponentInfo.type(), declaringType, buildingContext );
+		this.type = JandexTypeSwitchStandard.switchType( recordComponentInfo.type(), declaringType, modelsContext );
 
 		this.isArray = recordComponentInfo.type().kind() == Type.Kind.ARRAY;
 		this.isPlural = isArray || type.isImplementor( Collection.class ) || type.isImplementor( Map.class );
@@ -92,7 +91,7 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 	}
 
 	@Override
-	public Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+	public Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
 		// we could maybe resolve the corresponding method...
 		return null;
 	}

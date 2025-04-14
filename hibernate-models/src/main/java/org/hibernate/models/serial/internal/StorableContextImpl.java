@@ -14,12 +14,12 @@ import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import static org.hibernate.models.internal.util.CollectionHelper.linkedMapOfSize;
 
 /**
- * Standard implementation of {@linkplain StorableContext} representing a serializable {@linkplain SourceModelContext}
+ * Standard implementation of {@linkplain StorableContext} representing a serializable {@linkplain ModelsContext}
  *
  * @author Steve Ebersole
  */
@@ -42,7 +42,7 @@ public class StorableContextImpl implements StorableContext {
 	}
 
 	@Override
-	public SourceModelContext fromStorableForm(ClassLoading classLoading) {
+	public ModelsContext fromStorableForm(ClassLoading classLoading) {
 		return new RestoredModelContext( this, classLoading );
 	}
 

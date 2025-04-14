@@ -6,8 +6,8 @@ package org.hibernate.models.testing.tests.members;
 
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +20,9 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class RecordTests {
 	@Test
 	void testRecords() {
-		final SourceModelBuildingContext buildingContext = createModelContext( Data.class );
+		final ModelsContext modelsContext = createModelContext( Data.class );
 
-		final ClassDetails classDetails = buildingContext
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.findClassDetails( Data.class.getName() );
 		assertThat( classDetails ).isNotNull();

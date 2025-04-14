@@ -10,7 +10,7 @@ import org.hibernate.models.internal.jdk.JdkMethodDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,9 +26,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class MethodDetailsTests {
 	@Test
 	void testMethods() {
-		final SourceModelBuildingContext buildingContext = createModelContext( RandomClass.class );
+		final ModelsContext modelsContext = createModelContext( RandomClass.class );
 
-		final ClassDetails classDetails = buildingContext
+		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.findClassDetails( RandomClass.class.getName() );
 		assertThat( classDetails ).isNotNull();
@@ -138,6 +138,7 @@ public class MethodDetailsTests {
 				assertThat( method.getVisibility() ).isEqualTo( MemberDetails.Visibility.PUBLIC );
 			}
 			else {
+				//noinspection StatementWithEmptyBody
 				if ( ( (JdkMethodDetails) method ).getMethod().isSynthetic() ) {
 					// ignore it
 				}

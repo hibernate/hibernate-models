@@ -5,7 +5,7 @@
 package org.hibernate.models.jandex.internal.values;
 
 import org.hibernate.models.jandex.spi.JandexValueConverter;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -18,7 +18,7 @@ public class ShortValueConverter implements JandexValueConverter<Short> {
 	public static final ShortValueConverter JANDEX_SHORT_VALUE_WRAPPER = new ShortValueConverter();
 
 	@Override
-	public Short convert(AnnotationValue jandexValue, SourceModelBuildingContext modelContext) {
+	public Short convert(AnnotationValue jandexValue, ModelsContext modelContext) {
 		assert jandexValue != null;
 		return jandexValue.asShort();
 	}

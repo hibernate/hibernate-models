@@ -7,7 +7,7 @@ package org.hibernate.models.internal.jdk;
 import java.lang.annotation.Annotation;
 
 import org.hibernate.models.spi.AttributeDescriptor;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
@@ -23,7 +23,7 @@ public class JdkNestedValueExtractor<A extends Annotation> extends AbstractJdkVa
 	protected A wrap(
 			A rawValue,
 			AttributeDescriptor<A> attributeDescriptor,
-			SourceModelBuildingContext buildingContext) {
-		return converter.convert( rawValue, buildingContext );
+			ModelsContext modelsContext) {
+		return converter.convert( rawValue, modelsContext );
 	}
 }

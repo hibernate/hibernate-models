@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.jandex.internal.values;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -17,8 +17,8 @@ public class BooleanValueExtractor extends AbstractValueExtractor<Boolean> {
 	public static final BooleanValueExtractor JANDEX_BOOLEAN_EXTRACTOR = new BooleanValueExtractor();
 
 	@Override
-	protected Boolean extractAndWrap(AnnotationValue jandexValue, SourceModelBuildingContext buildingContext) {
+	protected Boolean extractAndWrap(AnnotationValue jandexValue, ModelsContext modelsContext) {
 		assert jandexValue != null;
-		return BooleanValueConverter.JANDEX_BOOLEAN_VALUE_WRAPPER.convert( jandexValue, buildingContext );
+		return BooleanValueConverter.JANDEX_BOOLEAN_VALUE_WRAPPER.convert( jandexValue, modelsContext );
 	}
 }

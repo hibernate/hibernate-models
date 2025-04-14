@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.jandex.spi;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.ArrayType;
 import org.jboss.jandex.ClassType;
@@ -27,45 +27,45 @@ public interface JandexTypeSwitch<T> {
 	/**
 	 * Handling for {@linkplain Type.Kind#CLASS class types}.
 	 */
-	T caseClass(ClassType classType, SourceModelBuildingContext buildingContext);
+	T caseClass(ClassType classType, ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#PRIMITIVE primitive types}.
 	 */
-	T casePrimitive(PrimitiveType primitiveType, SourceModelBuildingContext buildingContext);
+	T casePrimitive(PrimitiveType primitiveType, ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#VOID void types}.
 	 */
-	T caseVoid(VoidType voidType, SourceModelBuildingContext buildingContext);
+	T caseVoid(VoidType voidType, ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#PARAMETERIZED_TYPE parameterized types}.
 	 */
-	T caseParameterizedType(ParameterizedType parameterizedType, SourceModelBuildingContext buildingContext);
+	T caseParameterizedType(ParameterizedType parameterizedType, ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#WILDCARD_TYPE wildcard types}.
 	 */
-	T caseWildcardType(WildcardType wildcardType, SourceModelBuildingContext buildingContext);
+	T caseWildcardType(WildcardType wildcardType, ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#TYPE_VARIABLE type variable types}.
 	 */
-	T caseTypeVariable(TypeVariable typeVariable, SourceModelBuildingContext buildingContext);
+	T caseTypeVariable(TypeVariable typeVariable, ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#TYPE_VARIABLE_REFERENCE type variable reference types}.
 	 */
-	T caseTypeVariableReference(TypeVariableReference typeVariableReference, SourceModelBuildingContext buildingContext);
+	T caseTypeVariableReference(TypeVariableReference typeVariableReference, ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#ARRAY array types}.
 	 */
-	T caseArrayType(ArrayType genericArrayType, SourceModelBuildingContext buildingContext);
+	T caseArrayType(ArrayType genericArrayType, ModelsContext modelsContext);
 
 	/**
 	 * Fallback handling.
 	 */
-	T defaultCase(Type t, SourceModelBuildingContext buildingContext);
+	T defaultCase(Type t, ModelsContext modelsContext);
 }

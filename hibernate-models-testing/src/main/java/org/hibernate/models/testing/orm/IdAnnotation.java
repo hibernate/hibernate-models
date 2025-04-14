@@ -7,7 +7,7 @@ package org.hibernate.models.testing.orm;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.Id;
 
@@ -16,13 +16,13 @@ import jakarta.persistence.Id;
  */
 @SuppressWarnings({ "ClassExplicitlyAnnotation", "unused" })
 public class IdAnnotation implements Id {
-	public IdAnnotation(SourceModelBuildingContext modelContext) {
+	public IdAnnotation(ModelsContext modelContext) {
 	}
 
-	public IdAnnotation(Id jdkAnnotation, SourceModelBuildingContext modelContext) {
+	public IdAnnotation(Id jdkAnnotation, ModelsContext modelContext) {
 	}
 
-	public IdAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public IdAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 	}
 
 	@Override

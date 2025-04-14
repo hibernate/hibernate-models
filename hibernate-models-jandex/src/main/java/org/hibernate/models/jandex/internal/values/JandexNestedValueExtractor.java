@@ -6,7 +6,7 @@ package org.hibernate.models.jandex.internal.values;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -23,7 +23,7 @@ public class JandexNestedValueExtractor<A extends Annotation> extends AbstractVa
 	@Override
 	protected A extractAndWrap(
 			AnnotationValue jandexValue,
-			SourceModelBuildingContext buildingContext) {
-		return wrapper.convert( jandexValue, buildingContext );
+			ModelsContext modelsContext) {
+		return wrapper.convert( jandexValue, modelsContext );
 	}
 }

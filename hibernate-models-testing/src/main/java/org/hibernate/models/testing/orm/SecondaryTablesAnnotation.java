@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationUsageHelper;
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.SecondaryTables;
@@ -22,16 +22,16 @@ import static org.hibernate.models.testing.orm.JpaAnnotations.SECONDARY_TABLES;
 public class SecondaryTablesAnnotation implements SecondaryTables, RepeatableContainer<SecondaryTable> {
 	private SecondaryTable[] value;
 
-	public SecondaryTablesAnnotation(SourceModelBuildingContext modelContext) {
+	public SecondaryTablesAnnotation(ModelsContext modelContext) {
 		value = new SecondaryTable[0];
 	}
 
-	public SecondaryTablesAnnotation(SecondaryTables usage, SourceModelBuildingContext modelContext) {
+	public SecondaryTablesAnnotation(SecondaryTables usage, ModelsContext modelContext) {
 		value = AnnotationUsageHelper.extractRepeatedValues( usage, SECONDARY_TABLES, modelContext );
 	}
 
 
-	public SecondaryTablesAnnotation(Map<String,Object> attributeValues, SourceModelBuildingContext modelContext) {
+	public SecondaryTablesAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		value = (SecondaryTable[]) attributeValues.get( "value" );
 	}
 

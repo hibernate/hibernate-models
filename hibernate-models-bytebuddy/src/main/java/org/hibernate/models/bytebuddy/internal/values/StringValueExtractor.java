@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.bytebuddy.internal.values;
 
-import org.hibernate.models.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
 
@@ -17,7 +17,7 @@ public class StringValueExtractor extends AbstractValueExtractor<String> {
 	public static final StringValueExtractor STRING_EXTRACTOR = new StringValueExtractor();
 
 	@Override
-	protected String extractAndWrap(AnnotationValue<?,?> byteBuddyValue, SourceModelBuildingContext buildingContext) {
-		return StringValueConverter.STRING_VALUE_WRAPPER.convert( byteBuddyValue, buildingContext );
+	protected String extractAndWrap(AnnotationValue<?,?> byteBuddyValue, ModelsContext modelsContext) {
+		return StringValueConverter.STRING_VALUE_WRAPPER.convert( byteBuddyValue, modelsContext );
 	}
 }

@@ -20,7 +20,7 @@ import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
-import org.hibernate.models.spi.SourceModelContext;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
 import net.bytebuddy.description.annotation.AnnotationSource;
@@ -100,7 +100,7 @@ public class RecordComponentDetailsImpl
 	}
 
 	@Override
-	public Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, SourceModelContext modelContext) {
+	public Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
 		// we could maybe resolve the corresponding method...
 		return null;
 	}
