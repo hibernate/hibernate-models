@@ -14,7 +14,6 @@ import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.models.spi.SourceModelContext;
 
 /**
  * @see AnnotationHelper
@@ -206,7 +205,7 @@ public class AnnotationUsageHelper {
 			AnnotationDescriptor<A> descriptor,
 			String matchValue,
 			String attributeToMatch,
-			SourceModelContext modelContext) {
+			SourceModelBuildingContext modelContext) {
 		final AttributeDescriptor<String> attributeDescriptor = descriptor.getAttribute( attributeToMatch );
 		final String usageName = AnnotationHelper.extractValue( annotationUsage, attributeDescriptor );
 		return matchValue.equals( usageName );
