@@ -148,20 +148,19 @@ public class InheritanceTests {
 		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
 
 		final List<ClassDetails> subTypes = new ArrayList<>();
-		classDetailsRegistry.forEachDirectSubType( RootClass.class.getName(), subTypes::add );
+		classDetailsRegistry.forEachDirectSubtype( RootClass.class.getName(), subTypes::add );
 		assertThat( subTypes ).hasSize( 1 );
 		subTypes.clear();
 
-		classDetailsRegistry.forEachDirectSubType( TrunkClass.class.getName(), subTypes::add );
+		classDetailsRegistry.forEachDirectSubtype( TrunkClass.class.getName(), subTypes::add );
 		assertThat( subTypes ).hasSize( 1 );
 		subTypes.clear();
 
-		classDetailsRegistry.forEachDirectSubType( BranchClass.class.getName(), subTypes::add );
+		classDetailsRegistry.forEachDirectSubtype( BranchClass.class.getName(), subTypes::add );
 		assertThat( subTypes ).hasSize( 1 );
 		subTypes.clear();
 
-		classDetailsRegistry.forEachDirectSubType( LeafClass.class.getName(), subTypes::add );
+		classDetailsRegistry.forEachDirectSubtype( LeafClass.class.getName(), subTypes::add );
 		assertThat( subTypes ).hasSize( 0 );
 	}
-
 }
