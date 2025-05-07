@@ -63,10 +63,11 @@ pipeline {
                                          string(credentialsId: 'Hibernate-CI.github.com', variable: 'JRELEASER_GITHUB_TOKEN')]) {
                             sshagent(['ed25519.Hibernate-CI.github.com']) {
                                 sh 'cat $HOME/.ssh/config'
-                                sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git'
-                                env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
+                                dir('.release/scripts') {
+                                    sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git .'
+                                }
                                 sh """
-                                    bash -xe hibernate-release-scripts/release.sh ${params.RELEASE_DRY_RUN ? '-d' : ''} \
+                                    bash -xe .release/scripts/release.sh -j ${params.RELEASE_DRY_RUN ? '-d' : ''} \
                                             models ${releaseVersion.toString()} ${developmentVersion.toString()}
                                 """
                             }
