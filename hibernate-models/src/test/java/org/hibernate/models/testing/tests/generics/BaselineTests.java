@@ -13,6 +13,7 @@ import org.hibernate.models.spi.TypeDetails;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
 import static org.hibernate.models.testing.TestHelper.createModelContext;
 
 /**
@@ -21,7 +22,7 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class BaselineTests {
 	@Test
 	void testObjectUse() {
-		assertThat( ClassTypeDetails.OBJECT_TYPE_DETAILS.asClassType().getClassDetails() ).isSameAs( ClassDetails.OBJECT_CLASS_DETAILS );
+		assertThat( OBJECT_TYPE_DETAILS.asClassType().getClassDetails() ).isSameAs( ClassDetails.OBJECT_CLASS_DETAILS );
 	}
 
 	@Test

@@ -35,6 +35,7 @@ import org.hibernate.models.spi.WildcardTypeDetails;
 
 import static org.hibernate.models.internal.jdk.JdkBuilders.isVoid;
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
+import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
 
 /**
  * @author Steve Ebersole
@@ -83,14 +84,14 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 			final int numberOfBounds = CollectionHelper.length( wildcardType.getUpperBounds() );
 			final TypeDetails upper = numberOfBounds == 1
 					? switcher.switchType( wildcardType.getUpperBounds()[0] )
-					: ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+					: OBJECT_TYPE_DETAILS;
 			return new WildcardTypeDetailsImpl( upper, true );
 		}
 
 		final int numberOfBounds = CollectionHelper.length( lowerBounds );
 		final TypeDetails lower = numberOfBounds == 1
 				? switcher.switchType( lowerBounds[0] )
-				: ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+				: OBJECT_TYPE_DETAILS;
 		return new WildcardTypeDetailsImpl( lower, false );
 	}
 

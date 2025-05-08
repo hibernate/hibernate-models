@@ -4,10 +4,11 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
+
+import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
 
 /**
  * @author Steve Ebersole
@@ -42,7 +43,7 @@ public record WildcardTypeDetailsImpl(TypeDetails bound, boolean isExtends) impl
 	 * @return the upper bound, or {@code Object} if this wildcard has a lower bound
 	 */
 	@Override public TypeDetails getExtendsBound() {
-		return isExtends ? bound : ClassTypeDetails.OBJECT_TYPE_DETAILS;
+		return isExtends ? bound : OBJECT_TYPE_DETAILS;
 	}
 
 	/**
