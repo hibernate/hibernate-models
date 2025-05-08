@@ -13,7 +13,7 @@ import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.util.CollectionHelper;
 
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
-import static org.hibernate.models.spi.ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
 
 /**
  * Helper utilities for dealing with {@linkplain TypeDetails}

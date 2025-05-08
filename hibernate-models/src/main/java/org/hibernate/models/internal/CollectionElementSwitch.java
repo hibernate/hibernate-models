@@ -6,7 +6,6 @@ package org.hibernate.models.internal;
 
 import java.util.Collection;
 
-import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
@@ -14,6 +13,8 @@ import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.TypeVariableReferenceDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
+
+import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
 
 /**
  * Used to determine the type details for a Collection element - see {@linkplain #extractCollectionElementType(TypeDetails)}
@@ -45,7 +46,7 @@ public class CollectionElementSwitch extends TypeDetailsSwitchSupport<TypeDetail
 		}
 
 		// otherwise, assume Object
-		return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+		return OBJECT_TYPE_DETAILS;
 	}
 
 	private final TypeDetails memberTypeDetails;

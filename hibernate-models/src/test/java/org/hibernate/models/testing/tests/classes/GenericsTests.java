@@ -4,7 +4,6 @@
  */
 package org.hibernate.models.testing.tests.classes;
 
-import org.hibernate.models.spi.ClassBasedTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ModelsContext;
@@ -17,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
 import static org.hibernate.models.testing.TestHelper.buildModelContext;
 
 /**
@@ -44,7 +44,7 @@ public class GenericsTests {
 		assertThat( wrappedType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
 		assertThat( wrappedType.asTypeVariable().getIdentifier() ).isEqualTo( "T" );
 		assertThat( wrappedType.asTypeVariable().getBounds() ).hasSize( 1 );
-		assertThat( wrappedType.asTypeVariable().getBounds() ).contains( ClassBasedTypeDetails.OBJECT_TYPE_DETAILS );
+		assertThat( wrappedType.asTypeVariable().getBounds() ).contains( OBJECT_TYPE_DETAILS );
 		assertThat( wrappedType.isResolved() ).isFalse();
 		assertThat( wrappedType.determineRawClass().isResolved() ).isTrue();
 

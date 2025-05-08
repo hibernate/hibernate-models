@@ -4,8 +4,6 @@
  */
 package org.hibernate.models.spi;
 
-import org.hibernate.models.internal.WildcardTypeDetailsImpl;
-
 /**
  * Models a wildcard type declaration.
  *
@@ -14,11 +12,6 @@ import org.hibernate.models.internal.WildcardTypeDetailsImpl;
  * @author Steve Ebersole
  */
 public interface WildcardTypeDetails extends TypeDetails {
-	/**
-	 * A wildcard without a bound.  In other words, {@code ?}.
-	 */
-	WildcardTypeDetails UNBOUNDED = new WildcardTypeDetailsImpl( null, true );
-
 	TypeDetails getBound();
 
 	boolean isExtends();
