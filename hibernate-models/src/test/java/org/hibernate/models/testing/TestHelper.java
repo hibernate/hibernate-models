@@ -66,6 +66,7 @@ public class TestHelper {
 
 		return new BasicModelsContextImpl(
 				SIMPLE_CLASS_LOADING,
+				true,
 				(contributions, modelsContext) -> {
 					OrmAnnotationHelper.forEachOrmAnnotation( contributions::registerAnnotation );
 					if ( additionalPrimer != null ) {

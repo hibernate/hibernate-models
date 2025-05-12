@@ -23,8 +23,8 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 	private final IndexView jandexIndex;
 	private final ClassDetailsBuilder classDetailsBuilder;
 
-	public JandexClassDetailsRegistry(IndexView jandexIndex, ModelsContext context) {
-		super( context );
+	public JandexClassDetailsRegistry(IndexView jandexIndex, boolean trackImplementors, ModelsContext context) {
+		super( trackImplementors, context );
 		this.jandexIndex = jandexIndex;
 		this.classDetailsBuilder = new JandexClassDetailsBuilderImpl( jandexIndex, context );
 	}

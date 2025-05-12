@@ -8,9 +8,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.models.Settings;
 import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.internal.ModelsLogging;
 import org.hibernate.models.internal.SimpleClassLoading;
+
+import static java.lang.Boolean.parseBoolean;
 
 /**
  * Bootstrapping of {@linkplain ModelsContext}
@@ -124,7 +127,7 @@ public class ModelsConfiguration {
 
 		final Collection<ModelsContextProvider> discoveredProviders = classLoading.loadJavaServices( ModelsContextProvider.class );
 		if ( discoveredProviders.size() > 1 ) {
-			ModelsLogging.MODELS_LOGGER.debugf( "Multiple ModelsContext impls found" );
+			ModelsLogging.MODELS_LOGGER.debugf( "Multiple ModelsContextProvider implementations found" );
 		}
 		for ( ModelsContextProvider provider : discoveredProviders ) {
 			final ModelsContext context = provider.produceContext(
@@ -137,6 +140,21 @@ public class ModelsConfiguration {
 			}
 		}
 
-		return new BasicModelsContextImpl( classLoading, registryPrimer );
+		return new BasicModelsContextImpl( classLoading, shouldTrackImplementors(), registryPrimer );
+	}
+
+	private boolean shouldTrackImplementors() {
+		return shouldTrackImplementors( configValues );
+	}
+
+	public static boolean shouldTrackImplementors(Map<Object, Object> configValues) {
+		final Object value = configValues.get( Settings.TRACK_IMPLEMENTORS );
+		if ( value != null ) {
+			return value instanceof Boolean bool
+					? bool
+					: parseBoolean( value.toString() );
+		}
+		// false by default
+		return false;
 	}
 }

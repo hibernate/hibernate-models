@@ -18,12 +18,12 @@ public class ClassDetailsRegistryStandard
 		extends AbstractClassDetailsRegistry {
 	private final ClassDetailsBuilder classDetailsBuilder;
 
-	public ClassDetailsRegistryStandard(ModelsContext context) {
-		this( JdkBuilders.DEFAULT_BUILDER , context );
+	public ClassDetailsRegistryStandard(boolean trackImplementors, ModelsContext context) {
+		this( JdkBuilders.DEFAULT_BUILDER, trackImplementors, context );
 	}
 
-	public ClassDetailsRegistryStandard(ClassDetailsBuilder classDetailsBuilder, ModelsContext context) {
-		super( context );
+	public ClassDetailsRegistryStandard(ClassDetailsBuilder classDetailsBuilder, boolean trackImplementors, ModelsContext context) {
+		super( trackImplementors, context );
 		this.classDetailsBuilder = classDetailsBuilder;
 	}
 

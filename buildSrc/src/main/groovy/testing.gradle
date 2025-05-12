@@ -12,6 +12,7 @@ dependencies {
 	testImplementation jakartaLibs.jpa
 	testImplementation testLibs.junit5Api
 	testImplementation testLibs.assertjCore
+	testImplementation testLibs.junit5Params
 
 	testImplementation testLibs.junit5Engine
 	testImplementation testLibs.log4j

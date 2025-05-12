@@ -32,13 +32,13 @@ public class RestoredModelContext implements ModelsContext {
 
 	private final ClassLoading classLoading;
 
-	public RestoredModelContext(StorableContextImpl serialContext, ClassLoading classLoading) {
+	public RestoredModelContext(StorableContextImpl serialContext, ClassLoading classLoading, boolean trackImplementors) {
 		this.classLoading = classLoading;
 
 		final ClassDetailsBuilderImpl classDetailsBuilder = new ClassDetailsBuilderImpl( serialContext, classLoading );
 
 		this.annotationDescriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
-		this.classDetailsRegistry = new ClassDetailsRegistryStandard( classDetailsBuilder, this );
+		this.classDetailsRegistry = new ClassDetailsRegistryStandard( classDetailsBuilder, trackImplementors, this );
 
 		for ( Map.Entry<String, SerialClassDetails> classDetailsEntry : serialContext.getSerialClassDetailsMap().entrySet() ) {
 			classDetailsRegistry.resolveClassDetails( classDetailsEntry.getKey() );

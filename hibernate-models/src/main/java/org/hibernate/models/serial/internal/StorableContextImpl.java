@@ -24,12 +24,15 @@ import static org.hibernate.models.internal.util.CollectionHelper.linkedMapOfSiz
  * @author Steve Ebersole
  */
 public class StorableContextImpl implements StorableContext {
+	private final boolean trackImplementors;
 	private final LinkedHashMap<String, SerialClassDetails> serialClassDetailsMap;
 	private final LinkedHashMap<Class<? extends Annotation>, SerialAnnotationDescriptor<? extends Annotation>> serialAnnotationDescriptorMap;
 
 	public StorableContextImpl(
+			boolean trackImplementors,
 			Map<String, ClassDetails> classDetailsMap,
 			Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> annotationDescriptorMap) {
+		this.trackImplementors = trackImplementors;
 		serialClassDetailsMap = linkedMapOfSize( classDetailsMap.size() );
 		serialAnnotationDescriptorMap = linkedMapOfSize( annotationDescriptorMap.size() );
 
@@ -43,7 +46,7 @@ public class StorableContextImpl implements StorableContext {
 
 	@Override
 	public ModelsContext fromStorableForm(ClassLoading classLoading) {
-		return new RestoredModelContext( this, classLoading );
+		return new RestoredModelContext( this, classLoading, trackImplementors );
 	}
 
 	public LinkedHashMap<String, SerialClassDetails> getSerialClassDetailsMap() {

@@ -4,10 +4,15 @@
  */
 package org.hibernate.models.internal;
 
+import java.util.Map;
+
+import org.hibernate.models.Settings;
 import org.hibernate.models.serial.internal.StorableContextImpl;
 import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
+
+import static java.lang.Boolean.parseBoolean;
 
 /**
  * Standard ModelsContext implementation
@@ -18,13 +23,27 @@ public class BasicModelsContextImpl extends AbstractModelsContext {
 	private final AnnotationDescriptorRegistryStandard descriptorRegistry;
 	private final ClassDetailsRegistryStandard classDetailsRegistry;
 
-	public BasicModelsContextImpl(ClassLoading classLoadingAccess, RegistryPrimer registryPrimer) {
+	public BasicModelsContextImpl(
+			ClassLoading classLoadingAccess,
+			boolean trackImplementors,
+			RegistryPrimer registryPrimer) {
 		super( classLoadingAccess );
 
 		this.descriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
-		this.classDetailsRegistry = new ClassDetailsRegistryStandard( this );
+		this.classDetailsRegistry = new ClassDetailsRegistryStandard( trackImplementors, this );
 
 		primeRegistries( registryPrimer );
+	}
+
+	private static boolean shouldTrackImplementors(Map<Object, Object> configValues) {
+		final Object value = configValues.get( Settings.TRACK_IMPLEMENTORS );
+		if ( value != null ) {
+			return value instanceof Boolean bool
+					? bool
+					: parseBoolean( value.toString() );
+		}
+		// false by default
+		return false;
 	}
 
 	@Override
@@ -39,6 +58,10 @@ public class BasicModelsContextImpl extends AbstractModelsContext {
 
 	@Override
 	public StorableContext toStorableForm() {
-		return new StorableContextImpl( classDetailsRegistry.classDetailsMap, descriptorRegistry.descriptorMap );
+		return new StorableContextImpl(
+				classDetailsRegistry.isTrackingImplementors(),
+				classDetailsRegistry.classDetailsMap,
+				descriptorRegistry.descriptorMap
+		);
 	}
 }

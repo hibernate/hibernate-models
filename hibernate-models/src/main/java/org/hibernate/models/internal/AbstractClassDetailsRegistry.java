@@ -31,25 +31,28 @@ import static org.hibernate.models.spi.ClassDetails.VOID_OBJECT_CLASS_DETAILS;
  */
 public abstract class AbstractClassDetailsRegistry implements MutableClassDetailsRegistry {
 	protected final ModelsContext context;
+	private final boolean trackImplementors;
 
 	protected final Map<String, ClassDetails> classDetailsMap;
 
-	// subtype per type
-	protected final Map<String, Set<ClassDetails>> directSubTypeMap;
-	// implementor by interface
+	// class -> subclasses
+	protected final Map<String, Set<ClassDetails>> directSubtypeMap;
+	// interface -> implementations (and specializations)
 	protected final Map<String, Set<ClassDetails>> directImplementorMap;
 
-	protected AbstractClassDetailsRegistry(ModelsContext context) {
-		this( new ConcurrentHashMap<>(), new ConcurrentHashMap<>(), new ConcurrentHashMap<>(), context );
+	protected AbstractClassDetailsRegistry(boolean trackImplementors, ModelsContext context) {
+		this( trackImplementors, new ConcurrentHashMap<>(), new ConcurrentHashMap<>(), new ConcurrentHashMap<>(), context );
 	}
 
 	protected AbstractClassDetailsRegistry(
+			boolean trackImplementors,
 			Map<String, ClassDetails> classDetailsMap,
-			Map<String, Set<ClassDetails>> directSubTypeMap,
+			Map<String, Set<ClassDetails>> directSubtypeMap,
 			Map<String, Set<ClassDetails>> directImplementorMap,
 			ModelsContext context) {
+		this.trackImplementors = trackImplementors;
 		this.classDetailsMap = classDetailsMap;
-		this.directSubTypeMap = directSubTypeMap;
+		this.directSubtypeMap = directSubtypeMap;
 		this.directImplementorMap = directImplementorMap;
 		this.context = context;
 
@@ -57,6 +60,11 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		classDetailsMap.put( OBJECT_CLASS_DETAILS.getClassName(), OBJECT_CLASS_DETAILS );
 		classDetailsMap.put( VOID_CLASS_DETAILS.getClassName(), VOID_CLASS_DETAILS );
 		classDetailsMap.put( VOID_OBJECT_CLASS_DETAILS.getClassName(), VOID_OBJECT_CLASS_DETAILS );
+	}
+
+	@Override
+	public boolean isTrackingImplementors() {
+		return trackImplementors;
 	}
 
 	@Override
@@ -69,7 +77,7 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 
 	@Override
 	public Set<ClassDetails> getDirectSubtypes(String typeName) {
-		final Set<ClassDetails> directSubtypes = directSubTypeMap.get( typeName );
+		final Set<ClassDetails> directSubtypes = directSubtypeMap.get( typeName );
 		return directSubtypes != null ? directSubtypes : Set.of();
 	}
 
@@ -86,12 +94,20 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 
 	@Override
 	public Set<ClassDetails> getDirectImplementors(String interfaceName) {
+		if ( !trackImplementors ) {
+			return Collections.emptySet();
+		}
+
 		final Set<ClassDetails> implementors = directImplementorMap.get( interfaceName );
 		return implementors != null ? implementors : Set.of();
 	}
 
 	@Override
 	public void forEachDirectImplementor(String interfaceName, ClassDetailsConsumer consumer) {
+		if ( !trackImplementors ) {
+			return;
+		}
+
 		final Set<ClassDetails> directImplementors = getDirectImplementors( interfaceName );
 		if ( directImplementors != null ) {
 			directImplementors.forEach( consumer::consume );
@@ -99,15 +115,12 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	}
 
 	@Override
-	public Set<ClassDetails> findConcreteTypes(String base, boolean includeBase) {
-		final Set<ClassDetails> result = new LinkedHashSet<>();
+	public void walkConcreteTypes(String base, boolean includeBase, ClassDetailsConsumer consumer) {
 		walkImplementors( base, includeBase, classDetails -> {
 			if ( !classDetails.isAbstract() && !classDetails.isInterface() ) {
-				result.add( classDetails );
+				consumer.consume( classDetails );
 			}
-
 		});
-		return result;
 	}
 
 	@Override
@@ -133,10 +146,12 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 			walkSubtypes( subType, consumer );
 		} );
 
-		forEachDirectImplementor( base, (implementor) -> {
-			consumer.consume( implementor );
-			walkInterfaceImplementors( implementor, consumer );
-		} );
+		if ( trackImplementors ) {
+			forEachDirectImplementor( base, (implementor) -> {
+				consumer.consume( implementor );
+				walkInterfaceImplementors( implementor, consumer );
+			} );
+		}
 	}
 
 	private void walkSubtypes(ClassDetails base, ClassDetailsConsumer consumer) {
@@ -216,24 +231,26 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		classDetailsMap.put( name, classDetails );
 
 		if ( classDetails.getSuperClass() != null ) {
-			Set<ClassDetails> subTypes = directSubTypeMap.get( classDetails.getSuperClass().getName() );
+			Set<ClassDetails> subTypes = directSubtypeMap.get( classDetails.getSuperClass().getName() );
 			//noinspection Java8MapApi
 			if ( subTypes == null ) {
 				subTypes = new LinkedHashSet<>();
-				directSubTypeMap.put( classDetails.getSuperClass().getName(), subTypes );
+				directSubtypeMap.put( classDetails.getSuperClass().getName(), subTypes );
 			}
 			subTypes.add( classDetails );
 		}
 
-		final List<TypeDetails> implementedInterfaces = classDetails.getImplementedInterfaces();
-		if ( implementedInterfaces != null ) {
-			implementedInterfaces.forEach( (implementedInterface) -> {
-				final Set<ClassDetails> directImplementors = directImplementorMap.computeIfAbsent(
-						implementedInterface.getName(),
-						(interfaceName) -> new LinkedHashSet<>()
-				);
-				directImplementors.add( classDetails );
-			} );
+		if ( trackImplementors ) {
+			final List<TypeDetails> implementedInterfaces = classDetails.getImplementedInterfaces();
+			if ( implementedInterfaces != null ) {
+				implementedInterfaces.forEach( (implementedInterface) -> {
+					final Set<ClassDetails> directImplementors = directImplementorMap.computeIfAbsent(
+							implementedInterface.getName(),
+							(interfaceName) -> new LinkedHashSet<>()
+					);
+					directImplementors.add( classDetails );
+				} );
+			}
 		}
 	}
 
@@ -281,7 +298,7 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	}
 
 	public Map<String, Set<ClassDetails>> getDirectSubTypeMap() {
-		return Collections.unmodifiableMap( directSubTypeMap );
+		return Collections.unmodifiableMap( directSubtypeMap );
 	}
 
 	public Map<String, Set<ClassDetails>> getDirectImplementorMap() {

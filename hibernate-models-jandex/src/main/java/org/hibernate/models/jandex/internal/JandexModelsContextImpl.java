@@ -40,17 +40,18 @@ public class JandexModelsContextImpl extends AbstractModelsContext implements Ja
 
 	public JandexModelsContextImpl(
 			IndexView jandexIndex,
+			boolean trackImplementors,
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer) {
 		super( classLoading );
 
+		MODELS_CLASS_LOGGER.debugf( "Using Jandex support" );
+
 		assert jandexIndex != null;
 		this.jandexIndex = jandexIndex;
 
-		MODELS_CLASS_LOGGER.debugf( "Using Jandex support" );
-
 		this.descriptorRegistry = new JandexAnnotationDescriptorRegistry( this );
-		this.classDetailsRegistry = new JandexClassDetailsRegistry( jandexIndex, this );
+		this.classDetailsRegistry = new JandexClassDetailsRegistry( jandexIndex, trackImplementors,this );
 
 		primeRegistries( registryPrimer );
 	}
@@ -104,6 +105,10 @@ public class JandexModelsContextImpl extends AbstractModelsContext implements Ja
 
 	@Override
 	public StorableContext toStorableForm() {
-		return new StorableContextImpl( classDetailsRegistry.classDetailsMap(), descriptorRegistry.descriptorMap() );
+		return new StorableContextImpl(
+				classDetailsRegistry.isTrackingImplementors(),
+				classDetailsRegistry.classDetailsMap(),
+				descriptorRegistry.descriptorMap()
+		);
 	}
 }

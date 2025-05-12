@@ -29,7 +29,7 @@ public class ByteBuddyModelsContextFactory implements ModelsContextFactory {
 			RegistryPrimer registryPrimer,
 			Class<?>... modelClasses) {
 		final TypePool byteBuddyTypePool = buildTypePool( modelClasses );
-		return new ByteBuddyModelsContextImpl( byteBuddyTypePool, SIMPLE_CLASS_LOADING, registryPrimer );
+		return new ByteBuddyModelsContextImpl( byteBuddyTypePool, true, SIMPLE_CLASS_LOADING, registryPrimer );
 	}
 
 	public static TypePool buildTypePool(Class<?>... modelClasses) {

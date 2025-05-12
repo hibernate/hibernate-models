@@ -29,7 +29,7 @@ public class JandexModelsContextFactoryImpl implements ModelsContextFactory {
 			RegistryPrimer registryPrimer,
 			Class<?>... modelClasses) {
 		final Index jandexIndex = buildJandexIndex( SIMPLE_CLASS_LOADING, modelClasses );
-		return new JandexModelsContextImpl( jandexIndex, SIMPLE_CLASS_LOADING, registryPrimer );
+		return new JandexModelsContextImpl( jandexIndex, true,  SIMPLE_CLASS_LOADING, registryPrimer );
 	}
 
 	public static Index buildJandexIndex(ClassLoading classLoadingAccess, Class<?>... modelClasses) {

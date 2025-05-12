@@ -21,6 +21,8 @@ import org.hibernate.models.spi.ValueTypeDescriptor;
 
 import net.bytebuddy.pool.TypePool;
 
+import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
+
 /**
  * Implementation of ByteBuddyModelsContext
  *
@@ -39,13 +41,16 @@ public class ByteBuddyModelsContextImpl
 
 	public ByteBuddyModelsContextImpl(
 			TypePool typePool,
+			boolean trackImplementors,
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer) {
 		super( classLoading );
 
+		MODELS_CLASS_LOGGER.debugf( "Using Byte Buddy support" );
+
 		this.typePool = typePool;
 
-		this.classDetailsRegistry = new ClassDetailsRegistryImpl( this );
+		this.classDetailsRegistry = new ClassDetailsRegistryImpl( this, trackImplementors );
 		this.descriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
 
 		primeRegistries( registryPrimer );
@@ -68,7 +73,11 @@ public class ByteBuddyModelsContextImpl
 
 	@Override
 	public StorableContext toStorableForm() {
-		return new StorableContextImpl( classDetailsRegistry.classDetailsMap(), descriptorRegistry.descriptorMap() );
+		return new StorableContextImpl(
+				classDetailsRegistry.isTrackingImplementors(),
+				classDetailsRegistry.classDetailsMap(),
+				descriptorRegistry.descriptorMap()
+		);
 	}
 
 	@Override

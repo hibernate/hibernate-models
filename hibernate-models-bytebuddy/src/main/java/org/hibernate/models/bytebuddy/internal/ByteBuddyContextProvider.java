@@ -9,6 +9,7 @@ import java.util.Map;
 import org.hibernate.models.bytebuddy.Settings;
 import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.spi.ClassLoading;
+import org.hibernate.models.spi.ModelsConfiguration;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.spi.ModelsContextProvider;
@@ -27,12 +28,13 @@ public class ByteBuddyContextProvider implements ModelsContextProvider {
 			RegistryPrimer registryPrimer,
 			Map<Object, Object> configProperties) {
 		final TypePool typePool = resolveTypePool( configProperties );
+		final boolean trackImplementors = ModelsConfiguration.shouldTrackImplementors( configProperties );
 
 		if ( typePool != null ) {
-			return new ByteBuddyModelsContextImpl( typePool, classLoading, registryPrimer );
+			return new ByteBuddyModelsContextImpl( typePool, trackImplementors, classLoading, registryPrimer );
 		}
 
-		return new BasicModelsContextImpl( classLoading, registryPrimer );
+		return new BasicModelsContextImpl( classLoading, trackImplementors, registryPrimer );
 	}
 
 	private TypePool resolveTypePool(Map<Object, Object> configProperties) {

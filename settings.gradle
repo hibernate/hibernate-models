@@ -89,7 +89,7 @@ dependencyResolutionManagement {
 			def h2Version = version "h2", "2.2.224"
 			library( "h2", "com.h2database", "h2" ).versionRef( h2Version )
 
-			def junit5Version = version "junit5", "5.9.2"
+			def junit5Version = version "junit5", "5.11.0"
 			library( "junit5Api", "org.junit.jupiter", "junit-jupiter-api" ).versionRef( junit5Version )
 			library( "junit5Engine", "org.junit.jupiter", "junit-jupiter-engine" ).versionRef( junit5Version )
 			library( "junit5Params", "org.junit.jupiter", "junit-jupiter-params" ).versionRef( junit5Version )
