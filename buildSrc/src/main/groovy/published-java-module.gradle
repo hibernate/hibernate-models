@@ -16,6 +16,17 @@ java {
 	withSourcesJar()
 }
 
+def moduleNameBase = project.name.startsWith( 'hibernate-' ) ? name.drop( 'hibernate-'.length() ): name
+def moduleName = "org.hibernate.$moduleNameBase".replace('-','.')
+
+tasks.named("jar") {
+	manifest {
+		attributes(
+				'Automatic-Module-Name': moduleName
+		)
+	}
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Javadoc
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
