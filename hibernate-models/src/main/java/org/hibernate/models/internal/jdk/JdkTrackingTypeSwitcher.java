@@ -4,6 +4,11 @@
  */
 package org.hibernate.models.internal.jdk;
 
+import org.hibernate.models.internal.TypeVariableReferenceDetailsImpl;
+import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
+
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -14,19 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.models.internal.TypeVariableReferenceDetailsImpl;
-import org.hibernate.models.internal.util.CollectionHelper;
-import org.hibernate.models.spi.ModelsContext;
-import org.hibernate.models.spi.TypeDetails;
-import org.hibernate.models.spi.TypeVariableDetails;
-
 /**
  * @author Steve Ebersole
  */
 public class JdkTrackingTypeSwitcher implements JdkTypeSwitcher {
 	private final JdkTrackingTypeSwitch typeSwitch;
 
-	private List<String> typeVariableIdentifiers;
+	private Map<String, TypeVariableResolution> typeVariables;
 	private Map<String, List<TypeVariableReferenceDetailsImpl>> typeVariableRefXref;
 
 	public static TypeDetails standardSwitchType(
@@ -41,8 +40,7 @@ public class JdkTrackingTypeSwitcher implements JdkTypeSwitcher {
 
 	@Override
 	public TypeDetails switchType(Type type) {
-		//noinspection rawtypes
-		if ( type instanceof Class classType ) {
+		if ( type instanceof Class<?> classType ) {
 			return typeSwitch.caseClass( classType );
 		}
 
@@ -54,8 +52,7 @@ public class JdkTrackingTypeSwitcher implements JdkTypeSwitcher {
 			return typeSwitch.caseParameterizedType( parameterizedType );
 		}
 
-		//noinspection rawtypes
-		if ( type instanceof TypeVariable typeVariable ) {
+		if ( type instanceof TypeVariable<?> typeVariable ) {
 			return switchTypeVariable( type, typeVariable );
 		}
 
@@ -66,39 +63,60 @@ public class JdkTrackingTypeSwitcher implements JdkTypeSwitcher {
 		return typeSwitch.defaultCase( type );
 	}
 
-	private TypeDetails switchTypeVariable(Type type, @SuppressWarnings("rawtypes") TypeVariable typeVariable) {
-		if ( typeVariableIdentifiers == null ) {
-			typeVariableIdentifiers = new ArrayList<>();
+	private TypeDetails switchTypeVariable(Type type, TypeVariable<?> typeVariable) {
+		final TypeVariableResolution resolution = new TypeVariableResolution();
+		if ( typeVariables == null ) {
+			typeVariables = new HashMap<>();
+			typeVariables.put( typeVariable.getName(), resolution );
 		}
 		else {
-			if ( typeVariableIdentifiers.contains( typeVariable.getTypeName() ) ) {
+			final TypeVariableResolution existingResolution = typeVariables.putIfAbsent(
+					typeVariable.getTypeName(),
+					resolution
+			);
+			if ( existingResolution != null ) {
+				final TypeVariableDetails details = existingResolution.getDetails();
+				if ( details != null ) {
+					// The type variable has already been switched, so we can return the original details
+					return details;
+				}
 				// this should indicate a "recursive" type var (e.g. `T extends Comparable<T>`)
 				final TypeVariableReferenceDetailsImpl reference = new TypeVariableReferenceDetailsImpl( type.getTypeName() );
 				if ( typeVariableRefXref == null ) {
 					typeVariableRefXref = new HashMap<>();
-					final List<TypeVariableReferenceDetailsImpl> list = typeVariableRefXref.computeIfAbsent(
-							type.getTypeName(),
-							(s) -> new ArrayList<>()
-					);
-					list.add( reference );
 				}
+				final List<TypeVariableReferenceDetailsImpl> list = typeVariableRefXref.computeIfAbsent(
+						type.getTypeName(),
+						(s) -> new ArrayList<>()
+				);
+				list.add( reference );
 				return reference;
 			}
 		}
-		typeVariableIdentifiers.add( typeVariable.getTypeName() );
 
 		final TypeVariableDetails switched = typeSwitch.caseTypeVariable( typeVariable );
 		assert switched != null;
+		resolution.setDetails( switched );
 
 		if ( typeVariableRefXref != null ) {
-			final List<TypeVariableReferenceDetailsImpl> list = typeVariableRefXref.get( typeVariable.getTypeName() );
-			if ( CollectionHelper.isNotEmpty( list ) ) {
-				for ( TypeVariableReferenceDetailsImpl reference : list ) {
-					reference.setTarget( switched );
-				}
+			final List<TypeVariableReferenceDetailsImpl> list = typeVariableRefXref.remove( typeVariable.getTypeName() );
+			if ( list != null ) {
+				list.forEach( reference -> reference.setTarget( switched ) );
 			}
 		}
 
 		return switched;
+	}
+
+	private static class TypeVariableResolution {
+		private TypeVariableDetails details;
+
+		public void setDetails(TypeVariableDetails details) {
+			this.details = details;
+		}
+
+		public TypeVariableDetails getDetails() {
+			return details;
+		}
 	}
 }
