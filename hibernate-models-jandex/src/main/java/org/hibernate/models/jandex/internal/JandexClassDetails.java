@@ -121,7 +121,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	@Override
 	public List<TypeVariableDetails> getTypeParameters() {
 		if ( typeParameters == null ) {
-			this.typeParameters = determineTypeParameters( classInfo, this, getModelContext() );
+			this.typeParameters = determineTypeParameters( classInfo, getModelContext() );
 		}
 		return typeParameters;
 	}
@@ -246,15 +246,15 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 				.resolveClassDetails( classInfo.superClassType().name().toString() );
 	}
 
-	private static TypeDetails determineGenericSuperType(ClassInfo classInfo, ModelsContext modelsContext) {
+	private TypeDetails determineGenericSuperType(ClassInfo classInfo, ModelsContext modelsContext) {
 		if ( classInfo.superClassType() == null ) {
 			return null;
 		}
 
-		return JandexTypeSwitchStandard.switchType( classInfo.superClassType(), modelsContext );
+		return JandexTypeSwitchStandard.switchType( classInfo.superClassType(), this, modelsContext );
 	}
 
-	private static List<TypeDetails> determineInterfaces(
+	private List<TypeDetails> determineInterfaces(
 			ClassInfo classInfo,
 			ModelsContext modelsContext) {
 		final List<Type> interfaceTypes = classInfo.interfaceTypes();
@@ -266,6 +266,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		for ( Type interfaceType : interfaceTypes ) {
 			final TypeDetails switchedType = JandexTypeSwitchStandard.switchType(
 					interfaceType,
+					this,
 					modelsContext
 			);
 			result.add( switchedType );
@@ -273,7 +274,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		return result;
 	}
 
-	private static List<TypeVariableDetails> determineTypeParameters(ClassInfo classInfo, JandexClassDetails current, ModelsContext modelsContext) {
+	private List<TypeVariableDetails> determineTypeParameters(ClassInfo classInfo, ModelsContext modelsContext) {
 		final List<TypeVariable> jandexTypeVariables = classInfo.typeParameters();
 		if ( CollectionHelper.isEmpty( jandexTypeVariables ) ) {
 			return emptyList();
@@ -281,7 +282,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 		final ArrayList<TypeVariableDetails> result = arrayList( jandexTypeVariables.size() );
 		for ( TypeVariable jandexTypeVariable : jandexTypeVariables ) {
-			result.add( (TypeVariableDetails) JandexTypeSwitchStandard.switchType( jandexTypeVariable, current, modelsContext ) );
+			result.add( (TypeVariableDetails) JandexTypeSwitchStandard.switchType( jandexTypeVariable, this, modelsContext ) );
 		}
 		return result;
 	}
