@@ -27,12 +27,16 @@ public class InheritanceTypeVariableTests {
 		final ModelsContext modelsContext = createModelContext(
 				Root.class,
 				Base1.class,
-				Base2.class
+				Base2.class,
+				Level1.class,
+				Level2.class,
+				Base3.class
 		);
 
 		final ClassDetails rootClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Root.class.getName() );
 		final ClassDetails base1ClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Base1.class.getName() );
 		final ClassDetails base2ClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Base2.class.getName() );
+		final ClassDetails base3ClassDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Base3.class.getName() );
 
 		final FieldDetails idField = rootClassDetails.findFieldByName( "id" );
 		final TypeDetails idFieldType = idField.getType();
@@ -80,6 +84,35 @@ public class InheritanceTypeVariableTests {
 			assertThat( resolvedClassType.isResolved() ).isTrue();
 		}
 
+		{
+			final TypeDetails concreteType = idField.resolveRelativeType( base3ClassDetails );
+			assertThat( concreteType ).isInstanceOf( ClassTypeDetails.class );
+			final ClassDetails concreteClassDetails = ( (ClassTypeDetails) concreteType ).getClassDetails();
+			assertThat( concreteClassDetails.toJavaClass() ).isEqualTo( Long.class );
+
+			final ClassBasedTypeDetails resolvedClassType = idField.resolveRelativeClassType( base3ClassDetails );
+			assertThat( resolvedClassType.isResolved() ).isTrue();
+			assertThat( resolvedClassType.getClassDetails().toJavaClass() ).isEqualTo( Long.class );
+			assertThat( resolvedClassType.isResolved() ).isTrue();
+		}
+
+		{
+			final ClassDetails level1Class = modelsContext.getClassDetailsRegistry().getClassDetails( Level1.class.getName() );
+			final FieldDetails middleField = level1Class.findFieldByName( "middle" );
+			final TypeDetails middleFieldType = middleField.getType();
+			assertThat( middleFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
+			assertThat( middleFieldType.isResolved() ).isFalse();
+
+			final TypeDetails concreteType = middleField.resolveRelativeType( base3ClassDetails );
+			assertThat( concreteType ).isInstanceOf( ClassTypeDetails.class );
+			final ClassDetails concreteClassDetails = ( (ClassTypeDetails) concreteType ).getClassDetails();
+			assertThat( concreteClassDetails.toJavaClass() ).isEqualTo( Short.class );
+
+			final ClassBasedTypeDetails resolvedClassType = middleField.resolveRelativeClassType( base3ClassDetails );
+			assertThat( resolvedClassType.isResolved() ).isTrue();
+			assertThat( resolvedClassType.getClassDetails().toJavaClass() ).isEqualTo( Short.class );
+			assertThat( resolvedClassType.isResolved() ).isTrue();
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -91,5 +124,16 @@ public class InheritanceTypeVariableTests {
 	}
 
 	static class Base2 extends Root<String> {
+	}
+
+	// reuse same type parameter identifier as Root
+	static class Level1<J, I> extends Root<J> {
+		I middle;
+	}
+
+	static class Level2<K> extends Level1<K, Short> {
+	}
+
+	static class Base3<K> extends Level2<Long> {
 	}
 }

@@ -4,13 +4,13 @@
  */
 package org.hibernate.models.spi;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.hibernate.models.internal.ArrayTypeDetailsImpl;
 import org.hibernate.models.internal.ParameterizedTypeDetailsImpl;
 import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.util.CollectionHelper;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
 import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
@@ -185,35 +185,37 @@ public class TypeDetailsHelper {
 	 * @param parameterizedType the parameterized type used to resolve the type variable's relative type
 	 * @param typeVariable the type variable to resolve
 	 *
-	 * @return the type variable's relative type, or {@code null} if not resolved
+	 * @return the type variable's relative type
 	 */
 	public static TypeDetails resolveTypeVariableFromParameterizedType(
 			ParameterizedTypeDetails parameterizedType,
 			TypeVariableDetails typeVariable) {
 		final ClassDetails classDetails = parameterizedType.getRawClassDetails();
-		final TypeDetails typeArgument = findMatchingTypeArgument(
-				classDetails.getTypeParameters(),
-				parameterizedType.getArguments(),
-				typeVariable.getIdentifier()
-		);
-
-		// If no type argument is found, or the type variable is defined by another
-		// class, try resolving it in the generic super type if present
-		if ( typeArgument == null || classDetails != typeVariable.getDeclaringType() ) {
+		if ( classDetails == typeVariable.getDeclaringType() ) {
+			// If the type variable is defined by the parameterized class, try to find the matching type argument
+			return findMatchingTypeArgument(
+					classDetails.getTypeParameters(),
+					parameterizedType.getArguments(),
+					typeVariable.getIdentifier()
+			);
+		}
+		else {
+			// Try resolving the type variable in the generic super type
 			final TypeDetails genericSuper = classDetails.getGenericSuperType();
 			final TypeDetails resolvedType = genericSuper != null ?
 					genericSuper.resolveTypeVariable( typeVariable ) :
 					null;
-			if ( typeArgument == null || resolvedType != null
-					&& resolvedType.getTypeKind() != TypeDetails.Kind.TYPE_VARIABLE ) {
-				return resolvedType;
+			if ( resolvedType != null ) {
+				return resolvedType.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ?
+						parameterizedType.resolveTypeVariable( resolvedType.asTypeVariable() ) :
+						resolvedType;
 			}
 		}
 
-		// Either we found the exact type variable's argument, or the parameterized class redefines
-		// a type variable with the same identifier as a supertype, and it should be ignored.
-		// Return the matching generic type argument
-		return typeArgument;
+		throw new IllegalArgumentException(
+				"Unable to resolve type variable [" + typeVariable.getIdentifier() + "] from parameterized type ["
+						+ parameterizedType.getName() + "]"
+		);
 	}
 
 	private static TypeDetails findMatchingTypeArgument(

@@ -43,10 +43,6 @@ import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
  * @author Steve Ebersole
  */
 public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
-	public static TypeDetails switchType(Type type, ModelsContext modelsContext) {
-		assert type.kind() != Type.Kind.TYPE_VARIABLE;
-		return switchType( type, null, modelsContext );
-	}
 
 	public static TypeDetails switchType(Type type, ClassDetails declaringType, ModelsContext modelsContext) {
 		final JandexTypeSwitchStandard genericVariableSwitch = new JandexTypeSwitchStandard( declaringType );
@@ -55,7 +51,7 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 
 	private final ClassDetails declaringType;
 
-	public JandexTypeSwitchStandard(ClassDetails declaringType) {
+	private JandexTypeSwitchStandard(ClassDetails declaringType) {
 		this.declaringType = declaringType;
 	}
 

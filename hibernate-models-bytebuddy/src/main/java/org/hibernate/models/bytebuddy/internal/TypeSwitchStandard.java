@@ -35,10 +35,6 @@ import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
  */
 public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 
-	public static TypeDetails switchType(TypeDefinition typeDescription, ModelsContext modelsContext) {
-		return switchType( typeDescription, null, modelsContext );
-	}
-
 	public static TypeDetails switchType(TypeDefinition typeDescription, ClassDetails declaringType, ModelsContext modelsContext) {
 		final TypeSwitchStandard switchImpl = new TypeSwitchStandard( declaringType );
 		return TypeSwitcher.switchType( typeDescription, switchImpl, modelsContext );
@@ -47,7 +43,7 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 
 	private final ClassDetails declaringType;
 
-	public TypeSwitchStandard(ClassDetails declaringType) {
+	private TypeSwitchStandard(ClassDetails declaringType) {
 		this.declaringType = declaringType;
 	}
 

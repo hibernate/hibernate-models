@@ -121,7 +121,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	@Override
 	public List<TypeVariableDetails> getTypeParameters() {
 		if ( typeParameters == null ) {
-			this.typeParameters = determineTypeParameters( typeDescription, this, getModelContext() );
+			this.typeParameters = determineTypeParameters( typeDescription, getModelContext() );
 		}
 		return typeParameters;
 	}
@@ -227,15 +227,15 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 				.resolveClassDetails( typeDescription.getSuperClass().asRawType().getTypeName() );
 	}
 
-	private static TypeDetails determineGenericSuperType(TypeDescription typeDescription, ModelsContext modelsContext) {
+	private TypeDetails determineGenericSuperType(TypeDescription typeDescription, ModelsContext modelsContext) {
 		if ( typeDescription.getSuperClass() == null ) {
 			return null;
 		}
 
-		return TypeSwitchStandard.switchType( typeDescription.getSuperClass(), modelsContext );
+		return TypeSwitchStandard.switchType( typeDescription.getSuperClass(), this, modelsContext );
 	}
 
-	private static List<TypeDetails> determineInterfaces(
+	private List<TypeDetails> determineInterfaces(
 			TypeDescription typeDescription,
 			ModelsContext modelsContext) {
 		final TypeList.Generic interfaceTypes = typeDescription.getInterfaces();
@@ -247,6 +247,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 		for ( TypeDescription.Generic interfaceType : interfaceTypes ) {
 			final TypeDetails switchedType = TypeSwitchStandard.switchType(
 					interfaceType,
+					this,
 					modelsContext
 			);
 			result.add( switchedType );
@@ -254,9 +255,8 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 		return result;
 	}
 
-	private static List<TypeVariableDetails> determineTypeParameters(
+	private List<TypeVariableDetails> determineTypeParameters(
 			TypeDescription typeDescription,
-			ClassDetailsImpl current,
 			ModelsContext modelsContext) {
 		final TypeList.Generic typeArguments = typeDescription.getTypeVariables();
 		if ( CollectionHelper.isEmpty( typeArguments ) ) {
@@ -265,7 +265,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 
 		final ArrayList<TypeVariableDetails> result = arrayList( typeArguments.size() );
 		for ( TypeDescription.Generic typeArgument : typeArguments ) {
-			result.add( (TypeVariableDetails) TypeSwitchStandard.switchType( typeArgument, current, modelsContext ) );
+			result.add( (TypeVariableDetails) TypeSwitchStandard.switchType( typeArgument, this, modelsContext ) );
 		}
 		return result;
 	}
