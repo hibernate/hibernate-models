@@ -25,6 +25,11 @@ tasks.named("jar") {
 				'Automatic-Module-Name': moduleName
 		)
 	}
+	metaInf {
+		from(rootProject.projectDir, {
+			include "LICENSE"
+		})
+	}
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
