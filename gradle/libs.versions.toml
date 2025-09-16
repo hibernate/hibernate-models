@@ -19,9 +19,10 @@ jsonbApi = "3.0.1"
 jsonbRuntime = "3.0.4"
 
 # testLibs
-assertj = "3.22.0"
-h2 = "2.2.224"
-junit5 = "5.11.0"
+assertj = "3.27.4"
+h2 = "2.3.232"
+junit5 = "5.13.4"
+junitPlatform5= "1.13.4"
 log4j = "2.25.1"
 
 # plugins
@@ -58,6 +59,7 @@ test-h2 = { group = "com.h2database", name = "h2", version.ref = "h2" }
 test-junitJupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5" }
 test-junitJupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5" }
 test-junitJupiterParams = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit5" }
+test-junitPlatformLauncher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junitPlatform5" }
 test-log4jCore = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
 
 [plugins]

@@ -39,6 +39,7 @@ updates:
       test:
         patterns:
           - "org.junit.jupiter*"
+          - "org.junit.platform*"
           - "org.assertj*"
           - "com.h2database*"
     ignore:
