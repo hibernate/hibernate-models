@@ -17,11 +17,13 @@ rootProject.name = "hibernate-models-group"
 dependencyResolutionManagement {
 	repositories {
 		mavenCentral()
-		maven {
-			// temporary - OSSRH snapshot repo for ORM 7.0 snapshot
-			url "https://oss.sonatype.org/content/repositories/snapshots/"
-			mavenContent {
-				snapshotsOnly()
+		if (rootProject.hasProperty("enableSnapshotRepositories")) {
+			maven {
+				// temporary - Maven Central snapshots repo for ORM snapshots
+				url "https://central.sonatype.com/repository/maven-snapshots/"
+				mavenContent {
+					snapshotsOnly()
+				}
 			}
 		}
 		// Needed for RC versions of Jakarta Persistence
@@ -32,9 +34,11 @@ dependencyResolutionManagement {
 		maven {
 			url "https://jakarta.oss.sonatype.org/content/groups/staging/"
 		}
-		// Needed for SNAPSHOT versions of Jakarta Persistence (wtf)
-		maven {
-			url "https://jakarta.oss.sonatype.org/content/repositories/snapshots/"
+		if (rootProject.hasProperty("enableSnapshotRepositories")) {
+			// Needed for SNAPSHOT versions of Jakarta Persistence (wtf)
+			maven {
+				url "https://jakarta.oss.sonatype.org/content/repositories/snapshots/"
+			}
 		}
 	}
 }
