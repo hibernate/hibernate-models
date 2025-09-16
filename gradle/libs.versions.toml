@@ -4,14 +4,14 @@ byteBuddy = "1.17.7"
 classmate = "1.7.0"
 jackson = "2.14.1"
 jandex = "3.5.0"
-jbossLogging = "3.5.0.Final"
-jbossLoggingTool = "2.2.1.Final"
+jbossLogging = "3.6.1.Final"
+jbossLoggingTool = "3.0.4.Final"
 
 # jdks
 jdks-baseline = "17"
 
 # jakartaLibs
-jpa = "3.2.1-SNAPSHOT"
+jpa = "3.2.0"
 inject = "2.0.1"
 jaxbApi = "4.0.4"
 jaxbRuntime = "4.0.5"
@@ -22,7 +22,7 @@ jsonbRuntime = "3.0.2"
 assertj = "3.22.0"
 h2 = "2.2.224"
 junit5 = "5.11.0"
-log4j = "2.17.1"
+log4j = "2.25.1"
 
 # plugins
 spotless="7.2.1"
