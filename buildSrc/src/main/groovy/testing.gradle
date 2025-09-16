@@ -15,6 +15,7 @@ dependencies {
 	testImplementation libs.test.junitJupiterApi
 	testImplementation libs.test.junitJupiterEngine
 	testImplementation libs.test.junitJupiterParams
+	testRuntimeOnly libs.test.junitPlatformLauncher
 
 	testImplementation libs.test.log4jCore
 }
