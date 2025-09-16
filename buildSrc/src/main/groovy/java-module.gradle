@@ -4,12 +4,12 @@ plugins {
 }
 
 dependencies {
-	implementation libs.logging
+	implementation libs.loggingCore
 
 	compileOnly libs.loggingAnnotations
 
+	annotationProcessor libs.loggingCore
 	annotationProcessor libs.loggingProcessor
-	annotationProcessor libs.logging
 	annotationProcessor libs.loggingAnnotations
 }
 
@@ -19,8 +19,8 @@ dependencies {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 java {
-	sourceCompatibility = jdks.versions.baseline.get() as int
-	targetCompatibility = jdks.versions.baseline.get() as int
+	sourceCompatibility = libs.versions.jdks.baseline.get() as int
+	targetCompatibility = libs.versions.jdks.baseline.get() as int
 }
 
 // create a single "compile" task

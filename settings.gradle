@@ -37,81 +37,21 @@ dependencyResolutionManagement {
 			url "https://jakarta.oss.sonatype.org/content/repositories/snapshots/"
 		}
 	}
+}
 
-	versionCatalogs {
-		jdks {
-			version "baseline", "17"
+develocity {
+	server = 'https://develocity.commonhaus.dev'
+
+	buildScan {
+		capture {
+			fileFingerprints = true
 		}
-		libs {
-			def byteBuddyVersion = version "byteBuddy", "1.14.7"
-			library( "byteBuddy", "net.bytebuddy", "byte-buddy" ).versionRef( byteBuddyVersion )
-			library( "byteBuddyAgent", "net.bytebuddy", "byte-buddy-agent" ).versionRef( byteBuddyVersion )
+		publishing.onlyIf { it.authenticated }
 
-			def classmateVersion = version "classmate", "1.5.1"
-			library( "classmate", "com.fasterxml", "classmate" ).versionRef( classmateVersion )
-
-			def jacksonVersion = version "jackson", "2.14.1"
-			library( "jackson", "com.fasterxml.jackson.core", "jackson-databind" ).versionRef( jacksonVersion )
-			library( "jacksonXml", "com.fasterxml.jackson.dataformat", "jackson-dataformat-xml" ).versionRef( jacksonVersion )
-			library( "jacksonJsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310" ).versionRef( jacksonVersion )
-
-			def jandexVersion = version "jandex", "3.3.0"
-			library( "jandex", "io.smallrye", "jandex" ).versionRef( jandexVersion )
-
-			def jbossLoggingVersion = version "jbossLogging", "3.5.0.Final"
-			library( "logging", "org.jboss.logging", "jboss-logging" ).versionRef( jbossLoggingVersion )
-
-			def jbossLoggingToolVersion = version "jbossLoggingTool", "2.2.1.Final"
-			library( "loggingAnnotations", "org.jboss.logging", "jboss-logging-annotations" ).versionRef( jbossLoggingToolVersion )
-			library( "loggingProcessor", "org.jboss.logging", "jboss-logging-processor" ).versionRef( jbossLoggingToolVersion )
+		obfuscation {
+			// Don't share ip addresses
+			ipAddresses { addresses -> addresses.collect { address -> "0.0.0.0" } }
 		}
-		jakartaLibs {
-			def jpaVersion = version "jpa", "3.2.0-B02"
-			library( "jpa", "jakarta.persistence", "jakarta.persistence-api" ).versionRef( jpaVersion )
-
-			def injectVersion = version "inject", "2.0.1"
-			def jaxbApiVersion = version "jaxbApi", "4.0.0"
-			def jaxbRuntimeVersion = version "jaxbRuntime", "4.0.2"
-			library( "inject", "jakarta.inject", "jakarta.inject-api" ).versionRef( injectVersion )
-			library( "jaxbApi", "jakarta.xml.bind", "jakarta.xml.bind-api" ).versionRef( jaxbApiVersion )
-			library( "jaxb", "org.glassfish.jaxb", "jaxb-runtime" ).versionRef( jaxbRuntimeVersion )
-			library( "xjc", "org.glassfish.jaxb", "jaxb-xjc" ).versionRef( jaxbRuntimeVersion )
-
-			def jsonbApiVersion = version "jsonbApi", "3.0.0"
-			def jsonbRuntimeVersion = version "jsonbRuntime", "3.0.2"
-			library( "jsonbApi", "jakarta.json.bind", "jakarta.json.bind-api" ).versionRef( jsonbApiVersion )
-			library( "jsonb", "org.eclipse", "yasson" ).versionRef( jsonbRuntimeVersion )
-		}
-		testLibs {
-			def assertjVersion = version "assertj", "3.22.0"
-			library( "assertjCore", "org.assertj", "assertj-core" ).versionRef( assertjVersion )
-
-			def h2Version = version "h2", "2.2.224"
-			library( "h2", "com.h2database", "h2" ).versionRef( h2Version )
-
-			def junit5Version = version "junit5", "5.11.0"
-			library( "junit5Api", "org.junit.jupiter", "junit-jupiter-api" ).versionRef( junit5Version )
-			library( "junit5Engine", "org.junit.jupiter", "junit-jupiter-engine" ).versionRef( junit5Version )
-			library( "junit5Params", "org.junit.jupiter", "junit-jupiter-params" ).versionRef( junit5Version )
-
-			def log4jVersion = version "log4j", "2.17.1"
-			library( "log4j", "org.apache.logging.log4j", "log4j-core" ).versionRef( log4jVersion )
-		}
-	}
-
-	develocity {
-		server = 'https://develocity.commonhaus.dev'
-
-		buildScan {
-			capture {
-				fileFingerprints = true
-			}
-			publishing.onlyIf { it.authenticated }
-
-			obfuscation {
-				// Don't share ip addresses
-				ipAddresses { addresses -> addresses.collect { address -> "0.0.0.0" } }
-			}
 
 //			uploadInBackground = !settings.ext.isCiEnvironment
 //
@@ -122,7 +62,6 @@ dependencyResolutionManagement {
 //			if ( settings.extensions.findByName( 'ci.node' ) ) {
 //				tag settings.extensions.findByName( 'ci.node' )
 //			}
-		}
 	}
 }
 
