@@ -2,7 +2,7 @@
 # libs
 byteBuddy = "1.17.7"
 classmate = "1.7.0"
-jackson = "2.14.1"
+jackson = "2.20.0"
 jandex = "3.5.0"
 jbossLogging = "3.6.1.Final"
 jbossLoggingTool = "3.0.4.Final"
@@ -16,7 +16,7 @@ inject = "2.0.1"
 jaxbApi = "4.0.4"
 jaxbRuntime = "4.0.5"
 jsonbApi = "3.0.1"
-jsonbRuntime = "3.0.2"
+jsonbRuntime = "3.0.4"
 
 # testLibs
 assertj = "3.22.0"
