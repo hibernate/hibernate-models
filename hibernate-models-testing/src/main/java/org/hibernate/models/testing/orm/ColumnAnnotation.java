@@ -32,6 +32,7 @@ public class ColumnAnnotation implements Column, ColumnDetails {
 	private String options;
 	private int length;
 	private int precision;
+	private int secondPrecision;
 	private int scale;
 
 	private CheckConstraint[] check;
@@ -178,6 +179,15 @@ public class ColumnAnnotation implements Column, ColumnDetails {
 	@Override
 	public int scale() {
 		return scale;
+	}
+
+	@Override
+	public int secondPrecision() {
+		return secondPrecision;
+	}
+
+	public void secondPrecision(int secondPrecision) {
+		this.secondPrecision = secondPrecision;
 	}
 
 	public void scale(int scale) {

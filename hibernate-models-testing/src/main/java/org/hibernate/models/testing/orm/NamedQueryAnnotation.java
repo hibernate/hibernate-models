@@ -24,23 +24,27 @@ public class NamedQueryAnnotation implements NamedQuery, Named {
 	private String name;
 	private String query;
 	private LockModeType lockModeType;
+	private Class<?> resultClass;
 	private QueryHint[] hints;
 
 	public NamedQueryAnnotation(ModelsContext modelContext) {
 		lockModeType = LockModeType.NONE;
 		hints = new QueryHint[0];
+		resultClass = void.class;
 	}
 
 	public NamedQueryAnnotation(NamedQuery usage, ModelsContext modelContext) {
 		name = usage.name();
 		query = usage.query();
 		hints = extractRepeatedValues( usage, NAMED_QUERY.getAttribute( "hints" ), modelContext );
+		resultClass = usage.resultClass();
 	}
 
 	public NamedQueryAnnotation(Map<String,Object> attributeValues, ModelsContext modelContext) {
 		name = (String) attributeValues.get( "name" );
 		query = attributeValues.get( "query" ).toString();
 		hints = (QueryHint[]) attributeValues.get( "hints" );
+		resultClass = (Class<?>) attributeValues.get( "resultClass" );
 	}
 
 	@Override
@@ -56,6 +60,11 @@ public class NamedQueryAnnotation implements NamedQuery, Named {
 	@Override
 	public String query() {
 		return query;
+	}
+
+	@Override
+	public Class<?> resultClass() {
+		return resultClass;
 	}
 
 	public void query(String query) {
