@@ -4,6 +4,44 @@ updates:
     directory: "/"
     schedule:
       interval: monthly
+    groups:
+      workflow-actions:
+        patterns:
+          - "*"
     allow:
       - dependency-name: "actions/*"
       - dependency-name: "redhat-actions/*"
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    open-pull-requests-limit: 20
+    groups:
+      gradle-plugins:
+        patterns:
+          - "com.diffplug.spotless*"
+          - "com.dorongold.task-tree*"
+          - "org.checkerframework*"
+          - "com.gradle.develocity*"
+      jakarta:
+        patterns:
+          - "jakarta.*"
+          - "org.glassfish.jaxb*"
+      logging:
+        patterns:
+          - "org.jboss.logging*"
+          - "org.apache.logging*"
+      json:
+        patterns:
+          - "com.fasterxml.jackson*"
+          - "org.eclipse:yasson"
+      test:
+        patterns:
+          - "org.junit.jupiter*"
+          - "org.assertj*"
+          - "com.h2database*"
+    ignore:
+      # Handle major Jakarta updates manually:
+      - dependency-name: "jakarta*"
+        update-types: ["version-update:semver-major"]
