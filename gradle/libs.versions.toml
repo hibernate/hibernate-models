@@ -1,0 +1,67 @@
+[versions]
+# libs
+byteBuddy = "1.14.7"
+classmate = "1.5.1"
+jackson = "2.14.1"
+jandex = "3.3.0"
+jbossLogging = "3.5.0.Final"
+jbossLoggingTool = "2.2.1.Final"
+
+# jdks
+jdks-baseline = "17"
+
+# jakartaLibs
+jpa = "3.2.0-B02"
+inject = "2.0.1"
+jaxbApi = "4.0.0"
+jaxbRuntime = "4.0.2"
+jsonbApi = "3.0.0"
+jsonbRuntime = "3.0.2"
+
+# testLibs
+assertj = "3.22.0"
+h2 = "2.2.224"
+junit5 = "5.11.0"
+log4j = "2.17.1"
+
+# plugins
+spotless="6.25.0"
+develocity="3.17.4"
+checkerframework="0.6.34"
+taskTree="4.0.0"
+
+[libraries]
+# libs
+byteBuddy = { group = "net.bytebuddy", name = "byte-buddy", version.ref = "byteBuddy" }
+byteBuddyAgent = { group = "net.bytebuddy", name = "byte-buddy-agent", version.ref = "byteBuddy" }
+classmate = { group = "com.fasterxml", name = "classmate", version.ref = "classmate" }
+jacksonDatabind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+jacksonDataformatXml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-xml", version.ref = "jackson" }
+jacksonDatatypeJsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson" }
+jandex = { group = "io.smallrye", name = "jandex", version.ref = "jandex" }
+loggingCore = { group = "org.jboss.logging", name = "jboss-logging", version.ref = "jbossLogging" }
+loggingAnnotations = { group = "org.jboss.logging", name = "jboss-logging-annotations", version.ref = "jbossLoggingTool" }
+loggingProcessor = { group = "org.jboss.logging", name = "jboss-logging-processor", version.ref = "jbossLoggingTool" }
+
+# jakartaLibs
+jakarta-jpa = { group = "jakarta.persistence", name = "jakarta.persistence-api", version.ref = "jpa" }
+jakarta-inject = { group = "jakarta.inject", name = "jakarta.inject-api", version.ref = "inject" }
+jakarta-jaxbApi = { group = "jakarta.xml.bind", name = "jakarta.xml.bind-api", version.ref = "jaxbApi" }
+jakarta-jaxbRuntime = { group = "org.glassfish.jaxb", name = "jaxb-runtime", version.ref = "jaxbRuntime" }
+jakarta-xjc = { group = "org.glassfish.jaxb", name = "jaxb-xjc", version.ref = "jaxbRuntime" }
+jakarta-jsonbApi = { group = "jakarta.json.bind", name = "jakarta.json.bind-api", version.ref = "jsonbApi" }
+jakarta-jsonb = { group = "org.eclipse", name = "yasson", version.ref = "jsonbRuntime" }
+
+# testLibs
+test-assertjCore = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
+test-h2 = { group = "com.h2database", name = "h2", version.ref = "h2" }
+test-junitJupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5" }
+test-junitJupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5" }
+test-junitJupiterParams = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit5" }
+test-log4jCore = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+develocity = { id = "com.gradle.develocity", version.ref = "develocity" }
+checkerframework = { id = "org.checkerframework", version.ref = "checkerframework" }
+taskTree = { id = "com.dorongold.task-tree", version.ref = "taskTree" }
