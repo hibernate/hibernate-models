@@ -19,7 +19,7 @@ jsonbApi = "3.0.1"
 jsonbRuntime = "3.0.4"
 
 # testLibs
-assertj = "3.27.4"
+assertj = "3.27.6"
 h2 = "2.3.232"
 junit5 = "5.13.4"
 junitPlatform5= "1.13.4"
