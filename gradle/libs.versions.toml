@@ -14,7 +14,7 @@ jdks-baseline = "17"
 jpa = "3.2.0"
 inject = "2.0.1"
 jaxbApi = "4.0.4"
-jaxbRuntime = "4.0.5"
+jaxbRuntime = "4.0.6"
 jsonbApi = "3.0.1"
 jsonbRuntime = "3.0.4"
 
