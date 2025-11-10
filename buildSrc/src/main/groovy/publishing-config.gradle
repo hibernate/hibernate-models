@@ -57,3 +57,6 @@ publishing {
 	}
 }
 
+tasks.register("releasePrepare") {
+	dependsOn publishAllPublicationsToStagingRepository
+}
