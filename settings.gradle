@@ -1,6 +1,6 @@
 pluginManagement {
 	plugins {
-		id "org.checkerframework" version "0.6.60" apply false
+		id "org.checkerframework" version "0.6.61" apply false
 	}
 	repositories {
 		gradlePluginPortal()

@@ -2,7 +2,7 @@
 # libs
 byteBuddy = "1.17.8"
 classmate = "1.7.1"
-jackson = "2.20.0"
+jackson = "2.20.1"
 jandex = "3.5.2"
 jbossLogging = "3.6.1.Final"
 jbossLoggingTool = "3.0.4.Final"
@@ -21,14 +21,14 @@ jsonbRuntime = "3.0.4"
 # testLibs
 assertj = "3.27.6"
 h2 = "2.4.240"
-junit5 = "6.0.0"
-junitPlatform5= "6.0.0"
+junit5 = "6.0.1"
+junitPlatform5= "6.0.1"
 log4j = "2.25.2"
 
 # plugins
 spotless="8.0.0"
 develocity="4.2.2"
-checkerframework="0.6.60"
+checkerframework="0.6.61"
 taskTree="4.0.1"
 
 [libraries]
