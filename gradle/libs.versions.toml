@@ -3,7 +3,7 @@
 byteBuddy = "1.17.8"
 classmate = "1.7.1"
 jackson = "2.20.1"
-jandex = "3.5.2"
+jandex = "3.5.3"
 jbossLogging = "3.6.1.Final"
 jbossLoggingTool = "3.0.4.Final"
 
