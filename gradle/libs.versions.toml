@@ -23,7 +23,7 @@ assertj = "3.27.6"
 h2 = "2.4.240"
 junit5 = "6.0.1"
 junitPlatform5= "6.0.1"
-log4j = "2.25.2"
+log4j = "2.25.3"
 
 # plugins
 spotless="8.1.0"
