@@ -1,6 +1,6 @@
 [versions]
 # libs
-byteBuddy = "1.17.8"
+byteBuddy = "1.18.3"
 classmate = "1.7.1"
 jackson = "2.20.1"
 jandex = "3.5.2"
