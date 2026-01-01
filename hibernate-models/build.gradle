@@ -28,11 +28,14 @@ configurations {
 }
 
 artifacts {
-	exportedTestClasses(sourceSets.test.output.classesDirs.files) {
-		builtBy(compileTestJava)
+	add("exportedTestClasses", layout.dir(providers.provider {sourceSets.test.output.classesDirs.files.first})) {
+		builtBy(tasks.named("compileTestJava"))
 	}
-	exportedTestResources(sourceSets.test.output.resourcesDir) {
-		builtBy(processTestResources)
+
+	add("exportedTestResources", layout.dir(providers.provider {sourceSets.test.output.resourcesDir})) {
+			builtBy(tasks.named("processTestResources"))
 	}
-	exportedTestRuntimeClasspath sourceSets.test.runtimeClasspath.files
+
+	add("exportedTestRuntimeClasspath", layout.dir(providers.provider {sourceSets.test.runtimeClasspath.files.first})) {
+	}
 }
