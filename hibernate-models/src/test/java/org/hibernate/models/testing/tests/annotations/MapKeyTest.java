@@ -41,11 +41,11 @@ public class MapKeyTest {
 		assertThat( idFieldType.isResolved() ).isTrue();
 
 		FieldDetails mapKeyField = schoolClassDetails.findFieldByName( "studentsByDate" );
-		TypeDetails typeDetails = mapKeyField.resolveRelativeType( schoolClassDetails );
+		TypeDetails typeDetails = mapKeyField.resolveRelativeType( schoolClassDetails, modelsContext );
 		assertThat( typeDetails.isResolved() ).isTrue();
 
 		FieldDetails mapKeyField2 = schoolClassDetails.findFieldByName( "teachersByDate" );
-		TypeDetails typeDetails2 = mapKeyField2.resolveRelativeType( schoolClassDetails );
+		TypeDetails typeDetails2 = mapKeyField2.resolveRelativeType( schoolClassDetails, modelsContext );
 		assertThat( typeDetails2.isResolved() ).isFalse();
 	}
 

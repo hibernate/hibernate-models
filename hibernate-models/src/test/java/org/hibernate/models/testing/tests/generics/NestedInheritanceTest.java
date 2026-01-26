@@ -40,7 +40,7 @@ public class NestedInheritanceTest {
 		assertThat( baseFieldType.isResolved() ).isFalse();
 
 		{
-			final TypeDetails resolvedRelativeType = base.resolveRelativeType( baseClassDetails );
+			final TypeDetails resolvedRelativeType = base.resolveRelativeType( baseClassDetails, modelsContext );
 			assertThat( resolvedRelativeType.isResolved() ).isFalse();
 			assertThat( resolvedRelativeType ).isInstanceOf( TypeVariableDetails.class );
 		}
@@ -51,23 +51,23 @@ public class NestedInheritanceTest {
 		assertThat( oneFieldType.isResolved() ).isFalse();
 
 		{
-			final TypeDetails concreteType = base.resolveRelativeType( intermediateClassDetails );
+			final TypeDetails concreteType = base.resolveRelativeType( intermediateClassDetails, modelsContext );
 			assertThat( concreteType ).isInstanceOf( ClassTypeDetails.class );
 			final ClassDetails concreteClassDetails = ( (ClassTypeDetails) concreteType ).getClassDetails();
 			assertThat( concreteClassDetails.toJavaClass() ).isEqualTo( Integer.class );
 
-			final TypeDetails intermediateConcreteType = one.resolveRelativeType( intermediateClassDetails );
+			final TypeDetails intermediateConcreteType = one.resolveRelativeType( intermediateClassDetails, modelsContext );
 			assertThat( intermediateConcreteType.isResolved() ).isFalse();
 			assertThat( intermediateConcreteType ).isInstanceOf( TypeVariableDetails.class );
 		}
 
 		{
-			final TypeDetails baseConcreteType = base.resolveRelativeType( leafClassDetails );
+			final TypeDetails baseConcreteType = base.resolveRelativeType( leafClassDetails, modelsContext );
 			assertThat( baseConcreteType ).isInstanceOf( ClassTypeDetails.class );
 			final ClassDetails concreteClassDetails = ( (ClassTypeDetails) baseConcreteType ).getClassDetails();
 			assertThat( concreteClassDetails.toJavaClass() ).isEqualTo( Integer.class );
 
-			final TypeDetails intermediateConcreteType = one.resolveRelativeType( leafClassDetails );
+			final TypeDetails intermediateConcreteType = one.resolveRelativeType( leafClassDetails, modelsContext );
 			assertThat( intermediateConcreteType ).isInstanceOf( ClassTypeDetails.class );
 			final ClassDetails intermediateConcreteClassDetails = ( (ClassTypeDetails) intermediateConcreteType ).getClassDetails();
 			assertThat( intermediateConcreteClassDetails.toJavaClass() ).isEqualTo( String.class );

@@ -139,18 +139,18 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 	}
 
 	@Override
-	public TypeDetails resolveRelativeType(TypeVariableScope container) {
+	public TypeDetails resolveRelativeType(TypeVariableScope container, ModelsContext modelsContext) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
-			return type.determineRelativeType( container );
+			return type.determineRelativeType( container, modelsContext );
 		}
 
 		throw new IllegalStateException( "Method does not have a type - " + this );
 	}
 
 	@Override
-	public ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container) {
+	public ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container, ModelsContext modelsContext) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
-			return TypeDetailsHelper.resolveRelativeClassType( type, container );
+			return TypeDetailsHelper.resolveRelativeClassType( type, container, modelsContext );
 		}
 		throw new IllegalStateException( "Method does not have a type - " + this );
 	}

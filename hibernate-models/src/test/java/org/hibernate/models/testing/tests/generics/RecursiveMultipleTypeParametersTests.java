@@ -23,7 +23,7 @@ public class RecursiveMultipleTypeParametersTests {
 		);
 
 		final FieldDetails idField = classDetails.findFieldByName( "id" );
-		final TypeDetails idType = idField.resolveRelativeType( classDetails );
+		final TypeDetails idType = idField.resolveRelativeType( classDetails, modelsContext );
 		assertThat( idType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
 		assertThat( idType.isImplementor( Transitionable.class ) ).isTrue();
 	}
@@ -36,7 +36,7 @@ public class RecursiveMultipleTypeParametersTests {
 		);
 
 		final FieldDetails idField = classDetails.findFieldByName( "id" );
-		final TypeDetails idType = idField.resolveRelativeType( classDetails );
+		final TypeDetails idType = idField.resolveRelativeType( classDetails, modelsContext );
 		assertThat( idType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
 		assertThat( idType.isImplementor( Transitionable.class ) ).isTrue();
 	}

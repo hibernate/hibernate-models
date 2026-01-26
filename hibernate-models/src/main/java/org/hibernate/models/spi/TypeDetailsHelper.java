@@ -38,17 +38,21 @@ public class TypeDetailsHelper {
 	 * will return {@code ClassTypeDetails(Integer)}.  A call to resolve the type of {@code id}
 	 * relative to {@code Item} returns {@code ParameterizedTypeDetails(T)} (roughly Object)
 	 */
-	public static TypeDetails resolveRelativeType(TypeDetails type, TypeVariableScope container) {
+	public static TypeDetails resolveRelativeType(
+			TypeDetails type,
+			TypeVariableScope container,
+			ModelsContext modelsContext) {
 		switch ( type.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, WILDCARD_TYPE -> {
 				return type;
 			}
 			case ARRAY -> {
-				final ArrayTypeDetails arrayType = type.asArrayType();
-				return new ArrayTypeDetailsImpl(
-						arrayType.getArrayClassDetails(),
-						arrayType.getConstituentType().determineRelativeType( container )
-				);
+				final TypeDetails constituentType = type.asArrayType().getConstituentType();
+				final TypeDetails resolved = constituentType
+						.determineRelativeType( container, modelsContext );
+				return resolved != constituentType
+						? arrayOf( resolved, modelsContext )
+						: type;
 			}
 			case PARAMETERIZED_TYPE -> {
 				final ParameterizedTypeDetails parameterizedType = type.asParameterizedType();
@@ -59,7 +63,7 @@ public class TypeDetailsHelper {
 				else {
 					resolvedArguments = arrayList( parameterizedType.getArguments().size() );
 					for ( TypeDetails argument : parameterizedType.getArguments() ) {
-						resolvedArguments.add( argument.determineRelativeType( container ) );
+						resolvedArguments.add( argument.determineRelativeType( container, modelsContext ) );
 					}
 				}
 				return new ParameterizedTypeDetailsImpl(
@@ -94,16 +98,20 @@ public class TypeDetailsHelper {
 	}
 
 	/**
-	 * Very much the same as {@linkplain #resolveRelativeType(TypeDetails, TypeVariableScope)}, except that
+	 * Very much the same as {@linkplain #resolveRelativeType(TypeDetails, TypeVariableScope, ModelsContext)}, except that
 	 * here we resolve the relative type to the corresponding {@link ClassBasedTypeDetails} which
 	 * gives easy access to the type's {@linkplain ClassBasedTypeDetails#getClassDetails() ClassDetails}
 	 */
 	public static ClassBasedTypeDetails resolveRelativeClassType(
 			TypeDetails memberType,
-			TypeVariableScope containerType) {
+			TypeVariableScope containerType,
+			ModelsContext modelsContext) {
 		switch ( memberType.getTypeKind() ) {
-			case CLASS, PRIMITIVE, VOID, ARRAY -> {
+			case CLASS, PRIMITIVE, VOID -> {
 				return (ClassBasedTypeDetails) memberType;
+			}
+			case ARRAY -> {
+				return (ClassBasedTypeDetails) resolveRelativeType( memberType, containerType, modelsContext );
 			}
 			case TYPE_VARIABLE -> {
 				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
@@ -133,7 +141,7 @@ public class TypeDetailsHelper {
 				throw new UnsupportedOperationException( "TypeVariableReferenceDetails not supported for relative class resolution" );
 			}
 			case PARAMETERIZED_TYPE, WILDCARD_TYPE -> {
-				return resolveRelativeType( memberType, containerType ).asClassType();
+				return resolveRelativeType( memberType, containerType, modelsContext ).asClassType();
 			}
 			default -> {
 				throw new UnsupportedOperationException( "Unknown TypeDetails kind - " + memberType.getTypeKind() );

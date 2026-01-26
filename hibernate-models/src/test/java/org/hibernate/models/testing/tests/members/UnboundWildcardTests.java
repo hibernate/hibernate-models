@@ -42,7 +42,7 @@ public class UnboundWildcardTests {
 			assertThat( parentWildcard.isResolved() ).isTrue();
 			assertThat( parentWildcard.determineRawClass().toJavaClass() ).isEqualTo( Object.class );
 
-			final TypeDetails parentRelativeType = parent.resolveRelativeType( classDetails );
+			final TypeDetails parentRelativeType = parent.resolveRelativeType( classDetails, modelsContext );
 			assertThat( parentRelativeType.isResolved() ).isTrue();
 			assertThat( parentRelativeType.determineRawClass().toJavaClass() ).isEqualTo( Thing.class );
 			final WildcardTypeDetails parentRelativeWildcard = parentRelativeType.asParameterizedType()
@@ -68,7 +68,7 @@ public class UnboundWildcardTests {
 			assertThat( childrenWildcard.isResolved() ).isTrue();
 			assertThat( childrenWildcard.determineRawClass().toJavaClass() ).isEqualTo( Object.class );
 
-			final TypeDetails childrenRelativeType = children.resolveRelativeType( classDetails );
+			final TypeDetails childrenRelativeType = children.resolveRelativeType( classDetails, modelsContext );
 			assertThat( childrenRelativeType.isResolved() ).isTrue();
 			assertThat( childrenRelativeType.determineRawClass().toJavaClass() ).isEqualTo( List.class );
 			final ParameterizedTypeDetails listRelativeType = childrenRelativeType.asParameterizedType()

@@ -40,7 +40,7 @@ public class BaselineTests {
 
 		assertThat( classDetails.getTypeParameters() ).isEmpty();
 
-		final TypeDetails idFieldConcreteType = idField.resolveRelativeType( classDetails );
+		final TypeDetails idFieldConcreteType = idField.resolveRelativeType( classDetails, modelsContext );
 		assertThat( idFieldConcreteType ).isInstanceOf( ClassTypeDetails.class );
 		assertThat( ( (ClassTypeDetails) idFieldConcreteType ).getClassDetails().toJavaClass() ).isEqualTo( Integer.class );
 	}

@@ -43,16 +43,16 @@ public class SimpleTypeVariableTests {
 		assertThat( idFieldType.isImplementor( Object.class ) ).isTrue();
 		assertThat( idFieldType.isImplementor( String.class ) ).isFalse();
 		assertThat( idFieldType.isResolved() ).isFalse();
-		assertThat( idFieldType.determineRelativeType( classDetails ).isResolved() ).isFalse();
+		assertThat( idFieldType.determineRelativeType( classDetails, modelsContext ).isResolved() ).isFalse();
 
-		final TypeDetails idFieldConcreteType = idField.resolveRelativeType( classDetails );
+		final TypeDetails idFieldConcreteType = idField.resolveRelativeType( classDetails, modelsContext );
 		assertThat( idFieldConcreteType ).isInstanceOf( TypeVariableDetails.class );
 		final TypeVariableDetails typeVariable = idFieldConcreteType.asTypeVariable();
 		assertThat( typeVariable.getBounds() ).hasSize( 1 );
 		assertThat( typeVariable.getBounds().get( 0 ).asClassType().getClassDetails().toJavaClass() ).isEqualTo( Number.class );
 		assertThat( idFieldConcreteType.isResolved() ).isFalse();
 
-		final ClassBasedTypeDetails classBasedTypeDetails = idField.resolveRelativeClassType( classDetails );
+		final ClassBasedTypeDetails classBasedTypeDetails = idField.resolveRelativeClassType( classDetails, modelsContext );
 		assertThat( classBasedTypeDetails.getClassDetails().toJavaClass() ).isEqualTo( Number.class );
 	}
 

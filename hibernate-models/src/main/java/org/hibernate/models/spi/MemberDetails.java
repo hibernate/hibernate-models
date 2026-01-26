@@ -242,29 +242,29 @@ public interface MemberDetails extends AnnotationTarget {
 	 * @apiNote It is only valid to call this on members which have a type, i.e. fields,
 	 * getters, setters and record components.
 	 */
-	default TypeDetails resolveRelativeType(TypeVariableScope container) {
-		return getType().determineRelativeType( container );
+	default TypeDetails resolveRelativeType(TypeVariableScope container, ModelsContext modelsContext) {
+		return getType().determineRelativeType( container, modelsContext );
 	}
 
 	/**
-	 * Same as {@link #resolveRelativeType(TypeVariableScope)}, but for the
+	 * Same as {@link #resolveRelativeType(TypeVariableScope, ModelsContext)}, but for the
 	 * {@linkplain #getAssociatedType() associated type}.
 	 *
 	 * @see #getAssociatedType()
-	 * @see #resolveRelativeType(TypeVariableScope)
+	 * @see #resolveRelativeType(TypeVariableScope, ModelsContext)
 	 */
-	default TypeDetails resolveRelativeAssociatedType(TypeVariableScope container) {
-		return getAssociatedType().determineRelativeType( container );
+	default TypeDetails resolveRelativeAssociatedType(TypeVariableScope container, ModelsContext modelsContext) {
+		return getAssociatedType().determineRelativeType( container, modelsContext );
 	}
 
 	/**
 	 * Determine the concrete class of the member relative to the given {@code container} type.
 	 * <p/>
-	 * Similar to {@linkplain #resolveRelativeType(TypeVariableScope)}, but fully resolving the result
+	 * Similar to {@linkplain #resolveRelativeType(TypeVariableScope, ModelsContext)}, but fully resolving the result
 	 * into the concrete class.
 	 */
-	default ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container) {
-		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
+	default ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container, ModelsContext modelsContext) {
+		return TypeDetailsHelper.resolveRelativeClassType( getType(), container, modelsContext );
 	}
 
 
