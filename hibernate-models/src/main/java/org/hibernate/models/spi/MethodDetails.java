@@ -4,11 +4,11 @@
  */
 package org.hibernate.models.spi;
 
-import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.internal.util.StringHelper;
 
 import static org.hibernate.models.internal.ModifierUtils.hasPersistableMethodModifiers;
 
@@ -46,10 +46,10 @@ public interface MethodDetails extends MemberDetails {
 		final String methodName = getName();
 
 		if ( methodName.startsWith( "is" ) ) {
-			return Introspector.decapitalize( methodName.substring( 2 ) );
+			return StringHelper.decapitalize( methodName.substring( 2 ) );
 		}
 		else if ( methodName.startsWith( "get" ) ) {
-			return Introspector.decapitalize( methodName.substring( 3 ) );
+			return StringHelper.decapitalize( methodName.substring( 3 ) );
 		}
 
 		return null;
