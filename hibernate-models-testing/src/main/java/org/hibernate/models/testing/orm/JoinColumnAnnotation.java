@@ -93,7 +93,7 @@ public class JoinColumnAnnotation
 
 	@Override
 	public void name(String value) {
-		this.name = name;
+		this.name = value;
 	}
 
 	@Override
