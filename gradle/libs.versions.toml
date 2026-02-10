@@ -2,7 +2,7 @@
 # libs
 byteBuddy = "1.18.3"
 classmate = "1.7.3"
-jackson = "2.20.1"
+jackson = "2.21.0"
 jandex = "3.5.3"
 jbossLogging = "3.6.2.Final"
 jbossLoggingTool = "3.0.4.Final"
