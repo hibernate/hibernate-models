@@ -11,7 +11,7 @@ plugins {
 
 spotless {
 	//Don't fail during the check: rather than enforcing guidelines, we use this plugin to fix mistakes automatically.
-	enforceCheck false
+	enforceCheck = false
 	java {
 		licenseHeaderFile rootProject.file( 'config/spotless/license.java' )
 		removeUnusedImports()
@@ -27,7 +27,7 @@ spotless {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def enforceRulesTask = tasks.register( "enforceRules" ) {
-	description "Enforces some formatting rules to src/main/java files"
+	description = "Enforces some formatting rules to src/main/java files"
 	doLast {
 		def illegalImport = ~/^import (sun|java.awt|org.slf4j)/
 		def missingNewline = ~/^\s*}\s*(else|catch|finally)/
