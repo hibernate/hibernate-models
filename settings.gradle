@@ -73,4 +73,5 @@ include "hibernate-models"
 include "hibernate-models-jandex"
 include 'hibernate-models-bytebuddy'
 include 'hibernate-models-testing'
+include 'reporting'
 

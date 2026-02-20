@@ -1,0 +1,24 @@
+plugins {
+    id 'jacoco-report-aggregation'
+}
+
+description = 'Reporting module'
+
+dependencies {
+    jacocoAggregation project(':hibernate-models')
+    jacocoAggregation project(':hibernate-models-bytebuddy')
+    jacocoAggregation project(':hibernate-models-jandex')
+}
+
+tasks.register('mergeCodeCoverageReport', JacocoReport) {
+    executionData fileTree(rootProject.layout.projectDirectory.asFile).include("**/build/jacoco/*.exec")
+    sourceSets project(':hibernate-models').sourceSets.main
+    sourceSets project(':hibernate-models-bytebuddy').sourceSets.main
+    sourceSets project(':hibernate-models-jandex').sourceSets.main
+
+    reports {
+        xml.required = true
+    }
+
+    dependsOn rootProject.subprojects.collect { p -> p.tasks.matching { it.name == 'compileJava' } }
+}

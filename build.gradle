@@ -1,5 +1,23 @@
 plugins {
-	id "release-process"
-	alias(libs.plugins.spotless) apply false
-	alias(libs.plugins.taskTree)
+    id "release-process"
+    alias(libs.plugins.spotless) apply false
+    alias(libs.plugins.taskTree)
+}
+
+tasks.register('copyDependenciesSonar', Copy) {
+    description = "Aggregates all runtime dependencies for Sonar CLI analysis."
+
+    def targetProjects = subprojects.findAll { it.name != 'reporting' }
+
+    targetProjects.each { sub ->
+        evaluationDependsOn(sub.path)
+
+        if (sub.plugins.hasPlugin('java')) {
+            from(sub.configurations.runtimeClasspath)
+        }
+    }
+
+    into(layout.buildDirectory.dir("sonar-dependencies"))
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

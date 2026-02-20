@@ -42,3 +42,5 @@ bin/
 hibernate-noorm-release-scripts
 hibernate-release-scripts
 jreleaser
+
+.scannerwork
