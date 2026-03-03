@@ -8,10 +8,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableAnnotationDescriptor;
@@ -36,23 +38,48 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 
 	public OrmAnnotationDescriptor(
 			Class<A> annotationType,
-			Class<C> concreteClass) {
-		this( annotationType, concreteClass, null );
+			Class<C> concreteClass,
+			EnumSet<AnnotationTarget.Kind> allowableTargets,
+			boolean inherited) {
+		this( annotationType, concreteClass, allowableTargets, inherited, null );
 	}
 
 	public OrmAnnotationDescriptor(
 			Class<A> annotationType,
 			Class<C> concreteClass,
+			EnumSet<AnnotationTarget.Kind> allowableTargets,
+			boolean inherited,
 			AnnotationDescriptor<?> repeatableContainer) {
 		super(
 				annotationType,
-				AnnotationHelper.extractTargets( annotationType ),
-				AnnotationHelper.isInherited( annotationType ),
+				allowableTargets,
+				inherited,
 				repeatableContainer
 		);
 
 		this.concreteClass = concreteClass;
 		this.attributeDescriptors = AnnotationDescriptorBuilding.extractAttributeDescriptors( annotationType );
+	}
+
+	/**
+	 * @deprecated use {@link #OrmAnnotationDescriptor(Class, Class, EnumSet, boolean)} instead
+	 */
+	@Deprecated(forRemoval = true)
+	public OrmAnnotationDescriptor(
+			Class<A> annotationType,
+			Class<C> concreteClass) {
+		this( annotationType, concreteClass, null );
+	}
+
+	/**
+	 * @deprecated use {@link #OrmAnnotationDescriptor(Class, Class, EnumSet, boolean, AnnotationDescriptor)} instead
+	 */
+	@Deprecated(forRemoval = true)
+	public OrmAnnotationDescriptor(
+			Class<A> annotationType,
+			Class<C> concreteClass,
+			AnnotationDescriptor<?> repeatableContainer) {
+		this(annotationType, concreteClass, AnnotationHelper.extractTargets( annotationType ), AnnotationHelper.isInherited( annotationType ), repeatableContainer);
 	}
 
 	@Override
