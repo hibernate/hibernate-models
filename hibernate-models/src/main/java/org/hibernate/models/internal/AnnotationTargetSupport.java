@@ -156,6 +156,10 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 			ModelsContext modelContext) {
 		final List<Annotation> usages = new ArrayList<>();
 		forEachDirectAnnotationUsage( (usage) -> {
+			if (usage.annotationType().getName().startsWith("jakarta.persistence.")) {
+				return;
+			}
+
 			final Annotation metaUsage = usage.annotationType().getAnnotation( metaAnnotationType );
 			if ( metaUsage != null ) {
 				usages.add( usage );
