@@ -66,6 +66,14 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	 */
 	String getClassName();
 
+	default boolean isJdkClass() {
+		String className = getClassName();
+		if ( className == null ) {
+			return false;
+		}
+		return className.startsWith("java.") || className.startsWith("jdk.");
+	}
+
 	@Override
 	default ClassDetails getContainer(ModelsContext modelsContext) {
 		if ( getClassName() == null || getClassName().indexOf( "." ) <= 0 ) {

@@ -5,6 +5,7 @@
 package org.hibernate.models.testing.orm;
 
 import java.lang.annotation.Annotation;
+import java.util.EnumSet;
 import java.util.function.Consumer;
 
 import org.hibernate.models.internal.OrmAnnotationDescriptor;
@@ -37,6 +38,7 @@ import jakarta.persistence.SequenceGenerators;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
+import org.hibernate.models.spi.AnnotationTarget.Kind;
 
 /**
  * Descriptors for JPA annotations
@@ -45,13 +47,13 @@ import jakarta.persistence.UniqueConstraint;
  */
 @SuppressWarnings("unused")
 public interface JpaAnnotations {
-	AnnotationDescriptor<Entity> ENTITY = new OrmAnnotationDescriptor<>( Entity.class, EntityAnnotation.class );
-	AnnotationDescriptor<Embeddable> EMBEDDABLE = new OrmAnnotationDescriptor<>( Embeddable.class, EmbeddableAnnotation.class );
+	AnnotationDescriptor<Entity> ENTITY = new OrmAnnotationDescriptor<>( Entity.class, EntityAnnotation.class, EnumSet.of( Kind.CLASS ), false );
+	AnnotationDescriptor<Embeddable> EMBEDDABLE = new OrmAnnotationDescriptor<>( Embeddable.class, EmbeddableAnnotation.class, EnumSet.of( Kind.CLASS ), false );
 
-	AnnotationDescriptor<Id> ID = new OrmAnnotationDescriptor<>( Id.class, IdAnnotation.class );
+	AnnotationDescriptor<Id> ID = new OrmAnnotationDescriptor<>( Id.class, IdAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
 
-	AnnotationDescriptor<SequenceGenerators> SEQUENCE_GENERATORS = new OrmAnnotationDescriptor<>( SequenceGenerators.class, SequenceGeneratorsAnnotation.class );
-	AnnotationDescriptor<SequenceGenerator> SEQUENCE_GENERATOR = new OrmAnnotationDescriptor<>( SequenceGenerator.class, SequenceGeneratorAnnotation.class, SEQUENCE_GENERATORS );
+	AnnotationDescriptor<SequenceGenerators> SEQUENCE_GENERATORS = new OrmAnnotationDescriptor<>( SequenceGenerators.class, SequenceGeneratorsAnnotation.class, EnumSet.of( Kind.CLASS, Kind.METHOD, Kind.FIELD, Kind.PACKAGE ), false );
+	AnnotationDescriptor<SequenceGenerator> SEQUENCE_GENERATOR = new OrmAnnotationDescriptor<>( SequenceGenerator.class, SequenceGeneratorAnnotation.class, EnumSet.of( Kind.CLASS, Kind.METHOD, Kind.FIELD, Kind.PACKAGE ), false, SEQUENCE_GENERATORS );
 
 	AnnotationDescriptor<Basic> BASIC = new OrmAnnotationDescriptor<>( Basic.class, BasicAnnotation.class );
 	AnnotationDescriptor<Embedded> EMBEDDED = new OrmAnnotationDescriptor<>( Embedded.class, EmbeddedAnnotation.class );
