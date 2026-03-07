@@ -8,15 +8,15 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.List;
 
-import org.hibernate.models.internal.jdk.JdkArrayValueConverter;
-import org.hibernate.models.internal.jdk.JdkArrayValueExtractor;
-import org.hibernate.models.internal.jdk.JdkPassThruConverter;
-import org.hibernate.models.internal.jdk.JdkPassThruExtractor;
+import org.hibernate.models.jdk.internal.JdkArrayValueConverter;
+import org.hibernate.models.jdk.internal.JdkArrayValueExtractor;
+import org.hibernate.models.jdk.internal.JdkPassThruConverter;
+import org.hibernate.models.jdk.internal.JdkPassThruExtractor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.rendering.spi.Renderer;
-import org.hibernate.models.rendering.spi.RenderingTarget;
+import org.hibernate.models.rendering.Renderer;
+import org.hibernate.models.rendering.RenderingTarget;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 

@@ -9,19 +9,19 @@ import java.util.Map;
 
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
-import org.hibernate.models.internal.AbstractModelsContext;
+import org.hibernate.models.support.AbstractModelsContext;
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
-import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
-import org.hibernate.models.internal.MutableClassDetailsRegistry;
+import org.hibernate.models.support.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.support.MutableClassDetailsRegistry;
 import org.hibernate.models.serial.internal.StorableContextImpl;
-import org.hibernate.models.serial.spi.StorableContext;
+import org.hibernate.models.serial.StorableContext;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 import net.bytebuddy.pool.TypePool;
 
-import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
+import static org.hibernate.models.logging.ModelsClassLogging.MODELS_CLASS_LOGGER;
 
 /**
  * Implementation of ByteBuddyModelsContext

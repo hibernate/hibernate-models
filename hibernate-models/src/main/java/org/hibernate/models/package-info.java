@@ -46,3 +46,5 @@
  */
 @Incubating
 package org.hibernate.models;
+
+import org.hibernate.models.support.Incubating;

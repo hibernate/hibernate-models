@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
-import org.hibernate.models.internal.ClassDetailsSupport;
-import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
+import org.hibernate.models.support.ClassDetailsSupport;
+import org.hibernate.models.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
-import org.hibernate.models.serial.spi.SerialClassDetails;
+import org.hibernate.models.serial.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;

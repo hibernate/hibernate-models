@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.hibernate.models.Settings;
 import org.hibernate.models.internal.BasicModelsContextImpl;
-import org.hibernate.models.internal.ModelsLogging;
+import org.hibernate.models.logging.ModelsLogging;
 import org.hibernate.models.internal.SimpleClassLoading;
 
 import static java.lang.Boolean.parseBoolean;

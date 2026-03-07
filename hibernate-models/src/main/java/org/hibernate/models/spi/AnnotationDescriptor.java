@@ -14,8 +14,8 @@ import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
 import org.hibernate.models.serial.internal.SerialAnnotationDescriptorImpl;
-import org.hibernate.models.serial.spi.SerialAnnotationDescriptor;
-import org.hibernate.models.serial.spi.Storable;
+import org.hibernate.models.serial.SerialAnnotationDescriptor;
+import org.hibernate.models.serial.Storable;
 
 /**
  * Describes an annotation type (the Class)

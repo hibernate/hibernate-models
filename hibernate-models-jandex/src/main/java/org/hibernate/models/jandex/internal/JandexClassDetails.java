@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.DynamicClassException;
-import org.hibernate.models.internal.ClassDetailsSupport;
-import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
+import org.hibernate.models.support.ClassDetailsSupport;
+import org.hibernate.models.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
-import org.hibernate.models.serial.spi.SerialClassDetails;
+import org.hibernate.models.serial.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.FieldDetails;
@@ -31,7 +31,7 @@ import org.jboss.jandex.Type;
 import org.jboss.jandex.TypeVariable;
 
 import static java.util.Collections.emptyList;
-import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
+import static org.hibernate.models.logging.ModelsClassLogging.MODELS_CLASS_LOGGER;
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
 import static org.hibernate.models.internal.util.CollectionHelper.isEmpty;
 
