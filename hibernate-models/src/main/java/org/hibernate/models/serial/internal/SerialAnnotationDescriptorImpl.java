@@ -7,7 +7,7 @@ package org.hibernate.models.serial.internal;
 import java.lang.annotation.Annotation;
 
 import org.hibernate.models.internal.StandardAnnotationDescriptor;
-import org.hibernate.models.serial.spi.SerialAnnotationDescriptor;
+import org.hibernate.models.serial.SerialAnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ModelsContext;
 

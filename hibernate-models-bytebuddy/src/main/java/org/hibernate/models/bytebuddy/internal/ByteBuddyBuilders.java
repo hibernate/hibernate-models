@@ -34,7 +34,7 @@ import org.hibernate.models.bytebuddy.internal.values.StringValueExtractor;
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
 import org.hibernate.models.internal.ArrayTypeDescriptor;
-import org.hibernate.models.internal.jdk.JdkBuilders;
+import org.hibernate.models.jdk.JdkBuilders;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;

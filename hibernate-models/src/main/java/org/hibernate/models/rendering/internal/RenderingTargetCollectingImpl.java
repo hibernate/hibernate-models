@@ -6,8 +6,6 @@ package org.hibernate.models.rendering.internal;
 
 import java.io.PrintStream;
 
-import org.hibernate.models.rendering.spi.AbstractRenderingTarget;
-
 /**
  * RenderingTarget implementation which collects the rendering into an internal buffer.
  *

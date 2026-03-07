@@ -6,7 +6,7 @@ package org.hibernate.models.spi;
 
 import java.util.Locale;
 
-import org.hibernate.models.serial.spi.StorableContext;
+import org.hibernate.models.serial.StorableContext;
 
 /**
  * Context object for hibernate-models.

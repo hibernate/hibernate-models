@@ -6,7 +6,7 @@ package org.hibernate.models.testing.tests;
 
 import org.hibernate.models.rendering.internal.RenderingTargetCollectingImpl;
 import org.hibernate.models.rendering.internal.RenderingTargetStreamImpl;
-import org.hibernate.models.rendering.internal.SimpleRenderer;
+import org.hibernate.models.rendering.SimpleRenderer;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.annotations.EverythingBagel;
