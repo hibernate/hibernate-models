@@ -1,5 +1,4 @@
 module org.hibernate.models {
-	requires java.sql;
 	requires org.jboss.logging;
 
 	exports org.hibernate.models;
@@ -16,6 +15,7 @@ module org.hibernate.models {
 	exports org.hibernate.models.serial.internal to org.hibernate.models.bytebuddy, org.hibernate.models.jandex, org.hibernate.orm.core, org.hibernate.orm.envers;
 	exports org.hibernate.models.internal.dynamic to org.hibernate.orm.core, org.hibernate.orm.envers;
 	exports org.hibernate.models.rendering.internal to org.hibernate.orm.core, org.hibernate.orm.envers;
+	exports org.hibernate.models.jdk to org.hibernate.models.bytebuddy, org.hibernate.models.jandex, org.hibernate.orm.core, org.hibernate.orm.envers;
 
 	uses org.hibernate.models.spi.ModelsContextProvider;
 }
