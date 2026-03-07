@@ -6,8 +6,8 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.rendering.spi.Renderer;
-import org.hibernate.models.rendering.spi.RenderingTarget;
+import org.hibernate.models.rendering.Renderer;
+import org.hibernate.models.rendering.RenderingTarget;
 
 /**
  * Descriptor for the annotation attribute types, acting as a producer for

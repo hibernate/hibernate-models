@@ -14,8 +14,8 @@ import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
-import org.hibernate.models.serial.spi.SerialClassDetails;
-import org.hibernate.models.serial.spi.Storable;
+import org.hibernate.models.serial.SerialClassDetails;
+import org.hibernate.models.serial.Storable;
 
 /**
  * Abstraction for what Hibernate understands about a "class", generally before it has access to

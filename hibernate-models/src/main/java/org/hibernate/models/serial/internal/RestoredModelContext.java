@@ -9,11 +9,11 @@ import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
 import org.hibernate.models.internal.ClassDetailsRegistryStandard;
-import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
-import org.hibernate.models.internal.MutableClassDetailsRegistry;
-import org.hibernate.models.serial.spi.SerialAnnotationDescriptor;
-import org.hibernate.models.serial.spi.SerialClassDetails;
-import org.hibernate.models.serial.spi.StorableContext;
+import org.hibernate.models.support.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.support.MutableClassDetailsRegistry;
+import org.hibernate.models.serial.SerialAnnotationDescriptor;
+import org.hibernate.models.serial.SerialClassDetails;
+import org.hibernate.models.serial.StorableContext;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ClassLoading;

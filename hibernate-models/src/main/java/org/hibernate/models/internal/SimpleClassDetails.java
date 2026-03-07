@@ -10,9 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
+import org.hibernate.models.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
-import org.hibernate.models.serial.spi.SerialClassDetails;
+import org.hibernate.models.serial.SerialClassDetails;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;

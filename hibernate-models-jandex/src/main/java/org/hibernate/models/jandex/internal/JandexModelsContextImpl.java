@@ -7,20 +7,20 @@ package org.hibernate.models.jandex.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.models.internal.AbstractModelsContext;
-import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.support.AbstractModelsContext;
+import org.hibernate.models.support.MutableAnnotationDescriptorRegistry;
 import org.hibernate.models.jandex.spi.JandexModelsContext;
 import org.hibernate.models.jandex.spi.JandexValueConverter;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;
 import org.hibernate.models.serial.internal.StorableContextImpl;
-import org.hibernate.models.serial.spi.StorableContext;
+import org.hibernate.models.serial.StorableContext;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 import org.jboss.jandex.IndexView;
 
-import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
+import static org.hibernate.models.logging.ModelsClassLogging.MODELS_CLASS_LOGGER;
 
 /**
  * Implementation of JandexModelsContext.
