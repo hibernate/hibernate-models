@@ -2,7 +2,12 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.internal;
+
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright: Red Hat Inc. and Hibernate Authors
+ */
+package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
@@ -12,8 +17,6 @@ import java.util.EnumSet;
 import java.util.Locale;
 
 import org.hibernate.models.AnnotationAccessException;
-import org.hibernate.models.spi.AnnotationTarget;
-import org.hibernate.models.spi.AttributeDescriptor;
 
 /**
  * Helper for dealing with actual {@link Annotation} references

@@ -2,7 +2,12 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.internal;
+
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright: Red Hat Inc. and Hibernate Authors
+ */
+package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -12,11 +17,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationTarget;
-import org.hibernate.models.spi.AttributeDescriptor;
-import org.hibernate.models.spi.ModelsContext;
-import org.hibernate.models.spi.MutableAnnotationDescriptor;
+import org.hibernate.models.internal.AbstractAnnotationDescriptor;
+import org.hibernate.models.internal.AnnotationDescriptorBuilding;
 
 /**
  * Specialized AnnotationDescriptor implementation intended for use in describing
@@ -26,7 +28,7 @@ import org.hibernate.models.spi.MutableAnnotationDescriptor;
  *
  * @author Steve Ebersole
  */
-public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
+public class ExplicitAnnotationDescriptor<A extends Annotation, C extends A>
 		extends AbstractAnnotationDescriptor<A>
 		implements MutableAnnotationDescriptor<A,C> {
 	private final Class<C> concreteClass;
@@ -36,7 +38,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	private JdkCreator<A,C> jdkCreator;
 	private DeTypedCreator<A,C> deTypedCreator;
 
-	public OrmAnnotationDescriptor(
+	public ExplicitAnnotationDescriptor(
 			Class<A> annotationType,
 			Class<C> concreteClass,
 			EnumSet<AnnotationTarget.Kind> allowableTargets,
@@ -44,7 +46,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 		this( annotationType, concreteClass, allowableTargets, inherited, null );
 	}
 
-	public OrmAnnotationDescriptor(
+	public ExplicitAnnotationDescriptor(
 			Class<A> annotationType,
 			Class<C> concreteClass,
 			EnumSet<AnnotationTarget.Kind> allowableTargets,
@@ -62,24 +64,24 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	}
 
 	/**
-	 * @deprecated use {@link #OrmAnnotationDescriptor(Class, Class, EnumSet, boolean)} instead
+	 * @deprecated use {@link #ExplicitAnnotationDescriptor(Class, Class, EnumSet, boolean)} instead
 	 */
 	@Deprecated(forRemoval = true)
-	public OrmAnnotationDescriptor(
+	public ExplicitAnnotationDescriptor(
 			Class<A> annotationType,
 			Class<C> concreteClass) {
 		this( annotationType, concreteClass, null );
 	}
 
 	/**
-	 * @deprecated use {@link #OrmAnnotationDescriptor(Class, Class, EnumSet, boolean, AnnotationDescriptor)} instead
+	 * @deprecated use {@link #ExplicitAnnotationDescriptor(Class, Class, EnumSet, boolean, AnnotationDescriptor)} instead
 	 */
 	@Deprecated(forRemoval = true)
-	public OrmAnnotationDescriptor(
+	public ExplicitAnnotationDescriptor(
 			Class<A> annotationType,
 			Class<C> concreteClass,
 			AnnotationDescriptor<?> repeatableContainer) {
-		this(annotationType, concreteClass, AnnotationHelper.extractTargets( annotationType ), AnnotationHelper.isInherited( annotationType ), repeatableContainer);
+		this( annotationType, concreteClass, AnnotationHelper.extractTargets( annotationType ), AnnotationHelper.isInherited( annotationType ), repeatableContainer);
 	}
 
 	@Override

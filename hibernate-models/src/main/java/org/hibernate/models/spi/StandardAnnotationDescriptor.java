@@ -2,7 +2,12 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.internal;
+
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright: Red Hat Inc. and Hibernate Authors
+ */
+package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
@@ -13,10 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.AnnotationDescriptorRegistry;
-import org.hibernate.models.spi.AttributeDescriptor;
-import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.internal.AbstractAnnotationDescriptor;
+import org.hibernate.models.internal.AnnotationDescriptorBuilding;
 
 /**
  * Simple implementation of {@link AnnotationDescriptor}.

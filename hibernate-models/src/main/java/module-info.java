@@ -19,16 +19,14 @@ module org.hibernate.models {
 	exports org.hibernate.models.rendering.internal
 			to org.hibernate.models.bytebuddy, org.hibernate.models.jandex;
 
-	// TODO: have the "shared classes" in the SPI packages, instead of exporting "internal" packages
-	//  (even if it's to a limited number of own modules) ?
 	exports org.hibernate.models.internal.util
-			to org.hibernate.models.bytebuddy, org.hibernate.models.jandex, org.hibernate.orm.core, org.hibernate.orm.envers;
+			to org.hibernate.models.bytebuddy, org.hibernate.models.jandex;
 	exports org.hibernate.models.serial.internal
-			to org.hibernate.models.bytebuddy, org.hibernate.models.jandex, org.hibernate.orm.core, org.hibernate.orm.envers;
+			to org.hibernate.models.bytebuddy, org.hibernate.models.jandex;
+
 	exports org.hibernate.models.jdk.internal
-			to org.hibernate.models.bytebuddy, org.hibernate.models.jandex, org.hibernate.orm.core, org.hibernate.orm.envers;
-	exports org.hibernate.models.dynamic.internal
-			to org.hibernate.orm.core, org.hibernate.orm.envers;
+			to org.hibernate.models.bytebuddy, org.hibernate.models.jandex;
+
 
 	uses org.hibernate.models.spi.ModelsContextProvider;
 }
