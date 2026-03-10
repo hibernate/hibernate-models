@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.StandardAnnotationDescriptor;
 import org.hibernate.models.support.AbstractAnnotationDescriptorRegistry;
 import org.hibernate.models.support.MutableAnnotationDescriptorRegistry;
 

@@ -2,11 +2,6 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright: Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.models.rendering.internal;
 
 import java.lang.annotation.Annotation;
@@ -23,7 +18,7 @@ import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.ModelsContext;
 
-import static org.hibernate.models.internal.AnnotationHelper.extractValue;
+import static org.hibernate.models.spi.AnnotationHelper.extractValue;
 
 /**
  * Base support for Renderer implementations.  Handles rendering of annotations.

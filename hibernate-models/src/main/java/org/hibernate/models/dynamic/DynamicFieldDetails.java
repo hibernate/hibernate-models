@@ -2,11 +2,6 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright: Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.models.dynamic;
 
 import java.lang.annotation.Annotation;
@@ -28,6 +23,8 @@ import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableScope;
+
+import static org.hibernate.models.internal.ModifierUtils.DYNAMIC_ATTRIBUTE_MODIFIERS;
 
 /// FieldDetails which does not necessarily map to a physical Field (dynamic models).
 ///
@@ -70,6 +67,32 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 		this.isPlural = isPlural;
 
 		assert isPersistable();
+	}
+
+	/// Constructs a dynamic FieldDetails usable as a [persistable][#isPersistable()] attribute..
+	///
+	/// @param name The name of the "field"
+	/// @param type The type of the "field"
+	/// @param declaringType The type on which the "field" is declared
+	/// @param isArray Whether the "field" is an array
+	/// @param isPlural Whether the "field" is plural
+	/// @param modelsContext Context for the creation (access to useful information).
+	public DynamicFieldDetails(
+			String name,
+			TypeDetails type,
+			ClassDetails declaringType,
+			boolean isArray,
+			boolean isPlural,
+			ModelsContext modelsContext) {
+		this(
+				name,
+				type,
+				declaringType,
+				DYNAMIC_ATTRIBUTE_MODIFIERS,
+				isArray,
+				isPlural,
+				modelsContext
+		);
 	}
 
 	@Override
