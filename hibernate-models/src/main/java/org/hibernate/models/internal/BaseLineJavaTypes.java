@@ -16,9 +16,6 @@ import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.NClob;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -76,9 +73,6 @@ public class BaseLineJavaTypes {
 			Float.class,
 			BigInteger.class,
 			BigDecimal.class,
-			Blob.class,
-			Clob.class,
-			NClob.class,
 			Instant.class,
 			LocalDate.class,
 			LocalTime.class,
@@ -87,9 +81,6 @@ public class BaseLineJavaTypes {
 			OffsetDateTime.class,
 			ZonedDateTime.class,
 			java.util.Date.class,
-			java.sql.Date.class,
-			java.sql.Time.class,
-			java.sql.Timestamp.class,
 			Temporal.class,
 			TemporalAdjuster.class,
 			TemporalAccessor.class,

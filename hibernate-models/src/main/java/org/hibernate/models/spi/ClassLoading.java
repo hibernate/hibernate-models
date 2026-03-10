@@ -7,7 +7,7 @@ package org.hibernate.models.spi;
 import java.net.URL;
 import java.util.Collection;
 
-import org.hibernate.models.Incubating;
+import org.hibernate.models.support.Incubating;
 import org.hibernate.models.UnknownClassException;
 
 /**

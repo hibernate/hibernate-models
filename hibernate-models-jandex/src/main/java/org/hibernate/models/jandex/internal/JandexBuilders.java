@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.function.BiConsumer;
 
 import org.hibernate.models.internal.ArrayTypeDescriptor;
-import org.hibernate.models.internal.jdk.JdkBuilders;
+import org.hibernate.models.jdk.JdkBuilders;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.jandex.internal.values.ArrayValueConverter;
 import org.hibernate.models.jandex.internal.values.ArrayValueExtractor;

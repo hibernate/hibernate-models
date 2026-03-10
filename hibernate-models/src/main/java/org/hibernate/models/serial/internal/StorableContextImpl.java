@@ -8,9 +8,9 @@ import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.models.serial.spi.SerialAnnotationDescriptor;
-import org.hibernate.models.serial.spi.SerialClassDetails;
-import org.hibernate.models.serial.spi.StorableContext;
+import org.hibernate.models.serial.SerialAnnotationDescriptor;
+import org.hibernate.models.serial.SerialClassDetails;
+import org.hibernate.models.serial.StorableContext;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
