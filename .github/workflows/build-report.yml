@@ -89,9 +89,17 @@ jobs:
 
       - name: Install Sonar CLI
         run: |
+          SONAR_HASH=8fbfb1eb546b734a60fc3e537108f06e389a8ca124fbab3a16236a8a51edcc15
           SONAR_SCANNER_VERSION=8.0.1.6346
           export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION
           curl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION.zip
+          DOWNLOADED_HASH=$(sha256sum $HOME/.sonar/sonar-scanner.zip | awk '{print $1}')
+          if [ "$DOWNLOADED_HASH" == "$SONAR_HASH" ]; then
+            echo "Successfully verified the file checksum"
+          else
+            echo "Error: Failed the file checksum verification. Expected: $SONAR_HASH but got $DOWNLOADED_HASH instead"
+            exit 1
+          fi
           unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
           mv "$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION"/* "$HOME/.sonar/" 
 
