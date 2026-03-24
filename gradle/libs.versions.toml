@@ -4,7 +4,7 @@ byteBuddy = "1.18.7"
 classmate = "1.7.3"
 jackson = "2.21.0"
 jandex = "3.5.3"
-jbossLogging = "3.6.2.Final"
+jbossLogging = "3.6.3.Final"
 jbossLoggingTool = "3.0.4.Final"
 
 # jdks
