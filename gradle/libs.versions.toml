@@ -4,7 +4,7 @@ byteBuddy = "1.18.7"
 classmate = "1.7.3"
 jackson = "2.21.0"
 jandex = "3.5.3"
-jbossLogging = "3.6.2.Final"
+jbossLogging = "3.6.3.Final"
 jbossLoggingTool = "3.0.4.Final"
 
 # jdks
@@ -23,7 +23,7 @@ assertj = "3.27.7"
 h2 = "2.4.240"
 junit5 = "6.0.3"
 junitPlatform5= "6.0.3"
-log4j = "2.25.3"
+log4j = "2.25.4"
 
 # plugins
 spotless="8.3.0"
