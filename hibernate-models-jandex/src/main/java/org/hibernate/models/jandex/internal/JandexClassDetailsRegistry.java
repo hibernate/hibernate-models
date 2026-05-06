@@ -8,11 +8,15 @@ import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.AbstractClassDetailsRegistry;
 import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.internal.jdk.JdkClassDetails;
+import org.hibernate.models.jandex.FallbackStrategy;
+import org.hibernate.models.jandex.NotInJandexException;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.IndexView;
+
+import java.util.Locale;
 
 /**
  * ClassDetailsRegistry using Jandex
@@ -21,12 +25,18 @@ import org.jboss.jandex.IndexView;
  */
 public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 	private final IndexView jandexIndex;
-	private final ClassDetailsBuilder classDetailsBuilder;
+    private final FallbackStrategy fallbackStrategy;
+    private final ClassDetailsBuilder classDetailsBuilder;
 
-	public JandexClassDetailsRegistry(IndexView jandexIndex, boolean trackImplementors, ModelsContext context) {
+	public JandexClassDetailsRegistry(
+			IndexView jandexIndex,
+			FallbackStrategy fallbackStrategy,
+			boolean trackImplementors,
+			ModelsContext context) {
 		super( trackImplementors, context );
 		this.jandexIndex = jandexIndex;
-		this.classDetailsBuilder = new JandexClassDetailsBuilderImpl( jandexIndex, context );
+        this.fallbackStrategy = fallbackStrategy;
+        this.classDetailsBuilder = new JandexClassDetailsBuilderImpl( jandexIndex, context );
 	}
 
 	@SuppressWarnings("unused")
@@ -45,6 +55,10 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 		if ( fromJandex != null ) {
 			addClassDetails( name, fromJandex );
 			return fromJandex;
+		}
+
+		if ( fallbackStrategy == FallbackStrategy.NONE ) {
+			throw new NotInJandexException(String.format( Locale.ROOT, "Class was not found in Jandex : %s", name ) );
 		}
 
 		final JdkClassDetails jdkClassDetails = JdkBuilders.DEFAULT_BUILDER.buildClassDetails( name, context );

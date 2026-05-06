@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.hibernate.models.internal.AbstractModelsContext;
 import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.jandex.FallbackStrategy;
 import org.hibernate.models.jandex.spi.JandexModelsContext;
 import org.hibernate.models.jandex.spi.JandexValueConverter;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;
@@ -40,6 +41,7 @@ public class JandexModelsContextImpl extends AbstractModelsContext implements Ja
 
 	public JandexModelsContextImpl(
 			IndexView jandexIndex,
+			FallbackStrategy fallbackStrategy,
 			boolean trackImplementors,
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer) {
@@ -51,7 +53,7 @@ public class JandexModelsContextImpl extends AbstractModelsContext implements Ja
 		this.jandexIndex = jandexIndex;
 
 		this.descriptorRegistry = new JandexAnnotationDescriptorRegistry( this );
-		this.classDetailsRegistry = new JandexClassDetailsRegistry( jandexIndex, trackImplementors,this );
+		this.classDetailsRegistry = new JandexClassDetailsRegistry( jandexIndex, fallbackStrategy, trackImplementors,this );
 
 		primeRegistries( registryPrimer );
 	}
