@@ -4,7 +4,6 @@
  */
 package org.hibernate.models.jandex;
 
-import org.hibernate.models.spi.ClassDetails;
 
 /// Settings for hibernate-models Jandex support
 ///

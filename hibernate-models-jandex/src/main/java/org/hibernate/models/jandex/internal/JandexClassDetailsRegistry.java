@@ -25,8 +25,8 @@ import java.util.Locale;
  */
 public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 	private final IndexView jandexIndex;
-    private final FallbackStrategy fallbackStrategy;
-    private final ClassDetailsBuilder classDetailsBuilder;
+	private final FallbackStrategy fallbackStrategy;
+	private final ClassDetailsBuilder classDetailsBuilder;
 
 	public JandexClassDetailsRegistry(
 			IndexView jandexIndex,
@@ -35,8 +35,8 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 			ModelsContext context) {
 		super( trackImplementors, context );
 		this.jandexIndex = jandexIndex;
-        this.fallbackStrategy = fallbackStrategy;
-        this.classDetailsBuilder = new JandexClassDetailsBuilderImpl( jandexIndex, context );
+		this.fallbackStrategy = fallbackStrategy;
+		this.classDetailsBuilder = new JandexClassDetailsBuilderImpl( jandexIndex, context );
 	}
 
 	@SuppressWarnings("unused")
