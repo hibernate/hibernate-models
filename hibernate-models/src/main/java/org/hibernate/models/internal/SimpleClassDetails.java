@@ -55,6 +55,11 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public boolean wasBuiltFromReflection() {
+		return true;
+	}
+
+	@Override
 	public ClassDetails getSuperClass() {
 		return superClassDetails;
 	}

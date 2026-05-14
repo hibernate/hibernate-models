@@ -73,6 +73,11 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
+	public boolean wasBuiltFromReflection() {
+		return false;
+	}
+
+	@Override
 	public boolean isResolved() {
 		return false;
 	}

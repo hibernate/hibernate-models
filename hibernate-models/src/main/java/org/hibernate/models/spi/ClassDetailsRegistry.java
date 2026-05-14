@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.hibernate.models.Incubating;
 import org.hibernate.models.UnknownClassException;
@@ -63,6 +64,11 @@ public interface ClassDetailsRegistry {
 	 */
 	@SuppressWarnings("unused")
 	void forEachClassDetails(ClassDetailsConsumer consumer);
+
+	/**
+	 * Opens a Stream over all contained ClassDetails.
+	 */
+	Stream<ClassDetails> streamClassDetails();
 
 	/**
 	 * Get the list of all direct subtypes for the named managed-class.

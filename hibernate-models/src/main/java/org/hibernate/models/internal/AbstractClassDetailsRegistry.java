@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.util.CollectionHelper;
@@ -188,6 +189,11 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		for ( Map.Entry<String, ClassDetails> entry : classDetailsMap.entrySet() ) {
 			consumer.consume( entry.getValue() );
 		}
+	}
+
+	@Override
+	public Stream<ClassDetails> streamClassDetails() {
+		return classDetailsMap.values().stream();
 	}
 
 	@Override

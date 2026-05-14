@@ -85,6 +85,11 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	}
 
 	@Override
+	public boolean wasBuiltFromReflection() {
+		return true;
+	}
+
+	@Override
 	public boolean isResolved() {
 		return true;
 	}

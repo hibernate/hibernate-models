@@ -118,6 +118,16 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	}
 
 	@Override
+	public boolean isRealClass() {
+		return false;
+	}
+
+	@Override
+	public boolean wasBuiltFromReflection() {
+		return false;
+	}
+
+	@Override
 	public boolean isResolved() {
 		return true;
 	}

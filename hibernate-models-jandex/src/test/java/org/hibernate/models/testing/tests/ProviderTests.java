@@ -50,4 +50,26 @@ public class ProviderTests {
 		assertThat( context ).isNotNull();
 		assertThat( context ).isInstanceOf( JandexModelsContextImpl.class );
 	}
+
+	@Test
+	void testClassDetails() {
+		final Index index = JandexModelsContextFactoryImpl.buildJandexIndex( SIMPLE_CLASS_LOADING, Indexable.class );
+		final ModelsContext context = new ModelsConfiguration()
+				.configValue( Settings.INDEX_PARAM, index )
+				.bootstrap();
+
+		var classDetails = context.getClassDetailsRegistry().resolveClassDetails( Indexable.class.getName() );
+		assertThat( classDetails.wasBuiltFromReflection() ).isFalse();
+	}
+
+	@Test
+	void testClassDetailsFallback() {
+		final Index index = JandexModelsContextFactoryImpl.buildJandexIndex( SIMPLE_CLASS_LOADING );
+		final ModelsContext context = new ModelsConfiguration()
+				.configValue( Settings.INDEX_PARAM, index )
+				.bootstrap();
+
+		var classDetails = context.getClassDetailsRegistry().resolveClassDetails( Indexable.class.getName() );
+		assertThat( classDetails.wasBuiltFromReflection() ).isTrue();
+	}
 }
