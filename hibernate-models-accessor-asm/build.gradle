@@ -1,0 +1,11 @@
+plugins {
+    id "published-java-module"
+}
+
+description = "hibernate-models-accessor based on ASM generated implementation"
+
+dependencies {
+    api project( ":hibernate-models-accessor" )
+
+    implementation libs.asm
+}

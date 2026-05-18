@@ -1,0 +1,11 @@
+plugins {
+    id "testing"
+}
+
+description = "TCK runner for ASM-based accessor implementation"
+
+dependencies {
+    testImplementation project( ":hibernate-models-accessor-tck" )
+    testImplementation project( ":hibernate-models-accessor-asm" )
+    testImplementation libs.test.junitPlatformSuiteEngine
+}
