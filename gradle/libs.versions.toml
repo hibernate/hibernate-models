@@ -1,6 +1,7 @@
 [versions]
 # libs
 byteBuddy = "1.18.8"
+ow2Asm = "9.7.1"
 classmate = "1.7.3"
 jackson = "2.21.1"
 jandex = "3.5.3"
@@ -40,6 +41,7 @@ jacksonDatabind = { group = "com.fasterxml.jackson.core", name = "jackson-databi
 jacksonDataformatXml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-xml", version.ref = "jackson" }
 jacksonDatatypeJsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson" }
 jandex = { group = "io.smallrye", name = "jandex", version.ref = "jandex" }
+asm = { group = "org.ow2.asm", name = "asm", version.ref = "ow2Asm" }
 loggingCore = { group = "org.jboss.logging", name = "jboss-logging", version.ref = "jbossLogging" }
 loggingAnnotations = { group = "org.jboss.logging", name = "jboss-logging-annotations", version.ref = "jbossLoggingTool" }
 loggingProcessor = { group = "org.jboss.logging", name = "jboss-logging-processor", version.ref = "jbossLoggingTool" }
@@ -60,6 +62,7 @@ test-junitJupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api"
 test-junitJupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5" }
 test-junitJupiterParams = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit5" }
 test-junitPlatformLauncher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junitPlatform5" }
+test-junitPlatformSuiteEngine = { group = "org.junit.platform", name = "junit-platform-suite-engine", version.ref = "junitPlatform5" }
 test-log4jCore = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
 
 [plugins]
