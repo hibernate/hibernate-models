@@ -66,21 +66,25 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	 */
 	String getClassName();
 
-	default boolean isJdkClass() {
-		String className = getClassName();
-		if ( className == null ) {
-			return false;
-		}
-		return className.startsWith("java.") || className.startsWith("jdk.");
+	/**
+	 * Whether this descriptor represents a real Class reference.
+	 * This is generally true except for dynamic and missing class references.
+	 */
+	default boolean isRealClass() {
+		return true;
 	}
 
-	@Override
-	default ClassDetails getContainer(ModelsContext modelsContext) {
-		if ( getClassName() == null || getClassName().indexOf( "." ) <= 0 ) {
-			return null;
-		}
-		return AnnotationTargetHelper.resolvePackageInfo( this, modelsContext );
-	}
+	/**
+	 * Whether this descriptor was built from its {@linkplain Class} details.
+	 *
+	 * @see org.hibernate.models.internal.jdk.JdkBuilders
+	 */
+	boolean wasBuiltFromReflection();
+
+	/**
+	 * Whether this descriptor represents one of the primitive classes.
+	 */
+	boolean isPrimitive();
 
 	/**
 	 * Whether the {@linkplain Class}, if one, represented by this ClassDetails is
@@ -296,6 +300,25 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 				consumer.accept( recordComponent );
 			}
 		} );
+	}
+
+	/**
+	 * Whether this class is part of the JDK.  Best guess.
+	 */
+	default boolean isJdkClass() {
+		String className = getClassName();
+		if ( className == null ) {
+			return false;
+		}
+		return className.startsWith("java.") || className.startsWith("jdk.");
+	}
+
+	@Override
+	default ClassDetails getContainer(ModelsContext modelsContext) {
+		if ( getClassName() == null || getClassName().indexOf( "." ) <= 0 ) {
+			return null;
+		}
+		return AnnotationTargetHelper.resolvePackageInfo( this, modelsContext );
 	}
 
 	/**
