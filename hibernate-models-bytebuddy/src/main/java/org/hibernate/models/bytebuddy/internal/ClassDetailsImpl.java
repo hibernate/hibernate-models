@@ -78,6 +78,11 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	}
 
 	@Override
+	public boolean isPrimitive() {
+		return typeDescription.isPrimitive();
+	}
+
+	@Override
 	public boolean isResolved() {
 		return true;
 	}

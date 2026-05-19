@@ -101,6 +101,11 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
+	public boolean isPrimitive() {
+		return false;
+	}
+
+	@Override
 	public boolean isResolved() {
 		return false;
 	}

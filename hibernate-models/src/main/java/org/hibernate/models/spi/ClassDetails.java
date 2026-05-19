@@ -82,6 +82,11 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	boolean wasBuiltFromReflection();
 
 	/**
+	 * Whether this descriptor represents one of the primitive classes.
+	 */
+	boolean isPrimitive();
+
+	/**
 	 * Whether the {@linkplain Class}, if one, represented by this ClassDetails is
 	 * already loaded on the {@linkplain ClassLoader} used for {@linkplain ClassLoading loading}.
 	 *

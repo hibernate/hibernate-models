@@ -90,6 +90,11 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	}
 
 	@Override
+	public boolean isPrimitive() {
+		return managedClass.isPrimitive();
+	}
+
+	@Override
 	public boolean isResolved() {
 		return true;
 	}

@@ -60,6 +60,11 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
+	public boolean isPrimitive() {
+		return clazz.isPrimitive();
+	}
+
+	@Override
 	public ClassDetails getSuperClass() {
 		return superClassDetails;
 	}

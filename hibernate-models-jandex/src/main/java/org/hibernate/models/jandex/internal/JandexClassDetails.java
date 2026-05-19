@@ -78,6 +78,14 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
+	public boolean isPrimitive() {
+		// Jandex will never represent a primitive as a ClassInfo.
+		// And hibernate-models handles that by always representing primitives as a JdkClassDetails.
+		// If such a distinction is important, it would be at the member-level with TypeDetails.
+		return false;
+	}
+
+	@Override
 	public boolean isResolved() {
 		return false;
 	}
