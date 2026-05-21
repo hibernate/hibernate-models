@@ -5,12 +5,18 @@
 package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.hibernate.models.Incubating;
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.DynamicClassException;
+import org.hibernate.models.ModelsException;
+import org.hibernate.models.accessor.HibernateAccessorInstantiator;
 import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
@@ -204,6 +210,11 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	boolean isImplementor(Class<?> checkType);
 
 	/**
+	 * Access to the {@link ModelsContext} associated with this class.
+	 */
+	ModelsContext getModelContext();
+
+	/**
 	 * Get the fields for this class
 	 */
 	List<FieldDetails> getFields();
@@ -300,6 +311,55 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 				consumer.accept( recordComponent );
 			}
 		} );
+	}
+
+	/**
+	 * Creates an {@link HibernateAccessorInstantiator} for the no-argument constructor
+	 * of this class.
+	 *
+	 * @param <X> the type to instantiate
+	 * @return an instantiator for the no-arg constructor
+	 * @throws DynamicClassException if this ClassDetails has no backing Java class
+	 */
+	@Incubating
+	default <X> HibernateAccessorInstantiator<X> createInstantiator() {
+		return createInstantiator( new ClassDetails[0] );
+	}
+
+	/**
+	 * Creates an {@link HibernateAccessorInstantiator} for a constructor of this class
+	 * matching the given argument types.
+	 *
+	 * @param <X> the type to instantiate
+	 * @param argumentTypes the constructor parameter types, as ClassDetails
+	 * @return an instantiator for the matching constructor
+	 * @throws DynamicClassException if this ClassDetails has no backing Java class
+	 */
+	@Incubating
+	@SuppressWarnings("unchecked")
+	default <X> HibernateAccessorInstantiator<X> createInstantiator(ClassDetails... argumentTypes) {
+		final ModelsContext context = getModelContext();
+		final ClassLoading classLoading = context.getClassLoading();
+		final Class<X> javaClass = toJavaClass( classLoading, context );
+		final Class<?>[] argClasses = new Class<?>[argumentTypes.length];
+		for ( int i = 0; i < argumentTypes.length; i++ ) {
+			argClasses[i] = argumentTypes[i].toJavaClass( classLoading, context );
+		}
+		try {
+			final Constructor<X> constructor = javaClass.getDeclaredConstructor( argClasses );
+			return context.getAccessorFactory().instantiator( constructor );
+		}
+		catch (NoSuchMethodException e) {
+			throw new ModelsException(
+					String.format(
+							Locale.ROOT,
+							"Unable to locate constructor on %s with argument types %s",
+							getClassName(),
+							Arrays.toString( argClasses )
+					),
+					e
+			);
+		}
 	}
 
 	/**

@@ -7,6 +7,8 @@ package org.hibernate.models.spi;
 import java.lang.reflect.Field;
 
 import org.hibernate.models.IllegalCastException;
+import org.hibernate.models.accessor.HibernateAccessorValueReader;
+import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.internal.ModifierUtils;
 
 /**
@@ -35,6 +37,16 @@ public interface FieldDetails extends MemberDetails {
 
 	@Override
 	Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
+
+	@Override
+	default HibernateAccessorValueReader<?> createValueReader() {
+		return getModelContext().getAccessorFactory().valueReader( toJavaMember() );
+	}
+
+	@Override
+	default HibernateAccessorValueWriter createValueWriter() {
+		return getModelContext().getAccessorFactory().valueWriter( toJavaMember() );
+	}
 
 	@Override
 	default FieldDetails asFieldDetails() {
