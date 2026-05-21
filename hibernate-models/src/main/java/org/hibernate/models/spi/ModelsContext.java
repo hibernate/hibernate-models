@@ -6,6 +6,8 @@ package org.hibernate.models.spi;
 
 import java.util.Locale;
 
+import org.hibernate.models.Incubating;
+import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.serial.spi.StorableContext;
 
 /**
@@ -39,6 +41,18 @@ public interface ModelsContext {
 	ClassLoading getClassLoading();
 
 	/**
+	 * Access to the {@link HibernateAccessorFactory} used for creating field/method
+	 * readers, writers, and class instantiators.
+	 *
+	 * <p>Defaults to a reflection-based factory. Implementations may override
+	 * to provide alternative strategies (e.g. a factory backed by generated accessors).
+	 */
+	@Incubating
+	default HibernateAccessorFactory getAccessorFactory() {
+		return HibernateAccessorFactory.reflection();
+	}
+
+	/**
 	 * Treat support.
 	 */
 	default <S> S as(Class<S> type) {
@@ -60,6 +74,10 @@ public interface ModelsContext {
 
 		if ( type.isInstance( getClassLoading() ) ) {
 			return type.cast(getClassLoading() );
+		}
+
+		if ( type.isInstance( getAccessorFactory() ) ) {
+			return type.cast( getAccessorFactory() );
 		}
 
 		throw new UnsupportedOperationException(

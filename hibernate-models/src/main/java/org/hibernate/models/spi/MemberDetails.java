@@ -8,6 +8,9 @@ import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Map;
 
+import org.hibernate.models.Incubating;
+import org.hibernate.models.accessor.HibernateAccessorValueReader;
+import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.internal.CollectionElementSwitch;
 import org.hibernate.models.internal.MapKeySwitch;
 import org.hibernate.models.internal.MapValueSwitch;
@@ -143,6 +146,11 @@ public interface MemberDetails extends AnnotationTarget {
 	ClassDetails getDeclaringType();
 
 	/**
+	 * Access to the {@link ModelsContext} associated with this member.
+	 */
+	ModelsContext getModelContext();
+
+	/**
 	 * For member's with an associated {@linkplain #getType() type}, whether that type considered plural.
 	 *
 	 * @return {@code true} When the member has a type and that type is an array or a Map or Collection inheritor
@@ -267,6 +275,48 @@ public interface MemberDetails extends AnnotationTarget {
 		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
 	}
 
+
+	/**
+	 * Creates a {@link HibernateAccessorValueReader} for this member using the accessor
+	 * factory from the associated {@link ModelsContext}.
+	 */
+	@Incubating
+	default HibernateAccessorValueReader<?> createValueReader() {
+		throw new UnsupportedOperationException(
+				"createValueReader not supported for member kind " + getKind()
+		);
+	}
+
+	/**
+	 * Tries to resolve a corresponding {@link HibernateAccessorValueReader} for this member using the accessor
+	 * factory from the associated {@link ModelsContext}.
+	 * @throws org.hibernate.models.UnresolvableMemberException if unable to discover a writer counterpart.
+	 */
+	@Incubating
+	default HibernateAccessorValueReader<?> resolveValueReader() {
+		return createValueReader();
+	}
+
+	/**
+	 * Creates a {@link HibernateAccessorValueWriter} for this member using the accessor
+	 * factory from the associated {@link ModelsContext}.
+	 */
+	@Incubating
+	default HibernateAccessorValueWriter createValueWriter() {
+		throw new UnsupportedOperationException(
+				"createValueWriter not supported for member kind " + getKind()
+		);
+	}
+
+	/**
+	 * Tries to resolve a corresponding {@link HibernateAccessorValueWriter} for this member using the accessor
+	 * factory from the associated {@link ModelsContext}.
+	 * @throws org.hibernate.models.UnresolvableMemberException if unable to discover a writer counterpart.
+	 */
+	@Incubating
+	default HibernateAccessorValueWriter resolveValueWriter() {
+		return createValueWriter();
+	}
 
 	@Override
 	default MemberDetails asMemberDetails() {
