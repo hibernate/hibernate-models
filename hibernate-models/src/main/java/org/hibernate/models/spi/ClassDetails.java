@@ -4,17 +4,18 @@
  */
 package org.hibernate.models.spi;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.hibernate.models.Incubating;
-import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.ModelsException;
 import org.hibernate.models.accessor.HibernateAccessorInstantiator;
@@ -167,6 +168,58 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	}
 
 	/**
+	 * Walk the class hierarchy (this class, interfaces, superclasses) applying the given
+	 * {@code finder} at each level. Returns the first non-null result, or {@code null} if
+	 * no match is found.
+	 *
+	 * @param finder function applied at each hierarchy level; return non-null to stop
+	 * @param <T> the result type
+	 */
+	@Incubating
+	default <T> T findInHierarchy(Function<ClassDetails, T> finder) {
+		var current = this;
+		while ( current != null && current != OBJECT_CLASS_DETAILS ) {
+			final T result = finder.apply( current );
+			if ( result != null ) {
+				return result;
+			}
+			for ( var iface : current.getImplementedInterfaces() ) {
+				final T found = iface.determineRawClass().findInHierarchy( finder );
+				if ( found != null ) {
+					return found;
+				}
+			}
+			current = current.getSuperClass();
+		}
+		return null;
+	}
+
+	/**
+	 * Walk the class hierarchy (this class, interfaces, superclasses) applying the given
+	 * {@code finder} at each level. Collects and flattens all results across the entire hierarchy.
+	 *
+	 * @param finder function applied at each hierarchy level, returning a collection of matches
+	 * @param <T> the result type
+	 * @return flat list of all results, in traversal order
+	 */
+	@Incubating
+	default <T> List<T> findAllInHierarchy(Function<ClassDetails, Collection<T>> finder) {
+		final List<T> results = new ArrayList<>();
+		var current = this;
+		while ( current != null && current != OBJECT_CLASS_DETAILS ) {
+			final Collection<T> found = finder.apply( current );
+			if ( found != null ) {
+				results.addAll( found );
+			}
+			for ( var iface : current.getImplementedInterfaces() ) {
+				results.addAll( iface.determineRawClass().findAllInHierarchy( finder ) );
+			}
+			current = current.getSuperClass();
+		}
+		return results;
+	}
+
+	/**
 	 * Returns {@code true} is the provided classDetails is a
 	 * superclass of this class, {@code false} otherwise
 	 */
@@ -287,6 +340,31 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	 * Visit each method
 	 */
 	void forEachMethod(IndexedConsumer<MethodDetails> consumer);
+
+	/**
+	 * Find a method by check
+	 */
+	default MethodDetails findMethod(Predicate<MethodDetails> check) {
+		for ( MethodDetails methodDetails : getMethods() ) {
+			if ( check.test( methodDetails ) ) {
+				return methodDetails;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Find all methods matching the given check
+	 */
+	default List<MethodDetails> findMethods(Predicate<MethodDetails> check) {
+		final List<MethodDetails> results = new ArrayList<>();
+		for ( MethodDetails methodDetails : getMethods() ) {
+			if ( check.test( methodDetails ) ) {
+				results.add( methodDetails );
+			}
+		}
+		return results;
+	}
 
 	/**
 	 * Get the record components for this class
