@@ -9,7 +9,6 @@ import org.hibernate.models.accessor.HibernateAccessorInstantiator;
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 
-import java.io.Serial;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -57,10 +56,5 @@ public class HibernateAccessorAsmFactory implements HibernateAccessorFactory {
 
 	private HibernateAccessorAsmClassAccessorInfo getOrCreate(Class<?> declaringClass) {
 		return cache.computeIfAbsent(declaringClass, cls -> HibernateAccessorAsmClassAccessorInfo.create(cls, lookup));
-	}
-
-	@Serial
-	private Object readResolve() {
-		return new HibernateAccessorAsmFactory(MethodHandles.lookup());
 	}
 }
