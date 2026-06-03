@@ -7,6 +7,7 @@ package org.hibernate.models.jandex.internal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.internal.AbstractModelsContext;
 import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
 import org.hibernate.models.jandex.spi.JandexModelsContext;
@@ -43,7 +44,16 @@ public class JandexModelsContextImpl extends AbstractModelsContext implements Ja
 			boolean trackImplementors,
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer) {
-		super( classLoading );
+		this( jandexIndex, trackImplementors, classLoading, registryPrimer, HibernateAccessorFactory.reflection() );
+	}
+
+	public JandexModelsContextImpl(
+			IndexView jandexIndex,
+			boolean trackImplementors,
+			ClassLoading classLoading,
+			RegistryPrimer registryPrimer,
+			HibernateAccessorFactory accessorFactory) {
+		super( classLoading, accessorFactory );
 
 		MODELS_CLASS_LOGGER.debugf( "Using Jandex support" );
 

@@ -6,6 +6,7 @@ package org.hibernate.models.jandex.internal;
 
 import java.util.Map;
 
+import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.jandex.Settings;
 import org.hibernate.models.spi.ClassLoading;
@@ -27,16 +28,17 @@ public class JandexModelsContextProvider implements ModelsContextProvider {
 	@Override
 	public ModelsContext produceContext(
 			ClassLoading classLoading,
+			HibernateAccessorFactory accessorFactory,
 			RegistryPrimer registryPrimer,
 			Map<Object, Object> configProperties) {
 		final IndexView jandexIndex = resolveJandexIndex( configProperties );
 		final boolean trackImplementors = ModelsConfiguration.shouldTrackImplementors( configProperties );
 
 		if ( jandexIndex != null ) {
-			return new JandexModelsContextImpl( jandexIndex, trackImplementors, classLoading, registryPrimer );
+			return new JandexModelsContextImpl( jandexIndex, trackImplementors, classLoading, registryPrimer, accessorFactory );
 		}
 
-		return new BasicModelsContextImpl( classLoading, trackImplementors, registryPrimer );
+		return new BasicModelsContextImpl( classLoading, accessorFactory, trackImplementors, registryPrimer );
 
 	}
 

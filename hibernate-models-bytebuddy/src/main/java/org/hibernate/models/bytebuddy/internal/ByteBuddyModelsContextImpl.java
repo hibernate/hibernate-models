@@ -7,6 +7,7 @@ package org.hibernate.models.bytebuddy.internal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
 import org.hibernate.models.internal.AbstractModelsContext;
@@ -44,7 +45,16 @@ public class ByteBuddyModelsContextImpl
 			boolean trackImplementors,
 			ClassLoading classLoading,
 			RegistryPrimer registryPrimer) {
-		super( classLoading );
+		this( typePool, trackImplementors, classLoading, registryPrimer, HibernateAccessorFactory.reflection() );
+	}
+
+	public ByteBuddyModelsContextImpl(
+			TypePool typePool,
+			boolean trackImplementors,
+			ClassLoading classLoading,
+			RegistryPrimer registryPrimer,
+			HibernateAccessorFactory accessorFactory) {
+		super( classLoading, accessorFactory );
 
 		MODELS_CLASS_LOGGER.debugf( "Using Byte Buddy support" );
 
