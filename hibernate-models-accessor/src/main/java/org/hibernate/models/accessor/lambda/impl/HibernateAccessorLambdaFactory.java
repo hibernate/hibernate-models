@@ -9,9 +9,7 @@ import org.hibernate.models.accessor.HibernateAccessorInstantiator;
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.accessor.logging.impl.CoreLog;
-import org.hibernate.models.accessor.methodhandle.impl.HibernateAccessorMethodHandleFactory;
 
-import java.io.Serial;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
@@ -103,10 +101,5 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 			}
 			throw CoreLog.INSTANCE.errorCreatingHandle(setter, t, t.getMessage());
 		}
-	}
-
-	@Serial
-	private Object readResolve() {
-		return new HibernateAccessorMethodHandleFactory(MethodHandles.lookup());
 	}
 }
