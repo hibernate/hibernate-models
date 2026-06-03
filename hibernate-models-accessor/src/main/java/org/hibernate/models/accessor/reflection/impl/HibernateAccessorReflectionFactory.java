@@ -9,7 +9,6 @@ import org.hibernate.models.accessor.HibernateAccessorInstantiator;
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 
-import java.io.Serial;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -44,11 +43,6 @@ public class HibernateAccessorReflectionFactory implements HibernateAccessorFact
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Method setter) {
 		return new HibernateAccessorReflectionMethodValueWriter(setter);
-	}
-
-	@Serial
-	private Object readResolve() {
-		return INSTANCE;
 	}
 
 }

@@ -7,7 +7,6 @@ package org.hibernate.models.accessor;
 import org.hibernate.models.accessor.lambda.impl.HibernateAccessorLambdaFactory;
 import org.hibernate.models.accessor.reflection.impl.HibernateAccessorReflectionFactory;
 
-import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -19,10 +18,8 @@ import java.lang.reflect.Method;
  * <p>Obtain an instance via the static factory methods {@link #reflection()} or {@link #lambda(MethodHandles.Lookup)},
  * then use it to create {@link HibernateAccessorInstantiator instantiators},
  * {@link HibernateAccessorValueReader readers}, and {@link HibernateAccessorValueWriter writers}.
- *
- * <p>Implementations are {@link Serializable}.
  */
-public interface HibernateAccessorFactory extends Serializable {
+public interface HibernateAccessorFactory {
 
 	/**
 	 * Returns a reflection-based factory.
