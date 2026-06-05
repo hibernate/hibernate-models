@@ -34,6 +34,6 @@ jobs:
       - name: Check artifacts
         shell: bash
         run: |
-          ./gradlew --no-daemon clean publishToMavenLocal --no-build-cache -Dmaven.repo.local=${GITHUB_WORKSPACE}/build1
-          ./gradlew --no-daemon clean publishToMavenLocal --no-build-cache -Dmaven.repo.local=${GITHUB_WORKSPACE}/build2
-          ./ci/compare-build-results.sh ${GITHUB_WORKSPACE}/build1 ${GITHUB_WORKSPACE}/build2
+          ./gradlew --no-daemon clean publishToMavenLocal --no-build-cache -Dmaven.repo.local="${GITHUB_WORKSPACE}/build1"
+          ./gradlew --no-daemon clean publishToMavenLocal --no-build-cache -Dmaven.repo.local="${GITHUB_WORKSPACE}/build2"
+          ./ci/compare-build-results.sh "${GITHUB_WORKSPACE}/build1" "${GITHUB_WORKSPACE}/build2"
