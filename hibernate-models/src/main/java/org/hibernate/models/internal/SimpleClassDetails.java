@@ -130,6 +130,11 @@ public class SimpleClassDetails implements ClassDetails {
 		return checkType.isAssignableFrom( clazz );
 	}
 
+	@Override
+	public ModelsContext getModelContext() {
+		return null;
+	}
+
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// we do not care about the fields, methods nor record components of these simple types
