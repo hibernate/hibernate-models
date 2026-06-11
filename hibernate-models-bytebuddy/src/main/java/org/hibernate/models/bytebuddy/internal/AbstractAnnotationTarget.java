@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
-import org.hibernate.models.internal.AnnotationTargetSupport;
+import org.hibernate.models.support.AnnotationTargetSupport;
 
 import net.bytebuddy.description.annotation.AnnotationSource;
 

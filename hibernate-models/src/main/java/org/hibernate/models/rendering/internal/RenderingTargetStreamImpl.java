@@ -7,7 +7,6 @@ package org.hibernate.models.rendering.internal;
 import java.io.IOException;
 
 import org.hibernate.models.rendering.RenderingException;
-import org.hibernate.models.rendering.spi.AbstractRenderingTarget;
 
 /**
  * RenderingTarget implementation which collects the rendering into an internal buffer.
@@ -21,6 +20,7 @@ public class RenderingTargetStreamImpl extends AbstractRenderingTarget {
 		this( System.out );
 	}
 
+	@SuppressWarnings("unused")
 	public RenderingTargetStreamImpl(int indentationDepth) {
 		this( System.out, indentationDepth );
 	}

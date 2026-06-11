@@ -4,8 +4,8 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.rendering.spi.Renderer;
-import org.hibernate.models.rendering.spi.RenderingTarget;
+import org.hibernate.models.rendering.Renderer;
+import org.hibernate.models.rendering.RenderingTarget;
 import org.hibernate.models.spi.ModelsContext;
 
 /**

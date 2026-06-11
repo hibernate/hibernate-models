@@ -5,9 +5,8 @@ module org.hibernate.models.jandex {
 	requires transitive org.hibernate.models;
 
 	exports org.hibernate.models.jandex;
+	// todo : this should all move to "api" (org.hibernate.models.jandex)
 	exports org.hibernate.models.jandex.spi;
-	// exports org.hibernate.models.jandex.internal;
-	// exports org.hibernate.models.jandex.internal.values;
 
 	provides org.hibernate.models.spi.ModelsContextProvider with
 		org.hibernate.models.jandex.internal.JandexModelsContextProvider;

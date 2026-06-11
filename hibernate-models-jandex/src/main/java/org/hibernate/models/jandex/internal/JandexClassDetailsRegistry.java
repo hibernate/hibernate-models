@@ -5,9 +5,9 @@
 package org.hibernate.models.jandex.internal;
 
 import org.hibernate.models.UnknownClassException;
-import org.hibernate.models.internal.AbstractClassDetailsRegistry;
-import org.hibernate.models.internal.jdk.JdkBuilders;
-import org.hibernate.models.internal.jdk.JdkClassDetails;
+import org.hibernate.models.support.AbstractClassDetailsRegistry;
+import org.hibernate.models.jdk.JdkBuilders;
+import org.hibernate.models.jdk.JdkClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.ModelsContext;

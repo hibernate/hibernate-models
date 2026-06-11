@@ -7,11 +7,12 @@ package org.hibernate.models.internal;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.models.internal.jdk.JdkClassDetails;
+import org.hibernate.models.jdk.JdkClassDetails;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.support.MutableClassDetailsRegistry;
 
 /**
  * Utilities related to {@linkplain org.hibernate.models.spi.AnnotationTarget}

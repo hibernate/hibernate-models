@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.serial.internal;
 
-import org.hibernate.models.serial.spi.SerialClassDetails;
+import org.hibernate.models.serial.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.ClassLoading;

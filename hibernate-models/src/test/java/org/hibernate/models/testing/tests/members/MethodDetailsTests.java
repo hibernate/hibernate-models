@@ -6,7 +6,7 @@ package org.hibernate.models.testing.tests.members;
 
 import java.lang.reflect.Method;
 
-import org.hibernate.models.internal.jdk.JdkMethodDetails;
+import org.hibernate.models.jdk.JdkMethodDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;

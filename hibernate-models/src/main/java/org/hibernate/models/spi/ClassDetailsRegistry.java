@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.hibernate.models.Incubating;
+import org.hibernate.models.support.Incubating;
 import org.hibernate.models.UnknownClassException;
 
 /**

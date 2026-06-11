@@ -6,11 +6,15 @@ package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
+import java.util.Map;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.StandardAnnotationDescriptor;
+import org.hibernate.models.support.AbstractAnnotationDescriptorRegistry;
+import org.hibernate.models.support.MutableAnnotationDescriptorRegistry;
 
-import static org.hibernate.models.internal.ModelsAnnotationLogging.MODELS_ANNOTATION_LOGGER;
+import static org.hibernate.models.logging.ModelsAnnotationLogging.MODELS_ANNOTATION_LOGGER;
 
 /**
  * Access to AnnotationDescriptor instances based on a number of look-ups
@@ -80,5 +84,9 @@ public class AnnotationDescriptorRegistryStandard
 				containerDescriptor,
 				modelsContext
 		);
+	}
+
+	Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> getStorableDescriptorMap() {
+		return descriptorMap;
 	}
 }
