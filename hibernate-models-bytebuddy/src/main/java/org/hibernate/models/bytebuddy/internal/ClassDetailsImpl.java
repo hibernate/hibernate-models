@@ -14,6 +14,7 @@ import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
+import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
@@ -46,6 +47,7 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	private List<TypeDetails> implementedInterfaces;
 	private List<TypeVariableDetails> typeParameters;
 
+	private List<ConstructorDetails> constructors;
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
 	private List<RecordComponentDetails> recordComponents;
@@ -139,6 +141,25 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	@Override
 	public boolean isImplementor(Class<?> checkType) {
 		return typeDescription.isAssignableTo( checkType );
+	}
+
+	@Override
+	public List<ConstructorDetails> getConstructors() {
+		if ( constructors == null ) {
+			constructors = resolveConstructors();
+		}
+		return constructors;
+	}
+
+	private List<ConstructorDetails> resolveConstructors() {
+		final MethodList<MethodDescription.InDefinedShape> declaredMethods = typeDescription.getDeclaredMethods();
+		final List<ConstructorDetails> result = new ArrayList<>( declaredMethods.size() );
+		for ( MethodDescription.InDefinedShape declaredMethod : declaredMethods ) {
+			if ( declaredMethod.isConstructor() ) {
+				result.add( new ConstructorDetailsImpl( declaredMethod, this, getModelContext() ) );
+			}
+		}
+		return result;
 	}
 
 	@Override

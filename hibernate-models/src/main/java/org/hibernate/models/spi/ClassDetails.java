@@ -207,6 +207,37 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	List<FieldDetails> getFields();
 
 	/**
+	 * Get the constructors for this class
+	 */
+	default List<ConstructorDetails> getConstructors() {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Visit each constructor
+	 */
+	default void forEachConstructor(IndexedConsumer<ConstructorDetails> consumer) {
+		final List<ConstructorDetails> constructors = getConstructors();
+		for ( int i = 0; i < constructors.size(); i++ ) {
+			consumer.accept( i, constructors.get( i ) );
+		}
+	}
+
+	/**
+	 * Find a constructor by check
+	 */
+	default ConstructorDetails findConstructor(Predicate<ConstructorDetails> check) {
+		final List<ConstructorDetails> constructors = getConstructors();
+		for ( int i = 0; i < constructors.size(); i++ ) {
+			final ConstructorDetails constructorDetails = constructors.get( i );
+			if ( check.test( constructorDetails ) ) {
+				return constructorDetails;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Visit each field
 	 */
 	void forEachField(IndexedConsumer<FieldDetails> consumer);

@@ -4,8 +4,15 @@
  */
 package org.hibernate.models.testing.tests.annotations.target;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
+import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.tests.annotations.target.sub.SubNoGeneratorEntity;
@@ -19,6 +26,24 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
  * @author Steve Ebersole
  */
 public class AnnotationTargetTests {
+	@Test
+	void testConstructorTarget() {
+		final ModelsContext modelsContext = createModelContext( ConstructorTarget.class );
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
+
+		final ClassDetails constructorTarget = classDetailsRegistry.getClassDetails( ConstructorTarget.class.getName() );
+		final ConstructorDetails constructor = constructorTarget.findConstructor(
+				candidate -> candidate.getArgumentTypes().isEmpty()
+		);
+
+		assertThat( constructor ).isNotNull();
+		assertThat( constructor.getKind() ).isEqualTo( AnnotationTarget.Kind.CONSTRUCTOR );
+		assertThat( constructor.asConstructorDetails() ).isSameAs( constructor );
+		assertThat( constructor.getContainer( modelsContext ) ).isSameAs( constructorTarget );
+		assertThat( constructor.hasDirectAnnotationUsage( ConstructorAnnotation.class ) ).isTrue();
+		assertThat( constructor.getDirectAnnotationUsage( ConstructorAnnotation.class ) ).isNotNull();
+	}
+
 	/**
 	 * We should find the annotation on the package
 	 */
@@ -115,4 +140,15 @@ public class AnnotationTargetTests {
 		assertThat( entityClassPackagePackage.hasAnnotationUsage( GeneratorAnnotation.class, modelsContext ) ).isTrue();
 	}
 
+}
+
+class ConstructorTarget {
+	@ConstructorAnnotation
+	ConstructorTarget() {
+	}
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.CONSTRUCTOR)
+@interface ConstructorAnnotation {
 }
