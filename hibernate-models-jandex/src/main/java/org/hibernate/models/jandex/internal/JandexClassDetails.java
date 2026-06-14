@@ -15,6 +15,7 @@ import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
+import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
@@ -46,6 +47,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	private List<TypeDetails> implementedInterfaces;
 	private List<TypeVariableDetails> typeParameters;
 
+	private List<ConstructorDetails> constructors;
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
 	private List<RecordComponentDetails> recordComponents;
@@ -156,6 +158,25 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		}
 
 		return false;
+	}
+
+	@Override
+	public List<ConstructorDetails> getConstructors() {
+		if ( constructors == null ) {
+			constructors = resolveConstructors();
+		}
+		return constructors;
+	}
+
+	private List<ConstructorDetails> resolveConstructors() {
+		final List<MethodInfo> methodInfoList = classInfo.methods();
+		final List<ConstructorDetails> result = new ArrayList<>( methodInfoList.size() );
+		for ( MethodInfo methodInfo : methodInfoList ) {
+			if ( methodInfo.isConstructor() ) {
+				result.add( new JandexConstructorDetails( methodInfo, this, getModelContext() ) );
+			}
+		}
+		return result;
 	}
 
 	@Override

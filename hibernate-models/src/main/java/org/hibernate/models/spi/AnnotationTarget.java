@@ -398,6 +398,15 @@ public interface AnnotationTarget {
 	}
 
 	/**
+	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#CONSTRUCTOR constructor}.
+	 *
+	 * @throws IllegalCastException If the target is not a constructor
+	 */
+	default ConstructorDetails asConstructorDetails() {
+		throw new IllegalCastException( getKind() + " cannot be cast to ConstructorDetails" );
+	}
+
+	/**
 	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#FIELD field}, {@linkplain Kind#METHOD method} or {@linkplain Kind#RECORD_COMPONENT record component}.
 	 *
 	 * @throws IllegalCastException If the target is not a member
@@ -448,6 +457,7 @@ public interface AnnotationTarget {
 	enum Kind {
 		ANNOTATION( ElementType.ANNOTATION_TYPE ),
 		CLASS( ElementType.TYPE ),
+		CONSTRUCTOR( ElementType.CONSTRUCTOR ),
 		FIELD( ElementType.FIELD ),
 		METHOD( ElementType.METHOD ),
 		RECORD_COMPONENT( ElementType.RECORD_COMPONENT ),

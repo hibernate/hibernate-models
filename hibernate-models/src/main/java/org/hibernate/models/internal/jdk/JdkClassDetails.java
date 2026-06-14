@@ -4,6 +4,7 @@
  */
 package org.hibernate.models.internal.jdk;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -20,6 +21,7 @@ import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ClassLoading;
+import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
@@ -44,6 +46,7 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	private TypeDetails genericSuperType;
 	private List<TypeVariableDetails> typeParameters;
 
+	private List<ConstructorDetails> constructors;
 	private List<FieldDetails> fields;
 	private List<MethodDetails> methods;
 	private List<RecordComponentDetails> recordComponents;
@@ -197,6 +200,22 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	@Override
 	public boolean isImplementor(Class<?> checkType) {
 		return checkType.isAssignableFrom( managedClass );
+	}
+
+	@Override
+	public List<ConstructorDetails> getConstructors() {
+		if ( constructors == null ) {
+			final Constructor<?>[] reflectionConstructors = managedClass.getDeclaredConstructors();
+			this.constructors = arrayList( reflectionConstructors.length );
+			for ( int i = 0; i < reflectionConstructors.length; i++ ) {
+				final Constructor<?> reflectionConstructor = reflectionConstructors[i];
+				if ( reflectionConstructor.isSynthetic() ) {
+					continue;
+				}
+				constructors.add( new JdkConstructorDetails( reflectionConstructor, this, getModelContext() ) );
+			}
+		}
+		return constructors;
 	}
 
 	@Override
