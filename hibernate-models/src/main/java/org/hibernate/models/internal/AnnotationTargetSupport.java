@@ -12,13 +12,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.models.spi.AnnotationDescriptor;
-import org.hibernate.models.spi.FieldDetails;
-import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableAnnotationTarget;
-import org.hibernate.models.spi.MutableClassDetails;
-import org.hibernate.models.spi.MutableMemberDetails;
-import org.hibernate.models.spi.RecordComponentDetails;
 
 /**
  * @author Steve Ebersole
@@ -216,24 +211,4 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 
 		return containerTypeUsage;
 	}
-
-	@Override
-	default <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
-		return null;
-	}
-
-	@Override
-	FieldDetails asFieldDetails();
-
-	@Override
-	MethodDetails asMethodDetails();
-
-	@Override
-	RecordComponentDetails asRecordComponentDetails();
-
-	@Override
-	MutableClassDetails asClassDetails();
-
-	@Override
-	MutableMemberDetails asMemberDetails();
 }

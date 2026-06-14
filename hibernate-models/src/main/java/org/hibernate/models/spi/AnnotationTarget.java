@@ -384,42 +384,54 @@ public interface AnnotationTarget {
 	 *
 	 * @throws IllegalCastException If the target is not an annotation
 	 */
-	<A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor();
+	default <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
+		throw new IllegalCastException( getKind() + " cannot be cast to AnnotationDescriptor" );
+	}
 
 	/**
 	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#CLASS class}.
 	 *
 	 * @throws IllegalCastException If the target is not a class
 	 */
-	ClassDetails asClassDetails();
+	default ClassDetails asClassDetails() {
+		throw new IllegalCastException( getKind() + " cannot be cast to ClassDetails" );
+	}
 
 	/**
 	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#FIELD field}, {@linkplain Kind#METHOD method} or {@linkplain Kind#RECORD_COMPONENT record component}.
 	 *
 	 * @throws IllegalCastException If the target is not a member
 	 */
-	MemberDetails asMemberDetails();
+	default MemberDetails asMemberDetails() {
+		throw new IllegalCastException( getKind() + " cannot be cast to MemberDetails" );
+	}
 
 	/**
 	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#FIELD field}.
 	 *
 	 * @throws IllegalCastException If the target is not a field
 	 */
-	FieldDetails asFieldDetails();
+	default FieldDetails asFieldDetails() {
+		throw new IllegalCastException( getKind() + " cannot be cast to FieldDetails" );
+	}
 
 	/**
 	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#METHOD method}.
 	 *
 	 * @throws IllegalCastException If the target is not a method
 	 */
-	MethodDetails asMethodDetails();
+	default MethodDetails asMethodDetails() {
+		throw new IllegalCastException( getKind() + " cannot be cast to MethodDetails" );
+	}
 
 	/**
 	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#RECORD_COMPONENT record component}.
 	 *
 	 * @throws IllegalCastException If the target is not a record component
 	 */
-	RecordComponentDetails asRecordComponentDetails();
+	default RecordComponentDetails asRecordComponentDetails() {
+		throw new IllegalCastException( getKind() + " cannot be cast to RecordComponentDetails" );
+	}
 
 	/**
 	 * Subset of {@linkplain ElementType annotation targets} supported for mapping annotations

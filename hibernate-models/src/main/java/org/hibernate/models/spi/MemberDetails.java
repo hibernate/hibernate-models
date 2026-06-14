@@ -4,12 +4,10 @@
  */
 package org.hibernate.models.spi;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Map;
 
-import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.internal.CollectionElementSwitch;
 import org.hibernate.models.internal.MapKeySwitch;
 import org.hibernate.models.internal.MapValueSwitch;
@@ -273,16 +271,6 @@ public interface MemberDetails extends AnnotationTarget {
 	@Override
 	default MemberDetails asMemberDetails() {
 		return this;
-	}
-
-	@Override
-	default <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
-		throw new IllegalCastException( "MemberDetails cannot be cast to an AnnotationDescriptor" );
-	}
-
-	@Override
-	default ClassDetails asClassDetails() {
-		throw new IllegalCastException( "MemberDetails cannot be cast to a ClassDetails" );
 	}
 
 	enum Visibility {

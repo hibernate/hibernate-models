@@ -6,8 +6,6 @@ package org.hibernate.models.spi;
 
 import java.lang.reflect.Member;
 
-import org.hibernate.models.IllegalCastException;
-
 import static org.hibernate.models.spi.AnnotationTarget.Kind.RECORD_COMPONENT;
 
 /**
@@ -36,16 +34,6 @@ public interface RecordComponentDetails extends MemberDetails {
 
 	@Override
 	Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
-
-	@Override
-	default FieldDetails asFieldDetails() {
-		throw new IllegalCastException( "RecordComponentDetails cannot be cast to FieldDetails" );
-	}
-
-	@Override
-	default MethodDetails asMethodDetails() {
-		throw new IllegalCastException( "RecordComponentDetails cannot be cast to MethodDetails" );
-	}
 
 	@Override
 	default RecordComponentDetails asRecordComponentDetails() {

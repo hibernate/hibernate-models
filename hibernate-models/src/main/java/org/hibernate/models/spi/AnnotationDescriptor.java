@@ -10,7 +10,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
 import org.hibernate.models.serial.internal.SerialAnnotationDescriptorImpl;
@@ -129,31 +128,6 @@ public interface AnnotationDescriptor<A extends Annotation>
 	default <X extends Annotation> AnnotationDescriptor<X> asAnnotationDescriptor() {
 		//noinspection unchecked
 		return (AnnotationDescriptor<X>) this;
-	}
-
-	@Override
-	default ClassDetails asClassDetails() {
-		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to a ClassDetails" );
-	}
-
-	@Override
-	default MemberDetails asMemberDetails() {
-		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to a MemberDetails" );
-	}
-
-	@Override
-	default FieldDetails asFieldDetails() {
-		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to a FieldDetails" );
-	}
-
-	@Override
-	default MethodDetails asMethodDetails() {
-		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to a MethodDetails" );
-	}
-
-	@Override
-	default RecordComponentDetails asRecordComponentDetails() {
-		throw new IllegalCastException( "AnnotationDescriptor cannot be cast to a RecordComponentDetails" );
 	}
 
 	@Override
