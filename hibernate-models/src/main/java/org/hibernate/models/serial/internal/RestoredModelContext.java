@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
 import org.hibernate.models.internal.ClassDetailsRegistryStandard;
+import org.hibernate.models.internal.ModuleDetailsRegistryStandard;
 import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
 import org.hibernate.models.internal.MutableClassDetailsRegistry;
 import org.hibernate.models.serial.spi.SerialAnnotationDescriptor;
@@ -18,6 +19,7 @@ import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.ModuleDetailsRegistry;
 
 /**
  * ModelsContext implementation used with serialization support.
@@ -29,6 +31,7 @@ import org.hibernate.models.spi.ModelsContext;
 public class RestoredModelContext implements ModelsContext {
 	private final MutableAnnotationDescriptorRegistry annotationDescriptorRegistry;
 	private final MutableClassDetailsRegistry classDetailsRegistry;
+	private final ModuleDetailsRegistryStandard moduleDetailsRegistry;
 
 	private final ClassLoading classLoading;
 
@@ -39,6 +42,7 @@ public class RestoredModelContext implements ModelsContext {
 
 		this.annotationDescriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
 		this.classDetailsRegistry = new ClassDetailsRegistryStandard( classDetailsBuilder, trackImplementors, this );
+		this.moduleDetailsRegistry = new ModuleDetailsRegistryStandard( this );
 
 		for ( Map.Entry<String, SerialClassDetails> classDetailsEntry : serialContext.getSerialClassDetailsMap().entrySet() ) {
 			classDetailsRegistry.resolveClassDetails( classDetailsEntry.getKey() );
@@ -66,6 +70,11 @@ public class RestoredModelContext implements ModelsContext {
 	@Override
 	public ClassDetailsRegistry getClassDetailsRegistry() {
 		return classDetailsRegistry;
+	}
+
+	@Override
+	public ModuleDetailsRegistry getModuleDetailsRegistry() {
+		return moduleDetailsRegistry;
 	}
 
 	@Override

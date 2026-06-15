@@ -434,6 +434,15 @@ public interface AnnotationTarget {
 	}
 
 	/**
+	 * Safe cast method for cases when the {@linkplain #getKind() target} is a {@linkplain Kind#MODULE module}.
+	 *
+	 * @throws IllegalCastException If the target is not a module
+	 */
+	default ModuleDetails asModuleDetails() {
+		throw new IllegalCastException( getKind() + " cannot be cast to ModuleDetails" );
+	}
+
+	/**
 	 * Subset of {@linkplain ElementType annotation targets} supported for mapping annotations
 	 */
 	enum Kind {
@@ -442,7 +451,8 @@ public interface AnnotationTarget {
 		FIELD( ElementType.FIELD ),
 		METHOD( ElementType.METHOD ),
 		RECORD_COMPONENT( ElementType.RECORD_COMPONENT ),
-		PACKAGE( ElementType.PACKAGE );
+		PACKAGE( ElementType.PACKAGE ),
+		MODULE( ElementType.MODULE );
 
 		private final ElementType elementType;
 

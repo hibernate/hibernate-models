@@ -22,6 +22,7 @@ import static java.lang.Boolean.parseBoolean;
 public class BasicModelsContextImpl extends AbstractModelsContext {
 	private final AnnotationDescriptorRegistryStandard descriptorRegistry;
 	private final ClassDetailsRegistryStandard classDetailsRegistry;
+	private final ModuleDetailsRegistryStandard moduleDetailsRegistry;
 
 	public BasicModelsContextImpl(
 			ClassLoading classLoadingAccess,
@@ -31,6 +32,7 @@ public class BasicModelsContextImpl extends AbstractModelsContext {
 
 		this.descriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
 		this.classDetailsRegistry = new ClassDetailsRegistryStandard( trackImplementors, this );
+		this.moduleDetailsRegistry = new ModuleDetailsRegistryStandard( this );
 
 		primeRegistries( registryPrimer );
 	}
@@ -54,6 +56,11 @@ public class BasicModelsContextImpl extends AbstractModelsContext {
 	@Override
 	public MutableClassDetailsRegistry getClassDetailsRegistry() {
 		return classDetailsRegistry;
+	}
+
+	@Override
+	public ModuleDetailsRegistryStandard getModuleDetailsRegistry() {
+		return moduleDetailsRegistry;
 	}
 
 	@Override

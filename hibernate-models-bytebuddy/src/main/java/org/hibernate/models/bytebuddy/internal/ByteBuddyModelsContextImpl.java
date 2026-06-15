@@ -34,6 +34,7 @@ public class ByteBuddyModelsContextImpl
 	private final TypePool typePool;
 
 	private final ClassDetailsRegistryImpl classDetailsRegistry;
+	private final ModuleDetailsRegistryImpl moduleDetailsRegistry;
 	private final AnnotationDescriptorRegistryStandard descriptorRegistry;
 
 	@SuppressWarnings("rawtypes")
@@ -51,6 +52,7 @@ public class ByteBuddyModelsContextImpl
 		this.typePool = typePool;
 
 		this.classDetailsRegistry = new ClassDetailsRegistryImpl( this, trackImplementors );
+		this.moduleDetailsRegistry = new ModuleDetailsRegistryImpl( this );
 		this.descriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
 
 		primeRegistries( registryPrimer );
@@ -69,6 +71,11 @@ public class ByteBuddyModelsContextImpl
 	@Override
 	public MutableAnnotationDescriptorRegistry getAnnotationDescriptorRegistry() {
 		return descriptorRegistry;
+	}
+
+	@Override
+	public ModuleDetailsRegistryImpl getModuleDetailsRegistry() {
+		return moduleDetailsRegistry;
 	}
 
 	@Override

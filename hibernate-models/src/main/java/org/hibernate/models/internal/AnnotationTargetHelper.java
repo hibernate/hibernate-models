@@ -136,6 +136,9 @@ public class AnnotationTargetHelper {
 		}
 
 		final ClassDetails container = annotationTarget.getContainer( modelContext );
+		if ( container == null ) {
+			return null;
+		}
 		final T matchedExtraction = matchingExtractor.apply( container );
 		if ( matchedExtraction != null ) {
 			return matchedExtraction;
