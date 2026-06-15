@@ -58,6 +58,24 @@ public class AnnotationUsageBuilder {
 	}
 
 	/**
+	 * Create the AnnotationUsages map for a collection of Jandex annotation instances.
+	 */
+	public static Map<Class<? extends Annotation>, ? extends Annotation> collectUsages(
+			Collection<AnnotationInstance> annotations,
+			ModelsContext modelsContext) {
+		if ( annotations == null ) {
+			return Collections.emptyMap();
+		}
+		final Map<Class<? extends Annotation>, Annotation> result = new HashMap<>();
+		processAnnotations(
+				annotations,
+				result::put,
+				modelsContext
+		);
+		return result;
+	}
+
+	/**
 	 * Process annotations creating usage instances passed back to the consumer
 	 */
 	public static void processAnnotations(

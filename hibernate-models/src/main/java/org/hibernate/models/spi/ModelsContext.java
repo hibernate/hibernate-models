@@ -29,6 +29,11 @@ public interface ModelsContext {
 	ClassDetailsRegistry getClassDetailsRegistry();
 
 	/**
+	 * Registry of modules.
+	 */
+	ModuleDetailsRegistry getModuleDetailsRegistry();
+
+	/**
 	 * Access to {@linkplain ClassLoader} operations.
 	 */
 	ClassLoading getClassLoading();
@@ -43,6 +48,10 @@ public interface ModelsContext {
 
 		if ( type.isInstance( getClassDetailsRegistry() ) ) {
 			return type.cast( getClassDetailsRegistry() );
+		}
+
+		if ( type.isInstance( getModuleDetailsRegistry() ) ) {
+			return type.cast( getModuleDetailsRegistry() );
 		}
 
 		if ( type.isInstance( getAnnotationDescriptorRegistry() ) ) {

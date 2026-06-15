@@ -32,6 +32,7 @@ public class JandexModelsContextImpl extends AbstractModelsContext implements Ja
 
 	private final JandexAnnotationDescriptorRegistry descriptorRegistry;
 	private final JandexClassDetailsRegistry classDetailsRegistry;
+	private final JandexModuleDetailsRegistry moduleDetailsRegistry;
 
 	@SuppressWarnings("rawtypes")
 	private final Map<ValueTypeDescriptor, JandexValueConverter> valueConverters = new HashMap<>();
@@ -52,6 +53,7 @@ public class JandexModelsContextImpl extends AbstractModelsContext implements Ja
 
 		this.descriptorRegistry = new JandexAnnotationDescriptorRegistry( this );
 		this.classDetailsRegistry = new JandexClassDetailsRegistry( jandexIndex, trackImplementors,this );
+		this.moduleDetailsRegistry = new JandexModuleDetailsRegistry( jandexIndex, this );
 
 		primeRegistries( registryPrimer );
 	}
@@ -64,6 +66,11 @@ public class JandexModelsContextImpl extends AbstractModelsContext implements Ja
 	@Override
 	public JandexClassDetailsRegistry getClassDetailsRegistry() {
 		return classDetailsRegistry;
+	}
+
+	@Override
+	public JandexModuleDetailsRegistry getModuleDetailsRegistry() {
+		return moduleDetailsRegistry;
 	}
 
 	@Override
