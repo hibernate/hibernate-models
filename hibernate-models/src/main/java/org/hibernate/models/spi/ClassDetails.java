@@ -4,6 +4,7 @@
  */
 package org.hibernate.models.spi;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
