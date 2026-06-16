@@ -12,8 +12,8 @@ import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.MutableClassDetails;
+import org.hibernate.models.spi.MutableConstructorDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 
 import net.bytebuddy.description.annotation.AnnotationSource;
@@ -24,7 +24,7 @@ import net.bytebuddy.description.method.MethodDescription;
  */
 public class ConstructorDetailsImpl
 		extends AbstractAnnotationTarget
-		implements ConstructorDetails {
+		implements MutableConstructorDetails {
 	private final MethodDescription methodDescription;
 	private final ClassDetails declaringType;
 	private final List<ClassDetails> argumentTypes;

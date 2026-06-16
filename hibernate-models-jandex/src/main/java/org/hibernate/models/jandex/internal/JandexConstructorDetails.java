@@ -11,9 +11,9 @@ import java.util.List;
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableClassDetails;
+import org.hibernate.models.spi.MutableConstructorDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 
 import org.jboss.jandex.AnnotationTarget;
@@ -22,7 +22,7 @@ import org.jboss.jandex.MethodInfo;
 /**
  * @author Steve Ebersole
  */
-public class JandexConstructorDetails extends AbstractAnnotationTarget implements ConstructorDetails {
+public class JandexConstructorDetails extends AbstractAnnotationTarget implements MutableConstructorDetails {
 	private final MethodInfo methodInfo;
 	private final ClassDetails declaringType;
 	private final List<ClassDetails> argumentTypes;
