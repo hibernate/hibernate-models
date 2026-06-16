@@ -12,6 +12,7 @@ import static org.hibernate.models.spi.AnnotationTarget.Kind.CONSTRUCTOR;
 /**
  * Models a {@linkplain Constructor constructor} in a {@linkplain ClassDetails class}.
  *
+ * @since 1.3
  * @author Steve Ebersole
  */
 public interface ConstructorDetails extends AnnotationTarget {
