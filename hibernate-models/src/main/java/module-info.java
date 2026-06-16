@@ -1,5 +1,4 @@
 module org.hibernate.models {
-	requires java.sql;
 	requires org.jboss.logging;
 
 	exports org.hibernate.models;
