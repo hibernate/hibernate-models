@@ -11,15 +11,15 @@ import java.util.List;
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableClassDetails;
+import org.hibernate.models.spi.MutableConstructorDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 
 /**
  * @author Steve Ebersole
  */
-public class JdkConstructorDetails extends AbstractJdkAnnotationTarget implements ConstructorDetails {
+public class JdkConstructorDetails extends AbstractJdkAnnotationTarget implements MutableConstructorDetails {
 	private final Constructor<?> constructor;
 	private final ClassDetails declaringType;
 	private final List<ClassDetails> argumentTypes;
