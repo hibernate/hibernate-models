@@ -19,14 +19,13 @@ import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableAnnotationDescriptor;
 
 /**
- * Specialized AnnotationDescriptor implementation intended for use in describing
- * Hibernate and JPA annotations.  Note especially that this implementation
- * does not collect annotations from the annotation class as we never care about
- * meta-annotations in these cases.
+ * AnnotationDescriptor implementation backed by a concrete, mutable annotation
+ * implementation class.  This implementation does not collect meta-annotations
+ * from the annotation class as we never care about meta-annotations in these cases
  *
  * @author Steve Ebersole
  */
-public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
+public class ConcreteTypeAnnotationDescriptor<A extends Annotation, C extends A>
 		extends AbstractAnnotationDescriptor<A>
 		implements MutableAnnotationDescriptor<A,C> {
 	private final Class<C> concreteClass;
@@ -36,7 +35,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	private JdkCreator<A,C> jdkCreator;
 	private DeTypedCreator<A,C> deTypedCreator;
 
-	public OrmAnnotationDescriptor(
+	public ConcreteTypeAnnotationDescriptor(
 			Class<A> annotationType,
 			Class<C> concreteClass,
 			EnumSet<AnnotationTarget.Kind> allowableTargets,
@@ -44,7 +43,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 		this( annotationType, concreteClass, allowableTargets, inherited, null );
 	}
 
-	public OrmAnnotationDescriptor(
+	public ConcreteTypeAnnotationDescriptor(
 			Class<A> annotationType,
 			Class<C> concreteClass,
 			EnumSet<AnnotationTarget.Kind> allowableTargets,
@@ -62,20 +61,20 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	}
 
 	/**
-	 * @deprecated use {@link #OrmAnnotationDescriptor(Class, Class, EnumSet, boolean)} instead
+	 * @deprecated use {@link #ConcreteTypeAnnotationDescriptor(Class, Class, EnumSet, boolean)} instead
 	 */
 	@Deprecated(forRemoval = true)
-	public OrmAnnotationDescriptor(
+	public ConcreteTypeAnnotationDescriptor(
 			Class<A> annotationType,
 			Class<C> concreteClass) {
 		this( annotationType, concreteClass, null );
 	}
 
 	/**
-	 * @deprecated use {@link #OrmAnnotationDescriptor(Class, Class, EnumSet, boolean, AnnotationDescriptor)} instead
+	 * @deprecated use {@link #ConcreteTypeAnnotationDescriptor(Class, Class, EnumSet, boolean, AnnotationDescriptor)} instead
 	 */
 	@Deprecated(forRemoval = true)
-	public OrmAnnotationDescriptor(
+	public ConcreteTypeAnnotationDescriptor(
 			Class<A> annotationType,
 			Class<C> concreteClass,
 			AnnotationDescriptor<?> repeatableContainer) {
@@ -111,7 +110,7 @@ public class OrmAnnotationDescriptor<A extends Annotation, C extends A>
 	}
 
 	@Override
-	public A createUsage(Map<String,Object> attributeValues, ModelsContext context) {
+	public C createUsage(Map<String,Object> attributeValues, ModelsContext context) {
 		if ( deTypedCreator == null ) {
 			deTypedCreator = new DeTypedCreator<>( getAnnotationType(), concreteClass );
 		}

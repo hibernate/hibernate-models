@@ -8,8 +8,8 @@ import java.lang.annotation.Annotation;
 import java.util.EnumSet;
 import java.util.function.Consumer;
 
-import org.hibernate.models.internal.OrmAnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.MutableAnnotationDescriptor;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Cacheable;
@@ -47,44 +47,44 @@ import org.hibernate.models.spi.AnnotationTarget.Kind;
  */
 @SuppressWarnings("unused")
 public interface JpaAnnotations {
-	AnnotationDescriptor<Entity> ENTITY = new OrmAnnotationDescriptor<>( Entity.class, EntityAnnotation.class, EnumSet.of( Kind.CLASS ), false );
-	AnnotationDescriptor<Embeddable> EMBEDDABLE = new OrmAnnotationDescriptor<>( Embeddable.class, EmbeddableAnnotation.class, EnumSet.of( Kind.CLASS ), false );
+	AnnotationDescriptor<Entity> ENTITY = MutableAnnotationDescriptor.create( Entity.class, EntityAnnotation.class, EnumSet.of( Kind.CLASS ), false );
+	AnnotationDescriptor<Embeddable> EMBEDDABLE = MutableAnnotationDescriptor.create( Embeddable.class, EmbeddableAnnotation.class, EnumSet.of( Kind.CLASS ), false );
 
-	AnnotationDescriptor<Id> ID = new OrmAnnotationDescriptor<>( Id.class, IdAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
+	AnnotationDescriptor<Id> ID = MutableAnnotationDescriptor.create( Id.class, IdAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
 
-	AnnotationDescriptor<SequenceGenerators> SEQUENCE_GENERATORS = new OrmAnnotationDescriptor<>( SequenceGenerators.class, SequenceGeneratorsAnnotation.class, EnumSet.of( Kind.CLASS, Kind.METHOD, Kind.FIELD, Kind.PACKAGE ), false );
-	AnnotationDescriptor<SequenceGenerator> SEQUENCE_GENERATOR = new OrmAnnotationDescriptor<>( SequenceGenerator.class, SequenceGeneratorAnnotation.class, EnumSet.of( Kind.CLASS, Kind.METHOD, Kind.FIELD, Kind.PACKAGE ), false, SEQUENCE_GENERATORS );
+	AnnotationDescriptor<SequenceGenerators> SEQUENCE_GENERATORS = MutableAnnotationDescriptor.create( SequenceGenerators.class, SequenceGeneratorsAnnotation.class, EnumSet.of( Kind.CLASS, Kind.METHOD, Kind.FIELD, Kind.PACKAGE ), false );
+	AnnotationDescriptor<SequenceGenerator> SEQUENCE_GENERATOR = MutableAnnotationDescriptor.create( SequenceGenerator.class, SequenceGeneratorAnnotation.class, EnumSet.of( Kind.CLASS, Kind.METHOD, Kind.FIELD, Kind.PACKAGE ), false, SEQUENCE_GENERATORS );
 
-	AnnotationDescriptor<Basic> BASIC = new OrmAnnotationDescriptor<>( Basic.class, BasicAnnotation.class );
-	AnnotationDescriptor<Embedded> EMBEDDED = new OrmAnnotationDescriptor<>( Embedded.class, EmbeddedAnnotation.class );
-	AnnotationDescriptor<ElementCollection> ELEMENT_COLLECTION = new OrmAnnotationDescriptor<>( ElementCollection.class, ElementCollectionJpaAnnotation.class );
+	AnnotationDescriptor<Basic> BASIC = MutableAnnotationDescriptor.create( Basic.class, BasicAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
+	AnnotationDescriptor<Embedded> EMBEDDED = MutableAnnotationDescriptor.create( Embedded.class, EmbeddedAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
+	AnnotationDescriptor<ElementCollection> ELEMENT_COLLECTION = MutableAnnotationDescriptor.create( ElementCollection.class, ElementCollectionJpaAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
 
-	AnnotationDescriptor<NamedQueries> NAMED_QUERIES = new OrmAnnotationDescriptor<>( NamedQueries.class, NamedQueriesAnnotation.class );
-	AnnotationDescriptor<NamedQuery> NAMED_QUERY = new OrmAnnotationDescriptor<>( NamedQuery.class, NamedQueryAnnotation.class, NAMED_QUERIES );
+	AnnotationDescriptor<NamedQueries> NAMED_QUERIES = MutableAnnotationDescriptor.create( NamedQueries.class, NamedQueriesAnnotation.class, EnumSet.of( Kind.CLASS ), false );
+	AnnotationDescriptor<NamedQuery> NAMED_QUERY = MutableAnnotationDescriptor.create( NamedQuery.class, NamedQueryAnnotation.class, EnumSet.of( Kind.CLASS ), false, NAMED_QUERIES );
 
-	AnnotationDescriptor<NamedNativeQueries> NAMED_NATIVE_QUERIES = new OrmAnnotationDescriptor<>( NamedNativeQueries.class, NamedNativeQueriesAnnotation.class );
-	AnnotationDescriptor<NamedNativeQuery> NAMED_NATIVE_QUERY = new OrmAnnotationDescriptor<>( NamedNativeQuery.class, NamedNativeQueryAnnotation.class, NAMED_NATIVE_QUERIES );
+	AnnotationDescriptor<NamedNativeQueries> NAMED_NATIVE_QUERIES = MutableAnnotationDescriptor.create( NamedNativeQueries.class, NamedNativeQueriesAnnotation.class, EnumSet.of( Kind.CLASS ), false );
+	AnnotationDescriptor<NamedNativeQuery> NAMED_NATIVE_QUERY = MutableAnnotationDescriptor.create( NamedNativeQuery.class, NamedNativeQueryAnnotation.class, EnumSet.of( Kind.CLASS ), false, NAMED_NATIVE_QUERIES );
 
-	AnnotationDescriptor<Table> TABLE = new OrmAnnotationDescriptor<>( Table.class, TableAnnotation.class );
-	AnnotationDescriptor<SecondaryTables> SECONDARY_TABLES = new OrmAnnotationDescriptor<>( SecondaryTables.class, SecondaryTablesAnnotation.class );
-	AnnotationDescriptor<SecondaryTable> SECONDARY_TABLE = new OrmAnnotationDescriptor<>( SecondaryTable.class, SecondaryTableAnnotation.class, SECONDARY_TABLES );
-	AnnotationDescriptor<CollectionTable> COLLECTION_TABLE = new OrmAnnotationDescriptor<>( CollectionTable.class, CollectionTableAnnotation.class );
+	AnnotationDescriptor<Table> TABLE = MutableAnnotationDescriptor.create( Table.class, TableAnnotation.class, EnumSet.of( Kind.CLASS ), false );
+	AnnotationDescriptor<SecondaryTables> SECONDARY_TABLES = MutableAnnotationDescriptor.create( SecondaryTables.class, SecondaryTablesAnnotation.class, EnumSet.of( Kind.CLASS ), false );
+	AnnotationDescriptor<SecondaryTable> SECONDARY_TABLE = MutableAnnotationDescriptor.create( SecondaryTable.class, SecondaryTableAnnotation.class, EnumSet.of( Kind.CLASS ), false, SECONDARY_TABLES );
+	AnnotationDescriptor<CollectionTable> COLLECTION_TABLE = MutableAnnotationDescriptor.create( CollectionTable.class, CollectionTableAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
 
-	AnnotationDescriptor<Column> COLUMN = new OrmAnnotationDescriptor<>( Column.class, ColumnAnnotation.class );
+	AnnotationDescriptor<Column> COLUMN = MutableAnnotationDescriptor.create( Column.class, ColumnAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
 
-	AnnotationDescriptor<JoinColumns> JOIN_COLUMNS = new OrmAnnotationDescriptor<>( JoinColumns.class, JoinColumnsAnnotation.class );
-	AnnotationDescriptor<JoinColumn> JOIN_COLUMN = new OrmAnnotationDescriptor<>( JoinColumn.class, JoinColumnAnnotation.class, JOIN_COLUMNS );
+	AnnotationDescriptor<JoinColumns> JOIN_COLUMNS = MutableAnnotationDescriptor.create( JoinColumns.class, JoinColumnsAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
+	AnnotationDescriptor<JoinColumn> JOIN_COLUMN = MutableAnnotationDescriptor.create( JoinColumn.class, JoinColumnAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false, JOIN_COLUMNS );
 
-	AnnotationDescriptor<PrimaryKeyJoinColumns> PRIMARY_KEY_JOIN_COLUMNS = new OrmAnnotationDescriptor<>( PrimaryKeyJoinColumns.class, PrimaryKeyJoinColumnsJpaAnnotation.class );
-	AnnotationDescriptor<PrimaryKeyJoinColumn> PRIMARY_KEY_JOIN_COLUMN = new OrmAnnotationDescriptor<>( PrimaryKeyJoinColumn.class, PrimaryKeyJoinColumnJpaAnnotation.class, PRIMARY_KEY_JOIN_COLUMNS );
+	AnnotationDescriptor<PrimaryKeyJoinColumns> PRIMARY_KEY_JOIN_COLUMNS = MutableAnnotationDescriptor.create( PrimaryKeyJoinColumns.class, PrimaryKeyJoinColumnsJpaAnnotation.class, EnumSet.of( Kind.CLASS, Kind.METHOD, Kind.FIELD ), false );
+	AnnotationDescriptor<PrimaryKeyJoinColumn> PRIMARY_KEY_JOIN_COLUMN = MutableAnnotationDescriptor.create( PrimaryKeyJoinColumn.class, PrimaryKeyJoinColumnJpaAnnotation.class, EnumSet.of( Kind.CLASS, Kind.METHOD, Kind.FIELD ), false, PRIMARY_KEY_JOIN_COLUMNS );
 
-	AnnotationDescriptor<CheckConstraint> CHECK_CONSTRAINT = new OrmAnnotationDescriptor<>( CheckConstraint.class, CheckConstraintAnnotation.class );
-	AnnotationDescriptor<ForeignKey> FOREIGN_KEY = new OrmAnnotationDescriptor<>( ForeignKey.class, ForeignKeyAnnotation.class );
-	AnnotationDescriptor<UniqueConstraint> UNIQUE_CONSTRAINT = new OrmAnnotationDescriptor<>( UniqueConstraint.class, UniqueConstraintAnnotation.class );
-	AnnotationDescriptor<Index> INDEX = new OrmAnnotationDescriptor<>( Index.class, IndexAnnotation.class );
+	AnnotationDescriptor<CheckConstraint> CHECK_CONSTRAINT = MutableAnnotationDescriptor.create( CheckConstraint.class, CheckConstraintAnnotation.class, EnumSet.noneOf( Kind.class ), false );
+	AnnotationDescriptor<ForeignKey> FOREIGN_KEY = MutableAnnotationDescriptor.create( ForeignKey.class, ForeignKeyAnnotation.class, EnumSet.noneOf( Kind.class ), false );
+	AnnotationDescriptor<UniqueConstraint> UNIQUE_CONSTRAINT = MutableAnnotationDescriptor.create( UniqueConstraint.class, UniqueConstraintAnnotation.class, EnumSet.noneOf( Kind.class ), false );
+	AnnotationDescriptor<Index> INDEX = MutableAnnotationDescriptor.create( Index.class, IndexAnnotation.class, EnumSet.noneOf( Kind.class ), false );
 
-	AnnotationDescriptor<Cacheable> CACHEABLE = new OrmAnnotationDescriptor<>( Cacheable.class, CacheableAnnotation.class );
-	AnnotationDescriptor<Transient> TRANSIENT = new OrmAnnotationDescriptor<>( Transient.class, TransientAnnotation.class );
+	AnnotationDescriptor<Cacheable> CACHEABLE = MutableAnnotationDescriptor.create( Cacheable.class, CacheableAnnotation.class, EnumSet.of( Kind.CLASS ), false );
+	AnnotationDescriptor<Transient> TRANSIENT = MutableAnnotationDescriptor.create( Transient.class, TransientAnnotation.class, EnumSet.of( Kind.METHOD, Kind.FIELD ), false );
 
 //	AnnotationDescriptor<Access> ACCESS = createOrmDescriptor( Access.class );
 //	AnnotationDescriptor<AssociationOverrides> ASSOCIATION_OVERRIDES = createOrmDescriptor( AssociationOverrides.class );
