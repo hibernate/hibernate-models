@@ -5,6 +5,7 @@
 package org.hibernate.models.spi;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +20,8 @@ import org.hibernate.models.Incubating;
 import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.ModelsException;
 import org.hibernate.models.accessor.HibernateAccessorInstantiator;
+import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
+import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
 import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
@@ -470,6 +473,44 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 					e
 			);
 		}
+	}
+
+	/**
+	 * Creates a {@link HibernateAccessorMultiValueReader} for the given members using the accessor
+	 * factory from the associated {@link ModelsContext}.
+	 *
+	 * <p>Each member may be a field or a getter method. Values are read in the order
+	 * the members are specified.
+	 *
+	 * @param members the members to read from
+	 * @return a multi-value reader for the specified members
+	 */
+	@Incubating
+	default HibernateAccessorMultiValueReader createMultiValueReader(MemberDetails... members) {
+		final Member[] javaMembers = new Member[members.length];
+		for ( int i = 0; i < members.length; i++ ) {
+			javaMembers[i] = members[i].toJavaMember();
+		}
+		return getModelContext().getAccessorFactory().multiValueReader( javaMembers );
+	}
+
+	/**
+	 * Creates a {@link HibernateAccessorMultiValueWriter} for the given members using the accessor
+	 * factory from the associated {@link ModelsContext}.
+	 *
+	 * <p>Each member may be a field or a setter method. Values are written in the order
+	 * the members are specified.
+	 *
+	 * @param members the members to write to
+	 * @return a multi-value writer for the specified members
+	 */
+	@Incubating
+	default HibernateAccessorMultiValueWriter createMultiValueWriter(MemberDetails... members) {
+		final Member[] javaMembers = new Member[members.length];
+		for ( int i = 0; i < members.length; i++ ) {
+			javaMembers[i] = members[i].toJavaMember();
+		}
+		return getModelContext().getAccessorFactory().multiValueWriter( javaMembers );
 	}
 
 	/**
