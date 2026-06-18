@@ -10,6 +10,7 @@ import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
 import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
+import org.hibernate.models.accessor.spi.MemberValidation;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -41,6 +42,7 @@ public class HibernateAccessorAsmFactory implements HibernateAccessorFactory {
 
 	@Override
 	public HibernateAccessorValueReader<?> valueReader(Method method) {
+		MemberValidation.validateReaderMethod( method );
 		HibernateAccessorAsmClassAccessorInfo info = getOrCreate(method.getDeclaringClass());
 		return new HibernateAccessorAsmMethodValueReader<>(info.bulkAccessor(), info.methodIndex(method));
 	}
@@ -53,6 +55,7 @@ public class HibernateAccessorAsmFactory implements HibernateAccessorFactory {
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Method setter) {
+		MemberValidation.validateWriterMethod( setter );
 		HibernateAccessorAsmClassAccessorInfo info = getOrCreate(setter.getDeclaringClass());
 		return new HibernateAccessorAsmMethodValueWriter(info.bulkAccessor(), info.methodIndex(setter));
 	}
@@ -64,6 +67,7 @@ public class HibernateAccessorAsmFactory implements HibernateAccessorFactory {
 		HibernateAccessorAsmBulkAccessor accessor = null;
 		for ( int i = 0; i < members.length; i++ ) {
 			final Member member = members[i];
+			MemberValidation.validateReaderMember(member);
 			final HibernateAccessorAsmClassAccessorInfo info = getOrCreate( member.getDeclaringClass() );
 			if ( accessor == null ) {
 				accessor = info.bulkAccessor();
@@ -90,6 +94,7 @@ public class HibernateAccessorAsmFactory implements HibernateAccessorFactory {
 		HibernateAccessorAsmBulkAccessor accessor = null;
 		for ( int i = 0; i < members.length; i++ ) {
 			final Member member = members[i];
+			MemberValidation.validateWriterMember(member);
 			final HibernateAccessorAsmClassAccessorInfo info = getOrCreate( member.getDeclaringClass() );
 			if ( accessor == null ) {
 				accessor = info.bulkAccessor();
