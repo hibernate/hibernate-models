@@ -10,6 +10,7 @@ import org.hibernate.models.accessor.reflection.impl.HibernateAccessorReflection
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 /**
@@ -90,4 +91,30 @@ public interface HibernateAccessorFactory {
 	 * @throws HibernateAccessorException if the accessor cannot be created
 	 */
 	HibernateAccessorValueWriter valueWriter(Method setter);
+
+	/**
+	 * Creates a multi-value reader for the given members.
+	 *
+	 * <p>Each member may be a {@link Field} or a getter {@link Method}.
+	 * The returned reader reads all values in the order the members are specified.
+	 *
+	 * @param members the fields and/or getter methods to read from
+	 * @return a multi-value reader that reads all specified members from an object instance
+	 * @throws HibernateAccessorException if any accessor cannot be created
+	 * @throws IllegalArgumentException if a member is not a Field or Method
+	 */
+	HibernateAccessorMultiValueReader multiValueReader(Member... members);
+
+	/**
+	 * Creates a multi-value writer for the given members.
+	 *
+	 * <p>Each member may be a {@link Field} or a setter {@link Method}.
+	 * The returned writer writes all values in the order the members are specified.
+	 *
+	 * @param members the fields and/or setter methods to write to
+	 * @return a multi-value writer that writes all specified members on an object instance
+	 * @throws HibernateAccessorException if any accessor cannot be created
+	 * @throws IllegalArgumentException if a member is not a Field or Method
+	 */
+	HibernateAccessorMultiValueWriter multiValueWriter(Member... members);
 }

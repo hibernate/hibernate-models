@@ -6,6 +6,8 @@ package org.hibernate.models.accessor.lambda.impl;
 
 import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.accessor.HibernateAccessorInstantiator;
+import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
+import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.accessor.logging.impl.CoreLog;
@@ -17,6 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory {
@@ -101,5 +104,41 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 			}
 			throw CoreLog.INSTANCE.errorCreatingHandle(setter, t, t.getMessage());
 		}
+	}
+
+	@Override
+	public HibernateAccessorMultiValueReader multiValueReader(Member... members) {
+		final HibernateAccessorValueReader<?>[] readers = new HibernateAccessorValueReader<?>[members.length];
+		for ( int i = 0; i < members.length; i++ ) {
+			final Member member = members[i];
+			if ( member instanceof Field field ) {
+				readers[i] = valueReader( field );
+			}
+			else if ( member instanceof Method method ) {
+				readers[i] = valueReader( method );
+			}
+			else {
+				throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
+			}
+		}
+		return new LambdaMultiValueReader( readers );
+	}
+
+	@Override
+	public HibernateAccessorMultiValueWriter multiValueWriter(Member... members) {
+		final HibernateAccessorValueWriter[] writers = new HibernateAccessorValueWriter[members.length];
+		for ( int i = 0; i < members.length; i++ ) {
+			final Member member = members[i];
+			if ( member instanceof Field field ) {
+				writers[i] = valueWriter( field );
+			}
+			else if ( member instanceof Method method ) {
+				writers[i] = valueWriter( method );
+			}
+			else {
+				throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
+			}
+		}
+		return new LambdaMultiValueWriter( writers );
 	}
 }
