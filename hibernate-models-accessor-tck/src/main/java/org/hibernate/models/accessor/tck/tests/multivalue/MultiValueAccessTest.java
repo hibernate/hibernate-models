@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("Multi-value accessor access with mixed fields and methods")
@@ -47,7 +48,7 @@ public class MultiValueAccessTest {
 		longField.setAccessible( true );
 		doubleField.setAccessible( true );
 
-		HibernateAccessorMultiValueReader reader = factory.multiValueReader( intField, longField, doubleField );
+		HibernateAccessorMultiValueReader reader = factory.multiValueReader( PrimitiveFieldBean.class, intField, longField, doubleField );
 		Object[] values = reader.get( bean );
 
 		assertEquals( 3, values.length );
@@ -66,7 +67,7 @@ public class MultiValueAccessTest {
 		intField.setAccessible( true );
 		longField.setAccessible( true );
 
-		HibernateAccessorMultiValueWriter writer = factory.multiValueWriter( intField, longField );
+		HibernateAccessorMultiValueWriter writer = factory.multiValueWriter( PrimitiveFieldBean.class, intField, longField );
 		writer.set( bean, new Object[]{ 99, 200L } );
 
 		assertEquals( 99, bean.getIntField() );
@@ -87,7 +88,7 @@ public class MultiValueAccessTest {
 		Field booleanField = PrimitiveFieldBean.class.getDeclaredField( "booleanField" );
 		booleanField.setAccessible( true );
 
-		HibernateAccessorMultiValueReader reader = factory.multiValueReader( intField, getLong, booleanField );
+		HibernateAccessorMultiValueReader reader = factory.multiValueReader( PrimitiveFieldBean.class, intField, getLong, booleanField );
 		Object[] values = reader.get( bean );
 
 		assertEquals( 3, values.length );
@@ -107,12 +108,24 @@ public class MultiValueAccessTest {
 		Field booleanField = PrimitiveFieldBean.class.getDeclaredField( "booleanField" );
 		booleanField.setAccessible( true );
 
-		HibernateAccessorMultiValueWriter writer = factory.multiValueWriter( intField, setLong, booleanField );
+		HibernateAccessorMultiValueWriter writer = factory.multiValueWriter( PrimitiveFieldBean.class, intField, setLong, booleanField );
 		writer.set( bean, new Object[]{ 55, 77L, true } );
 
 		assertEquals( 55, bean.getIntField() );
 		assertEquals( 77L, bean.getLongField() );
 		assertEquals( true, bean.isBooleanField() );
+	}
+
+	@Test
+	@DisplayName("multiValueReader with empty members throws IllegalArgumentException")
+	void testEmptyMembersReaderThrows() {
+		assertThrows( IllegalArgumentException.class, () -> factory.multiValueReader( PrimitiveFieldBean.class ) );
+	}
+
+	@Test
+	@DisplayName("multiValueWriter with empty members throws IllegalArgumentException")
+	void testEmptyMembersWriterThrows() {
+		assertThrows( IllegalArgumentException.class, () -> factory.multiValueWriter( PrimitiveFieldBean.class ) );
 	}
 
 	@Test
@@ -130,8 +143,8 @@ public class MultiValueAccessTest {
 		Member[] writeMembers = { intField, setDouble, charField };
 		Member[] readMembers = { intField, getDouble, charField };
 
-		HibernateAccessorMultiValueWriter writer = factory.multiValueWriter( writeMembers );
-		HibernateAccessorMultiValueReader reader = factory.multiValueReader( readMembers );
+		HibernateAccessorMultiValueWriter writer = factory.multiValueWriter( PrimitiveFieldBean.class, writeMembers );
+		HibernateAccessorMultiValueReader reader = factory.multiValueReader( PrimitiveFieldBean.class, readMembers );
 
 		Object[] input = { 123, 9.81, 'X' };
 		writer.set( bean, input );

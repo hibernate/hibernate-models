@@ -98,12 +98,15 @@ public interface HibernateAccessorFactory {
 	 * <p>Each member may be a {@link Field} or a getter {@link Method}.
 	 * The returned reader reads all values in the order the members are specified.
 	 *
+	 * @param declaringClass the concrete class whose instances will be read;
+	 *                       each member must be declared on this class or one of its supertypes
 	 * @param members the fields and/or getter methods to read from
 	 * @return a multi-value reader that reads all specified members from an object instance
 	 * @throws HibernateAccessorException if any accessor cannot be created
-	 * @throws IllegalArgumentException if a member is not a Field or Method
+	 * @throws IllegalArgumentException if a member is not a Field or Method, or is not
+	 *         declared on {@code declaringClass} or one of its supertypes
 	 */
-	HibernateAccessorMultiValueReader multiValueReader(Member... members);
+	HibernateAccessorMultiValueReader multiValueReader(Class<?> declaringClass, Member... members);
 
 	/**
 	 * Creates a multi-value writer for the given members.
@@ -111,10 +114,13 @@ public interface HibernateAccessorFactory {
 	 * <p>Each member may be a {@link Field} or a setter {@link Method}.
 	 * The returned writer writes all values in the order the members are specified.
 	 *
+	 * @param declaringClass the concrete class whose instances will be written;
+	 *                       each member must be declared on this class or one of its supertypes
 	 * @param members the fields and/or setter methods to write to
 	 * @return a multi-value writer that writes all specified members on an object instance
 	 * @throws HibernateAccessorException if any accessor cannot be created
-	 * @throws IllegalArgumentException if a member is not a Field or Method
+	 * @throws IllegalArgumentException if a member is not a Field or Method, or is not
+	 *         declared on {@code declaringClass} or one of its supertypes
 	 */
-	HibernateAccessorMultiValueWriter multiValueWriter(Member... members);
+	HibernateAccessorMultiValueWriter multiValueWriter(Class<?> declaringClass, Member... members);
 }

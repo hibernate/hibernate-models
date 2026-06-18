@@ -46,13 +46,13 @@ public class MemberValidationTest {
 	@DisplayName("multiValueReader rejects a setter method in mixed members")
 	void testMultiReaderRejectsSetter() throws Exception {
 		Method setter = PrimitiveFieldBean.class.getDeclaredMethod( "setIntField", int.class );
-		assertThrows( HibernateAccessorException.class, () -> factory.multiValueReader( setter ) );
+		assertThrows( HibernateAccessorException.class, () -> factory.multiValueReader( PrimitiveFieldBean.class, setter ) );
 	}
 
 	@Test
 	@DisplayName("multiValueWriter rejects a getter method in mixed members")
 	void testMultiWriterRejectsGetter() throws Exception {
 		Method getter = PrimitiveFieldBean.class.getDeclaredMethod( "getIntField" );
-		assertThrows( HibernateAccessorException.class, () -> factory.multiValueWriter( getter ) );
+		assertThrows( HibernateAccessorException.class, () -> factory.multiValueWriter( PrimitiveFieldBean.class, getter ) );
 	}
 }

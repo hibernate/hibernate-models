@@ -12,7 +12,7 @@ package org.hibernate.models.accessor;
  * to create this writer, in the same order they were specified.
  *
  * <p>Obtain an instance via
- * {@link HibernateAccessorFactory#multiValueWriter(java.lang.reflect.Member...)}.
+ * {@link HibernateAccessorFactory#multiValueWriter(Class, java.lang.reflect.Member...)}.
  */
 public interface HibernateAccessorMultiValueWriter {
 
