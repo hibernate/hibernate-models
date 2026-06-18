@@ -7,12 +7,15 @@ package org.hibernate.models.accessor.tck.tests.validation;
 import org.hibernate.models.accessor.HibernateAccessorException;
 import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.accessor.tck.tests.beans.PrimitiveFieldBean;
+import org.hibernate.models.accessor.tck.tests.beans.inheritance.ChildBean;
+import org.hibernate.models.accessor.tck.tests.beans.inheritance.ParentBean;
 import org.hibernate.models.accessor.tck.util.TckHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -54,5 +57,25 @@ public class MemberValidationTest {
 	void testMultiWriterRejectsGetter() throws Exception {
 		Method getter = PrimitiveFieldBean.class.getDeclaredMethod( "getIntField" );
 		assertThrows( HibernateAccessorException.class, () -> factory.multiValueWriter( PrimitiveFieldBean.class, getter ) );
+	}
+
+	@Test
+	@DisplayName("multiValueReader rejects member from unrelated class")
+	void testMultiReaderRejectsUnrelatedMember() throws Exception {
+		Field childField = ChildBean.class.getDeclaredField( "childField" );
+		childField.setAccessible( true );
+		Field intField = PrimitiveFieldBean.class.getDeclaredField( "intField" );
+		intField.setAccessible( true );
+		assertThrows( IllegalArgumentException.class,
+				() -> factory.multiValueReader( ChildBean.class, childField, intField ) );
+	}
+
+	@Test
+	@DisplayName("multiValueReader rejects child member when declaring class is parent")
+	void testMultiReaderRejectsChildMemberForParentClass() throws Exception {
+		Field childField = ChildBean.class.getDeclaredField( "childField" );
+		childField.setAccessible( true );
+		assertThrows( IllegalArgumentException.class,
+				() -> factory.multiValueReader( ParentBean.class, childField ) );
 	}
 }
