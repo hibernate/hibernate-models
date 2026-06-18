@@ -87,4 +87,20 @@ public final class MemberValidation {
 		}
 		throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
 	}
+
+	/**
+	 * Validates that the given member is declared on the concrete class or one of its supertypes.
+	 *
+	 * @param declaringClass the concrete class whose instances will be accessed
+	 * @param member the member to validate
+	 * @throws IllegalArgumentException if the member is not declared on the class or any of its supertypes
+	 */
+	public static void validateMemberDeclaringType(Class<?> declaringClass, Member member) {
+		if ( !member.getDeclaringClass().isAssignableFrom( declaringClass ) ) {
+			throw new IllegalArgumentException(
+					"Member '" + member.getName() + "' is declared on " + member.getDeclaringClass().getName()
+							+ " which is not a supertype of " + declaringClass.getName()
+			);
+		}
+	}
 }

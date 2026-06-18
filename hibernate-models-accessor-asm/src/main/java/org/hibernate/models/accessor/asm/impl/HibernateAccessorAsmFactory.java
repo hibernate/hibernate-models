@@ -62,8 +62,9 @@ public class HibernateAccessorAsmFactory implements HibernateAccessorFactory {
 
 	@Override
 	public HibernateAccessorMultiValueReader multiValueReader(Class<?> declaringClass, Member... members) {
-		for (Member member : members) {
-			MemberValidation.validateReaderMember(member);
+		for ( Member member : members ) {
+			MemberValidation.validateMemberDeclaringType( declaringClass, member );
+			MemberValidation.validateReaderMember( member );
 		}
 		if (allSameDeclaringClass(declaringClass, members)) {
 			return generateDirectReader(members);
@@ -73,8 +74,9 @@ public class HibernateAccessorAsmFactory implements HibernateAccessorFactory {
 
 	@Override
 	public HibernateAccessorMultiValueWriter multiValueWriter(Class<?> declaringClass, Member... members) {
-		for (Member member : members) {
-			MemberValidation.validateWriterMember(member);
+		for ( Member member : members ) {
+			MemberValidation.validateMemberDeclaringType( declaringClass, member );
+			MemberValidation.validateWriterMember( member );
 		}
 		if (allSameDeclaringClass(declaringClass, members)) {
 			return generateDirectWriter(members);

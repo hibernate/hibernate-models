@@ -114,6 +114,7 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 		final HibernateAccessorValueReader<?>[] readers = new HibernateAccessorValueReader<?>[members.length];
 		for ( int i = 0; i < members.length; i++ ) {
 			final Member member = members[i];
+			MemberValidation.validateMemberDeclaringType( declaringClass, member );
 			MemberValidation.validateReaderMember(member);
 			if ( member instanceof Field field ) {
 				readers[i] = valueReader( field );
@@ -133,6 +134,7 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 		final HibernateAccessorValueWriter[] writers = new HibernateAccessorValueWriter[members.length];
 		for ( int i = 0; i < members.length; i++ ) {
 			final Member member = members[i];
+			MemberValidation.validateMemberDeclaringType( declaringClass, member );
 			MemberValidation.validateWriterMember( member );
 			if ( member instanceof Field field ) {
 				writers[i] = valueWriter( field );
