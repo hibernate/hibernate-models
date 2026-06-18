@@ -6,12 +6,15 @@ package org.hibernate.models.accessor.asm.impl;
 
 import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.accessor.HibernateAccessorInstantiator;
+import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
+import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,6 +55,58 @@ public class HibernateAccessorAsmFactory implements HibernateAccessorFactory {
 	public HibernateAccessorValueWriter valueWriter(Method setter) {
 		HibernateAccessorAsmClassAccessorInfo info = getOrCreate(setter.getDeclaringClass());
 		return new HibernateAccessorAsmMethodValueWriter(info.bulkAccessor(), info.methodIndex(setter));
+	}
+
+	@Override
+	public HibernateAccessorMultiValueReader multiValueReader(Member... members) {
+		final boolean[] isField = new boolean[members.length];
+		final int[] indices = new int[members.length];
+		HibernateAccessorAsmBulkAccessor accessor = null;
+		for ( int i = 0; i < members.length; i++ ) {
+			final Member member = members[i];
+			final HibernateAccessorAsmClassAccessorInfo info = getOrCreate( member.getDeclaringClass() );
+			if ( accessor == null ) {
+				accessor = info.bulkAccessor();
+			}
+			if ( member instanceof Field field ) {
+				isField[i] = true;
+				indices[i] = info.fieldIndex( field );
+			}
+			else if ( member instanceof Method method ) {
+				isField[i] = false;
+				indices[i] = info.methodIndex( method );
+			}
+			else {
+				throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
+			}
+		}
+		return new HibernateAccessorAsmMultiValueReader( accessor, isField, indices );
+	}
+
+	@Override
+	public HibernateAccessorMultiValueWriter multiValueWriter(Member... members) {
+		final boolean[] isField = new boolean[members.length];
+		final int[] indices = new int[members.length];
+		HibernateAccessorAsmBulkAccessor accessor = null;
+		for ( int i = 0; i < members.length; i++ ) {
+			final Member member = members[i];
+			final HibernateAccessorAsmClassAccessorInfo info = getOrCreate( member.getDeclaringClass() );
+			if ( accessor == null ) {
+				accessor = info.bulkAccessor();
+			}
+			if ( member instanceof Field field ) {
+				isField[i] = true;
+				indices[i] = info.fieldIndex( field );
+			}
+			else if ( member instanceof Method method ) {
+				isField[i] = false;
+				indices[i] = info.methodIndex( method );
+			}
+			else {
+				throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
+			}
+		}
+		return new HibernateAccessorAsmMultiValueWriter( accessor, isField, indices );
 	}
 
 	private HibernateAccessorAsmClassAccessorInfo getOrCreate(Class<?> declaringClass) {
