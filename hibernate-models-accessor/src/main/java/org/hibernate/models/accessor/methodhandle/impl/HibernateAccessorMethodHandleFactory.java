@@ -10,6 +10,7 @@ import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
 import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
+import org.hibernate.models.accessor.spi.MemberValidation;
 import org.hibernate.models.accessor.logging.impl.CoreLog;
 
 import java.lang.invoke.MethodHandles;
@@ -50,6 +51,7 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 
 	@Override
 	public HibernateAccessorValueReader<?> valueReader(Method method) {
+		MemberValidation.validateReaderMethod( method );
 		try {
 			return new HibernateAccessorMethodHandleMethodValueReader<>(
 					privateLookup(method.getDeclaringClass()).unreflect(method));
@@ -72,6 +74,7 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Method setter) {
+		MemberValidation.validateWriterMethod( setter );
 		try {
 			return new HibernateAccessorMethodHandleMethodValueWriter(
 					privateLookup(setter.getDeclaringClass()).unreflect(setter));
@@ -86,6 +89,7 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 		final HibernateAccessorValueReader<?>[] readers = new HibernateAccessorValueReader<?>[members.length];
 		for ( int i = 0; i < members.length; i++ ) {
 			final Member member = members[i];
+			MemberValidation.validateReaderMember( member );
 			if ( member instanceof Field field ) {
 				readers[i] = valueReader( field );
 			}
@@ -104,6 +108,7 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 		final HibernateAccessorValueWriter[] writers = new HibernateAccessorValueWriter[members.length];
 		for ( int i = 0; i < members.length; i++ ) {
 			final Member member = members[i];
+			MemberValidation.validateWriterMember( member );
 			if ( member instanceof Field field ) {
 				writers[i] = valueWriter( field );
 			}
