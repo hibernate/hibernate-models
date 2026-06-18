@@ -4,38 +4,18 @@
  */
 package org.hibernate.models.accessor.asm.impl;
 
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Map;
+
+import static org.hibernate.models.accessor.asm.impl.HibernateAccessorAsmUtils.*;
 
 final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 
 	private static final String BULK_ACCESSOR_INTERNAL = Type.getInternalName(HibernateAccessorAsmBulkAccessor.class);
 	private static final String EXCEPTION_INTERNAL = "org/hibernate/models/accessor/HibernateAccessorException";
-
-	private static final Map<Class<?>, BoxingInfo> BOXING = Map.of(
-			boolean.class, new BoxingInfo("java/lang/Boolean", "Z", "booleanValue", "()Z"),
-			byte.class, new BoxingInfo("java/lang/Byte", "B", "byteValue", "()B"),
-			char.class, new BoxingInfo("java/lang/Character", "C", "charValue", "()C"),
-			short.class, new BoxingInfo("java/lang/Short", "S", "shortValue", "()S"),
-			int.class, new BoxingInfo("java/lang/Integer", "I", "intValue", "()I"),
-			long.class, new BoxingInfo("java/lang/Long", "J", "longValue", "()J"),
-			float.class, new BoxingInfo("java/lang/Float", "F", "floatValue", "()F"),
-			double.class, new BoxingInfo("java/lang/Double", "D", "doubleValue", "()D")
-	);
-
-	private record BoxingInfo(String wrapperInternal, String primitiveDesc, String unboxMethod, String unboxDesc) {
-		String valueOfDesc() {
-			return "(" + primitiveDesc + ")L" + wrapperInternal + ";";
-		}
-	}
 
 	static byte[] generate(Class<?> targetClass, Field[] fields, Method[] methods, Constructor<?>[] constructors) {
 		String targetInternal = Type.getInternalName(targetClass);
@@ -270,38 +250,6 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 		mv.visitEnd();
 	}
 
-	private static void emitBox(MethodVisitor mv, Class<?> type) {
-		BoxingInfo info = BOXING.get(type);
-		if (info != null) {
-			mv.visitMethodInsn(INVOKESTATIC, info.wrapperInternal, "valueOf", info.valueOfDesc(), false);
-		}
-	}
-
-	private static void emitUnboxOrCast(MethodVisitor mv, Class<?> type) {
-		BoxingInfo info = BOXING.get(type);
-		if (info != null) {
-			mv.visitTypeInsn(CHECKCAST, info.wrapperInternal);
-			mv.visitMethodInsn(INVOKEVIRTUAL, info.wrapperInternal, info.unboxMethod, info.unboxDesc, false);
-		}
-		else {
-			mv.visitTypeInsn(CHECKCAST, Type.getInternalName(type));
-		}
-	}
-
-	private static void emitIntConstant(MethodVisitor mv, int value) {
-		if (value >= -1 && value <= 5) {
-			mv.visitInsn(ICONST_0 + value);
-		}
-		else if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE) {
-			mv.visitIntInsn(BIPUSH, value);
-		}
-		else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE) {
-			mv.visitIntInsn(SIPUSH, value);
-		}
-		else {
-			mv.visitLdcInsn(value);
-		}
-	}
 
 	private static void emitThrow(MethodVisitor mv, String message) {
 		mv.visitTypeInsn(NEW, EXCEPTION_INTERNAL);

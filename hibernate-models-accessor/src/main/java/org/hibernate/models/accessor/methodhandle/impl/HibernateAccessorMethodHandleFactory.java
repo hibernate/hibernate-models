@@ -85,7 +85,7 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 	}
 
 	@Override
-	public HibernateAccessorMultiValueReader multiValueReader(Member... members) {
+	public HibernateAccessorMultiValueReader multiValueReader(Class<?> declaringClass, Member... members) {
 		final HibernateAccessorValueReader<?>[] readers = new HibernateAccessorValueReader<?>[members.length];
 		for ( int i = 0; i < members.length; i++ ) {
 			final Member member = members[i];
@@ -104,7 +104,7 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 	}
 
 	@Override
-	public HibernateAccessorMultiValueWriter multiValueWriter(Member... members) {
+	public HibernateAccessorMultiValueWriter multiValueWriter(Class<?> declaringClass, Member... members) {
 		final HibernateAccessorValueWriter[] writers = new HibernateAccessorValueWriter[members.length];
 		for ( int i = 0; i < members.length; i++ ) {
 			final Member member = members[i];
