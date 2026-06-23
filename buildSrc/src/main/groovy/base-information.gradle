@@ -28,10 +28,10 @@ private static String extractVersionFileVersion(File versionFile) {
 }
 
 private String determineVersion(String type, String versionFileVersion) {
-	if ( project.hasProperty( type ) ) {
-		// only use the provided value if it is non-empty
-		def incomingValue = project.property( type ) as String
-		if ( incomingValue != null && incomingValue.trim().length() > 0 ) {
+	def provider = providers.gradleProperty( type )
+	if ( provider.isPresent() ) {
+		def incomingValue = provider.get().trim()
+		if ( !incomingValue.isEmpty() ) {
 			return incomingValue
 		}
 	}
