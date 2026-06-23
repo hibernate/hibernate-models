@@ -26,8 +26,8 @@ junitPlatform5= "6.1.0"
 log4j = "2.26.0"
 
 # plugins
-spotless="8.6.0"
-develocity="4.4.2"
+spotless="8.7.0"
+develocity="4.4.3"
 checkerframework="1.0.2"
 taskTree="4.0.1"
 
