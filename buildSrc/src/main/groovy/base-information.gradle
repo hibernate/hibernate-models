@@ -7,33 +7,16 @@ group = "org.hibernate.models"
 
 def versionFile = rootProject.file( "version.txt" )
 def versionFileVersion = extractVersionFileVersion(versionFile)
-def releaseVersion = determineVersion("releaseVersion", versionFileVersion)
-def developmentVersion = determineVersion("developmentVersion", versionFileVersion)
 
-project.version = releaseVersion != null
-		? releaseVersion
-		: developmentVersion
+project.version = versionFileVersion
 
 ext.versionFile = versionFile
-ext.releaseVersion = releaseVersion
-ext.developmentVersion = developmentVersion
 
 
 private static String extractVersionFileVersion(File versionFile) {
 	def versionFileVersion = versionFile.text.trim()
 	if ( versionFileVersion.length() <= 0 ) {
 		throw new RuntimeException("Project version unknown")
-	}
-	return versionFileVersion
-}
-
-private String determineVersion(String type, String versionFileVersion) {
-	def provider = providers.gradleProperty( type )
-	if ( provider.isPresent() ) {
-		def incomingValue = provider.get().trim()
-		if ( !incomingValue.isEmpty() ) {
-			return incomingValue
-		}
 	}
 	return versionFileVersion
 }
