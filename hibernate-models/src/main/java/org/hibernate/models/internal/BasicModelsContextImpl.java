@@ -7,6 +7,7 @@ package org.hibernate.models.internal;
 import java.util.Map;
 
 import org.hibernate.models.Settings;
+import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.serial.internal.StorableContextImpl;
 import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.ClassLoading;
@@ -28,7 +29,15 @@ public class BasicModelsContextImpl extends AbstractModelsContext {
 			ClassLoading classLoadingAccess,
 			boolean trackImplementors,
 			RegistryPrimer registryPrimer) {
-		super( classLoadingAccess );
+		this( classLoadingAccess, HibernateAccessorFactory.reflection(), trackImplementors, registryPrimer );
+	}
+
+	public BasicModelsContextImpl(
+			ClassLoading classLoadingAccess,
+			HibernateAccessorFactory accessorFactory,
+			boolean trackImplementors,
+			RegistryPrimer registryPrimer) {
+		super( classLoadingAccess, accessorFactory );
 
 		this.descriptorRegistry = new AnnotationDescriptorRegistryStandard( this );
 		this.classDetailsRegistry = new ClassDetailsRegistryStandard( trackImplementors, this );

@@ -6,6 +6,7 @@ package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
 
+import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
@@ -19,9 +20,15 @@ import org.hibernate.models.spi.RegistryPrimer;
  */
 public abstract class AbstractModelsContext implements ModelsContext {
 	private final ClassLoading classLoadingAccess;
+	private final HibernateAccessorFactory accessorFactory;
 
 	public AbstractModelsContext(ClassLoading classLoadingAccess) {
+		this( classLoadingAccess, HibernateAccessorFactory.reflection() );
+	}
+
+	public AbstractModelsContext(ClassLoading classLoadingAccess, HibernateAccessorFactory accessorFactory) {
 		this.classLoadingAccess = classLoadingAccess;
+		this.accessorFactory = accessorFactory;
 	}
 
 	@Override
@@ -33,6 +40,11 @@ public abstract class AbstractModelsContext implements ModelsContext {
 	@Override
 	public ClassLoading getClassLoading() {
 		return classLoadingAccess;
+	}
+
+	@Override
+	public HibernateAccessorFactory getAccessorFactory() {
+		return accessorFactory;
 	}
 
 	protected void primeRegistries(RegistryPrimer registryPrimer) {

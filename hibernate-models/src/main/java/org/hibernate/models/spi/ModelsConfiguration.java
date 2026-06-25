@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.models.Settings;
+import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.internal.ModelsLogging;
 import org.hibernate.models.internal.SimpleClassLoading;
@@ -25,6 +26,8 @@ public class ModelsConfiguration {
 
 	private ClassLoading classLoading = SimpleClassLoading.SIMPLE_CLASS_LOADING;
 	private RegistryPrimer registryPrimer;
+
+	private HibernateAccessorFactory accessorFactory = HibernateAccessorFactory.reflection();
 
 	private ModelsContextProvider explicitContextProvider;
 
@@ -110,12 +113,31 @@ public class ModelsConfiguration {
 	}
 
 	/**
+	 * The {@linkplain HibernateAccessorFactory} to use for creating field/method
+	 * readers, writers, and class instantiators.
+	 *
+	 * @apiNote Defaults to a reflection-based factory.
+	 */
+	public HibernateAccessorFactory getAccessorFactory() {
+		return accessorFactory;
+	}
+
+	/**
+	 * Specify a specific {@linkplain #getAccessorFactory() HibernateAccessorFactory} to use.
+	 */
+	public ModelsConfiguration setAccessorFactory(HibernateAccessorFactory accessorFactory) {
+		this.accessorFactory = accessorFactory;
+		return this;
+	}
+
+	/**
 	 * Build the {@linkplain ModelsContext} instance.
 	 */
 	public ModelsContext bootstrap() {
 		if ( explicitContextProvider != null ) {
 			final ModelsContext context = explicitContextProvider.produceContext(
 					classLoading,
+					accessorFactory,
 					registryPrimer,
 					configValues
 			);
@@ -132,6 +154,7 @@ public class ModelsConfiguration {
 		for ( ModelsContextProvider provider : discoveredProviders ) {
 			final ModelsContext context = provider.produceContext(
 					classLoading,
+					accessorFactory,
 					registryPrimer,
 					configValues
 			);
@@ -140,7 +163,7 @@ public class ModelsConfiguration {
 			}
 		}
 
-		return new BasicModelsContextImpl( classLoading, shouldTrackImplementors(), registryPrimer );
+		return new BasicModelsContextImpl( classLoading, accessorFactory, shouldTrackImplementors(), registryPrimer );
 	}
 
 	private boolean shouldTrackImplementors() {

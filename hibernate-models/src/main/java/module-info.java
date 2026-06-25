@@ -1,5 +1,6 @@
 module org.hibernate.models {
 	requires org.jboss.logging;
+	requires transitive org.hibernate.models.accessor;
 
 	exports org.hibernate.models;
 	exports org.hibernate.models.rendering;
