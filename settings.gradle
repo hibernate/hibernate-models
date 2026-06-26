@@ -98,3 +98,6 @@ project(':hibernate-models-accessor-tck-asm').projectDir = file('hibernate-model
 
 include 'hibernate-models-accessor-generator'
 project(':hibernate-models-accessor-generator').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-generator')
+
+include 'hibernate-models-accessor-tck-generator'
+project(':hibernate-models-accessor-tck-generator').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-generator')

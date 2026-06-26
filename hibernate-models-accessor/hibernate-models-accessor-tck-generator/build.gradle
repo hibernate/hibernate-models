@@ -1,0 +1,35 @@
+plugins {
+    id "testing"
+}
+
+description = "TCK runner for build-time generator accessor implementation"
+
+dependencies {
+    testImplementation project( ":hibernate-models-accessor-tck" )
+    testImplementation project( ":hibernate-models-accessor-generator" )
+    testImplementation libs.asm
+    testImplementation libs.test.junitPlatformSuiteEngine
+}
+
+def generatedClassesDir = layout.buildDirectory.dir( "generated-test-classes" )
+
+// Build-time accessor generation task
+tasks.register( "generateAccessors", JavaExec ) {
+    dependsOn compileTestJava
+
+    classpath = sourceSets.test.compileClasspath + files( sourceSets.test.java.classesDirectory )
+    mainClass = "org.hibernate.models.accessor.tck.generator.GenerateAccessorClasses"
+    args generatedClassesDir.get().asFile.absolutePath
+
+    outputs.dir generatedClassesDir
+
+    doFirst {
+        generatedClassesDir.get().asFile.mkdirs()
+    }
+}
+
+tasks.named( "test" ) {
+    dependsOn "generateAccessors"
+    // Place generated/transformed classes BEFORE TCK classes on classpath
+    classpath = files( generatedClassesDir ) + classpath
+}
