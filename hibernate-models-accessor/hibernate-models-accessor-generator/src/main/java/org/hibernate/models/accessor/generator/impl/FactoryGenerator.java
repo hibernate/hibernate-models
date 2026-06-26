@@ -72,19 +72,21 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 		generateReadResolve( cw );
 
 		generateValueAccessor( cw, "valueReader", "java/lang/reflect/Field", "getName",
-				METHOD_NAME_FIELD_READER_ACCESSOR, READER_INTERFACE_INTERNAL, fieldReaderClasses );
+				METHOD_NAME_FIELD_READER_ACCESSOR, READER_INTERFACE_INTERNAL, fieldReaderClasses, null );
 		generateValueAccessor( cw, "valueReader", "java/lang/reflect/Method", "getName",
-				METHOD_NAME_METHOD_READER_ACCESSOR, READER_INTERFACE_INTERNAL, methodReaderClasses );
+				METHOD_NAME_METHOD_READER_ACCESSOR, READER_INTERFACE_INTERNAL, methodReaderClasses,
+				"validateReaderMethod" );
 		generateValueAccessor( cw, "valueWriter", "java/lang/reflect/Field", "getName",
-				METHOD_NAME_FIELD_WRITER_ACCESSOR, WRITER_INTERFACE_INTERNAL, fieldWriterClasses );
+				METHOD_NAME_FIELD_WRITER_ACCESSOR, WRITER_INTERFACE_INTERNAL, fieldWriterClasses, null );
 		generateValueAccessor( cw, "valueWriter", "java/lang/reflect/Method", "getName",
-				METHOD_NAME_METHOD_WRITER_ACCESSOR, WRITER_INTERFACE_INTERNAL, methodWriterClasses );
+				METHOD_NAME_METHOD_WRITER_ACCESSOR, WRITER_INTERFACE_INTERNAL, methodWriterClasses,
+				"validateWriterMethod" );
 		generateInstantiatorMethod( cw );
 
-		generateMultiValueStub( cw, "multiValueReader",
-				"org.hibernate.models.accessor.HibernateAccessorMultiValueReader" );
-		generateMultiValueStub( cw, "multiValueWriter",
-				"org.hibernate.models.accessor.HibernateAccessorMultiValueWriter" );
+		generateMultiValueMethod( cw, "multiValueReader", MULTI_VALUE_READER_INTERNAL,
+				"createMultiValueReader" );
+		generateMultiValueMethod( cw, "multiValueWriter", MULTI_VALUE_WRITER_INTERNAL,
+				"createMultiValueWriter" );
 
 		cw.visitEnd();
 		return cw.toByteArray();
@@ -114,16 +116,25 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 		mv.visitEnd();
 	}
 
+	private static final String MEMBER_VALIDATION_INTERNAL = GenerationUtil.fqcnToName(
+			"org.hibernate.models.accessor.spi.MemberValidation" );
+
 	private void generateValueAccessor(ClassWriter cw, String factoryMethodName,
 			String reflectType, String memberNameMethod,
 			String hostMethodName, String returnInterface,
-			Set<String> classes) {
+			Set<String> classes, String validationMethod) {
 		String returnDesc = "L" + returnInterface + ";";
 		String hostMethodDesc = "(Ljava/lang/String;)" + returnDesc;
 
 		MethodVisitor mv = cw.visitMethod( ACC_PUBLIC, factoryMethodName,
 				"(L" + reflectType + ";)L" + returnInterface + ";", null, null );
 		mv.visitCode();
+
+		if ( validationMethod != null ) {
+			mv.visitVarInsn( ALOAD, 1 );
+			mv.visitMethodInsn( INVOKESTATIC, MEMBER_VALIDATION_INTERNAL, validationMethod,
+					"(L" + reflectType + ";)V", false );
+		}
 
 		mv.visitVarInsn( ALOAD, 1 );
 		mv.visitMethodInsn( INVOKEVIRTUAL, reflectType, "getDeclaringClass",
@@ -355,19 +366,29 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 		mv.visitEnd();
 	}
 
-	private void generateMultiValueStub(ClassWriter cw, String methodName, String returnInterfaceFqcn) {
-		String returnInternal = GenerationUtil.fqcnToName( returnInterfaceFqcn );
+	private static final String MULTI_VALUE_HELPER_INTERNAL = GenerationUtil.fqcnToName(
+			"org.hibernate.models.accessor.generator.runtime.MultiValueHelper" );
+	private static final String MULTI_VALUE_READER_INTERNAL = GenerationUtil.fqcnToName(
+			"org.hibernate.models.accessor.HibernateAccessorMultiValueReader" );
+	private static final String MULTI_VALUE_WRITER_INTERNAL = GenerationUtil.fqcnToName(
+			"org.hibernate.models.accessor.HibernateAccessorMultiValueWriter" );
+
+	private void generateMultiValueMethod(ClassWriter cw, String methodName, String returnInternal,
+			String helperMethodName) {
 		String descriptor = "(Ljava/lang/Class;[Ljava/lang/reflect/Member;)L" + returnInternal + ";";
 
 		MethodVisitor mv = cw.visitMethod( ACC_PUBLIC | ACC_VARARGS, methodName, descriptor, null, null );
 		mv.visitCode();
 
-		mv.visitTypeInsn( NEW, "java/lang/UnsupportedOperationException" );
-		mv.visitInsn( DUP );
-		mv.visitLdcInsn( "Multi-value accessors are not yet supported by the build-time generator" );
-		mv.visitMethodInsn( INVOKESPECIAL, "java/lang/UnsupportedOperationException", "<init>",
-				"(Ljava/lang/String;)V", false );
-		mv.visitInsn( ATHROW );
+		// Call MultiValueHelper.createMultiValueReader/Writer(this, declaringClass, members)
+		mv.visitVarInsn( ALOAD, 0 );
+		mv.visitVarInsn( ALOAD, 1 );
+		mv.visitVarInsn( ALOAD, 2 );
+		mv.visitMethodInsn( INVOKESTATIC, MULTI_VALUE_HELPER_INTERNAL, helperMethodName,
+				"(L" + FACTORY_INTERFACE_INTERNAL + ";Ljava/lang/Class;[Ljava/lang/reflect/Member;)L"
+						+ returnInternal + ";",
+				false );
+		mv.visitInsn( ARETURN );
 
 		mv.visitMaxs( 0, 0 );
 		mv.visitEnd();
