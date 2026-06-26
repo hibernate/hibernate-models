@@ -76,9 +76,22 @@ include 'hibernate-models-testing'
 include 'reporting'
 
 include 'hibernate-models-accessor'
+project(':hibernate-models-accessor').projectDir = file('hibernate-models-accessor/hibernate-models-accessor')
+
 include 'hibernate-models-accessor-asm'
+project(':hibernate-models-accessor-asm').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-asm')
+
 include 'hibernate-models-accessor-tck'
+project(':hibernate-models-accessor-tck').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck')
+
 include 'hibernate-models-accessor-tck-reflection'
+project(':hibernate-models-accessor-tck-reflection').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-reflection')
+
 include 'hibernate-models-accessor-tck-methodhandle'
+project(':hibernate-models-accessor-tck-methodhandle').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-methodhandle')
+
 include 'hibernate-models-accessor-tck-lambda'
+project(':hibernate-models-accessor-tck-lambda').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-lambda')
+
 include 'hibernate-models-accessor-tck-asm'
+project(':hibernate-models-accessor-tck-asm').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-asm')
