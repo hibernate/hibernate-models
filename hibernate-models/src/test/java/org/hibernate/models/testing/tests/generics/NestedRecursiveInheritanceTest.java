@@ -47,11 +47,11 @@ public class NestedRecursiveInheritanceTest {
 			assertThat( parentFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
 			assertThat( parentFieldType.determineRawClass().toJavaClass() ).isEqualTo( Parent.class );
 
-			final TypeDetails child2Parent = parentField.resolveRelativeType( child2 );
+			final TypeDetails child2Parent = parentField.resolveRelativeType( child2, modelsContext );
 			assertThat( child2Parent.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
 			assertThat( child2Parent.determineRawClass().toJavaClass() ).isEqualTo( ParentHierarchy2.class );
 
-			final TypeDetails child22Parent = parentField.resolveRelativeType( child22 );
+			final TypeDetails child22Parent = parentField.resolveRelativeType( child22, modelsContext );
 			assertThat( child22Parent ).isInstanceOf( ClassTypeDetails.class );
 			assertThat( child22Parent.determineRawClass().toJavaClass() ).isEqualTo( ParentHierarchy22.class );
 		}
@@ -69,11 +69,11 @@ public class NestedRecursiveInheritanceTest {
 			assertThat( childrenFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
 			assertThat( childrenFieldType.determineRawClass().toJavaClass() ).isEqualTo( Child.class );
 
-			final TypeDetails parent2Children = childrenField.resolveRelativeAssociatedType( parent2 );
+			final TypeDetails parent2Children = childrenField.resolveRelativeAssociatedType( parent2, modelsContext );
 			assertThat( parent2Children.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
 			assertThat( parent2Children.determineRawClass().toJavaClass() ).isEqualTo( ChildHierarchy2.class );
 
-			final TypeDetails parent22Children = childrenField.resolveRelativeAssociatedType( parent22 );
+			final TypeDetails parent22Children = childrenField.resolveRelativeAssociatedType( parent22, modelsContext );
 			assertThat( parent22Children ).isInstanceOf( ClassTypeDetails.class );
 			assertThat( parent22Children.determineRawClass().toJavaClass() ).isEqualTo( ChildHierarchy22.class );
 		}

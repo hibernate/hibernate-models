@@ -49,11 +49,11 @@ public class GenericsTests {
 		assertThat( wrappedType.determineRawClass().isResolved() ).isTrue();
 
 		final ClassDetails thing1ClassDetails = classDetailsRegistry.resolveClassDetails( Thing1.class.getName() );
-		final TypeDetails thing1IdType = idType.determineRelativeType( thing1ClassDetails );
+		final TypeDetails thing1IdType = idType.determineRelativeType( thing1ClassDetails, modelsContext );
 		assertThat( thing1IdType.isResolved() ).isTrue();
 
 		final ClassDetails thing2ClassDetails = classDetailsRegistry.resolveClassDetails( Thing2.class.getName() );
-		final TypeDetails thing2IdType = idType.determineRelativeType( thing2ClassDetails );
+		final TypeDetails thing2IdType = idType.determineRelativeType( thing2ClassDetails, modelsContext );
 		assertThat( thing2IdType.isResolved() ).isTrue();
 	}
 
@@ -74,11 +74,11 @@ public class GenericsTests {
 		assertThat( idType.determineRawClass().isResolved() ).isTrue();
 
 		final ClassDetails thing3ClassDetails = classDetailsRegistry.resolveClassDetails( Thing3.class.getName() );
-		final TypeDetails thing3IdType = idType.determineRelativeType( thing3ClassDetails );
+		final TypeDetails thing3IdType = idType.determineRelativeType( thing3ClassDetails, modelsContext );
 		assertThat( thing3IdType.isResolved() ).isTrue();
 
 		final ClassDetails thing4ClassDetails = classDetailsRegistry.resolveClassDetails( Thing4.class.getName() );
-		final TypeDetails thing4IdType = idType.determineRelativeType( thing4ClassDetails );
+		final TypeDetails thing4IdType = idType.determineRelativeType( thing4ClassDetails, modelsContext );
 		assertThat( thing4IdType.isResolved() ).isTrue();
 	}
 
@@ -102,7 +102,7 @@ public class GenericsTests {
 		assertThat( genericArrayType.determineRawClass().isResolved() ).isTrue();
 
 		final ClassDetails thing5ClassDetails = classDetailsRegistry.getClassDetails( Thing5.class.getName() );
-		final TypeDetails thing5GenericArrayType = genericArrayType.determineRelativeType( thing5ClassDetails );
+		final TypeDetails thing5GenericArrayType = genericArrayType.determineRelativeType( thing5ClassDetails, modelsContext );
 		assertThat( thing5GenericArrayType.isResolved() ).isTrue();
 		assertThat( thing5GenericArrayType.determineRawClass().isResolved() ).isTrue();
 

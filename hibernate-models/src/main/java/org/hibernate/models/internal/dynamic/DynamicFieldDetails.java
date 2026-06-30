@@ -132,7 +132,7 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	}
 
 	@Override
-	public TypeDetails resolveRelativeType(TypeVariableScope container) {
+	public TypeDetails resolveRelativeType(TypeVariableScope container, ModelsContext modelsContext) {
 		return type;
 	}
 
