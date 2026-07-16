@@ -31,6 +31,8 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 	private final Set<String> fieldWriterClasses = new LinkedHashSet<>();
 	private final Set<String> methodWriterClasses = new LinkedHashSet<>();
 	private final Set<String> instantiatorClasses = new LinkedHashSet<>();
+	private final Set<String> multiValueReaderClasses = new LinkedHashSet<>();
+	private final Set<String> multiValueWriterClasses = new LinkedHashSet<>();
 
 	public void registerDispatchTarget(String declaringClassFqcn, String dispatchTargetInternal, boolean isInterface) {
 		dispatchTargets.put( declaringClassFqcn, dispatchTargetInternal );
@@ -59,6 +61,14 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 		instantiatorClasses.add( declaringClassFqcn );
 	}
 
+	public void registerMultiValueReader(String declaringClassFqcn) {
+		multiValueReaderClasses.add( declaringClassFqcn );
+	}
+
+	public void registerMultiValueWriter(String declaringClassFqcn) {
+		multiValueWriterClasses.add( declaringClassFqcn );
+	}
+
 	public byte[] generate() {
 		ClassWriter cw = new ClassWriter( ClassWriter.COMPUTE_FRAMES );
 
@@ -84,9 +94,9 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 		generateInstantiatorMethod( cw );
 
 		generateMultiValueMethod( cw, "multiValueReader", MULTI_VALUE_READER_INTERNAL,
-				"createMultiValueReader" );
+				"createMultiValueReader", METHOD_NAME_MULTI_VALUE_READER_ACCESSOR, multiValueReaderClasses );
 		generateMultiValueMethod( cw, "multiValueWriter", MULTI_VALUE_WRITER_INTERNAL,
-				"createMultiValueWriter" );
+				"createMultiValueWriter", METHOD_NAME_MULTI_VALUE_WRITER_ACCESSOR, multiValueWriterClasses );
 
 		cw.visitEnd();
 		return cw.toByteArray();
@@ -374,13 +384,58 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 			"org.hibernate.models.accessor.HibernateAccessorMultiValueWriter" );
 
 	private void generateMultiValueMethod(ClassWriter cw, String methodName, String returnInternal,
-			String helperMethodName) {
+			String helperMethodName, String hostMethodName, Set<String> registeredClasses) {
 		String descriptor = "(Ljava/lang/Class;[Ljava/lang/reflect/Member;)L" + returnInternal + ";";
 
 		MethodVisitor mv = cw.visitMethod( ACC_PUBLIC | ACC_VARARGS, methodName, descriptor, null, null );
 		mv.visitCode();
 
-		// Call MultiValueHelper.createMultiValueReader/Writer(this, declaringClass, members)
+		Label fallbackLabel = new Label();
+
+		if ( !registeredClasses.isEmpty() ) {
+			// Compute descriptor: NamingUtil.multiValueDescriptor(members)
+			mv.visitVarInsn( ALOAD, 2 );
+			mv.visitMethodInsn( INVOKESTATIC, NAMING_UTIL_INTERNAL, "multiValueDescriptor",
+					"([Ljava/lang/reflect/Member;)Ljava/lang/String;", false );
+			mv.visitVarInsn( ASTORE, 3 ); // descriptor string
+
+			// Get declaring class name: declaringClass.getName()
+			mv.visitVarInsn( ALOAD, 1 );
+			mv.visitMethodInsn( INVOKEVIRTUAL, "java/lang/Class", "getName",
+					"()Ljava/lang/String;", false );
+			mv.visitVarInsn( ASTORE, 4 ); // class name
+
+			List<String> classNames = new ArrayList<>( registeredClasses );
+			String hostMethodDesc = "(Ljava/lang/String;)L" + returnInternal + ";";
+
+			Label defaultLabel = new Label();
+
+			emitStringSwitch( mv, 4, 5, classNames, defaultLabel, (caseMv, classIdx) -> {
+				String className = classNames.get( classIdx );
+				String target = dispatchTargets.get( className );
+				boolean isIface = interfaceTargets.contains( target );
+
+				caseMv.visitVarInsn( ALOAD, 3 ); // descriptor
+				caseMv.visitMethodInsn( INVOKESTATIC, target, hostMethodName,
+						hostMethodDesc, isIface );
+				caseMv.visitInsn( DUP );
+				Label notNull = new Label();
+				caseMv.visitJumpInsn( IFNONNULL, notNull );
+				caseMv.visitInsn( POP );
+				caseMv.visitJumpInsn( GOTO, fallbackLabel );
+				caseMv.visitLabel( notNull );
+				caseMv.visitInsn( ARETURN );
+			} );
+
+			mv.visitLabel( defaultLabel );
+			mv.visitFrame( F_SAME, 0, null, 0, null );
+		}
+
+		// Fallback: MultiValueHelper.createMultiValueReader/Writer(this, declaringClass, members)
+		mv.visitLabel( fallbackLabel );
+		if ( !registeredClasses.isEmpty() ) {
+			mv.visitFrame( F_SAME, 0, null, 0, null );
+		}
 		mv.visitVarInsn( ALOAD, 0 );
 		mv.visitVarInsn( ALOAD, 1 );
 		mv.visitVarInsn( ALOAD, 2 );

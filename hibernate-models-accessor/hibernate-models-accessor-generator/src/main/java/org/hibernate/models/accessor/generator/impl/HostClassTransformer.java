@@ -42,19 +42,30 @@ public class HostClassTransformer implements Opcodes, GeneratorConstants {
 	private final Set<MemberMetadata> writers;
 	private final Set<ConstructorMetadata> constructors;
 	private final int classIndex;
+	private final List<NameAndIndex> multiValueReaderGroups;
+	private final List<NameAndIndex> multiValueWriterGroups;
 
 	public HostClassTransformer(Set<MemberMetadata> readers, Set<MemberMetadata> writers,
 			Set<ConstructorMetadata> constructors, int classIndex) {
+		this( readers, writers, constructors, classIndex, List.of(), List.of() );
+	}
+
+	public HostClassTransformer(Set<MemberMetadata> readers, Set<MemberMetadata> writers,
+			Set<ConstructorMetadata> constructors, int classIndex,
+			List<NameAndIndex> multiValueReaderGroups, List<NameAndIndex> multiValueWriterGroups) {
 		this.readers = readers;
 		this.writers = writers;
 		this.constructors = constructors;
 		this.classIndex = classIndex;
+		this.multiValueReaderGroups = multiValueReaderGroups;
+		this.multiValueWriterGroups = multiValueWriterGroups;
 	}
 
 	public byte[] transform(byte[] originalBytecode) {
 		ClassReader reader = new ClassReader( originalBytecode );
 		ClassWriter writer = new ClassWriter( reader, ClassWriter.COMPUTE_FRAMES );
-		reader.accept( new HostClassVisitor( writer, readers, writers, constructors, classIndex ), 0 );
+		reader.accept( new HostClassVisitor( writer, readers, writers, constructors, classIndex,
+				multiValueReaderGroups, multiValueWriterGroups ), 0 );
 		return writer.toByteArray();
 	}
 
@@ -63,16 +74,21 @@ public class HostClassTransformer implements Opcodes, GeneratorConstants {
 		private final Set<MemberMetadata> writers;
 		private final Set<ConstructorMetadata> constructors;
 		private final int classIndex;
+		private final List<NameAndIndex> multiValueReaderGroups;
+		private final List<NameAndIndex> multiValueWriterGroups;
 		private boolean isInterface;
 		private String className;
 
 		HostClassVisitor(ClassVisitor visitor, Set<MemberMetadata> readers, Set<MemberMetadata> writers,
-				Set<ConstructorMetadata> constructors, int classIndex) {
+				Set<ConstructorMetadata> constructors, int classIndex,
+				List<NameAndIndex> multiValueReaderGroups, List<NameAndIndex> multiValueWriterGroups) {
 			super( Opcodes.ASM9, visitor );
 			this.readers = readers;
 			this.writers = writers;
 			this.constructors = constructors;
 			this.classIndex = classIndex;
+			this.multiValueReaderGroups = multiValueReaderGroups;
+			this.multiValueWriterGroups = multiValueWriterGroups;
 		}
 
 		@Override
@@ -118,6 +134,7 @@ public class HostClassTransformer implements Opcodes, GeneratorConstants {
 			generateWriteMethod();
 			generateCreateMethod();
 			generateAccessorMethods();
+			generateMultiValueAccessorMethods();
 
 			super.visitEnd();
 		}
@@ -169,6 +186,84 @@ public class HostClassTransformer implements Opcodes, GeneratorConstants {
 					classIndex, WRITER_INTERFACE_INTERNAL, "createWriter" );
 			generateAccessorMethod( METHOD_NAME_INSTANTIATOR_ACCESSOR, instantiatorEntries,
 					classIndex, INSTANTIATOR_INTERFACE_INTERNAL, "createInstantiator" );
+		}
+
+		private void generateMultiValueAccessorMethods() {
+			generateMultiValueAccessorMethod( METHOD_NAME_MULTI_VALUE_READER_ACCESSOR,
+					multiValueReaderGroups, MULTI_VALUE_READER_INTERFACE_INTERNAL, "createMultiValueReader" );
+			generateMultiValueAccessorMethod( METHOD_NAME_MULTI_VALUE_WRITER_ACCESSOR,
+					multiValueWriterGroups, MULTI_VALUE_WRITER_INTERFACE_INTERNAL, "createMultiValueWriter" );
+		}
+
+		private void generateMultiValueAccessorMethod(String methodName, List<NameAndIndex> groups,
+				String returnTypeInternal, String factoryMethodName) {
+			String returnDesc = "L" + returnTypeInternal + ";";
+			String descriptor = "(Ljava/lang/String;)" + returnDesc;
+
+			if ( groups.isEmpty() ) {
+				generateNullReturnMethod( methodName, descriptor );
+				return;
+			}
+
+			List<String> descriptors = groups.stream().map( NameAndIndex::name ).toList();
+
+			if ( descriptors.size() <= STRING_SWITCH_CHUNK_SIZE ) {
+				generateMultiValueAccessorSwitch( methodName, descriptor, descriptors, groups,
+						returnTypeInternal, factoryMethodName );
+			}
+			else {
+				int numChunks = (descriptors.size() + STRING_SWITCH_CHUNK_SIZE - 1) / STRING_SWITCH_CHUNK_SIZE;
+
+				List<List<String>> chunkDescriptors = new ArrayList<>();
+				List<List<NameAndIndex>> chunkGroups = new ArrayList<>();
+				for ( int i = 0; i < numChunks; i++ ) {
+					chunkDescriptors.add( new ArrayList<>() );
+					chunkGroups.add( new ArrayList<>() );
+				}
+
+				for ( int i = 0; i < groups.size(); i++ ) {
+					int bucket = (descriptors.get( i ).hashCode() & 0x7FFFFFFF) % numChunks;
+					chunkDescriptors.get( bucket ).add( descriptors.get( i ) );
+					chunkGroups.get( bucket ).add( groups.get( i ) );
+				}
+
+				for ( int i = 0; i < numChunks; i++ ) {
+					if ( !chunkDescriptors.get( i ).isEmpty() ) {
+						generateMultiValueAccessorSwitch( methodName + "$" + i, descriptor,
+								chunkDescriptors.get( i ), chunkGroups.get( i ),
+								returnTypeInternal, factoryMethodName );
+					}
+				}
+
+				generateAccessorDispatcher( methodName, descriptor, numChunks, chunkDescriptors );
+			}
+		}
+
+		private void generateMultiValueAccessorSwitch(String methodName, String descriptor,
+				List<String> descriptors, List<NameAndIndex> groups,
+				String returnTypeInternal, String factoryMethodName) {
+			MethodVisitor mv = cv.visitMethod( ACC_PUBLIC | ACC_STATIC, methodName,
+					descriptor, null, null );
+			mv.visitCode();
+
+			Label defaultLabel = new Label();
+
+			emitStringSwitch( mv, 0, 1, descriptors, defaultLabel, (caseMv, caseIdx) -> {
+				int groupIndex = groups.get( caseIdx ).index();
+				pushIntConst( caseMv, groupIndex );
+				caseMv.visitMethodInsn( INVOKESTATIC, ACCESSOR_IMPL_FACTORY_INTERNAL,
+						factoryMethodName, "(I)Ljava/lang/Object;", false );
+				caseMv.visitTypeInsn( CHECKCAST, returnTypeInternal );
+				caseMv.visitInsn( ARETURN );
+			} );
+
+			mv.visitLabel( defaultLabel );
+			mv.visitFrame( F_SAME, 0, null, 0, null );
+			mv.visitInsn( ACONST_NULL );
+			mv.visitInsn( ARETURN );
+
+			mv.visitMaxs( 0, 0 );
+			mv.visitEnd();
 		}
 
 		private void generateAccessorMethod(String methodName, List<NameAndIndex> entries,
@@ -596,6 +691,6 @@ public class HostClassTransformer implements Opcodes, GeneratorConstants {
 		}
 	}
 
-	record NameAndIndex(String name, int index) {
+	public record NameAndIndex(String name, int index) {
 	}
 }

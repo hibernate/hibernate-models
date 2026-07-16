@@ -6,12 +6,15 @@ package org.hibernate.models.accessor.tck.generator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.accessor.generator.AccessorClassMetadata;
+import org.hibernate.models.accessor.generator.AccessorClassMetadata.MultiValueGroupMetadata;
 import org.hibernate.models.accessor.generator.AccessorGenerator;
 import org.hibernate.models.accessor.generator.GeneratedClassResult;
 import org.hibernate.models.accessor.tck.tests.beans.PrimitiveFieldBean;
@@ -56,7 +59,10 @@ public class GenerateAccessorClasses {
 				.build();
 		inputs.add( new AccessorGenerator.GenerationInput( ppMetadata, readClassBytes( packagePrivateBean ) ) );
 
-		AccessorGenerator.GenerationResult result = AccessorGenerator.generate( inputs );
+		List<MultiValueGroupMetadata> readerGroups = buildReaderGroups();
+		List<MultiValueGroupMetadata> writerGroups = buildWriterGroups();
+
+		AccessorGenerator.GenerationResult result = AccessorGenerator.generate( inputs, readerGroups, writerGroups );
 
 		for ( GeneratedClassResult generated : result.generatedClasses() ) {
 			writeClass( outputDir, generated.className(), generated.bytecode() );
@@ -68,6 +74,59 @@ public class GenerateAccessorClasses {
 
 		System.out.println( "Generated " + result.generatedClasses().size() + " classes, transformed "
 				+ result.transformedClasses().size() + " host classes to " + outputDir );
+	}
+
+	private static List<MultiValueGroupMetadata> buildReaderGroups() throws Exception {
+		List<MultiValueGroupMetadata> groups = new ArrayList<>();
+
+		// MultiValueAccessTest groups
+		Field intField = PrimitiveFieldBean.class.getDeclaredField( "intField" );
+		Field longField = PrimitiveFieldBean.class.getDeclaredField( "longField" );
+		Field doubleField = PrimitiveFieldBean.class.getDeclaredField( "doubleField" );
+		Field booleanField = PrimitiveFieldBean.class.getDeclaredField( "booleanField" );
+		Field charField = PrimitiveFieldBean.class.getDeclaredField( "charField" );
+		Method getLong = PrimitiveFieldBean.class.getDeclaredMethod( "getLongField" );
+		Method getDouble = PrimitiveFieldBean.class.getDeclaredMethod( "getDoubleField" );
+
+		groups.add( MultiValueGroupMetadata.readerGroup( PrimitiveFieldBean.class, intField, longField, doubleField ) );
+		groups.add( MultiValueGroupMetadata.readerGroup( PrimitiveFieldBean.class, intField, getLong, booleanField ) );
+		groups.add( MultiValueGroupMetadata.readerGroup( PrimitiveFieldBean.class, intField, getDouble, charField ) );
+
+		// MultiValueInheritanceTest groups
+		Field parentField = ParentBean.class.getDeclaredField( "parentField" );
+		Field childField = ChildBean.class.getDeclaredField( "childField" );
+		Method getChild = ChildBean.class.getDeclaredMethod( "getChildField" );
+
+		groups.add( MultiValueGroupMetadata.readerGroup( ChildBean.class, parentField, childField ) );
+		groups.add( MultiValueGroupMetadata.readerGroup( ChildBean.class, parentField, getChild ) );
+
+		return groups;
+	}
+
+	private static List<MultiValueGroupMetadata> buildWriterGroups() throws Exception {
+		List<MultiValueGroupMetadata> groups = new ArrayList<>();
+
+		// MultiValueAccessTest groups
+		Field intField = PrimitiveFieldBean.class.getDeclaredField( "intField" );
+		Field longField = PrimitiveFieldBean.class.getDeclaredField( "longField" );
+		Field booleanField = PrimitiveFieldBean.class.getDeclaredField( "booleanField" );
+		Field charField = PrimitiveFieldBean.class.getDeclaredField( "charField" );
+		Method setLong = PrimitiveFieldBean.class.getDeclaredMethod( "setLongField", long.class );
+		Method setDouble = PrimitiveFieldBean.class.getDeclaredMethod( "setDoubleField", double.class );
+
+		groups.add( MultiValueGroupMetadata.writerGroup( PrimitiveFieldBean.class, intField, longField ) );
+		groups.add( MultiValueGroupMetadata.writerGroup( PrimitiveFieldBean.class, intField, setLong, booleanField ) );
+		groups.add( MultiValueGroupMetadata.writerGroup( PrimitiveFieldBean.class, intField, setDouble, charField ) );
+
+		// MultiValueInheritanceTest groups
+		Field parentField = ParentBean.class.getDeclaredField( "parentField" );
+		Field childField = ChildBean.class.getDeclaredField( "childField" );
+		Method setParent = ParentBean.class.getDeclaredMethod( "setParentField", String.class );
+
+		groups.add( MultiValueGroupMetadata.writerGroup( ChildBean.class, parentField, childField ) );
+		groups.add( MultiValueGroupMetadata.writerGroup( ChildBean.class, setParent, childField ) );
+
+		return groups;
 	}
 
 	private static byte[] readClassBytes(Class<?> clazz) throws IOException {

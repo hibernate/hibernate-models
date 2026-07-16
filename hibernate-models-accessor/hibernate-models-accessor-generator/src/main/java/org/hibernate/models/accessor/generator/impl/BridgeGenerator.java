@@ -41,6 +41,10 @@ public class BridgeGenerator implements Opcodes, GeneratorConstants {
 				hostName );
 		generateForward( cw, METHOD_NAME_INSTANTIATOR_ACCESSOR,
 				accessorMethodDescriptor( INSTANTIATOR_INTERFACE_INTERNAL ), hostName );
+		generateForward( cw, METHOD_NAME_MULTI_VALUE_READER_ACCESSOR,
+				accessorMethodDescriptor( MULTI_VALUE_READER_INTERFACE_INTERNAL ), hostName );
+		generateForward( cw, METHOD_NAME_MULTI_VALUE_WRITER_ACCESSOR,
+				accessorMethodDescriptor( MULTI_VALUE_WRITER_INTERFACE_INTERNAL ), hostName );
 
 		cw.visitEnd();
 		return cw.toByteArray();

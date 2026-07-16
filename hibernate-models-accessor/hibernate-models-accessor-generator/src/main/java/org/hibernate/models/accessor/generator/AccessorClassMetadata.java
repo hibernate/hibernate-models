@@ -9,6 +9,7 @@ import static java.util.Comparator.nullsFirst;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.hibernate.models.accessor.generator.runtime.NamingUtil;
 
 public final class AccessorClassMetadata implements Comparable<AccessorClassMetadata> {
 
@@ -259,6 +262,68 @@ public final class AccessorClassMetadata implements Comparable<AccessorClassMeta
 	}
 
 	public record ParameterMetadata(String name, String descriptor, boolean isPrimitive) {
+	}
+
+	public record MultiValueGroupMetadata(
+			String targetDeclaringClass,
+			List<MemberMetadata> members,
+			String descriptor) {
+
+		public static MultiValueGroupMetadata readerGroup(Class<?> targetClass, Member... members) {
+			List<MemberMetadata> metadataList = buildMemberMetadataList( members, true );
+			return new MultiValueGroupMetadata(
+					targetClass.getName(),
+					metadataList,
+					NamingUtil.multiValueDescriptorFromMetadata( metadataList ) );
+		}
+
+		public static MultiValueGroupMetadata writerGroup(Class<?> targetClass, Member... members) {
+			List<MemberMetadata> metadataList = buildMemberMetadataList( members, false );
+			return new MultiValueGroupMetadata(
+					targetClass.getName(),
+					metadataList,
+					NamingUtil.multiValueDescriptorFromMetadata( metadataList ) );
+		}
+
+		private static List<MemberMetadata> buildMemberMetadataList(Member[] members, boolean isReader) {
+			List<MemberMetadata> result = new ArrayList<>();
+			for ( Member member : members ) {
+				if ( member instanceof Field field ) {
+					Class<?> fieldType = field.getType();
+					result.add( new FieldMetadata(
+							field.getName(),
+							org.objectweb.asm.Type.getDescriptor( fieldType ),
+							fieldType.isPrimitive(),
+							field.getDeclaringClass().getName(),
+							false ) );
+				}
+				else if ( member instanceof Method method ) {
+					String descriptor = org.objectweb.asm.Type.getMethodDescriptor( method );
+					if ( isReader ) {
+						result.add( new MethodMetadata(
+								method.getName(),
+								descriptor,
+								method.getReturnType().isPrimitive(),
+								method.getDeclaringClass().getName(),
+								method.getDeclaringClass().isInterface(),
+								org.objectweb.asm.Type.getDescriptor( method.getReturnType() ) ) );
+					}
+					else {
+						result.add( new MethodMetadata(
+								method.getName(),
+								descriptor,
+								method.getParameterTypes()[0].isPrimitive(),
+								method.getDeclaringClass().getName(),
+								method.getDeclaringClass().isInterface(),
+								org.objectweb.asm.Type.getDescriptor( method.getReturnType() ) ) );
+					}
+				}
+				else {
+					throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
+				}
+			}
+			return result;
+		}
 	}
 
 	public record TypeMetadata(String packageName, String name, String host,
