@@ -12,7 +12,7 @@ package org.hibernate.models.accessor;
  * to create this reader, in the same order they were specified.
  *
  * <p>Obtain an instance via
- * {@link HibernateAccessorFactory#multiValueReader(java.lang.reflect.Member...)}.
+ * {@link HibernateAccessorFactory#multiValueReader(Class, java.lang.reflect.Member...)}.
  */
 public interface HibernateAccessorMultiValueReader {
 
