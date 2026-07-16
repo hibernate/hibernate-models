@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 
 public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFactory {
 
-	private transient final MethodHandles.Lookup lookup;
+	private final MethodHandles.Lookup lookup;
 
 	public HibernateAccessorMethodHandleFactory(MethodHandles.Lookup lookup) {
 		this.lookup = lookup;

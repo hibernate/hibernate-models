@@ -1,0 +1,281 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright: Red Hat Inc. and Hibernate Authors
+ */
+package org.hibernate.models.accessor.bytebuddy.impl;
+
+import org.hibernate.models.accessor.HibernateAccessorInstantiator;
+import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
+import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
+import org.hibernate.models.accessor.HibernateAccessorValueReader;
+import org.hibernate.models.accessor.HibernateAccessorValueWriter;
+import org.hibernate.models.accessor.MultiValueAccessorGenerationException;
+import org.hibernate.models.accessor.bytebuddy.spi.MultiValueAccessorPointcuts;
+import org.hibernate.models.accessor.spi.MemberValidation;
+
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class HibernateAccessorByteBuddyFactory implements org.hibernate.models.accessor.bytebuddy.HibernateAccessorByteBuddyFactory {
+
+	private static final MethodHandles.Lookup ACCESSOR_MODULE_LOOKUP = MethodHandles.lookup();
+	private final ConcurrentHashMap<Class<?>, HibernateAccessorByteBuddyClassAccessorInfo> cache = new ConcurrentHashMap<>();
+	private final MethodHandles.Lookup lookup;
+
+	public HibernateAccessorByteBuddyFactory(MethodHandles.Lookup lookup) {
+		this.lookup = lookup;
+	}
+
+	@Override
+	public <T> HibernateAccessorInstantiator<T> instantiator(Constructor<T> constructor) {
+		HibernateAccessorByteBuddyClassAccessorInfo info = getOrCreate(constructor.getDeclaringClass());
+		return new HibernateAccessorByteBuddyInstantiator<>(info.bulkAccessor(), info.constructorIndex(constructor));
+	}
+
+	@Override
+	public HibernateAccessorValueReader<?> valueReader(Field field) {
+		HibernateAccessorByteBuddyClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
+		return new HibernateAccessorByteBuddyFieldValueReader<>(info.bulkAccessor(), info.fieldIndex(field));
+	}
+
+	@Override
+	public HibernateAccessorValueReader<?> valueReader(Method method) {
+		MemberValidation.validateReaderMethod(method);
+		HibernateAccessorByteBuddyClassAccessorInfo info = getOrCreate(method.getDeclaringClass());
+		return new HibernateAccessorByteBuddyMethodValueReader<>(info.bulkAccessor(), info.methodIndex(method));
+	}
+
+	@Override
+	public HibernateAccessorValueWriter valueWriter(Field field) {
+		HibernateAccessorByteBuddyClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
+		return new HibernateAccessorByteBuddyFieldValueWriter(info.bulkAccessor(), info.fieldIndex(field));
+	}
+
+	@Override
+	public HibernateAccessorValueWriter valueWriter(Method setter) {
+		MemberValidation.validateWriterMethod(setter);
+		HibernateAccessorByteBuddyClassAccessorInfo info = getOrCreate(setter.getDeclaringClass());
+		return new HibernateAccessorByteBuddyMethodValueWriter(info.bulkAccessor(), info.methodIndex(setter));
+	}
+
+	@Override
+	public HibernateAccessorMultiValueReader multiValueReader(Class<?> declaringClass, Member... members) {
+		if ( members.length == 0 ) {
+			throw new IllegalArgumentException( "At least one member is required" );
+		}
+		for ( Member member : members ) {
+			MemberValidation.validateMemberDeclaringType( declaringClass, member );
+			MemberValidation.validateReaderMember( member );
+		}
+		if (allSameDeclaringClass(declaringClass, members)) {
+			return generateDirectReader(members);
+		}
+		return generateBulkBasedReader(members);
+	}
+
+	@Override
+	public HibernateAccessorMultiValueWriter multiValueWriter(Class<?> declaringClass, Member... members) {
+		if ( members.length == 0 ) {
+			throw new IllegalArgumentException( "At least one member is required" );
+		}
+		for ( Member member : members ) {
+			MemberValidation.validateMemberDeclaringType( declaringClass, member );
+			MemberValidation.validateWriterMember( member );
+		}
+		if (allSameDeclaringClass(declaringClass, members)) {
+			return generateDirectWriter(members);
+		}
+		return generateBulkBasedWriter(members);
+	}
+
+	public HibernateAccessorMultiValueReader multiValueReader(
+			Class<?> declaringClass, Member[] members, MultiValueAccessorPointcuts pointcuts) {
+		if ( members.length == 0 ) {
+			throw new IllegalArgumentException( "At least one member is required" );
+		}
+		for ( Member member : members ) {
+			MemberValidation.validateMemberDeclaringType( declaringClass, member );
+			MemberValidation.validateReaderMember( member );
+		}
+		if (allSameDeclaringClass(declaringClass, members)) {
+			return generateDirectReader(members, pointcuts);
+		}
+		return generateBulkBasedReader(members, pointcuts);
+	}
+
+	public HibernateAccessorMultiValueWriter multiValueWriter(
+			Class<?> declaringClass, Member[] members, MultiValueAccessorPointcuts pointcuts) {
+		if ( members.length == 0 ) {
+			throw new IllegalArgumentException( "At least one member is required" );
+		}
+		for ( Member member : members ) {
+			MemberValidation.validateMemberDeclaringType( declaringClass, member );
+			MemberValidation.validateWriterMember( member );
+		}
+		if (allSameDeclaringClass(declaringClass, members)) {
+			return generateDirectWriter(members, pointcuts);
+		}
+		return generateBulkBasedWriter(members, pointcuts);
+	}
+
+	// multi-value accessors are not cached; each call generates a new hidden class
+	private HibernateAccessorMultiValueReader generateDirectReader(Member[] members) {
+		final Class<?> targetClass = members[0].getDeclaringClass();
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateReader(targetClass, members);
+		try {
+			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(targetClass, lookup);
+			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass().getDeclaredConstructor().newInstance();
+		}
+		catch (Exception e) {
+			throw new MultiValueAccessorGenerationException("Failed to create direct multi-value reader for " + targetClass.getName(), e);
+		}
+	}
+
+	private HibernateAccessorMultiValueWriter generateDirectWriter(Member[] members) {
+		final Class<?> targetClass = members[0].getDeclaringClass();
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateWriter(targetClass, members);
+		try {
+			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(targetClass, lookup);
+			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass().getDeclaredConstructor().newInstance();
+		}
+		catch (Exception e) {
+			throw new MultiValueAccessorGenerationException("Failed to create direct multi-value writer for " + targetClass.getName(), e);
+		}
+	}
+
+	private HibernateAccessorMultiValueReader generateBulkBasedReader(Member[] members) {
+		final BulkAccessorLayout layout = buildBulkAccessorLayout(members);
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateBulkReader(layout.accesses, layout.accessors.length);
+		try {
+			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass(bytecode, true);
+			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
+			Arrays.fill(paramTypes, HibernateAccessorByteBuddyBulkAccessor.class);
+			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass().getDeclaredConstructor(paramTypes).newInstance((Object[]) layout.accessors);
+		}
+		catch (Exception e) {
+			throw new MultiValueAccessorGenerationException("Failed to create bulk-based multi-value reader", e);
+		}
+	}
+
+	private HibernateAccessorMultiValueWriter generateBulkBasedWriter(Member[] members) {
+		final BulkAccessorLayout layout = buildBulkAccessorLayout(members);
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateBulkWriter(layout.accesses, layout.accessors.length);
+		try {
+			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass(bytecode, true);
+			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
+			Arrays.fill(paramTypes, HibernateAccessorByteBuddyBulkAccessor.class);
+			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass().getDeclaredConstructor(paramTypes).newInstance((Object[]) layout.accessors);
+		}
+		catch (Exception e) {
+			throw new MultiValueAccessorGenerationException("Failed to create bulk-based multi-value writer", e);
+		}
+	}
+
+	private HibernateAccessorMultiValueReader generateDirectReader(Member[] members, MultiValueAccessorPointcuts pointcuts) {
+		final Class<?> targetClass = members[0].getDeclaringClass();
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateReader(targetClass, members, pointcuts);
+		try {
+			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(targetClass, lookup);
+			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass().getDeclaredConstructor().newInstance();
+		}
+		catch (Exception e) {
+			throw new MultiValueAccessorGenerationException("Failed to create direct multi-value reader for " + targetClass.getName(), e);
+		}
+	}
+
+	private HibernateAccessorMultiValueWriter generateDirectWriter(Member[] members, MultiValueAccessorPointcuts pointcuts) {
+		final Class<?> targetClass = members[0].getDeclaringClass();
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateWriter(targetClass, members, pointcuts);
+		try {
+			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(targetClass, lookup);
+			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass().getDeclaredConstructor().newInstance();
+		}
+		catch (Exception e) {
+			throw new MultiValueAccessorGenerationException("Failed to create direct multi-value writer for " + targetClass.getName(), e);
+		}
+	}
+
+	private HibernateAccessorMultiValueReader generateBulkBasedReader(Member[] members, MultiValueAccessorPointcuts pointcuts) {
+		final BulkAccessorLayout layout = buildBulkAccessorLayout(members);
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateBulkReader(layout.accesses, layout.accessors.length, pointcuts);
+		try {
+			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass(bytecode, true);
+			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
+			Arrays.fill(paramTypes, HibernateAccessorByteBuddyBulkAccessor.class);
+			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass().getDeclaredConstructor(paramTypes).newInstance((Object[]) layout.accessors);
+		}
+		catch (Exception e) {
+			throw new MultiValueAccessorGenerationException("Failed to create bulk-based multi-value reader", e);
+		}
+	}
+
+	private HibernateAccessorMultiValueWriter generateBulkBasedWriter(Member[] members, MultiValueAccessorPointcuts pointcuts) {
+		final BulkAccessorLayout layout = buildBulkAccessorLayout(members);
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateBulkWriter(layout.accesses, layout.accessors.length, pointcuts);
+		try {
+			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass(bytecode, true);
+			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
+			Arrays.fill(paramTypes, HibernateAccessorByteBuddyBulkAccessor.class);
+			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass().getDeclaredConstructor(paramTypes).newInstance((Object[]) layout.accessors);
+		}
+		catch (Exception e) {
+			throw new MultiValueAccessorGenerationException("Failed to create bulk-based multi-value writer", e);
+		}
+	}
+
+	private BulkAccessorLayout buildBulkAccessorLayout(Member[] members) {
+		final Map<Class<?>, Integer> classToFieldIndex = new LinkedHashMap<>();
+		for (Member member : members) {
+			classToFieldIndex.computeIfAbsent(member.getDeclaringClass(), cls -> classToFieldIndex.size());
+		}
+
+		final HibernateAccessorByteBuddyBulkAccessor[] accessors = new HibernateAccessorByteBuddyBulkAccessor[classToFieldIndex.size()];
+		final HibernateAccessorByteBuddyClassAccessorInfo[] infos = new HibernateAccessorByteBuddyClassAccessorInfo[classToFieldIndex.size()];
+		for (var entry : classToFieldIndex.entrySet()) {
+			final HibernateAccessorByteBuddyClassAccessorInfo info = getOrCreate(entry.getKey());
+			accessors[entry.getValue()] = info.bulkAccessor();
+			infos[entry.getValue()] = info;
+		}
+
+		final HibernateAccessorBulkMemberAccess[] accesses = new HibernateAccessorBulkMemberAccess[members.length];
+		for (int i = 0; i < members.length; i++) {
+			final int fieldIdx = classToFieldIndex.get(members[i].getDeclaringClass());
+			final HibernateAccessorByteBuddyClassAccessorInfo info = infos[fieldIdx];
+			final boolean isField = members[i] instanceof Field;
+			final int memberIdx = isField ? info.fieldIndex((Field) members[i]) : info.methodIndex((Method) members[i]);
+			accesses[i] = new HibernateAccessorBulkMemberAccess(fieldIdx, memberIdx, isField);
+		}
+
+		return new BulkAccessorLayout(accesses, accessors);
+	}
+
+	private record BulkAccessorLayout(HibernateAccessorBulkMemberAccess[] accesses, HibernateAccessorByteBuddyBulkAccessor[] accessors) {
+	}
+
+	private static boolean allSameDeclaringClass(Class<?> declaringClass, Member[] members) {
+		if (members.length == 0) {
+			return true;
+		}
+		for (int i = 0; i < members.length; i++) {
+			if (members[i].getDeclaringClass() != declaringClass) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private HibernateAccessorByteBuddyClassAccessorInfo getOrCreate(Class<?> declaringClass) {
+		return cache.computeIfAbsent(declaringClass, cls -> HibernateAccessorByteBuddyClassAccessorInfo.create(cls, lookup));
+	}
+}

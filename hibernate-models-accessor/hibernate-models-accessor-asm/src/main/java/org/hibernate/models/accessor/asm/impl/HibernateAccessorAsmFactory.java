@@ -127,6 +127,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 		return generateBulkBasedWriter( members, pointcuts );
 	}
 
+	// multi-value accessors are not cached; each call generates a new hidden class
 	private HibernateAccessorMultiValueReader generateDirectReader(Member[] members) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateReader( targetClass, members );

@@ -2,19 +2,23 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.accessor.asm.impl;
+package org.hibernate.models.accessor.bytebuddy.impl;
 
-import org.objectweb.asm.*;
+import net.bytebuddy.jar.asm.ClassWriter;
+import net.bytebuddy.jar.asm.Label;
+import net.bytebuddy.jar.asm.MethodVisitor;
+import net.bytebuddy.jar.asm.Opcodes;
+import net.bytebuddy.jar.asm.Type;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import static org.hibernate.models.accessor.asm.impl.HibernateAccessorAsmUtils.*;
+import static org.hibernate.models.accessor.bytebuddy.impl.HibernateAccessorByteBuddyUtils.*;
 
-final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
+final class HibernateAccessorByteBuddyBulkAccessorClassGenerator implements Opcodes {
 
-	private static final String BULK_ACCESSOR_INTERNAL = Type.getInternalName(HibernateAccessorAsmBulkAccessor.class);
+	private static final String BULK_ACCESSOR_INTERNAL = Type.getInternalName(HibernateAccessorByteBuddyBulkAccessor.class);
 	private static final String EXCEPTION_INTERNAL = "org/hibernate/models/accessor/HibernateAccessorException";
 
 	static byte[] generate(Class<?> targetClass, Field[] fields, Method[] methods, Constructor<?>[] constructors) {
@@ -47,9 +51,8 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 		mv.visitEnd();
 	}
 
-	// readByField(Object instance, int index) -> Object
-	// locals: [this=0, instance=1, index=2]
-	private static void generateReadByField(ClassWriter cw, String targetInternal, Field[] fields) {
+	private static void generateReadByField(ClassWriter cw,
+											String targetInternal, Field[] fields) {
 		MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "readByField",
 				"(Ljava/lang/Object;I)Ljava/lang/Object;", null, null);
 		mv.visitCode();
@@ -82,8 +85,6 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 		mv.visitEnd();
 	}
 
-	// writeByField(Object instance, int index, Object value) -> void
-	// locals: [this=0, instance=1, index=2, value=3]
 	private static void generateWriteByField(ClassWriter cw, String targetInternal, Field[] fields) {
 		MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "writeByField",
 				"(Ljava/lang/Object;ILjava/lang/Object;)V", null, null);
@@ -118,8 +119,6 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 		mv.visitEnd();
 	}
 
-	// readByMethod(Object instance, int index) -> Object
-	// locals: [this=0, instance=1, index=2]
 	private static void generateReadByMethod(ClassWriter cw, String targetInternal, boolean isInterface, Method[] methods) {
 		MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "readByMethod",
 				"(Ljava/lang/Object;I)Ljava/lang/Object;", null, null);
@@ -160,8 +159,6 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 		mv.visitEnd();
 	}
 
-	// writeByMethod(Object instance, int index, Object value) -> void
-	// locals: [this=0, instance=1, index=2, value=3]
 	private static void generateWriteByMethod(ClassWriter cw, String targetInternal, boolean isInterface, Method[] methods) {
 		MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "writeByMethod",
 				"(Ljava/lang/Object;ILjava/lang/Object;)V", null, null);
@@ -207,8 +204,6 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 		mv.visitEnd();
 	}
 
-	// newInstance(int index, Object[] args) -> Object
-	// locals: [this=0, index=1, args=2]
 	private static void generateNewInstance(ClassWriter cw, String targetInternal, Constructor<?>[] constructors) {
 		MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "newInstance",
 				"(I[Ljava/lang/Object;)Ljava/lang/Object;", null, null);
