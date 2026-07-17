@@ -78,4 +78,25 @@ public class MemberValidationTest {
 		assertThrows( IllegalArgumentException.class,
 				() -> factory.multiValueReader( ParentBean.class, childField ) );
 	}
+
+	@Test
+	@DisplayName("valueReader rejects static field")
+	void testValueReaderRejectsStaticField() throws Exception {
+		Field staticField = Integer.class.getDeclaredField( "MAX_VALUE" );
+		assertThrows( HibernateAccessorException.class, () -> factory.valueReader( staticField ) );
+	}
+
+	@Test
+	@DisplayName("valueWriter rejects static field")
+	void testValueWriterRejectsStaticField() throws Exception {
+		Field staticField = Integer.class.getDeclaredField( "MAX_VALUE" );
+		assertThrows( HibernateAccessorException.class, () -> factory.valueWriter( staticField ) );
+	}
+
+	@Test
+	@DisplayName("valueReader rejects static method")
+	void testValueReaderRejectsStaticMethod() throws Exception {
+		Method staticMethod = Integer.class.getDeclaredMethod( "valueOf", int.class );
+		assertThrows( HibernateAccessorException.class, () -> factory.valueReader( staticMethod ) );
+	}
 }

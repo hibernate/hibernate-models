@@ -43,8 +43,9 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 
 	@Override
 	public HibernateAccessorValueReader<?> valueReader(Field field) {
-		HibernateAccessorAsmClassAccessorInfo info = getOrCreate( field.getDeclaringClass() );
-		return new HibernateAccessorAsmFieldValueReader<>( info.bulkAccessor(), info.fieldIndex( field ) );
+		MemberValidation.validateInstanceMember( field );
+		HibernateAccessorAsmClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
+		return new HibernateAccessorAsmFieldValueReader<>(info.bulkAccessor(), info.fieldIndex(field));
 	}
 
 	@Override
@@ -56,8 +57,9 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Field field) {
-		HibernateAccessorAsmClassAccessorInfo info = getOrCreate( field.getDeclaringClass() );
-		return new HibernateAccessorAsmFieldValueWriter( info.bulkAccessor(), info.fieldIndex( field ) );
+		MemberValidation.validateInstanceMember( field );
+		HibernateAccessorAsmClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
+		return new HibernateAccessorAsmFieldValueWriter(info.bulkAccessor(), info.fieldIndex(field));
 	}
 
 	@Override

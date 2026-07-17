@@ -41,6 +41,7 @@ public class HibernateAccessorByteBuddyFactory implements org.hibernate.models.a
 
 	@Override
 	public HibernateAccessorValueReader<?> valueReader(Field field) {
+		MemberValidation.validateInstanceMember( field );
 		HibernateAccessorByteBuddyClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
 		return new HibernateAccessorByteBuddyFieldValueReader<>(info.bulkAccessor(), info.fieldIndex(field));
 	}
@@ -54,6 +55,7 @@ public class HibernateAccessorByteBuddyFactory implements org.hibernate.models.a
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Field field) {
+		MemberValidation.validateInstanceMember( field );
 		HibernateAccessorByteBuddyClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
 		return new HibernateAccessorByteBuddyFieldValueWriter(info.bulkAccessor(), info.fieldIndex(field));
 	}

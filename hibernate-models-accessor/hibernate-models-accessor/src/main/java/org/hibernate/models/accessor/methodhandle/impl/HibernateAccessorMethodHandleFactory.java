@@ -41,6 +41,7 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 
 	@Override
 	public HibernateAccessorValueReader<?> valueReader(Field field) {
+		MemberValidation.validateInstanceMember( field );
 		try {
 			return new HibernateAccessorMethodHandleFieldValueReader<>(
 					privateLookup(field.getDeclaringClass()).unreflectGetter(field));
@@ -64,6 +65,7 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Field field) {
+		MemberValidation.validateInstanceMember( field );
 		try {
 			return new HibernateAccessorMethodHandleFieldValueWriter(
 					privateLookup(field.getDeclaringClass()).unreflectSetter(field));

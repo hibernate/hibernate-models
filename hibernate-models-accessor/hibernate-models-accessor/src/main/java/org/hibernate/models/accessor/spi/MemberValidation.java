@@ -10,6 +10,7 @@ import org.hibernate.models.accessor.HibernateAccessorFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * Shared validation for {@link Member} arguments passed to
@@ -21,11 +22,26 @@ public final class MemberValidation {
 	}
 
 	/**
+	 * Validates that the given member is an instance (non-static) member.
+	 *
+	 * @throws HibernateAccessorException if the member is static
+	 */
+	public static void validateInstanceMember(Member member) {
+		if ( Modifier.isStatic( member.getModifiers() ) ) {
+			throw new HibernateAccessorException(
+					"Static member '" + member.getName() + "' on " + member.getDeclaringClass().getName()
+							+ " cannot be used as an instance accessor"
+			);
+		}
+	}
+
+	/**
 	 * Validates that the given method is suitable for reading (i.e. is a getter).
 	 *
 	 * @throws HibernateAccessorException if the method has parameters or returns void
 	 */
 	public static void validateReaderMethod(Method method) {
+		validateInstanceMember( method );
 		if ( method.getParameterCount() != 0 ) {
 			throw new HibernateAccessorException(
 					"Method '" + method.getName() + "' on " + method.getDeclaringClass().getName()
@@ -46,6 +62,7 @@ public final class MemberValidation {
 	 * @throws HibernateAccessorException if the method does not have exactly one parameter
 	 */
 	public static void validateWriterMethod(Method method) {
+		validateInstanceMember( method );
 		if ( method.getParameterCount() != 1 ) {
 			throw new HibernateAccessorException(
 					"Method '" + method.getName() + "' on " + method.getDeclaringClass().getName()
@@ -61,6 +78,7 @@ public final class MemberValidation {
 	 * @throws HibernateAccessorException if the member is a Method that is not a valid getter
 	 */
 	public static void validateReaderMember(Member member) {
+		validateInstanceMember( member );
 		if ( member instanceof Field ) {
 			return;
 		}
@@ -78,6 +96,7 @@ public final class MemberValidation {
 	 * @throws HibernateAccessorException if the member is a Method that is not a valid setter
 	 */
 	public static void validateWriterMember(Member member) {
+		validateInstanceMember( member );
 		if ( member instanceof Field ) {
 			return;
 		}

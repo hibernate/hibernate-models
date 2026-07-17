@@ -31,6 +31,7 @@ public class HibernateAccessorReflectionFactory implements HibernateAccessorFact
 
 	@Override
 	public HibernateAccessorValueReader<?> valueReader(Field field) {
+		MemberValidation.validateInstanceMember( field );
 		return new HibernateAccessorReflectionFieldValueReader<>(field);
 	}
 
@@ -42,6 +43,7 @@ public class HibernateAccessorReflectionFactory implements HibernateAccessorFact
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Field field) {
+		MemberValidation.validateInstanceMember( field );
 		return new HibernateAccessorReflectionFieldValueWriter(field);
 	}
 

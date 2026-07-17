@@ -46,6 +46,7 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 
 	@Override
 	public HibernateAccessorValueReader<?> valueReader(Field field) {
+		MemberValidation.validateInstanceMember( field );
 		try {
 			return new LambdaFieldValueReader<>(MethodHandles.privateLookupIn(field.getDeclaringClass(), this.lookup).unreflectGetter(field));
 		}
@@ -80,6 +81,7 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Field field) {
+		MemberValidation.validateInstanceMember( field );
 		try {
 			return new LambdaFieldValueWriter(MethodHandles.privateLookupIn(field.getDeclaringClass(), this.lookup).unreflectSetter(field));
 		}
