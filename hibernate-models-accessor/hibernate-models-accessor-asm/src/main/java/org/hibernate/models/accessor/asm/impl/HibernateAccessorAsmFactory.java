@@ -4,7 +4,6 @@
  */
 package org.hibernate.models.accessor.asm.impl;
 
-import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.accessor.HibernateAccessorInstantiator;
 import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
 import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;

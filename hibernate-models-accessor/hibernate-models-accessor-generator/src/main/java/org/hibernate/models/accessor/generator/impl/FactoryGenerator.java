@@ -140,6 +140,10 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 				"(L" + reflectType + ";)L" + returnInterface + ";", null, null );
 		mv.visitCode();
 
+		mv.visitVarInsn( ALOAD, 1 );
+		mv.visitMethodInsn( INVOKESTATIC, MEMBER_VALIDATION_INTERNAL, "validateInstanceMember",
+				"(Ljava/lang/reflect/Member;)V", false );
+
 		if ( validationMethod != null ) {
 			mv.visitVarInsn( ALOAD, 1 );
 			mv.visitMethodInsn( INVOKESTATIC, MEMBER_VALIDATION_INTERNAL, validationMethod,
@@ -389,6 +393,20 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 
 		MethodVisitor mv = cw.visitMethod( ACC_PUBLIC | ACC_VARARGS, methodName, descriptor, null, null );
 		mv.visitCode();
+
+		// if (members.length == 0) throw new IllegalArgumentException("At least one member is required")
+		mv.visitVarInsn( ALOAD, 2 );
+		mv.visitInsn( ARRAYLENGTH );
+		Label nonEmptyLabel = new Label();
+		mv.visitJumpInsn( IFNE, nonEmptyLabel );
+		mv.visitTypeInsn( NEW, "java/lang/IllegalArgumentException" );
+		mv.visitInsn( DUP );
+		mv.visitLdcInsn( "At least one member is required" );
+		mv.visitMethodInsn( INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>",
+				"(Ljava/lang/String;)V", false );
+		mv.visitInsn( ATHROW );
+		mv.visitLabel( nonEmptyLabel );
+		mv.visitFrame( F_SAME, 0, null, 0, null );
 
 		Label fallbackLabel = new Label();
 

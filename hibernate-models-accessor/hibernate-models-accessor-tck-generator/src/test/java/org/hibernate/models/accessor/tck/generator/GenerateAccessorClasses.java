@@ -17,6 +17,7 @@ import org.hibernate.models.accessor.generator.AccessorClassMetadata;
 import org.hibernate.models.accessor.generator.AccessorClassMetadata.MultiValueGroupMetadata;
 import org.hibernate.models.accessor.generator.AccessorGenerator;
 import org.hibernate.models.accessor.generator.GeneratedClassResult;
+import org.hibernate.models.accessor.tck.tests.beans.FinalFieldBean;
 import org.hibernate.models.accessor.tck.tests.beans.PrimitiveFieldBean;
 import org.hibernate.models.accessor.tck.tests.beans.SimpleRecord;
 import org.hibernate.models.accessor.tck.tests.beans.inheritance.ChildBean;
@@ -28,6 +29,7 @@ import org.hibernate.models.accessor.tck.tests.interfacemethod.GreetingServiceIm
 public class GenerateAccessorClasses {
 
 	private static final Class<?>[] BEAN_CLASSES = {
+			FinalFieldBean.class,
 			PrimitiveFieldBean.class,
 			SimpleRecord.class,
 			ChildBean.class,
@@ -79,6 +81,11 @@ public class GenerateAccessorClasses {
 	private static List<MultiValueGroupMetadata> buildReaderGroups() throws Exception {
 		List<MultiValueGroupMetadata> groups = new ArrayList<>();
 
+		// FinalFieldMultiValueTest groups
+		Field alphaField = FinalFieldBean.class.getDeclaredField( "alpha" );
+		Field gammaField = FinalFieldBean.class.getDeclaredField( "gamma" );
+		groups.add( MultiValueGroupMetadata.readerGroup( FinalFieldBean.class, alphaField, gammaField ) );
+
 		// MultiValueAccessTest groups
 		Field intField = PrimitiveFieldBean.class.getDeclaredField( "intField" );
 		Field longField = PrimitiveFieldBean.class.getDeclaredField( "longField" );
@@ -105,6 +112,11 @@ public class GenerateAccessorClasses {
 
 	private static List<MultiValueGroupMetadata> buildWriterGroups() throws Exception {
 		List<MultiValueGroupMetadata> groups = new ArrayList<>();
+
+		// FinalFieldMultiValueTest groups
+		Field alphaField = FinalFieldBean.class.getDeclaredField( "alpha" );
+		Field gammaField = FinalFieldBean.class.getDeclaredField( "gamma" );
+		groups.add( MultiValueGroupMetadata.writerGroup( FinalFieldBean.class, alphaField, gammaField ) );
 
 		// MultiValueAccessTest groups
 		Field intField = PrimitiveFieldBean.class.getDeclaredField( "intField" );

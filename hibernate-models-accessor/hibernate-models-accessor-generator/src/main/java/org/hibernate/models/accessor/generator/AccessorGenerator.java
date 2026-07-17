@@ -109,15 +109,9 @@ public final class AccessorGenerator {
 			currentClassIndex++;
 		}
 
-		// Process multi-value groups
-		List<ProcessedMultiValueGroup> processedReaderGroups = processMultiValueGroups(
-				readerGroups, hostByName, dispatchTargetByHost, isInterfaceByHost, true );
-		List<ProcessedMultiValueGroup> processedWriterGroups = processMultiValueGroups(
-				writerGroups, hostByName, dispatchTargetByHost, isInterfaceByHost, false );
-
 		// Build per-host multi-value group maps for HostClassTransformer
-		Map<String, List<NameAndIndex>> readerGroupsByHost = groupByTargetHost( readerGroups, processedReaderGroups );
-		Map<String, List<NameAndIndex>> writerGroupsByHost = groupByTargetHost( writerGroups, processedWriterGroups );
+		Map<String, List<NameAndIndex>> readerGroupsByHost = groupByTargetHost( readerGroups );
+		Map<String, List<NameAndIndex>> writerGroupsByHost = groupByTargetHost( writerGroups );
 
 		// Register multi-value target classes with factory
 		for ( String targetClass : readerGroupsByHost.keySet() ) {
@@ -127,7 +121,8 @@ public final class AccessorGenerator {
 			factoryGen.registerMultiValueWriter( targetClass );
 		}
 
-		// Transform host classes
+		// Transform host classes — this mutates reader/writer sets
+		// (removes final fields from writers, adds $$_hibernate_read_* to readers)
 		for ( ProcessedHostData data : hosts ) {
 			String hostFqcn = data.type().host();
 			int hostClassIndex = classIndexByName.get( hostFqcn );
@@ -144,6 +139,13 @@ public final class AccessorGenerator {
 				transformedClasses.add( new GeneratedClassResult( hostFqcn, transformed ) );
 			}
 		}
+
+		// Process multi-value groups AFTER transformation so member indices
+		// are consistent with the finalized reader/writer sets
+		List<ProcessedMultiValueGroup> processedReaderGroups = processMultiValueGroups(
+				readerGroups, hostByName, dispatchTargetByHost, isInterfaceByHost, true );
+		List<ProcessedMultiValueGroup> processedWriterGroups = processMultiValueGroups(
+				writerGroups, hostByName, dispatchTargetByHost, isInterfaceByHost, false );
 
 		SingleImplGenerator implGen = new SingleImplGenerator();
 
@@ -215,14 +217,12 @@ public final class AccessorGenerator {
 	}
 
 	private static Map<String, List<NameAndIndex>> groupByTargetHost(
-			List<MultiValueGroupMetadata> groups,
-			List<ProcessedMultiValueGroup> processedGroups) {
+			List<MultiValueGroupMetadata> groups) {
 		Map<String, List<NameAndIndex>> result = new HashMap<>();
 		for ( int i = 0; i < groups.size(); i++ ) {
-			String targetClass = groups.get( i ).targetDeclaringClass();
-			result.computeIfAbsent( targetClass, k -> new ArrayList<>() )
-					.add( new NameAndIndex( processedGroups.get( i ).descriptor(),
-							processedGroups.get( i ).groupIndex() ) );
+			MultiValueGroupMetadata group = groups.get( i );
+			result.computeIfAbsent( group.targetDeclaringClass(), k -> new ArrayList<>() )
+					.add( new NameAndIndex( group.descriptor(), i ) );
 		}
 		return result;
 	}
