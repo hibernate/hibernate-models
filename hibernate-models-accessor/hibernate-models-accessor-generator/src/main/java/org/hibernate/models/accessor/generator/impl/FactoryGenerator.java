@@ -83,12 +83,12 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 
 		generateValueAccessor( cw, "valueReader", "java/lang/reflect/Field", "getName",
 				METHOD_NAME_FIELD_READER_ACCESSOR, READER_INTERFACE_INTERNAL, fieldReaderClasses, null );
-		generateValueAccessor( cw, "valueReader", "java/lang/reflect/Method", "getName",
+		generateValueAccessor( cw, "valueReader", "java/lang/reflect/Method", null,
 				METHOD_NAME_METHOD_READER_ACCESSOR, READER_INTERFACE_INTERNAL, methodReaderClasses,
 				"validateReaderMethod" );
 		generateValueAccessor( cw, "valueWriter", "java/lang/reflect/Field", "getName",
 				METHOD_NAME_FIELD_WRITER_ACCESSOR, WRITER_INTERFACE_INTERNAL, fieldWriterClasses, null );
-		generateValueAccessor( cw, "valueWriter", "java/lang/reflect/Method", "getName",
+		generateValueAccessor( cw, "valueWriter", "java/lang/reflect/Method", null,
 				METHOD_NAME_METHOD_WRITER_ACCESSOR, WRITER_INTERFACE_INTERNAL, methodWriterClasses,
 				"validateWriterMethod" );
 		generateInstantiatorMethod( cw );
@@ -157,9 +157,16 @@ public class FactoryGenerator implements Opcodes, GeneratorConstants {
 				"()Ljava/lang/String;", false );
 		mv.visitVarInsn( ASTORE, 2 );
 
-		mv.visitVarInsn( ALOAD, 1 );
-		mv.visitMethodInsn( INVOKEVIRTUAL, reflectType, memberNameMethod,
-				"()Ljava/lang/String;", false );
+		if ( memberNameMethod != null ) {
+			mv.visitVarInsn( ALOAD, 1 );
+			mv.visitMethodInsn( INVOKEVIRTUAL, reflectType, memberNameMethod,
+					"()Ljava/lang/String;", false );
+		}
+		else {
+			mv.visitVarInsn( ALOAD, 1 );
+			mv.visitMethodInsn( INVOKESTATIC, NAMING_UTIL_INTERNAL, "methodKey",
+					"(Ljava/lang/reflect/Method;)Ljava/lang/String;", false );
+		}
 		mv.visitVarInsn( ASTORE, 3 );
 
 		if ( classes.isEmpty() ) {

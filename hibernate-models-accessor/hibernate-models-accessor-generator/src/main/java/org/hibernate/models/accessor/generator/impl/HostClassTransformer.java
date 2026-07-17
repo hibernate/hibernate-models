@@ -149,7 +149,7 @@ public class HostClassTransformer implements Opcodes, GeneratorConstants {
 						fieldReaderEntries.add( new NameAndIndex( member.name(), index++ ) );
 					}
 					else {
-						methodReaderEntries.add( new NameAndIndex( member.name(), index++ ) );
+						methodReaderEntries.add( new NameAndIndex( member.name() + member.descriptor(), index++ ) );
 					}
 				}
 			}
@@ -163,7 +163,7 @@ public class HostClassTransformer implements Opcodes, GeneratorConstants {
 						fieldWriterEntries.add( new NameAndIndex( member.name(), index++ ) );
 					}
 					else {
-						methodWriterEntries.add( new NameAndIndex( member.name(), index++ ) );
+						methodWriterEntries.add( new NameAndIndex( member.name() + member.descriptor(), index++ ) );
 					}
 				}
 			}

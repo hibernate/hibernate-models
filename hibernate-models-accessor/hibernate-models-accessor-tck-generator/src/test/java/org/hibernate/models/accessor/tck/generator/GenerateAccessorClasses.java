@@ -18,6 +18,7 @@ import org.hibernate.models.accessor.generator.AccessorClassMetadata.MultiValueG
 import org.hibernate.models.accessor.generator.AccessorGenerator;
 import org.hibernate.models.accessor.generator.GeneratedClassResult;
 import org.hibernate.models.accessor.tck.tests.beans.FinalFieldBean;
+import org.hibernate.models.accessor.tck.tests.beans.OverloadedSetterBean;
 import org.hibernate.models.accessor.tck.tests.beans.PrimitiveFieldBean;
 import org.hibernate.models.accessor.tck.tests.beans.SimpleRecord;
 import org.hibernate.models.accessor.tck.tests.beans.inheritance.ChildBean;
@@ -30,6 +31,7 @@ public class GenerateAccessorClasses {
 
 	private static final Class<?>[] BEAN_CLASSES = {
 			FinalFieldBean.class,
+			OverloadedSetterBean.class,
 			PrimitiveFieldBean.class,
 			SimpleRecord.class,
 			ChildBean.class,
