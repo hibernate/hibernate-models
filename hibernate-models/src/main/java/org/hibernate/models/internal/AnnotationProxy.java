@@ -5,6 +5,7 @@
 package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -48,8 +49,15 @@ public class AnnotationProxy<A extends Annotation> implements InvocationHandler 
 		}
 
 		if ( method.getParameterCount() == 0 ) {
+			final Object rawValue = valueMap.get( method.getName() );
+			if ( rawValue != null && method.getReturnType().isInstance( rawValue ) ) {
+				return rawValue;
+			}
+			if ( rawValue != null && method.getReturnType().isArray() && method.getReturnType().getComponentType().isPrimitive() ) {
+				return adaptArrayValue( rawValue, method.getReturnType().getComponentType() );
+			}
 			final AttributeDescriptor<Object> attributeDescriptor = annotationDescriptor.getAttribute( method.getName() );
-			return attributeDescriptor.getTypeDescriptor().unwrap( valueMap.get( method.getName() ) );
+			return attributeDescriptor.getTypeDescriptor().unwrap( rawValue );
 		}
 
 		// allow for mutability
@@ -63,6 +71,18 @@ public class AnnotationProxy<A extends Annotation> implements InvocationHandler 
 		}
 
 		throw new UnhandledMethodException( "Unhandled method - " + method.toGenericString() );
+	}
+
+	private Object adaptArrayValue(Object rawValue, Class<?> componentType) {
+		if ( !rawValue.getClass().isArray() ) {
+			return rawValue;
+		}
+		final int length = Array.getLength( rawValue );
+		final Object result = Array.newInstance( componentType, length );
+		for ( int i = 0; i < length; i++ ) {
+			Array.set( result, i, Array.get( rawValue, i ) );
+		}
+		return result;
 	}
 
 	private boolean isSetValueMethod(Method method) {

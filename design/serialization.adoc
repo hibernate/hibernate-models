@@ -1,0 +1,321 @@
+= Hibernate Models serialization contributor guide
+:toc:
+
+== Purpose
+
+This document describes the Hibernate Models serialization support from the point of view of Hibernate Models contributors.
+It defines the responsibilities, invariants, and extension points of the `ModelsArchive` format.
+
+The expected Hibernate ORM usage is described separately in xref:orm-metadata-serialization.adoc[Hibernate ORM metadata serialization process].
+That ORM document is expected to be more transient.
+This document should remain useful as the durable guide for maintaining Hibernate Models' own serialization support.
+
+== Scope
+
+Hibernate Models owns serialization of the model graph referenced by an owning serialized graph.
+The primary integration point is a single coordinated archive operation:
+
+[source,java]
+----
+ModelsArchiveWriter writer = ModelsArchives.createWriter( trackImplementors );
+
+ObjectOutputStream payloadOut = ModelsArchives.createObjectOutputStream(
+        outputStream,
+        writer
+);
+
+// write the owning payload through payloadOut
+
+ModelsArchive archive = writer.finish();
+----
+
+Restoration is explicit and requires runtime services:
+
+[source,java]
+----
+RestoredModels restoredModels = archive.restore(
+        classLoading,
+        registryPrimer
+);
+
+ObjectInputStream payloadIn = ModelsArchives.createObjectInputStream(
+        inputStream,
+        restoredModels
+);
+----
+
+The archive does not own ORM metadata serialization, service-registry selection, payload buffering, or ORM's serial form.
+It only owns the backend-neutral representation of Hibernate Models objects and the resolver used by an owning graph.
+
+== Main contracts
+
+`ModelsArchive`::
+The versioned, backend-neutral serial form of the collected model graph.
+It implements `Externalizable` so the archive format is controlled explicitly rather than by Java default serialization of implementation fields.
+
+`ModelsArchiveWriter`::
+Stateful collector that assigns archive-local `ModelReference` identifiers and captures transitive model state.
+A writer instance is intended for model objects associated with a single `ModelsContext`.
+
+`ModelReference`::
+A compact archive-local reference containing a kind and an id.
+IDs are meaningful only inside one `ModelsArchive`.
+
+`RestoredModels`::
+The result of restoring a `ModelsArchive`.
+It exposes the restored `ModelsContext` and a temporary resolver for references embedded in an owning serialized payload.
+
+`ModelsArchives`::
+Factory for writers and model-aware object streams.
+
+== Reference kinds
+
+The supported reference kinds are:
+
+* `CLASS`
+* `TYPE`
+* `FIELD`
+* `METHOD`
+* `CONSTRUCTOR`
+* `RECORD_COMPONENT`
+* `MODULE`
+
+`MODULE` exists so the API and object-stream replacement path have a stable shape.
+Module archive entries are not implemented yet; referencing a `ModuleDetails` currently fails with an explicit unsupported-operation diagnostic.
+
+== Writer behavior
+
+The writer assigns ids as model objects are encountered.
+Repeated references to the same source object return the same `ModelReference`.
+
+Class references are additionally canonicalized by class name.
+This prevents duplicated class rows for equivalent class-valued annotation attributes and for repeated logical class references.
+
+Referencing a model object captures the state needed to restore that object:
+
+* class references capture class serial forms and direct annotation usages;
+* type references capture their transitive type structure;
+* member references capture declaring class references, names, signatures, and direct annotation usages;
+* annotation usages capture effective attribute values.
+
+After `finish()` is called, the writer is inactive and further reference calls are invalid.
+
+== Model-aware object streams
+
+Hibernate Models provides object streams for an owning serialization process.
+
+The output stream replaces live Hibernate Models objects with internal serial proxies containing `ModelReference`s.
+This prevents backend implementation objects such as JDK, Jandex, or Byte Buddy details from being serialized into the owning payload.
+
+The input stream resolves those proxies through `RestoredModels`.
+After payload deserialization, fields in the owning graph contain restored Hibernate Models objects, not references or proxies.
+
+The proxy class is internal and is not part of the public archive contract.
+The stable contract is the `ModelsArchive` plus `ModelReference`.
+
+== Class serialization
+
+Class state must be backend-neutral.
+The archive must not serialize:
+
+* Jandex indexes or annotation instances;
+* Byte Buddy type descriptions;
+* reflection caches;
+* class-loader services; or
+* live `ModelsContext` or registry objects.
+
+Physical class details are serialized by model name and loadable class name.
+They are restored using the supplied `ClassLoading` service.
+
+Dynamic class details are serialized as dynamic model state.
+The current dynamic support preserves:
+
+* dynamic model name;
+* optional physical class name;
+* abstract flag;
+* superclass name; and
+* dynamic fields using class, primitive, or void type shapes.
+
+Dynamic methods are not implemented yet and fail explicitly if encountered.
+
+Missing package-info details have a dedicated serial form.
+Broader unresolved and missing class support should be added deliberately as needed by ORM.
+
+== Type serialization
+
+The type table is a tagged representation of `TypeDetails.Kind`.
+It currently supports:
+
+* class, primitive, and void types;
+* array types;
+* parameterized types;
+* type variables;
+* recursive type-variable references; and
+* wildcard types.
+
+Recursive type-variable graphs require multi-pass restoration.
+For declarations such as:
+
+[source,java]
+----
+class Node<T extends Comparable<T>> {
+}
+----
+
+the restored `Comparable<T>` argument must point back to the canonical restored type variable for `T`.
+
+== Member serialization
+
+Members are restored by resolving their declaring class and then finding the matching member:
+
+* fields by name;
+* methods by name and argument type names;
+* constructors by argument type names;
+* record components by name.
+
+Member references do not serialize reflective `Field`, `Method`, `Constructor`, or record-component instances.
+Physical Java members may be resolved lazily after restoration through the normal `*Details` APIs.
+
+== Annotation serialization
+
+Annotation usages are serialized as effective values, not usage implementation classes.
+This is important because a source usage may be:
+
+* a JDK annotation instance;
+* a Hibernate Models proxy;
+* a Byte Buddy-derived usage;
+* a Jandex-derived usage; or
+* an ORM-generated mutable usage.
+
+The archive stores:
+
+* the target `ModelReference`;
+* the annotation type name;
+* optional mutable contract requirement;
+* a tagged value map for every effective annotation attribute.
+
+Supported annotation value shapes include:
+
+* primitives and boxed primitive values;
+* `String`;
+* enum constants;
+* class-valued attributes;
+* nested annotations;
+* arrays, including primitive arrays and nested annotation arrays; and
+* `null` for internal representation where applicable.
+
+Defaulted values are stored as effective values.
+Restoration therefore does not depend on defaults remaining unchanged.
+
+Annotation classes must be loadable during restoration.
+A missing annotation class is treated as a restoration failure.
+
+== Mutable annotation usages
+
+Mutability is restored through the `AnnotationDescriptor` registered in the restored `ModelsContext`.
+The archive does not serialize mutable usage implementation classes.
+
+When the source descriptor requires a mutable contract, the archive records the mutable annotation contract name.
+During restoration, the registered descriptor must provide the same mutable contract.
+Otherwise restoration fails.
+
+This allows ORM to supply custom mutable descriptors through a `RegistryPrimer` before annotation usages are recreated.
+
+== Registry primer
+
+`ModelsArchive.restore(ClassLoading, RegistryPrimer)` applies the supplied primer before annotation usages are restored.
+
+The primer is the hook for:
+
+* ORM's built-in annotation descriptors;
+* integration-provided annotation descriptors; and
+* custom mutable descriptor contracts.
+
+The primer is not serialized.
+It is supplied by the runtime that performs restoration.
+
+== Restored context
+
+Restoring an archive creates one `ModelsContext`.
+All restored class, type, member, and annotation references resolve into that context.
+
+The `RestoredModels` resolver is normally temporary.
+It is needed while the owning payload is deserialized.
+After that, the owning graph should hold actual restored model objects.
+
+The restored context may be retained by the owning runtime for subsequent model registry and annotation operations.
+
+== Implementor tracking
+
+`ModelsArchives.createWriter(boolean trackImplementors)` stores whether the restored class-details registry should track implementors.
+
+The archive does not serialize `AbstractClassDetailsRegistry#directImplementorMap`.
+That map is derived registry state.
+When `trackImplementors` is true, the restored registry rebuilds implementor and subtype mappings as restored class details are registered.
+
+== Versioning and validation
+
+The archive has an explicit format version independent of Java `serialVersionUID`.
+
+There are distinct compatibility layers:
+
+. the Hibernate Models archive format version;
+. any owning archive format version, such as an ORM metadata archive version; and
+. Java `serialVersionUID` values for Java-serialized helper/proxy classes.
+
+Changes to table layouts, reference encoding, or archive contents are governed by the explicit archive format version.
+
+The implementation should:
+
+* reject unsupported versions with a descriptive exception;
+* validate table sizes before allocation;
+* validate reference kinds and ids;
+* validate table entry types;
+* validate nested reference state;
+* reject duplicate archived class names;
+* reject invalid cross-references during restoration; and
+* avoid Java enum ordinals or implementation class names as format contracts.
+
+== Cross-context usage
+
+A writer instance is intended to collect references associated with a single `ModelsContext`.
+The implementation does not currently perform expensive registry ownership checks for every reference.
+
+Supplying semantically different model objects from multiple contexts to one writer is unsupported.
+Callers should create a separate writer for each independently serialized model context.
+
+== Current unsupported or incomplete areas
+
+The following areas are intentionally not complete:
+
+* module archive entries;
+* dynamic method archive entries;
+* broad unresolved class support beyond currently modeled missing package-info details;
+* standalone serialization of arbitrary individual model objects outside an owning graph; and
+* compatibility readers for older archive format versions.
+
+== Testing expectations
+
+Hibernate Models serialization tests should cover:
+
+* each supported reference kind;
+* repeated references resolving to the same restored instance;
+* `ClassDetails` used as a map key;
+* physical and dynamic classes;
+* primitive, void, array, parameterized, wildcard, and type-variable types;
+* recursive type-variable bounds;
+* overloaded method resolution;
+* records and record components;
+* JDK, Jandex, and Byte Buddy source models restoring to equivalent neutral models;
+* absence of backend implementation state from model-aware payload streams;
+* every legal annotation attribute value kind;
+* effective default annotation values;
+* mutable annotation usages supplied through a custom descriptor primer;
+* missing or incompatible required mutable descriptors;
+* nested annotations and repeatable containers;
+* direct, inherited, repeated, and meta-annotation lookup behavior;
+* class-valued annotation attributes and class-loading failures;
+* missing annotation classes;
+* explicit failure rather than omission when module annotations are encountered;
+* unsupported versions, invalid ids, and corrupt data; and
+* lazy Java class and member resolution after restoration.

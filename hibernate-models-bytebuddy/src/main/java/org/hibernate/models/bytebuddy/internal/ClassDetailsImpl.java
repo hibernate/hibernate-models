@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.internal.ClassDetailsSupport;
-import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
+import org.hibernate.models.serial.internal.SerialClassDetailsImpl;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -237,8 +237,8 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	}
 
 	@Override
-	public SerialClassDetails toStorableForm() {
-		return new SerialJdkClassDetails( getName(), toJavaClass() );
+	public SerialClassDetails toSerialForm() {
+		return new SerialClassDetailsImpl( getName(), getClassName() );
 	}
 
 	@Override

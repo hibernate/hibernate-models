@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.serial.internal;
 
+import java.util.Map;
+
+import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
@@ -14,22 +17,25 @@ import org.hibernate.models.spi.ModelsContext;
  * @author Steve Ebersole
  */
 public class ClassDetailsBuilderImpl implements ClassDetailsBuilder {
-	private StorableContextImpl serialContext;
+	private Map<String, SerialClassDetails> serialClassDetailsMap;
 
-	public ClassDetailsBuilderImpl(StorableContextImpl serialContext, ClassLoading classLoading) {
-		this.serialContext = serialContext;
+	public ClassDetailsBuilderImpl(Map<String, SerialClassDetails> serialClassDetailsMap, ClassLoading classLoading) {
+		this.serialClassDetailsMap = serialClassDetailsMap;
 	}
 
 	@Override
 	public ClassDetails buildClassDetails(String name, ModelsContext modelsContext) {
-		if ( serialContext == null ) {
-			throw new IllegalStateException( "Building context is now immutable" );
+		if ( serialClassDetailsMap != null ) {
+			final SerialClassDetails serialClassDetails = serialClassDetailsMap.get( name );
+			if ( serialClassDetails != null ) {
+				return serialClassDetails.toClassDetails( modelsContext );
+			}
 		}
-		final SerialClassDetails serialClassDetails = serialContext.getSerialClassDetailsMap().get( name );
-		return serialClassDetails.fromStorableForm( modelsContext );
+
+		return JdkBuilders.DEFAULT_BUILDER.buildClassDetails( name, modelsContext );
 	}
 
 	public void invalidate() {
-		serialContext = null;
+		serialClassDetailsMap = null;
 	}
 }

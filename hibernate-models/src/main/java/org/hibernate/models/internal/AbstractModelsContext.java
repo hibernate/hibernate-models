@@ -37,7 +37,10 @@ public abstract class AbstractModelsContext implements ModelsContext {
 
 	protected void primeRegistries(RegistryPrimer registryPrimer) {
 		BaseLineJavaTypes.forEachJavaType( this::primeClassDetails );
+		applyRegistryPrimer( registryPrimer );
+	}
 
+	protected void applyRegistryPrimer(RegistryPrimer registryPrimer) {
 		if ( registryPrimer != null ) {
 			registryPrimer.primeRegistries( new RegistryContributions(), this );
 		}

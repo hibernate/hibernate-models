@@ -11,6 +11,7 @@ import java.util.List;
 import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
+import org.hibernate.models.serial.internal.SerialDynamicClassDetails;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
@@ -259,7 +260,7 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
-	public SerialClassDetails toStorableForm() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+	public SerialClassDetails toSerialForm() {
+		return new SerialDynamicClassDetails( this );
 	}
 }

@@ -220,7 +220,7 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	}
 
 	@Override
-	public SerialClassDetails toStorableForm() {
+	public SerialClassDetails toSerialForm() {
 		return new SerialFormImpl( packageName, packageInfoClassName );
 	}
 
@@ -244,7 +244,7 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 		}
 
 		@Override
-		public ClassDetails fromStorableForm(ModelsContext context) {
+		public ClassDetails toClassDetails(ModelsContext context) {
 			return new MissingPackageInfoDetails( packageName, packageInfoClassName );
 		}
 	}

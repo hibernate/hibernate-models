@@ -12,8 +12,6 @@ import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
 import org.hibernate.models.jandex.spi.JandexModelsContext;
 import org.hibernate.models.jandex.spi.JandexValueConverter;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;
-import org.hibernate.models.serial.internal.StorableContextImpl;
-import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.spi.ValueTypeDescriptor;
@@ -110,12 +108,4 @@ public class JandexModelsContextImpl extends AbstractModelsContext implements Ja
 		);
 	}
 
-	@Override
-	public StorableContext toStorableForm() {
-		return new StorableContextImpl(
-				classDetailsRegistry.isTrackingImplementors(),
-				classDetailsRegistry.classDetailsMap(),
-				descriptorRegistry.descriptorMap()
-		);
-	}
 }

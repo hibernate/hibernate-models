@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.internal.ClassDetailsSupport;
-import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
+import org.hibernate.models.serial.internal.SerialClassDetailsImpl;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
@@ -322,7 +322,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	}
 
 	@Override
-	public SerialClassDetails toStorableForm() {
-		return new SerialJdkClassDetails( getName(), toJavaClass() );
+	public SerialClassDetails toSerialForm() {
+		return new SerialClassDetailsImpl( getName(), getClassName() );
 	}
 }

@@ -4,13 +4,18 @@
  */
 package org.hibernate.models.serial.spi;
 
+import java.io.Serializable;
+
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ModelsContext;
 
 /**
  * @author Steve Ebersole
  */
-public interface SerialClassDetails extends StorableForm<ClassDetails> {
+public interface SerialClassDetails extends Serializable {
 	String getName();
 
 	String getClassName();
+
+	ClassDetails toClassDetails(ModelsContext context);
 }

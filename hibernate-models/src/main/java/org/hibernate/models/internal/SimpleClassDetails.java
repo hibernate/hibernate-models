@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
+import org.hibernate.models.serial.internal.SerialClassDetailsImpl;
 import org.hibernate.models.internal.util.IndexedConsumer;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -248,7 +248,7 @@ public class SimpleClassDetails implements ClassDetails {
 	}
 
 	@Override
-	public SerialClassDetails toStorableForm() {
-		return new SerialJdkClassDetails( clazz.getName(), clazz );
+	public SerialClassDetails toSerialForm() {
+		return new SerialClassDetailsImpl( clazz.getName(), clazz.getName() );
 	}
 }

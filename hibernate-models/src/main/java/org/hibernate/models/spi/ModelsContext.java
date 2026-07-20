@@ -6,14 +6,11 @@ package org.hibernate.models.spi;
 
 import java.util.Locale;
 
-import org.hibernate.models.serial.spi.StorableContext;
-
 /**
  * Context object for hibernate-models.
  * Basically support for accessing the {@linkplain #getClassDetailsRegistry() ClassDetails registry}
  * and the {@linkplain #getAnnotationDescriptorRegistry() AnnotationDescriptor registry}.
- * Additionally, defines support for {@linkplain #as treat-style casting}
- * and {@linkplain #toStorableForm() serialization}.
+ * Additionally, defines support for {@linkplain #as treat-style casting}.
  *
  * @author Steve Ebersole
  */
@@ -72,8 +69,4 @@ public interface ModelsContext {
 		);
 	}
 
-	/**
-	 * Serialization support.
-	 */
-	StorableContext toStorableForm();
 }

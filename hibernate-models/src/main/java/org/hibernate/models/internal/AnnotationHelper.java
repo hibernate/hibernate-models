@@ -35,6 +35,9 @@ public class AnnotationHelper {
 
 	public static <A extends Annotation, R> R extractValue(A annotationUsage, AttributeDescriptor<R> attributeDescriptor) {
 		try {
+			if ( !attributeDescriptor.getAttributeMethod().canAccess( annotationUsage ) ) {
+				attributeDescriptor.getAttributeMethod().setAccessible( true );
+			}
 			//noinspection unchecked
 			return (R) attributeDescriptor.getAttributeMethod().invoke( annotationUsage );
 		}
