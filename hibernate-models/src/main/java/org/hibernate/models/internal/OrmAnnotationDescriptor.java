@@ -9,6 +9,7 @@ import java.util.EnumSet;
 
 import org.hibernate.models.CompleteAnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.AnnotationHelper;
 import org.hibernate.models.spi.AnnotationTarget;
 
 /**
