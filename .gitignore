@@ -45,3 +45,4 @@ hibernate-release-scripts
 jreleaser
 
 .scannerwork
+/hibernate-models/.profileconfig.json

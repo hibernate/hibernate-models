@@ -9,8 +9,12 @@ import org.hibernate.models.internal.ParameterizedTypeDetailsImpl;
 import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.util.CollectionHelper;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
 import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
@@ -21,6 +25,110 @@ import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
  * @author Steve Ebersole
  */
 public class TypeDetailsHelper {
+	/**
+	 * Resolve {@code type} to the corresponding occurrence of {@code superType} in its
+	 * type hierarchy, substituting type variables at each hierarchy edge.
+	 *
+	 * @return the resolved super type, or {@code null} if {@code type} does not implement it
+	 */
+	public static TypeDetails resolveSuperType(TypeDetails type, Class<?> superType) {
+		if ( type == null || !type.isImplementor( superType ) ) {
+			return null;
+		}
+		return resolveSuperType( type, superType, new HashSet<>() );
+	}
+
+	private static TypeDetails resolveSuperType(
+			TypeDetails type,
+			Class<?> superType,
+			Set<ClassDetails> visitedTypes) {
+		if ( type.getTypeKind() == TypeDetails.Kind.WILDCARD_TYPE ) {
+			final TypeDetails bound = type.asWildcardType().getBound();
+			return bound == null ? null : resolveSuperType( bound, superType, visitedTypes );
+		}
+		if ( type.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ) {
+			for ( TypeDetails bound : type.asTypeVariable().getBounds() ) {
+				final TypeDetails resolved = resolveSuperType( bound, superType, visitedTypes );
+				if ( resolved != null ) {
+					return resolved;
+				}
+			}
+			return null;
+		}
+
+		final ClassDetails rawType = type.determineRawClass();
+		if ( rawType.getName().equals( superType.getName() ) ) {
+			return type;
+		}
+		if ( !visitedTypes.add( rawType ) ) {
+			return null;
+		}
+
+		final TypeDetails genericSuperType = rawType.getGenericSuperType();
+		if ( genericSuperType != null ) {
+			final TypeDetails resolved = resolveSuperType(
+					genericSuperType.determineRelativeType( type ),
+					superType,
+					visitedTypes
+			);
+			if ( resolved != null ) {
+				return resolved;
+			}
+		}
+
+		for ( TypeDetails implementedInterface : rawType.getImplementedInterfaces() ) {
+			final TypeDetails resolved = resolveSuperType(
+					implementedInterface.determineRelativeType( type ),
+					superType,
+					visitedTypes
+			);
+			if ( resolved != null ) {
+				return resolved;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Extract the collection element or map value type.
+	 */
+	public static TypeDetails extractElementType(TypeDetails type) {
+		if ( type == null ) {
+			return null;
+		}
+		if ( type.getTypeKind() == TypeDetails.Kind.ARRAY ) {
+			return type.asArrayType().getConstituentType();
+		}
+		if ( type.isImplementor( Collection.class ) ) {
+			return extractCollectionElementType( type );
+		}
+		if ( type.isImplementor( Map.class ) ) {
+			return extractMapValueType( type );
+		}
+		return null;
+	}
+
+	public static TypeDetails extractCollectionElementType(TypeDetails type) {
+		return extractTypeArgument( resolveSuperType( type, Collection.class ), 0 );
+	}
+
+	public static TypeDetails extractMapKeyType(TypeDetails type) {
+		return extractTypeArgument( resolveSuperType( type, Map.class ), 0 );
+	}
+
+	public static TypeDetails extractMapValueType(TypeDetails type) {
+		return extractTypeArgument( resolveSuperType( type, Map.class ), 1 );
+	}
+
+	private static TypeDetails extractTypeArgument(TypeDetails resolvedType, int argumentIndex) {
+		if ( resolvedType == null || resolvedType.getTypeKind() != TypeDetails.Kind.PARAMETERIZED_TYPE ) {
+			return OBJECT_TYPE_DETAILS;
+		}
+		final List<TypeDetails> arguments = resolvedType.asParameterizedType().getArguments();
+		return argumentIndex < arguments.size() ? arguments.get( argumentIndex ) : OBJECT_TYPE_DETAILS;
+	}
+
 	/**
 	 * Given an attribute member type and a concrete container type, resolve the type of
 	 * the attribute relative to that container.
