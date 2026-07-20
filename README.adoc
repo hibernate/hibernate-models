@@ -1,47 +1,135 @@
-:fn-managed: footnote:[The application's domain and related classes]
-== Hibernate models
+= Hibernate Models
 
 link:https://central.sonatype.com/search?namespace=org.hibernate.models&sort=name[image:https://img.shields.io/maven-central/v/org.hibernate.models/hibernate-models.svg?label=Maven%20Central&style=for-the-badge[Maven Central]]
 link:https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/hibernate/models/hibernate-models/README.md[image:https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/org/hibernate/models/hibernate-models/badge.json&style=for-the-badge[Reproducible Builds]]
 link:https://ge.hibernate.org/scans?search.rootProjectNames=hibernate-models-group[image:https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?style=for-the-badge&logo=gradle[Develocity]]
 
-Provides support for dealing with an application's managed resources{fn-managed} as a de-typed abstraction model
-backed by one or more sources.  Consumers can then access details from that abstraction model in a unified way,
-regardless of the underlying source.
+Hibernate Models provides a unified model of an application’s classes, members, type signatures, and annotations, including models that do not correspond to loaded Java classes.
+The model may be backed by Java reflection, a Jandex index, Byte Buddy TypePool, generated metadata, or a combination of sources.
+Consumers use the same API regardless of the source, and indexed or generated models do not require every represented class to be loaded.
 
-NOTE: This work replaces the https://github.com/hibernate/hibernate-commons-annotations[`hibernate-commons-annotation`] library, which suffered from a number of shortcomings.
-
-
-=== Annotations
-
-The modeling of annotations in hibernate-models is defined by a few main actors:
-
-AnnotationDescriptor:: Extended information about an annotation class
-AnnotationTarget:: Something (Class, Method, ...) where an annotation can be used
-AnnotationUsage:: Specific usage of an annotation on a target
-AttributeDescriptor:: Details about an annotation attribute, including it's `ValueTypeDescriptor`
-ValueTypeDescriptor:: Describes an allowable type for annotation attributes - ints, enums, etc.  Provides the capability to manipulate these values (create them, wrap them, unwrap them, etc).
-AnnotationDescriptorRegistry:: registry of `AnnotationDescriptor` references
+NOTE: Hibernate Models replaces the
+link:https://github.com/hibernate/hibernate-commons-annotations[Hibernate Commons Annotations] library which was historically used across Hibernate projects.
 
 
-=== Model
+== Getting started
 
-These mostly model Java constructs such as Class, Method, etc. but adds the capability
-for these to be dynamic models (no physical Class).
+Hibernate Models requires Java 17 or later. Add the base artifact to use the standard JDK-backed model:
 
-ClassDetails:: Think `java.lang.Class`
-TypeDetails:: Think `java.lang.reflect.Type`
-MemberDetails:: Think `java.lang.reflect.Member`
-FieldDetails:: Think `java.lang.reflect.Field`
-MethodDetails:: Think `java.lang.reflect.Method`
-RecordComponentDetails:: Think `java.lang.reflect.RecordComponent`
-ClassDetailsRegistry:: registry of `ClassDetails` references
+[source,xml,subs=attributes+]
+----
+<dependency>
+    <groupId>org.hibernate.models</groupId>
+    <artifactId>hibernate-models</artifactId>
+    <version>{hibernate-models-version}</version>
+</dependency>
+----
+
+or with Gradle:
+
+[source,groovy,subs=attributes+]
+----
+implementation "org.hibernate.models:hibernate-models:{hibernate-models-version}"
+----
+
+Replace `{hibernate-models-version}` with the desired
+link:https://central.sonatype.com/artifact/org.hibernate.models/hibernate-models[released version].
+
+The following example bootstraps the standard model and resolves details for a class:
+
+[source,java]
+----
+ModelsContext modelsContext = new ModelsConfiguration().bootstrap();
+ClassDetails classDetails = modelsContext.getClassDetailsRegistry()
+        .resolveClassDetails(MyEntity.class.getName());
+
+classDetails.getFields().forEach(field -> {
+    String name = field.getName();
+    TypeDetails type = field.getType();
+    // inspect the field and its annotations
+});
+----
+
+The principal API entry points are:
+
+`ModelsConfiguration`:: Bootstraps a `ModelsContext`, discovering an alternate backend through `ServiceLoader` when present.
+`ModelsContext`:: Provides access to the class, annotation, and module registries.
+`ClassDetailsRegistry`:: Resolves and tracks `ClassDetails` by name.
+`AnnotationDescriptorRegistry`:: Resolves and tracks annotation definitions.
+`Creator`:: Creates supported annotation, JDK-backed, and dynamic model objects.
+`TypeDetails`:: Models Java types and provides factories for common type forms.
+`TypeDetailsHelper`:: Implements cross-object type algorithms, including collection element and map key/value resolution.
+`ModelsContextProvider`:: `ServiceLoader` contract for discovering additional `ModelsContext` implementations.
 
 
-=== Artifacts
+== Model
 
-hibernate-models:: The base support, using Java reflection as the backing source.
-hibernate-models-jandex:: Optional support for using https://smallrye.io/jandex/[Jandex] as the backing source.  Using
-definitions from a Jandex index has the benefit that the classes are not loaded into the ClassLoader which can be important
-in a few scenarios (e.g. retain the ability to enhance a class's bytecode).
+The model mirrors familiar Java reflection concepts while also representing dynamic types which have no corresponding
+loaded `Class<?>`:
 
+`ClassDetails`:: Analogous to `java.lang.Class`.
+`TypeDetails`:: Analogous to `java.lang.reflect.Type`.
+`MemberDetails`:: Common contract analogous to `java.lang.reflect.Member`.
+`FieldDetails`:: Analogous to `java.lang.reflect.Field`.
+`MethodDetails`:: Analogous to `java.lang.reflect.Method`.
+`RecordComponentDetails`:: Analogous to `java.lang.reflect.RecordComponent`.
+
+A `ModelsContext` ties the principal parts of the model together:
+
+[source]
+----
+ModelsContext
+|-- ClassDetailsRegistry
+|   `-- ClassDetails
+|       `-- MemberDetails
+`-- AnnotationDescriptorRegistry
+    `-- AnnotationDescriptor
+        `-- AnnotationUsage
+----
+
+
+== Annotations
+
+The main annotation abstractions are:
+
+`AnnotationDescriptor`:: Extended information about an annotation type.
+`AnnotationTarget`:: A model object, such as a class or method, on which an annotation may be used.
+`AnnotationUsage`:: A particular use of an annotation on a target.
+`AttributeDescriptor`:: Details about an annotation attribute, including its `ValueTypeDescriptor`.
+`ValueTypeDescriptor`:: Describes and converts an allowable annotation attribute type, including primitive values,
+enums, classes, annotations, and arrays.
+`AnnotationDescriptorRegistry`:: Registry of `AnnotationDescriptor` references.
+
+
+== Artifacts and Java modules
+
+`hibernate-models` (`org.hibernate.models`):: The API and standard Java reflection-backed implementation.
+`hibernate-models-jandex` (`org.hibernate.models.jandex`):: Optional Jandex-backed implementation using a Jandex
+`Index`.
+`hibernate-models-bytebuddy` (`org.hibernate.models.bytebuddy`):: Optional Byte Buddy-backed implementation using a
+Byte Buddy `TypePool`.
+`hibernate-models-testing`:: Shared test support for Hibernate Models and its consumers; it is not intended as a
+production dependency.
+
+[TIP]
+====
+When an `Index` or `TypePool` is already available, reading its metadata is generally faster than discovering the same
+information through reflection. These backends can also model types without loading the represented classes or
+materializing reflection objects, which is especially useful when their bytecode must remain available for enhancement.
+====
+
+The Jandex and Byte Buddy modules both require `org.hibernate.models` transitively. Placing either implementation on
+the module path or class path allows `ModelsConfiguration` to discover its `ModelsContextProvider` as a Java service.
+
+
+== Building Hibernate Models
+
+Build the project and run its tests with:
+
+[source,shell]
+----
+./gradlew test
+----
+
+Hibernate Models is licensed under the link:LICENSE[Apache License 2.0]. Report bugs and request enhancements through
+the link:https://github.com/hibernate/hibernate-models/issues[issue tracker].
