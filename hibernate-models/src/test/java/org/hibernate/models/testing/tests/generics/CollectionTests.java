@@ -5,6 +5,7 @@
 package org.hibernate.models.testing.tests.generics;
 
 import java.util.ArrayList;
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -319,6 +320,46 @@ public class CollectionTests {
 		assertThat( superSpecialHashMapField.getElementType().determineRawClass().toJavaClass() ).isEqualTo( String.class );
 	}
 
+	@Test
+	@SuppressWarnings("removal")
+	void testMapSubtypeArgumentResolution() {
+		final ModelsContext modelsContext = createModelContext(
+				GenericStringMap.class,
+				JsonPayload.class,
+				IntermediateMap.class,
+				ReversedMap.class,
+				StringKeyedMap.class,
+				GenericMapContainer.class
+		);
+		final ClassDetails container = modelsContext.getClassDetailsRegistry()
+				.getClassDetails( GenericMapContainer.class.getName() );
+
+		assertMapArguments( container.findFieldByName( "payload" ), String.class, Object.class );
+		assertMapArguments( container.findFieldByName( "integerValues" ), String.class, Integer.class );
+		assertMapArguments( container.findFieldByName( "longValues" ), String.class, Long.class );
+		assertMapArguments( container.findFieldByName( "reversed" ), String.class, Integer.class );
+		assertMapArguments( container.findFieldByName( "interfaceMap" ), String.class, Double.class );
+		assertMapArguments( container.findFieldByName( "rawValues" ), String.class, Object.class );
+
+		final TypeDetails resolvedMapType = org.hibernate.models.spi.TypeDetailsHelper.resolveSuperType(
+				container.findFieldByName( "longValues" ).getType(),
+				Map.class
+		);
+		assertThat( resolvedMapType ).isInstanceOf( ParameterizedTypeDetails.class );
+		assertThat( resolvedMapType.asParameterizedType().getRawClassDetails().toJavaClass() ).isEqualTo( Map.class );
+
+		final TypeDetails payloadType = container.findFieldByName( "payload" ).getType();
+		assertThat( org.hibernate.models.internal.MapKeySwitch.extractMapKeyType( payloadType )
+				.determineRawClass().toJavaClass() ).isEqualTo( String.class );
+		assertThat( org.hibernate.models.internal.MapValueSwitch.extractMapValueType( payloadType )
+				.determineRawClass().toJavaClass() ).isEqualTo( Object.class );
+	}
+
+	private static void assertMapArguments(FieldDetails field, Class<?> keyType, Class<?> valueType) {
+		assertThat( field.getMapKeyType().determineRawClass().toJavaClass() ).isEqualTo( keyType );
+		assertThat( field.getElementType().determineRawClass().toJavaClass() ).isEqualTo( valueType );
+	}
+
 
 	@SuppressWarnings("unused")
 	static class ClassOfCollections<T> {
@@ -509,6 +550,35 @@ public class CollectionTests {
 	}
 
 	static class SuperSpecialHashMap extends SpecialHashMap {
+	}
+
+	abstract static class GenericStringMap<V> extends AbstractMap<String, V> {
+	}
+
+	static class JsonPayload extends GenericStringMap<Object> {
+		@Override
+		public Set<Entry<String, Object>> entrySet() {
+			return Set.of();
+		}
+	}
+
+	abstract static class IntermediateMap<T> extends GenericStringMap<T> {
+	}
+
+	abstract static class ReversedMap<A, B> extends AbstractMap<B, A> {
+	}
+
+	interface StringKeyedMap<V> extends Map<String, V> {
+	}
+
+	@SuppressWarnings({"unused", "rawtypes"})
+	static class GenericMapContainer {
+		JsonPayload payload;
+		GenericStringMap<Integer> integerValues;
+		IntermediateMap<Long> longValues;
+		ReversedMap<Integer, String> reversed;
+		StringKeyedMap<Double> interfaceMap;
+		GenericStringMap rawValues;
 	}
 
 

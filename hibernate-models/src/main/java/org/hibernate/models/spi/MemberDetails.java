@@ -5,12 +5,6 @@
 package org.hibernate.models.spi;
 
 import java.lang.reflect.Member;
-import java.util.Collection;
-import java.util.Map;
-
-import org.hibernate.models.internal.CollectionElementSwitch;
-import org.hibernate.models.internal.MapKeySwitch;
-import org.hibernate.models.internal.MapValueSwitch;
 import org.hibernate.models.internal.ModifierUtils;
 
 /**
@@ -61,50 +55,7 @@ public interface MemberDetails extends AnnotationTarget {
 	 * For maps, the value type is returned.
 	 */
 	default TypeDetails getElementType() {
-		final TypeDetails memberType = getType();
-		if ( memberType == null ) {
-			return null;
-		}
-
-		if ( memberType.getTypeKind() == TypeDetails.Kind.ARRAY ) {
-			return memberType.asArrayType().getConstituentType();
-		}
-
-		if ( memberType.isImplementor( Collection.class ) ) {
-			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
-				// handle "concrete types" such as `class SpecialList implements List<String>`
-				return CollectionElementSwitch.extractCollectionElementType( memberType );
-			}
-			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
-				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
-				assert parameterizedType.getArguments().size() == 1;
-				return parameterizedType.getArguments().get( 0 );
-			}
-			if ( memberType.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ) {
-				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
-				assert typeVariable.getBounds().size() == 1;
-				return typeVariable.getBounds().get( 0 );
-			}
-		}
-
-		if ( memberType.isImplementor( Map.class ) ) {
-			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
-				// handle "concrete types" such as `class SpecialMap implements Map<String,String>`
-				return MapValueSwitch.extractMapValueType( memberType );
-			}
-			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
-				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
-				assert parameterizedType.getArguments().size() == 2;
-				return parameterizedType.getArguments().get( 1 );
-			}
-			if ( memberType.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ) {
-				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
-				assert typeVariable.getBounds().size() == 2;
-				return typeVariable.getBounds().get( 1 );
-			}
-		}
-
-		return null;
+		return TypeDetailsHelper.extractElementType( getType() );
 	}
 
 	/**
@@ -113,28 +64,9 @@ public interface MemberDetails extends AnnotationTarget {
 	 */
 	default TypeDetails getMapKeyType() {
 		final TypeDetails memberType = getType();
-		if ( memberType == null ) {
-			return null;
-		}
-
-		if ( memberType.isImplementor( Map.class ) ) {
-			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
-				// handle "concrete types" such as `class SpecialMap implements Map<String,String>`
-				return MapKeySwitch.extractMapKeyType( memberType );
-			}
-			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
-				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
-				assert parameterizedType.getArguments().size() == 2;
-				return parameterizedType.getArguments().get( 0 );
-			}
-			if ( memberType.getTypeKind() == TypeDetails.Kind.TYPE_VARIABLE ) {
-				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
-				assert typeVariable.getBounds().size() == 2;
-				return typeVariable.getBounds().get( 0 );
-			}
-		}
-
-		return null;
+		return memberType == null || !memberType.isImplementor( java.util.Map.class )
+				? null
+				: TypeDetailsHelper.extractMapKeyType( memberType );
 	}
 
 	/**
