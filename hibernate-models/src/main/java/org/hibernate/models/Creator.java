@@ -115,6 +115,25 @@ public class Creator {
 		return new DynamicFieldDetails( name, type, declaringType, modifierFlags, isArray, isPlural, modelsContext );
 	}
 
+	/// Create member for a [dynamic class][#createDynamicClassDetails] using the standard dynamic
+	/// [modifiers][#DYNAMIC_ATTRIBUTE_MODIFIERS].
+	///
+	/// @param name The member name.
+	/// @param type The member type.
+	/// @param declaringType The dynamic class.
+	/// @param isArray Whether the member is an array.
+	/// @param isPlural Whether the member is a Java Collection.
+	/// @param modelsContext Needed for additional lookups.
+	public static MutableMemberDetails createDynamicMemberDetails(
+			String name,
+			TypeDetails type,
+			ClassDetails declaringType,
+			boolean isArray,
+			boolean isPlural,
+			ModelsContext modelsContext) {
+		return new DynamicFieldDetails( name, type, declaringType, DYNAMIC_ATTRIBUTE_MODIFIERS, isArray, isPlural, modelsContext );
+	}
+
 	/// Create ClassDetails from a JDK Class reference.
 	///
 	/// @param managedClass The JDK Class reference.
