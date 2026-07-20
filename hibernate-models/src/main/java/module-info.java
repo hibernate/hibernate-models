@@ -7,7 +7,6 @@ module org.hibernate.models {
 	exports org.hibernate.models.rendering;
 	exports org.hibernate.models.serial.spi;
 
-	// todo : most of this should move to `org.hibernate.models`
 	exports org.hibernate.models.spi;
 
 	exports org.hibernate.models.logging
