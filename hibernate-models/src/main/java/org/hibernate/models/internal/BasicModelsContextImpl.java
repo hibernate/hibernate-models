@@ -7,8 +7,6 @@ package org.hibernate.models.internal;
 import java.util.Map;
 
 import org.hibernate.models.Settings;
-import org.hibernate.models.serial.internal.StorableContextImpl;
-import org.hibernate.models.serial.spi.StorableContext;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 
@@ -61,14 +59,5 @@ public class BasicModelsContextImpl extends AbstractModelsContext {
 	@Override
 	public ModuleDetailsRegistryStandard getModuleDetailsRegistry() {
 		return moduleDetailsRegistry;
-	}
-
-	@Override
-	public StorableContext toStorableForm() {
-		return new StorableContextImpl(
-				classDetailsRegistry.isTrackingImplementors(),
-				classDetailsRegistry.classDetailsMap,
-				descriptorRegistry.descriptorMap
-		);
 	}
 }

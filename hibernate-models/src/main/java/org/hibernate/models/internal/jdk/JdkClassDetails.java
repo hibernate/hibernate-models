@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.util.CollectionHelper;
+import org.hibernate.models.serial.internal.SerialClassDetailsImpl;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -280,7 +281,7 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	}
 
 	@Override
-	public SerialClassDetails toStorableForm() {
-		return new SerialJdkClassDetails( name, managedClass );
+	public SerialClassDetails toSerialForm() {
+		return new SerialClassDetailsImpl( name, managedClass.getName() );
 	}
 }

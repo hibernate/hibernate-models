@@ -1,0 +1,481 @@
+= Hibernate ORM metadata serialization process
+:toc:
+
+== Status
+
+This document describes the proposed end-to-end process for serializing and restoring Hibernate ORM's boot `Metadata` graph.
+It concentrates on the ORM integration boundary, the serial form of metadata, and dependency injection during restoration.
+It is intended as a temporary integration design note while ORM's metadata serialization support is implemented.
+
+The durable Hibernate Models contributor guide is xref:serialization.adoc[Hibernate Models serialization contributor guide].
+That document defines `ModelsArchive`, model references, restored model identity, types, members, annotations, and descriptor priming in greater detail.
+
+The names of types and methods shown here are illustrative and may change during implementation.
+
+== Motivation
+
+Hibernate ORM's boot model is becoming serializable.
+The boot model now retains Hibernate Models references such as `ClassDetails`, `TypeDetails`, and member details.
+Restoring ORM metadata therefore requires restoring both:
+
+* the ORM boot-model graph; and
+* the Hibernate Models graph referenced by it.
+
+Restoration also requires runtime facilities that should not be captured in the serialized representation, including class loading and registration of ORM's custom annotation descriptors.
+The serialization design must provide these dependencies explicitly rather than attempting to serialize services or discover them from ambient JVM state.
+
+== Serialization boundary
+
+The serializable boundary is a dedicated serial form of ORM metadata:
+
+[source,text]
+----
+live Metadata
+      |
+      | create serial form
+      v
+SerializedMetadata
+ +-- ORM archive format and version
+ +-- ModelsArchive
+ `-- serialized ORM boot-model payload
+----
+
+`SerializedMetadata` is a data container.
+It may implement `Externalizable` to control its format, but Java deserialization of that object does not immediately reconstruct live `Metadata`.
+
+The supported lifecycle is:
+
+[source,java]
+----
+SerializedMetadata serialForm = MetadataSerialization.serialize( metadata );
+
+// The serial form may now be written, read, cloned, or cached.
+
+Metadata restoredMetadata = serialForm.restore(
+        classLoading,
+        registryPrimer
+);
+----
+
+This is intentionally different from relying on:
+
+[source,java]
+----
+Metadata restoredMetadata = SerializationHelper.clone( metadata );
+----
+
+Direct Java deserialization cannot supply the runtime services needed to restore the model safely.
+
+== Serialized metadata contents
+
+The serial form contains only data required to reconstruct the two graphs:
+
+`ModelsArchive`::
+The versioned, backend-neutral Hibernate Models tables and reference IDs.
+
+ORM boot-model payload::
+The ordinary ORM boot graph with every archived Hibernate Models object replaced by a compact model reference.
+
+The serial form must not contain:
+
+* `ClassLoading`;
+* ORM's `ClassLoaderService`;
+* a `RegistryPrimer`;
+* a `ServiceRegistry`;
+* a live `ModelsContext`; or
+* Jandex, Byte Buddy, or reflection backend state.
+
+== Creating the serial form
+
+Creating `SerializedMetadata` uses a dedicated serialization process rather than Java default serialization of the live `Metadata` object.
+
+. Create a Hibernate Models archive writer.
+. Serialize the ORM boot-model graph into a nested payload.
+. Replace every encountered `ClassDetails`, `TypeDetails`, `FieldDetails`, `MethodDetails`, `ConstructorDetails`, and `RecordComponentDetails` with a model-reference proxy supplied by the Hibernate Models-aware stream.
+. Capture the transitive Hibernate Models state as model references are assigned.
+. Complete the `ModelsArchive` after the ORM payload has been traversed.
+. Store the completed archive and buffered ORM payload in `SerializedMetadata`.
+
+The ORM payload is normally buffered before the complete archive is written because traversing the payload discovers which model objects must be included.
+
+Conceptually, the payload output stream performs:
+
+[source,java]
+----
+ObjectOutputStream out = ModelsArchives.createObjectOutputStream(
+        payloadOutputStream,
+        archiveWriter
+);
+
+@Override
+protected Object replaceObject(Object value) {
+    if ( value instanceof ClassDetails details ) {
+        return new ModelReferenceProxy( archiveWriter.reference( details ) );
+    }
+    if ( value instanceof TypeDetails details ) {
+        return new ModelReferenceProxy( archiveWriter.reference( details ) );
+    }
+    if ( value instanceof FieldDetails details ) {
+        return new ModelReferenceProxy( archiveWriter.reference( details ) );
+    }
+    if ( value instanceof MethodDetails details ) {
+        return new ModelReferenceProxy( archiveWriter.reference( details ) );
+    }
+    if ( value instanceof ConstructorDetails details ) {
+        return new ModelReferenceProxy( archiveWriter.reference( details ) );
+    }
+    if ( value instanceof RecordComponentDetails details ) {
+        return new ModelReferenceProxy( archiveWriter.reference( details ) );
+    }
+    return value;
+}
+----
+
+The proxy type is internal to Hibernate Models; ORM should obtain the stream through `ModelsArchives`.
+
+== Reading versus restoring
+
+Reading a `SerializedMetadata` object and restoring live `Metadata` are separate operations.
+
+=== Reading the serial form
+
+`readExternal()` or an equivalent reader:
+
+* reads the versioned archive data;
+* validates structural properties that require no runtime services;
+* retains the `ModelsArchive` and ORM payload; and
+* returns a data-only `SerializedMetadata`.
+
+It must not:
+
+* load application classes;
+* construct a `ModelsContext`;
+* resolve model references;
+* locate a service registry; or
+* recreate live ORM metadata.
+
+=== Restoring live metadata
+
+Restoration is an explicit operation with injected dependencies:
+
+[source,java]
+----
+Metadata restore(
+        ClassLoading classLoading,
+        RegistryPrimer registryPrimer);
+----
+
+It performs these phases:
+
+. Restore the `ModelsArchive`, supplying class loading and the registry primer.
+. Receive `RestoredModels`, containing the populated `ModelsContext` and model-reference resolver.
+. Deserialize the nested ORM payload using a dedicated input stream with access to `RestoredModels`.
+. Replace every model reference with its canonical restored Hibernate Models object.
+. Return the completed ORM `Metadata` graph.
+
+Conceptually:
+
+[source,java]
+----
+public Metadata restore(
+        ClassLoading classLoading,
+        RegistryPrimer registryPrimer) {
+    RestoredModels restoredModels = modelsArchive.restore(
+            classLoading,
+            registryPrimer
+    );
+
+    return bootModelPayload.restore(
+            restoredModels,
+            classLoading
+    );
+}
+----
+
+== `RestoredModels`
+
+Restoring the `ModelsArchive` produces both the live model context and a temporary resolver:
+
+[source,java]
+----
+interface RestoredModels {
+    ModelsContext getModelsContext();
+
+    Object resolve(ModelReference reference);
+}
+----
+
+More type-specific resolution methods may be used in the final API.
+
+The resolver is necessary because only classes and annotation descriptors have public registries.
+Types and members still require lookup through archive ID tables.
+
+The ORM payload input stream uses the resolver uniformly:
+
+[source,java]
+----
+ObjectInputStream in = ModelsArchives.createObjectInputStream(
+        payloadInputStream,
+        restoredModels
+);
+
+@Override
+protected Object resolveObject(Object value) {
+    if ( value instanceof ModelReferenceProxy proxy ) {
+        return restoredModels.resolve( proxy.reference() );
+    }
+    return value;
+}
+----
+
+ORM boot-model classes do not individually handle model references.
+For example, `PersistentClass`, `MappedSuperclass`, and `Component` receive real `ClassDetails` instances as their fields are assigned by the nested deserialization process.
+
+After the payload has been restored, the temporary ID resolver normally does not need to be retained.
+All model references in the ORM graph have been replaced by canonical objects belonging to the restored `ModelsContext`.
+ORM may retain the `ModelsContext` for subsequent registry and annotation operations.
+
+== Restoring the Hibernate Models context
+
+The internal Hibernate Models restoration sequence is summarized here to establish ORM's integration points:
+
+. Create an empty restored `ModelsContext` and empty registries.
+. Apply the supplied `RegistryPrimer`.
+. Allocate skeletal classes and recursive type variables.
+. Populate the `ClassDetailsRegistry` and archive ID tables.
+. Resolve class, type, and member graphs.
+. Resolve remaining standard annotation descriptors from loadable annotation classes.
+. Validate custom descriptor requirements against descriptors supplied by the primer.
+. Restore annotation usages and attach them to their targets.
+. Complete or freeze structural state while retaining supported annotation mutability.
+. Return `RestoredModels` containing the context and resolver.
+
+Custom annotation descriptor implementations are not reconstructed from serialized implementation classes.
+ORM contributes its descriptors through the primer before annotation usages are created.
+See xref:serialization.adoc#_serialized_annotations[Serialized annotations] for the annotation value and mutability design.
+
+== Restoration dependencies
+
+=== Hibernate Models-level API
+
+The lowest-level restoration operation accepts only Hibernate Models contracts:
+
+[source,java]
+----
+RestoredModels ModelsArchive.restore(
+        ClassLoading classLoading,
+        RegistryPrimer registryPrimer);
+----
+
+Neither dependency is stored in `ModelsArchive` or `SerializedMetadata`.
+
+=== ORM service-registry API
+
+ORM may expose an overload using its native service infrastructure:
+
+[source,java]
+----
+Metadata restore(
+        ServiceRegistry serviceRegistry,
+        RegistryPrimer additionalPrimer);
+----
+
+That overload obtains a `ClassLoaderService`, adapts it to Hibernate Models' `ClassLoading`, and composes the optional integration primer with ORM's built-in primer.
+
+Conceptually:
+
+[source,java]
+----
+public Metadata restore(
+        ServiceRegistry serviceRegistry,
+        RegistryPrimer additionalPrimer) {
+    ClassLoaderService classLoaderService =
+            serviceRegistry.requireService( ClassLoaderService.class );
+
+    ClassLoading classLoading =
+            new OrmClassLoading( classLoaderService );
+
+    RegistryPrimer effectivePrimer = RegistryPrimer.compose(
+            ModelsHelper::preFillRegistries,
+            additionalPrimer
+    );
+
+    return restore( classLoading, effectivePrimer );
+}
+----
+
+The exact service-registry level is an implementation decision.
+A bootstrap or standard service registry may be sufficient if `ClassLoaderService` is the only initial service required.
+
+ORM should also provide a convenient built-in form:
+
+[source,java]
+----
+Metadata restore(ServiceRegistry serviceRegistry) {
+    return restore(
+            serviceRegistry,
+            ModelsHelper::preFillRegistries
+    );
+}
+----
+
+The final implementation must avoid applying ORM's built-in primer twice when overloads delegate.
+
+== Class loading
+
+The explicitly supplied class-loading facility is used by both restoration layers.
+
+Hibernate Models uses it to resolve:
+
+* physical classes;
+* annotation types;
+* enum types and constants;
+* class-valued annotation attributes; and
+* physical fields, methods, and record components when requested.
+
+The ORM payload input stream uses it to resolve ordinary Java classes referenced by the serialized boot-model graph.
+The dedicated stream may override class resolution conceptually as follows:
+
+[source,java]
+----
+@Override
+protected Class<?> resolveClass(ObjectStreamClass descriptor)
+        throws IOException, ClassNotFoundException {
+    return classLoading.classForName( descriptor.getName() );
+}
+----
+
+The real implementation must account for primitive and array descriptors and any ORM proxy classes requiring special handling.
+
+Restoration must not fall back silently to an unrelated thread context class loader when an explicit service was supplied.
+
+== Registry priming
+
+ORM supplies the same built-in descriptor contributions used during normal model creation, including its JPA, Hibernate, dialect-override, and XML annotation descriptors.
+This preserves ORM's generated mutable annotation implementations after restoration.
+
+Additional integration primers may be composed with ORM's built-in primer.
+The archive does not serialize primers, descriptor factories, or service objects.
+
+If the archive records that an annotation type requires a custom mutable descriptor and the effective primer does not register a compatible descriptor, restoration fails instead of silently replacing the usage with an immutable or semantically different implementation.
+
+== API sketch
+
+The complete API shape might resemble:
+
+[source,java]
+----
+interface SerializedMetadata extends Externalizable {
+    Metadata restore(
+            ClassLoading classLoading,
+            RegistryPrimer registryPrimer);
+
+    Metadata restore(ServiceRegistry serviceRegistry);
+
+    Metadata restore(
+            ServiceRegistry serviceRegistry,
+            RegistryPrimer additionalPrimer);
+}
+
+final class MetadataSerialization {
+    static SerializedMetadata serialize(Metadata metadata) {
+        // ...
+    }
+
+    static SerializedMetadata read(InputStream stream) {
+        // ...
+    }
+
+    static void write(
+            SerializedMetadata metadata,
+            OutputStream stream) {
+        // ...
+    }
+}
+----
+
+The public interfaces, method locations, checked exceptions, and whether `SerializedMetadata` is public API or internal SPI remain implementation decisions.
+
+== Failure handling
+
+Reading the data-only serial form should fail for structural problems such as:
+
+* invalid magic values;
+* unsupported archive versions;
+* truncated payloads;
+* invalid lengths; and
+* structurally invalid table entries.
+
+Explicit restoration should fail for environment-dependent problems such as:
+
+* unavailable application or annotation classes;
+* incompatible enum constants;
+* missing required mutable annotation descriptors;
+* invalid model-reference targets;
+* incompatible ORM payload classes; and
+* inability to resolve physical model members when required.
+
+Failures should identify whether they occurred while restoring the Hibernate Models archive or the ORM boot payload and should include the relevant model reference or class name.
+
+== Versioning
+
+`SerializedMetadata` has an explicit ORM archive format version independent of Java `serialVersionUID`.
+The contained `ModelsArchive` has its own explicit format version.
+See xref:serialization.adoc#_versioning_and_validation[Versioning and validation] for the separation of archive versions and Java serialization compatibility.
+
+== Implementation plan
+
+. Define `SerializedMetadata` as a data-only serial form.
+. Define the ORM metadata archive header and format version.
+. Implement the model-aware nested ORM payload output stream.
+. Create and embed a completed `ModelsArchive` while traversing the ORM graph.
+. Implement data-only reading of `SerializedMetadata`.
+. Implement explicit restoration accepting `ClassLoading` and `RegistryPrimer`.
+. Implement the nested ORM payload input stream using `RestoredModels` and injected class loading.
+. Add ORM service-registry convenience overloads.
+. Compose ORM's built-in annotation descriptor primer with integration primers.
+. Retain the restored `ModelsContext` where later ORM operations require it.
+. Enable and expand ORM boot-model serialization tests.
+
+== Testing
+
+ORM should test the complete lifecycle:
+
+[source,java]
+----
+SerializedMetadata serialForm = MetadataSerialization.serialize( metadata );
+SerializedMetadata clonedForm = SerializationHelper.clone( serialForm );
+
+Metadata restored = clonedForm.restore(
+        classLoading,
+        registryPrimer
+);
+----
+
+Coverage should include:
+
+* reading a serial form without loading application classes;
+* explicit restoration using a supplied `ClassLoading`;
+* service-registry restoration using `ClassLoaderService`;
+* repeated model references resolving to the same object;
+* `ClassDetails` used as map keys;
+* mutable ORM annotation usages after restoration;
+* additional integration descriptor primers;
+* missing required descriptor contributions;
+* missing application and annotation classes;
+* incompatible ORM and Models archive versions;
+* corruption in either archive layer;
+* restoration using an isolated application class loader; and
+* confirmation that no service registry, class-loading service, or live model context appears in the serial form.
+
+== Open questions
+
+The ORM implementation must still decide:
+
+* which concrete metadata implementation or service creates `SerializedMetadata`;
+* whether the serial form is public API, integration SPI, or internal infrastructure;
+* which ORM service-registry level is required for restoration;
+* whether the nested ORM payload uses Java object serialization or a more explicit format;
+* how the restored `ModelsContext` is retained by the resulting metadata graph;
+* whether payload buffering requires size limits or a spill-to-disk strategy; and
+* what compatibility guarantees ORM makes for metadata archives across patch or minor releases.

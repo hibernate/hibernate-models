@@ -12,17 +12,13 @@ import java.util.Map;
 
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
-import org.hibernate.models.serial.internal.SerialAnnotationDescriptorImpl;
-import org.hibernate.models.serial.spi.SerialAnnotationDescriptor;
-import org.hibernate.models.serial.spi.Storable;
 
 /**
  * Describes an annotation type (the Class)
  *
  * @author Steve Ebersole
  */
-public interface AnnotationDescriptor<A extends Annotation>
-		extends AnnotationTarget, Storable<AnnotationDescriptor<A>, SerialAnnotationDescriptor<A>> {
+public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTarget {
 	@Override
 	default Kind getKind() {
 		return Kind.ANNOTATION;
@@ -130,8 +126,4 @@ public interface AnnotationDescriptor<A extends Annotation>
 		return (AnnotationDescriptor<X>) this;
 	}
 
-	@Override
-	default SerialAnnotationDescriptor<A> toStorableForm() {
-		return new SerialAnnotationDescriptorImpl<>( getAnnotationType() );
-	}
 }

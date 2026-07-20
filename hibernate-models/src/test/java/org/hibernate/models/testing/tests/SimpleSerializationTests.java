@@ -9,9 +9,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.models.serial.spi.StorableContext;
+import org.hibernate.models.serial.spi.ModelReference;
+import org.hibernate.models.serial.spi.ModelsArchiveWriter;
+import org.hibernate.models.serial.spi.ModelsArchives;
+import org.hibernate.models.serial.spi.RestoredModels;
 import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.util.SerializationHelper;
 
 import org.junit.jupiter.api.Test;
@@ -24,42 +26,26 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 public class SimpleSerializationTests {
 	@Test
 	void serializeSimpleClass() {
-		final ModelsContext modelsContext = createModelContext( SimpleClass.class );
-		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().findClassDetails( SimpleClass.class.getName() );
+		final ClassDetails classDetails = createModelContext( SimpleClass.class )
+				.getClassDetailsRegistry()
+				.findClassDetails( SimpleClass.class.getName() );
 		Assertions.assertThat( classDetails ).isNotNull();
 
-		final StorableContext serialContext = modelsContext.toStorableForm();
-		final StorableContext clonedSerialContext = SerializationHelper.clone( serialContext );
-		Assertions.assertThat( serialContext ).isNotSameAs( clonedSerialContext );
-
-		final ModelsContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
-		Assertions.assertThat( modelsContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
-		Assertions.assertThat( modelsContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
-
-		final ClassDetails restoredClassDetails = restored.getClassDetailsRegistry().findClassDetails( SimpleClass.class.getName() );
+		final ClassDetails restoredClassDetails = roundTrip( classDetails );
 		Assertions.assertThat( restoredClassDetails ).isNotNull();
 		Assertions.assertThat( classDetails ).isNotSameAs( restoredClassDetails );
 	}
 
 	@Test
 	void serializeSimpleClassWithMembers() {
-		final ModelsContext modelsContext = createModelContext( SimpleClassWithMembers.class );
-
-		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().findClassDetails( SimpleClassWithMembers.class.getName() );
+		final ClassDetails classDetails = createModelContext( SimpleClassWithMembers.class )
+				.getClassDetailsRegistry()
+				.findClassDetails( SimpleClassWithMembers.class.getName() );
 		Assertions.assertThat( classDetails ).isNotNull();
 		Assertions.assertThat( classDetails.getFields() ).hasSize( 1 );
 		Assertions.assertThat( classDetails.getMethods() ).hasSize( 3 );
 
-		final StorableContext serialContext = modelsContext.toStorableForm();
-		final StorableContext clonedSerialContext = SerializationHelper.clone( serialContext );
-		Assertions.assertThat( serialContext ).isNotSameAs( clonedSerialContext );
-
-		final ModelsContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
-		Assertions.assertThat( modelsContext ).isNotSameAs( restored );
-		Assertions.assertThat( modelsContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
-		Assertions.assertThat( modelsContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
-
-		final ClassDetails cloneCassDetails = restored.getClassDetailsRegistry().findClassDetails( SimpleClassWithMembers.class.getName() );
+		final ClassDetails cloneCassDetails = roundTrip( classDetails );
 		Assertions.assertThat( cloneCassDetails ).isNotNull();
 		Assertions.assertThat( cloneCassDetails.getFields() ).hasSize( 1 );
 		Assertions.assertThat( cloneCassDetails.getMethods() ).hasSize( 3 );
@@ -69,9 +55,9 @@ public class SimpleSerializationTests {
 
 	@Test
 	void serializeSimpleClassWithAnnotations() {
-		final ModelsContext modelsContext = createModelContext( SimpleClassWithAnnotations.class );
-
-		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().findClassDetails( SimpleClassWithAnnotations.class.getName() );
+		final ClassDetails classDetails = createModelContext( SimpleClassWithAnnotations.class )
+				.getClassDetailsRegistry()
+				.findClassDetails( SimpleClassWithAnnotations.class.getName() );
 		Assertions.assertThat( classDetails ).isNotNull();
 		Assertions.assertThat( classDetails.getDirectAnnotationUsages() ).hasSize( 1 );
 		Assertions.assertThat( classDetails.getFields() ).hasSize( 1 );
@@ -79,22 +65,21 @@ public class SimpleSerializationTests {
 		Assertions.assertThat( classDetails.getMethods() ).hasSize( 1 );
 		Assertions.assertThat( classDetails.getMethods().iterator().next().getDirectAnnotationUsages() ).hasSize( 1 );
 
-		final StorableContext serialContext = modelsContext.toStorableForm();
-		final StorableContext clonedSerialContext = SerializationHelper.clone( serialContext );
-		Assertions.assertThat( serialContext ).isNotSameAs( clonedSerialContext );
-
-		final ModelsContext restored = clonedSerialContext.fromStorableForm( SIMPLE_CLASS_LOADING );
-		Assertions.assertThat( modelsContext ).isNotSameAs( restored );
-		Assertions.assertThat( modelsContext.getClassDetailsRegistry() ).isNotSameAs( restored.getClassDetailsRegistry() );
-		Assertions.assertThat( modelsContext.getAnnotationDescriptorRegistry() ).isNotSameAs( restored.getAnnotationDescriptorRegistry() );
-
-		final ClassDetails cloneCassDetails = restored.getClassDetailsRegistry().findClassDetails( SimpleClassWithAnnotations.class.getName() );
+		final ClassDetails cloneCassDetails = roundTrip( classDetails );
 		Assertions.assertThat( classDetails ).isNotSameAs( cloneCassDetails );
 		Assertions.assertThat( cloneCassDetails.getDirectAnnotationUsages() ).hasSize( 1 );
 		Assertions.assertThat( cloneCassDetails.getFields() ).hasSize( 1 );
 		Assertions.assertThat( cloneCassDetails.getFields().iterator().next().getDirectAnnotationUsages() ).hasSize( 1 );
 		Assertions.assertThat( cloneCassDetails.getMethods() ).hasSize( 1 );
 		Assertions.assertThat( cloneCassDetails.getMethods().iterator().next().getDirectAnnotationUsages() ).hasSize( 1 );
+	}
+
+	private ClassDetails roundTrip(ClassDetails classDetails) {
+		final ModelsArchiveWriter writer = ModelsArchives.createWriter( false );
+		final ModelReference reference = writer.reference( classDetails );
+		final RestoredModels restoredModels = SerializationHelper.clone( writer.finish() )
+				.restore( SIMPLE_CLASS_LOADING, null );
+		return (ClassDetails) restoredModels.resolve( reference );
 	}
 
 	public static class SimpleClass {
