@@ -14,15 +14,15 @@ import org.jboss.jandex.AnnotationValue;
 /**
  * @author Steve Ebersole
  */
-public class ArrayValueExtractor<V> extends AbstractValueExtractor<V[]> {
-	private final JandexValueConverter<V[]> wrapper;
+public class ArrayValueExtractor extends AbstractValueExtractor<Object> {
+	private final JandexValueConverter<Object> wrapper;
 
-	public ArrayValueExtractor(JandexValueConverter<V[]> wrapper) {
+	public ArrayValueExtractor(JandexValueConverter<Object> wrapper) {
 		this.wrapper = wrapper;
 	}
 
 	@Override
-	protected V[] extractAndWrap(AnnotationValue jandexValue, ModelsContext modelsContext) {
+	protected Object extractAndWrap(AnnotationValue jandexValue, ModelsContext modelsContext) {
 		assert jandexValue != null;
 
 		final List<AnnotationValue> values = jandexValue.asArrayList();

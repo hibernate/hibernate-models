@@ -66,7 +66,7 @@ public class RenderingSmokeTest {
 
 	@Test
 	void testContainedAnnotationRendering() {
-		final ModelsContext modelsContext = createModelContext( SimpleClass.class );
+		final ModelsContext modelsContext = createModelContext( SimpleClass.class, EverythingBagel.class );
 		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
 
 		assertThat( classDetails.render( modelsContext, ClassDetails.RenderMode.CLASS_ONLY ) )

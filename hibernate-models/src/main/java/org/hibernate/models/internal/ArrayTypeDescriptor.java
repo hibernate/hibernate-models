@@ -18,8 +18,8 @@ import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
 /**
- * Descriptor for array values.  These are modeled as an array in the
- * annotation, but as a List here.
+ * Descriptor for array values, retaining the annotation attribute's runtime
+ * array type, including primitive array types.
  *
  * @author Steve Ebersole
  */
@@ -35,7 +35,35 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 		this.elementTypeDescriptor = elementTypeDescriptor;
 		this.componentType = elementTypeDescriptor.getValueType();
 		//noinspection unchecked
-		this.arrayType = (Class<V[]>) componentType.arrayType();
+		this.arrayType = (Class<V[]>) arrayType( componentType );
+	}
+
+	private static Class<?> arrayType(Class<?> componentType) {
+		if ( componentType == Boolean.class ) {
+			return boolean[].class;
+		}
+		if ( componentType == Byte.class ) {
+			return byte[].class;
+		}
+		if ( componentType == Character.class ) {
+			return char[].class;
+		}
+		if ( componentType == Short.class ) {
+			return short[].class;
+		}
+		if ( componentType == Integer.class ) {
+			return int[].class;
+		}
+		if ( componentType == Long.class ) {
+			return long[].class;
+		}
+		if ( componentType == Float.class ) {
+			return float[].class;
+		}
+		if ( componentType == Double.class ) {
+			return double[].class;
+		}
+		return componentType.arrayType();
 	}
 
 	public ValueTypeDescriptor<V> getElementTypeDescriptor() {

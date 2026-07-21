@@ -14,15 +14,15 @@ import net.bytebuddy.description.annotation.AnnotationValue;
  *
  * @author Steve Ebersole
  */
-public class ArrayValueExtractor<V> extends AbstractValueExtractor<V[]> {
-	private final ValueConverter<V[]> wrapper;
+public class ArrayValueExtractor extends AbstractValueExtractor<Object> {
+	private final ValueConverter<Object> wrapper;
 
-	public ArrayValueExtractor(ValueConverter<V[]> wrapper) {
+	public ArrayValueExtractor(ValueConverter<Object> wrapper) {
 		this.wrapper = wrapper;
 	}
 
 	@Override
-	protected V[] extractAndWrap(AnnotationValue<?, ?> byteBuddyValue, ModelsContext modelsContext) {
+	protected Object extractAndWrap(AnnotationValue<?, ?> byteBuddyValue, ModelsContext modelsContext) {
 		return wrapper.convert( byteBuddyValue, modelsContext );
 	}
 }
