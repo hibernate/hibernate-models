@@ -163,7 +163,7 @@ public class ModelsArchiveImpl implements ModelsArchive {
 		for ( SerialClassDetails serialClass : classes ) {
 			restoredClasses.add( modelsContext.getClassDetailsRegistry().findClassDetails( serialClass.getName() ) );
 		}
-		final List<TypeDetails> restoredTypes = restoreTypes( restoredClasses );
+		final List<TypeDetails> restoredTypes = restoreTypes( modelsContext, restoredClasses );
 		final List<FieldDetails> restoredFields = restoreFields( restoredClasses );
 		final List<MethodDetails> restoredMethods = restoreMethods( restoredClasses );
 		final List<ConstructorDetails> restoredConstructors = restoreConstructors( restoredClasses );
@@ -435,19 +435,20 @@ public class ModelsArchiveImpl implements ModelsArchive {
 		return List.copyOf( restoredFields );
 	}
 
-	private List<TypeDetails> restoreTypes(List<ClassDetails> restoredClasses) {
+	private List<TypeDetails> restoreTypes(ModelsContext modelsContext, List<ClassDetails> restoredClasses) {
 		final ArrayList<TypeDetails> restoredTypes = new ArrayList<>( types.size() );
 		for ( int i = 0; i < types.size(); i++ ) {
 			restoredTypes.add( null );
 		}
 		for ( int i = 0; i < types.size(); i++ ) {
-			restoreType( i, restoredClasses, restoredTypes );
+			restoreType( i, modelsContext, restoredClasses, restoredTypes );
 		}
 		return List.copyOf( restoredTypes );
 	}
 
 	private TypeDetails restoreType(
 			int typeId,
+			ModelsContext modelsContext,
 			List<ClassDetails> restoredClasses,
 			ArrayList<TypeDetails> restoredTypes) {
 		if ( typeId < 0 || typeId >= types.size() ) {
@@ -468,7 +469,7 @@ public class ModelsArchiveImpl implements ModelsArchive {
 			restoredTypes.set( typeId, placeholder );
 			placeholder.setBounds( typeVariableReference.boundTypeIds()
 					.stream()
-					.map( boundTypeId -> restoreType( boundTypeId, restoredClasses, restoredTypes ) )
+					.map( boundTypeId -> restoreType( boundTypeId, modelsContext, restoredClasses, restoredTypes ) )
 					.toList() );
 			return placeholder;
 		}
@@ -480,7 +481,8 @@ public class ModelsArchiveImpl implements ModelsArchive {
 		else if ( reference instanceof ArrayTypeReference arrayTypeReference ) {
 			restoredType = new ArrayTypeDetailsImpl(
 					resolveDeclaringType( restoredClasses, arrayTypeReference.arrayClassId() ),
-					restoreType( arrayTypeReference.constituentTypeId(), restoredClasses, restoredTypes )
+					restoreType( arrayTypeReference.constituentTypeId(), modelsContext, restoredClasses, restoredTypes ),
+					modelsContext.getClassDetailsRegistry()
 			);
 		}
 		else if ( reference instanceof ParameterizedTypeReference parameterizedTypeReference ) {
@@ -488,22 +490,22 @@ public class ModelsArchiveImpl implements ModelsArchive {
 					resolveDeclaringType( restoredClasses, parameterizedTypeReference.rawClassId() ),
 					parameterizedTypeReference.argumentTypeIds()
 							.stream()
-							.map( argumentTypeId -> restoreType( argumentTypeId, restoredClasses, restoredTypes ) )
+							.map( argumentTypeId -> restoreType( argumentTypeId, modelsContext, restoredClasses, restoredTypes ) )
 							.toList(),
-					restoreScope( parameterizedTypeReference.owner(), restoredClasses, restoredTypes )
+					restoreScope( parameterizedTypeReference.owner(), modelsContext, restoredClasses, restoredTypes )
 			);
 		}
 		else if ( reference instanceof TypeVariableTargetReference typeVariableTargetReference ) {
 			restoredType = new TypeVariableReferenceDetailsImpl(
 					typeVariableTargetReference.identifier(),
-					restoreTypeVariable( typeVariableTargetReference.targetTypeId(), restoredClasses, restoredTypes )
+					restoreTypeVariable( typeVariableTargetReference.targetTypeId(), modelsContext, restoredClasses, restoredTypes )
 			);
 		}
 		else if ( reference instanceof WildcardTypeReference wildcardTypeReference ) {
 			restoredType = new WildcardTypeDetailsImpl(
 					wildcardTypeReference.boundTypeId() < 0
 							? null
-							: restoreType( wildcardTypeReference.boundTypeId(), restoredClasses, restoredTypes ),
+							: restoreType( wildcardTypeReference.boundTypeId(), modelsContext, restoredClasses, restoredTypes ),
 					wildcardTypeReference.isExtends()
 			);
 		}
@@ -526,9 +528,10 @@ public class ModelsArchiveImpl implements ModelsArchive {
 
 	private TypeVariableDetails restoreTypeVariable(
 			int typeId,
+			ModelsContext modelsContext,
 			List<ClassDetails> restoredClasses,
 			ArrayList<TypeDetails> restoredTypes) {
-		final TypeDetails restoredType = restoreType( typeId, restoredClasses, restoredTypes );
+		final TypeDetails restoredType = restoreType( typeId, modelsContext, restoredClasses, restoredTypes );
 		if ( restoredType instanceof TypeVariableDetails typeVariableDetails ) {
 			return typeVariableDetails;
 		}
@@ -537,6 +540,7 @@ public class ModelsArchiveImpl implements ModelsArchive {
 
 	private TypeVariableScope restoreScope(
 			ScopeReference scopeReference,
+			ModelsContext modelsContext,
 			List<ClassDetails> restoredClasses,
 			ArrayList<TypeDetails> restoredTypes) {
 		if ( scopeReference == null ) {
@@ -544,7 +548,7 @@ public class ModelsArchiveImpl implements ModelsArchive {
 		}
 		return switch ( scopeReference.kind() ) {
 			case CLASS -> resolveDeclaringType( restoredClasses, scopeReference.id() );
-			case TYPE -> restoreType( scopeReference.id(), restoredClasses, restoredTypes );
+			case TYPE -> restoreType( scopeReference.id(), modelsContext, restoredClasses, restoredTypes );
 			default -> throw new IllegalStateException( "Invalid type-variable scope kind: " + scopeReference.kind() );
 		};
 	}

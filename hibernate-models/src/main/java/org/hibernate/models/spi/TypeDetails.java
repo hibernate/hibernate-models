@@ -10,7 +10,6 @@ import org.hibernate.models.internal.ArrayTypeDetailsImpl;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.internal.IsResolvedTypeSwitch;
 import org.hibernate.models.internal.ParameterizedTypeDetailsImpl;
-import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.WildcardTypeDetailsImpl;
 
 import static org.hibernate.models.spi.TypeDetailsSwitch.switchType;
@@ -64,21 +63,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Create type details for an array of the given constituent type.
 	 */
 	static ArrayTypeDetails arrayType(TypeDetails constituentType, ModelsContext modelsContext) {
-		final ClassDetails arrayClassDetails;
-		if ( constituentType.getTypeKind() == Kind.PRIMITIVE ) {
-			final PrimitiveKind primitiveKind = constituentType.asPrimitiveType().getPrimitiveKind();
-			arrayClassDetails = modelsContext
-					.getClassDetailsRegistry()
-					.resolveClassDetails( "[" + primitiveKind.getJavaTypeChar() );
-		}
-		else {
-			final ClassDetails rawComponentType = constituentType.determineRawClass();
-			final String arrayClassName = "[L" + rawComponentType.getName().replace( '.', '/' ) + ";";
-			arrayClassDetails = modelsContext
-					.getClassDetailsRegistry()
-					.resolveClassDetails( arrayClassName );
-		}
-		return new ArrayTypeDetailsImpl( arrayClassDetails, constituentType );
+		return ArrayTypeDetailsImpl.arrayOf( constituentType, modelsContext.getClassDetailsRegistry() );
 	}
 
 	String getName();
