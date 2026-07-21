@@ -18,6 +18,7 @@ import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.MutableClassDetailsRegistry;
 import org.hibernate.models.spi.TypeDetails;
 
 import static org.hibernate.models.spi.ClassDetails.CLASS_CLASS_DETAILS;

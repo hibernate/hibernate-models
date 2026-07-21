@@ -13,6 +13,7 @@ import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.SimpleClassDetails;
 import org.hibernate.models.internal.util.IndexedConsumer;
+import org.hibernate.models.rendering.internal.RenderingHelper;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 
 /**
@@ -23,6 +24,36 @@ import org.hibernate.models.serial.spi.SerialClassDetails;
  * @see ClassDetailsRegistry
  */
 public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
+	/**
+	 * The amount of class detail to render.
+	 */
+	enum RenderMode {
+		/**
+		 * Render the class and its fields, methods and record components.
+		 * Constructor details are omitted.
+		 */
+		COMPLETE,
+
+		/**
+		 * Render the class without its members.
+		 */
+		CLASS_ONLY
+	}
+
+	/**
+	 * Render this class completely, excluding constructor details.
+	 */
+	default String render(ModelsContext modelsContext) {
+		return render( modelsContext, RenderMode.COMPLETE );
+	}
+
+	/**
+	 * Render this class using the requested mode.
+	 */
+	default String render(ModelsContext modelsContext, RenderMode mode) {
+		return RenderingHelper.renderClass( this, modelsContext, mode );
+	}
+
 	/**
 	 * Details for {@code Object.class}
 	 */

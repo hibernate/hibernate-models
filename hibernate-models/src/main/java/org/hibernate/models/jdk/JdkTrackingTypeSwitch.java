@@ -29,7 +29,6 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
-import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
@@ -115,7 +114,7 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 
 	public TypeDetails caseGenericArrayType(GenericArrayType genericArrayType) {
 		final TypeDetails componentType = switcher.switchType( genericArrayType.getGenericComponentType() );
-		return TypeDetailsHelper.arrayOf( componentType, modelsContext );
+		return TypeDetails.arrayType( componentType, modelsContext );
 	}
 
 	public TypeDetails defaultCase(Type type) {

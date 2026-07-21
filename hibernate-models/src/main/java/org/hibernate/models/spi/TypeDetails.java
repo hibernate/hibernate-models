@@ -4,7 +4,14 @@
  */
 package org.hibernate.models.spi;
 
+import java.util.List;
+
+import org.hibernate.models.internal.ArrayTypeDetailsImpl;
+import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.internal.IsResolvedTypeSwitch;
+import org.hibernate.models.internal.ParameterizedTypeDetailsImpl;
+import org.hibernate.models.internal.PrimitiveKind;
+import org.hibernate.models.internal.WildcardTypeDetailsImpl;
 
 import static org.hibernate.models.spi.TypeDetailsSwitch.switchType;
 
@@ -15,6 +22,65 @@ import static org.hibernate.models.spi.TypeDetailsSwitch.switchType;
  * @author Steve Ebersole
  */
 public interface TypeDetails extends TypeVariableScope {
+	/**
+	 * Create type details for a class, interface or annotation.
+	 */
+	static ClassTypeDetails classType(ClassDetails classDetails) {
+		return new ClassTypeDetailsImpl( classDetails, Kind.CLASS );
+	}
+
+	/**
+	 * Create type details for a parameterized type.
+	 */
+	static ParameterizedTypeDetails parameterizedType(
+			ClassDetails rawType,
+			List<TypeDetails> arguments,
+			TypeVariableScope owner) {
+		return new ParameterizedTypeDetailsImpl( rawType, arguments, owner );
+	}
+
+	/**
+	 * Create type details for an unbounded wildcard ({@code ?}).
+	 */
+	static WildcardTypeDetails unboundedWildcard() {
+		return new WildcardTypeDetailsImpl( null, true );
+	}
+
+	/**
+	 * Create type details for an upper-bounded wildcard ({@code ? extends Bound}).
+	 */
+	static WildcardTypeDetails extendsWildcard(TypeDetails bound) {
+		return new WildcardTypeDetailsImpl( bound, true );
+	}
+
+	/**
+	 * Create type details for a lower-bounded wildcard ({@code ? super Bound}).
+	 */
+	static WildcardTypeDetails superWildcard(TypeDetails bound) {
+		return new WildcardTypeDetailsImpl( bound, false );
+	}
+
+	/**
+	 * Create type details for an array of the given constituent type.
+	 */
+	static ArrayTypeDetails arrayType(TypeDetails constituentType, ModelsContext modelsContext) {
+		final ClassDetails arrayClassDetails;
+		if ( constituentType.getTypeKind() == Kind.PRIMITIVE ) {
+			final PrimitiveKind primitiveKind = constituentType.asPrimitiveType().getPrimitiveKind();
+			arrayClassDetails = modelsContext
+					.getClassDetailsRegistry()
+					.resolveClassDetails( "[" + primitiveKind.getJavaTypeChar() );
+		}
+		else {
+			final ClassDetails rawComponentType = constituentType.determineRawClass();
+			final String arrayClassName = "[L" + rawComponentType.getName().replace( '.', '/' ) + ";";
+			arrayClassDetails = modelsContext
+					.getClassDetailsRegistry()
+					.resolveClassDetails( arrayClassName );
+		}
+		return new ArrayTypeDetailsImpl( arrayClassDetails, constituentType );
+	}
+
 	String getName();
 
 	Kind getTypeKind();

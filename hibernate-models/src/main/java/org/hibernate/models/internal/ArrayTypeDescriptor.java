@@ -6,7 +6,6 @@ package org.hibernate.models.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
-import java.util.List;
 
 import org.hibernate.models.jdk.internal.JdkArrayValueConverter;
 import org.hibernate.models.jdk.internal.JdkArrayValueExtractor;
@@ -15,8 +14,6 @@ import org.hibernate.models.jdk.internal.JdkPassThruExtractor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.rendering.Renderer;
-import org.hibernate.models.rendering.RenderingTarget;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
@@ -93,39 +90,6 @@ public class ArrayTypeDescriptor<V> implements ValueTypeDescriptor<V[]> {
 			result[i] = elementTypeDescriptor.unwrap( value[i] );
 		}
 		return result;
-	}
-
-	@Override
-	public void render(
-			String name,
-			Object attributeValue,
-			RenderingTarget target,
-			Renderer renderer,
-			ModelsContext modelContext) {
-		assert attributeValue != null : "Annotation value was null - " + name;
-
-		//noinspection unchecked
-		final V[] values = (V[]) attributeValue;
-
-		target.addLine( "%s = {", name );
-		target.indent( 2 );
-		for ( V value : values ) {
-			elementTypeDescriptor.render( value, target, renderer, modelContext );
-		}
-		target.unindent( 2 );
-		target.addLine( "}" );
-	}
-
-	@Override
-	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, ModelsContext modelContext) {
-		//noinspection unchecked
-		final List<V> values = (List<V>) attributeValue;
-
-		target.addLine( "{" );
-		target.indent( 2 );
-		values.forEach( (value) -> elementTypeDescriptor.render( value, target, renderer, modelContext ) );
-		target.unindent( 2 );
-		target.addLine( "}" );
 	}
 
 	@Override

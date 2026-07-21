@@ -9,4 +9,4 @@
 @Internal
 package org.hibernate.models.logging;
 
-import org.hibernate.models.support.Internal;
+import org.hibernate.models.Internal;

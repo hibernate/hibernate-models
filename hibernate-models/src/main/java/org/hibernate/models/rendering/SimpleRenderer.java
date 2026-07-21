@@ -23,6 +23,10 @@ public class SimpleRenderer extends AbstractRenderer {
 		this.renderingTarget = renderingTarget;
 	}
 
+	protected boolean renderMembers() {
+		return true;
+	}
+
 	@Override
 	protected RenderingTarget getRenderingTarget() {
 		return renderingTarget;
@@ -43,6 +47,11 @@ public class SimpleRenderer extends AbstractRenderer {
 
 		renderingTarget.addLine( typeDeclarationPattern, classDetails.getName() );
 		renderingTarget.indent( 1 );
+		if ( !renderMembers() ) {
+			renderingTarget.unindent( 1 );
+			renderingTarget.addLine( "}" );
+			return;
+		}
 
 		renderingTarget.addLine( "// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
 		renderingTarget.addLine( "// fields" );

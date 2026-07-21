@@ -12,8 +12,6 @@ import org.hibernate.models.jdk.internal.JdkPassThruExtractor;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.rendering.Renderer;
-import org.hibernate.models.rendering.RenderingTarget;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
@@ -38,21 +36,6 @@ public abstract class AbstractTypeDescriptor<V> implements ValueTypeDescriptor<V
 	@Override
 	public JdkValueExtractor<V> createJdkValueExtractor(ModelsContext modelContext) {
 		return JdkPassThruExtractor.passThruExtractor();
-	}
-
-	@Override
-	public void render(
-			String name,
-			Object attributeValue,
-			RenderingTarget target,
-			Renderer renderer,
-			ModelsContext modelContext) {
-		target.addLine( "%s = %s", name, attributeValue );
-	}
-
-	@Override
-	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, ModelsContext modelContext) {
-		target.addLine( "%s", attributeValue );
 	}
 
 	@Override

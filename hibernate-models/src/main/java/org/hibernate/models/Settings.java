@@ -5,7 +5,6 @@
 package org.hibernate.models;
 
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.models.support.Incubating;
 
 /**
  * @author Steve Ebersole

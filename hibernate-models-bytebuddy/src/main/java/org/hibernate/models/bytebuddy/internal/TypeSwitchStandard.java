@@ -22,7 +22,6 @@ import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
-import org.hibernate.models.spi.TypeDetailsHelper;
 
 import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
@@ -156,7 +155,7 @@ public class TypeSwitchStandard implements TypeSwitch<TypeDetails> {
 	@Override
 	public TypeDetails caseArrayType(TypeDefinition typeDescription, ModelsContext modelsContext) {
 		final TypeDetails constituentType = TypeSwitcher.switchType( typeDescription.getComponentType(), this, modelsContext );
-		return TypeDetailsHelper.arrayOf( constituentType, modelsContext );
+		return TypeDetails.arrayType( constituentType, modelsContext );
 	}
 
 	@Override

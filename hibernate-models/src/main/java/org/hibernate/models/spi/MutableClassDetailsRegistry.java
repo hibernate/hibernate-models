@@ -2,11 +2,9 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.support;
+package org.hibernate.models.spi;
 
 import org.hibernate.models.UnknownClassException;
-import org.hibernate.models.spi.ClassDetails;
-import org.hibernate.models.spi.ClassDetailsRegistry;
 
 /**
  * @author Steve Ebersole

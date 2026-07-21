@@ -6,6 +6,8 @@ package org.hibernate.models.spi;
 
 import java.lang.reflect.Member;
 
+import org.hibernate.models.rendering.internal.RenderingHelper;
+
 import static org.hibernate.models.spi.AnnotationTarget.Kind.RECORD_COMPONENT;
 
 /**
@@ -14,6 +16,14 @@ import static org.hibernate.models.spi.AnnotationTarget.Kind.RECORD_COMPONENT;
  * @author Steve Ebersole
  */
 public interface RecordComponentDetails extends MemberDetails {
+	/**
+	 * Render this record component and its directly associated annotations.
+	 * Contained annotation values are rendered recursively.
+	 */
+	default String render(ModelsContext modelsContext) {
+		return RenderingHelper.renderRecordComponent( this, modelsContext );
+	}
+
 	@Override
 	default Kind getKind() {
 		return RECORD_COMPONENT;

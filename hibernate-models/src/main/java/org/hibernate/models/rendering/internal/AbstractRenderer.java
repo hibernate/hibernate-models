@@ -5,6 +5,7 @@
 package org.hibernate.models.rendering.internal;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.util.List;
 
 import org.hibernate.models.rendering.Renderer;
@@ -77,15 +78,7 @@ public abstract class AbstractRenderer implements Renderer {
 		else {
 			getRenderingTarget().addLine( "@%s(", descriptor.getAnnotationType().getName() );
 			getRenderingTarget().indent( 2 );
-
-			attributes.forEach( (attribute) -> attribute.getTypeDescriptor().render(
-					attribute.getName(),
-					extractValue( annotation, attribute ),
-					getRenderingTarget(),
-					this,
-					context
-			) );
-
+			renderAttributes( annotation, attributes, context );
 			getRenderingTarget().unindent( 2 );
 			getRenderingTarget().addLine( ")" );
 		}
@@ -99,15 +92,7 @@ public abstract class AbstractRenderer implements Renderer {
 
 		getRenderingTarget().addLine( "%s = @%s(", name, descriptor.getAnnotationType().getName() );
 		getRenderingTarget().indent( 2 );
-
-		attributes.forEach( (attribute) -> attribute.getTypeDescriptor().render(
-				attribute.getName(),
-				extractValue( annotation, attribute ),
-				getRenderingTarget(),
-				this,
-				context
-		) );
-
+		renderAttributes( annotation, attributes, context );
 		getRenderingTarget().unindent( 2 );
 		getRenderingTarget().addLine( ")" );
 	}
@@ -120,17 +105,91 @@ public abstract class AbstractRenderer implements Renderer {
 
 		getRenderingTarget().addLine( "@%s(", descriptor.getAnnotationType().getName() );
 		getRenderingTarget().indent( 2 );
-
-		attributes.forEach( (attribute) -> attribute.getTypeDescriptor().render(
-				attribute.getName(),
-				extractValue( annotation, attribute ),
-				getRenderingTarget(),
-				this,
-				context
-		) );
-
+		renderAttributes( annotation, attributes, context );
 		getRenderingTarget().unindent( 2 );
 		getRenderingTarget().addLine( ")" );
+	}
+
+	private void renderAttributes(
+			Annotation annotation,
+			List<AttributeDescriptor<?>> attributes,
+			ModelsContext context) {
+		attributes.forEach( (attribute) -> renderValue(
+				attribute.getName(),
+				attribute.getAttributeMethod().getReturnType(),
+				extractValue( annotation, attribute ),
+				context
+		) );
+	}
+
+	private void renderValue(String name, Class<?> valueType, Object value, ModelsContext context) {
+		if ( value == null ) {
+			if ( name == null ) {
+				getRenderingTarget().addLine( "null" );
+			}
+			else {
+				getRenderingTarget().addLine( "%s = null", name );
+			}
+			return;
+		}
+
+		if ( valueType.isArray() ) {
+			renderArray( name, valueType.getComponentType(), value, context );
+		}
+		else if ( valueType.isAnnotation() ) {
+			@SuppressWarnings("unchecked")
+			final Annotation nested = (Annotation) value;
+			if ( name == null ) {
+				renderNestedAnnotation( nested, context );
+			}
+			else {
+				renderNestedAnnotation( name, nested, context );
+			}
+		}
+		else {
+			final Object renderedValue = renderedScalarValue( valueType, value );
+			if ( name == null ) {
+				getRenderingTarget().addLine( "%s", renderedValue );
+			}
+			else {
+				getRenderingTarget().addLine( "%s = %s", name, renderedValue );
+			}
+		}
+	}
+
+	private void renderArray(
+			String name,
+			Class<?> componentType,
+			Object values,
+			ModelsContext context) {
+		if ( name == null ) {
+			getRenderingTarget().addLine( "{" );
+		}
+		else {
+			getRenderingTarget().addLine( "%s = {", name );
+		}
+		getRenderingTarget().indent( 2 );
+		for ( int i = 0; i < Array.getLength( values ); i++ ) {
+			renderValue( null, componentType, Array.get( values, i ), context );
+		}
+		getRenderingTarget().unindent( 2 );
+		getRenderingTarget().addLine( "}" );
+	}
+
+	private static Object renderedScalarValue(Class<?> valueType, Object value) {
+		if ( valueType == String.class ) {
+			return '"' + value.toString() + '"';
+		}
+		if ( valueType == Class.class ) {
+			return ( (Class<?>) value ).getName();
+		}
+		if ( valueType == float.class || valueType == Float.class ) {
+			return value + "F";
+		}
+		if ( valueType == long.class || valueType == Long.class ) {
+			return value + "L";
+		}
+		return value;
 
 	}
 }

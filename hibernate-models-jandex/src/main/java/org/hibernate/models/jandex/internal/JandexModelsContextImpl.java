@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.models.support.AbstractModelsContext;
-import org.hibernate.models.support.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.spi.MutableAnnotationDescriptorRegistry;
 import org.hibernate.models.jandex.spi.JandexModelsContext;
 import org.hibernate.models.jandex.spi.JandexValueConverter;
 import org.hibernate.models.jandex.spi.JandexValueExtractor;

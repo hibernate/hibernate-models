@@ -12,7 +12,7 @@ import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
-import org.hibernate.models.support.MutableClassDetailsRegistry;
+import org.hibernate.models.spi.MutableClassDetailsRegistry;
 
 /**
  * Utilities related to {@linkplain org.hibernate.models.spi.AnnotationTarget}

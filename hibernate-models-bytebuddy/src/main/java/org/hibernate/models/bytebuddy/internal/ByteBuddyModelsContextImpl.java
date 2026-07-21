@@ -11,9 +11,9 @@ import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.bytebuddy.spi.ValueExtractor;
 import org.hibernate.models.support.AbstractModelsContext;
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
-import org.hibernate.models.support.MutableAnnotationDescriptorRegistry;
-import org.hibernate.models.support.MutableClassDetailsRegistry;
 import org.hibernate.models.spi.ClassLoading;
+import org.hibernate.models.spi.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.spi.MutableClassDetailsRegistry;
 import org.hibernate.models.spi.RegistryPrimer;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 

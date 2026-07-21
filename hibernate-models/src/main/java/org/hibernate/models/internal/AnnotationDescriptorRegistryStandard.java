@@ -12,7 +12,7 @@ import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.StandardAnnotationDescriptor;
 import org.hibernate.models.support.AbstractAnnotationDescriptorRegistry;
-import org.hibernate.models.support.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.spi.MutableAnnotationDescriptorRegistry;
 
 import static org.hibernate.models.logging.ModelsAnnotationLogging.MODELS_ANNOTATION_LOGGER;
 

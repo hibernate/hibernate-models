@@ -6,7 +6,7 @@ package org.hibernate.models.testing.tests.dynamic;
 
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.internal.ModifierUtils;
-import org.hibernate.models.support.MutableClassDetailsRegistry;
+import org.hibernate.models.spi.MutableClassDetailsRegistry;
 import org.hibernate.models.dynamic.DynamicClassDetails;
 import org.hibernate.models.dynamic.DynamicFieldDetails;
 import org.hibernate.models.spi.ClassDetails;

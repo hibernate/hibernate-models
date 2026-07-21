@@ -11,6 +11,8 @@ import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.spi.MutableClassDetailsRegistry;
 import org.hibernate.models.spi.RegistryPrimer;
 
 /**

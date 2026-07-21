@@ -6,9 +6,6 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.models.rendering.Renderer;
-import org.hibernate.models.rendering.RenderingTarget;
-
 /**
  * Descriptor for the annotation attribute types, acting as a producer for
  * {@link AttributeDescriptor}, {@link JdkValueConverter} and {@link JdkValueExtractor} references
@@ -33,19 +30,4 @@ public interface ValueTypeDescriptor<V> {
 	Object unwrap(V value);
 
 	V[] makeArray(int size, ModelsContext modelContext);
-
-	default void render(
-			String name,
-			Object attributeValue,
-			RenderingTarget target,
-			Renderer renderer,
-			ModelsContext modelContext) {
-		target.addLine( "%s = %s", name, "..." );
-	}
-
-	void render(
-			Object attributeValue,
-			RenderingTarget target,
-			Renderer renderer,
-			ModelsContext modelContext);
 }

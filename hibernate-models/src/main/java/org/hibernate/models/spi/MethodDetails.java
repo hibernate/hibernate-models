@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.hibernate.models.internal.util.StringHelper;
+import org.hibernate.models.rendering.internal.RenderingHelper;
 
 import static org.hibernate.models.internal.ModifierUtils.hasPersistableMethodModifiers;
 
@@ -17,6 +18,14 @@ import static org.hibernate.models.internal.ModifierUtils.hasPersistableMethodMo
  * @author Steve Ebersole
  */
 public interface MethodDetails extends MemberDetails {
+	/**
+	 * Render this method and its directly associated annotations.  Contained
+	 * annotation values are rendered recursively.
+	 */
+	default String render(ModelsContext modelsContext) {
+		return RenderingHelper.renderMethod( this, modelsContext );
+	}
+
 	enum MethodKind {
 		GETTER,
 		SETTER,
