@@ -34,6 +34,20 @@ public class AttributeAccessTests {
 		assertThat( annotationUsage.theLong() ).isEqualTo( 4L );
 		assertThat( annotationUsage.theFloat() ).isEqualTo( 5.1F );
 		assertThat( annotationUsage.theDouble() ).isEqualTo( 6.2 );
+		assertThat( annotationUsage.theBooleans() ).isExactlyInstanceOf( boolean[].class ).containsExactly( true, false );
+		assertThat( annotationUsage.theBytes() ).isExactlyInstanceOf( byte[].class ).containsExactly( (byte) 1, (byte) 2 );
+		assertThat( annotationUsage.theCharacters() ).isExactlyInstanceOf( char[].class ).containsExactly( 'a', 'b' );
+		assertThat( annotationUsage.theShorts() ).isExactlyInstanceOf( short[].class ).containsExactly( (short) 2, (short) 3 );
+		assertThat( annotationUsage.theIntegers() ).isExactlyInstanceOf( int[].class ).containsExactly( 3, 4 );
+		assertThat( annotationUsage.theLongs() ).isExactlyInstanceOf( long[].class ).containsExactly( 4L, 5L );
+		assertThat( annotationUsage.theFloats() ).isExactlyInstanceOf( float[].class ).containsExactly( 5.1F, 5.2F );
+		assertThat( annotationUsage.theDoubles() ).isExactlyInstanceOf( double[].class ).containsExactly( 6.2, 6.3 );
+
+		assertThat( modelsContext.getAnnotationDescriptorRegistry()
+				.getDescriptor( EverythingBagel.class )
+				.getAttribute( "theIntegers" )
+				.getTypeDescriptor()
+				.getValueType() ).isEqualTo( int[].class );
 
 		assertThat( annotationUsage.theClass() ).isEqualTo( TheClass.class );
 		assertThat( annotationUsage.theNested() ).isNotNull();
@@ -50,6 +64,14 @@ public class AttributeAccessTests {
 			theLong = 4L,
 			theFloat = 5.1F,
 			theDouble = 6.2,
+			theBooleans = {true, false},
+			theBytes = {1, 2},
+			theCharacters = {'a', 'b'},
+			theShorts = {2, 3},
+			theIntegers = {3, 4},
+			theLongs = {4L, 5L},
+			theFloats = {5.1F, 5.2F},
+			theDoubles = {6.2, 6.3},
 			theClass = TheClass.class,
 			theNested = @Nested(),
 			theNesteds = {@Nested(), @Nested()},

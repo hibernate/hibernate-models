@@ -33,6 +33,22 @@ public @interface EverythingBagel {
 
 	double theDouble();
 
+	boolean[] theBooleans() default {};
+
+	byte[] theBytes() default {};
+
+	char[] theCharacters() default {};
+
+	short[] theShorts() default {};
+
+	int[] theIntegers() default {};
+
+	long[] theLongs() default {};
+
+	float[] theFloats() default {};
+
+	double[] theDoubles() default {};
+
 	Class<?> theClass();
 
 	Nested theNested();

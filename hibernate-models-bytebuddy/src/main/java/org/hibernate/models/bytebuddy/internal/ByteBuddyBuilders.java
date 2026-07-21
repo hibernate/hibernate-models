@@ -309,9 +309,8 @@ public class ByteBuddyBuilders {
 			ValueTypeDescriptor<V> valueTypeDescriptor,
 			ByteBuddyModelsContextImpl modelsContext) {
 		if ( valueTypeDescriptor.getValueType().isArray() ) {
-			final ValueTypeDescriptor<?> elementTypeDescriptor = ( (ArrayTypeDescriptor<?>) valueTypeDescriptor ).getElementTypeDescriptor();
-			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( elementTypeDescriptor );
-			final ArrayValueExtractor<?> valueExtractor = new ArrayValueExtractor<>( valueConverter );
+			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( (ArrayTypeDescriptor<?>) valueTypeDescriptor );
+			final ArrayValueExtractor valueExtractor = new ArrayValueExtractor( valueConverter );
 			return (ValueExtractor<V>) valueExtractor;
 		}
 

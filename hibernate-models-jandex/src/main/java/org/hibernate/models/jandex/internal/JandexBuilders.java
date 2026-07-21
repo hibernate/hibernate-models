@@ -170,9 +170,8 @@ public class JandexBuilders {
 			BiConsumer<ValueTypeDescriptor<V>, JandexValueExtractor<V>> extractorCollector,
 			ModelsContext modelsContext) {
 		if ( valueTypeDescriptor.getValueType().isArray() ) {
-			final ValueTypeDescriptor<?> elementTypeDescriptor = ( (ArrayTypeDescriptor<?>) valueTypeDescriptor ).getElementTypeDescriptor();
-			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( elementTypeDescriptor );
-			final ArrayValueExtractor<?> valueExtractor = new ArrayValueExtractor<>( valueConverter );
+			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( (ArrayTypeDescriptor<?>) valueTypeDescriptor );
+			final ArrayValueExtractor valueExtractor = new ArrayValueExtractor( valueConverter );
 			converterCollector.accept( valueTypeDescriptor, (JandexValueConverter<V>) valueConverter );
 			extractorCollector.accept( valueTypeDescriptor, (JandexValueExtractor<V>) valueExtractor );
 			return (JandexValueConverter<V>) valueConverter;
@@ -268,9 +267,8 @@ public class JandexBuilders {
 			BiConsumer<ValueTypeDescriptor<V>,JandexValueExtractor<V>> extractorCollector,
 			ModelsContext modelsContext) {
 		if ( valueTypeDescriptor.getValueType().isArray() ) {
-			final ValueTypeDescriptor<?> elementTypeDescriptor = ( (ArrayTypeDescriptor<?>) valueTypeDescriptor ).getElementTypeDescriptor();
-			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( elementTypeDescriptor );
-			final ArrayValueExtractor<?> valueExtractor = new ArrayValueExtractor<>( valueConverter );
+			final ArrayValueConverter<?> valueConverter = new ArrayValueConverter<>( (ArrayTypeDescriptor<?>) valueTypeDescriptor );
+			final ArrayValueExtractor valueExtractor = new ArrayValueExtractor( valueConverter );
 			converterCollector.accept( valueTypeDescriptor, (JandexValueConverter<V>) valueConverter );
 			extractorCollector.accept( valueTypeDescriptor, (JandexValueExtractor<V>) valueExtractor );
 			return (JandexValueExtractor<V>) valueExtractor;
