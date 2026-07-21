@@ -105,6 +105,13 @@ public class GenericsTests {
 		final TypeDetails thing5GenericArrayType = genericArrayType.determineRelativeType( thing5ClassDetails );
 		assertThat( thing5GenericArrayType.isResolved() ).isTrue();
 		assertThat( thing5GenericArrayType.determineRawClass().isResolved() ).isTrue();
+		assertThat( thing5GenericArrayType.asArrayType().getConstituentType().determineRawClass().toJavaClass() )
+				.isEqualTo( Integer.class );
+		assertThat( thing5GenericArrayType.determineRawClass().toJavaClass() ).isEqualTo( Integer[].class );
+		assertThat( baseClassDetails.findFieldByName( "generics" )
+				.resolveRelativeClassType( thing5ClassDetails )
+				.getClassDetails()
+				.toJavaClass() ).isEqualTo( Integer[].class );
 
 		assertThat( stringArrayType.determineRawClass().isResolved() ).isTrue();
 		assertThat( genericArrayType.determineRawClass().isResolved() ).isTrue();
