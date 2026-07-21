@@ -27,7 +27,7 @@ import java.util.Map;
 import org.hibernate.models.CompleteAnnotationDescriptor;
 import org.hibernate.models.Creator;
 import org.hibernate.models.internal.ModuleDetailsSupport;
-import org.hibernate.models.internal.dynamic.DynamicClassDetails;
+import org.hibernate.models.dynamic.DynamicClassDetails;
 import org.hibernate.models.serial.spi.ModelReference;
 import org.hibernate.models.serial.spi.ModelsArchive;
 import org.hibernate.models.serial.spi.ModelsArchiveWriter;

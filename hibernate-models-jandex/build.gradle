@@ -7,6 +7,5 @@ description = "Support for hibernate-models based on Jandex (isolated dependency
 
 dependencies {
 	api project( ":hibernate-models" )
-
-	implementation libs.jandex
+	api libs.jandex
 }

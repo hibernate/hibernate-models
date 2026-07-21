@@ -8,13 +8,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.Locale;
 
-import org.hibernate.models.internal.jdk.JdkNestedValueConverter;
-import org.hibernate.models.internal.jdk.JdkNestedValueExtractor;
+import org.hibernate.models.jdk.internal.JdkNestedValueConverter;
+import org.hibernate.models.jdk.internal.JdkNestedValueExtractor;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.rendering.spi.Renderer;
-import org.hibernate.models.rendering.spi.RenderingTarget;
 import org.hibernate.models.spi.ModelsContext;
 
 /**
@@ -73,23 +71,6 @@ public class NestedTypeDescriptor<A extends Annotation> extends AbstractTypeDesc
 	@Override
 	public Object unwrap(A value) {
 		return value;
-	}
-
-	@Override
-	public void render(
-			String name,
-			Object attributeValue,
-			RenderingTarget target,
-			Renderer renderer,
-			ModelsContext modelContext) {
-		//noinspection unchecked
-		renderer.renderNestedAnnotation( name, (A) attributeValue, modelContext );
-	}
-
-	@Override
-	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, ModelsContext modelContext) {
-		//noinspection unchecked
-		renderer.renderNestedAnnotation( (A) attributeValue, modelContext );
 	}
 
 	@Override

@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.testing.tests.classes;
 
-import org.hibernate.models.internal.jdk.JdkClassDetails;
+import org.hibernate.models.jdk.JdkClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ModelsContext;

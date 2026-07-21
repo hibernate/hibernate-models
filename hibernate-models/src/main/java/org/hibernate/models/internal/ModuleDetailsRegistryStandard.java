@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.internal.jdk.JdkModuleDetails;
+import org.hibernate.models.jdk.JdkModuleDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ModuleDetails;
 

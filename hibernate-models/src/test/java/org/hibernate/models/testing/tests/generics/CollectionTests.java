@@ -21,6 +21,7 @@ import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ParameterizedTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeDetailsHelper;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
@@ -54,6 +55,9 @@ public class CollectionTests {
 			assertThat( type.getArguments().get(0) ).isInstanceOf( ClassTypeDetails.class );
 			final ClassTypeDetails elementType = (ClassTypeDetails) type.getArguments().get( 0);
 			assertThat( elementType.isImplementor( String.class ) ).isTrue();
+			assertThat( TypeDetailsHelper.extractElementType( type ) ).isSameAs( elementType );
+			assertThat( TypeDetailsHelper.extractCollectionElementType( type ) ).isSameAs( elementType );
+			assertThat( TypeDetailsHelper.extractMapKeyType( type ) ).isNull();
 			assertThat( type.isResolved() ).isTrue();
 			assertThat( type.getRawClassDetails().toJavaClass() ).isEqualTo( List.class );
 			assertThat( type.determineRawClass().toJavaClass() ).isEqualTo( List.class );
@@ -104,6 +108,9 @@ public class CollectionTests {
 			assertThat( type.getArguments().get(1) ).isInstanceOf( ClassTypeDetails.class );
 			final ClassTypeDetails valueType = (ClassTypeDetails) type.getArguments().get( 0);
 			assertThat( valueType.isImplementor( String.class ) ).isTrue();
+			assertThat( TypeDetailsHelper.extractElementType( type ) ).isSameAs( type.getArguments().get( 1 ) );
+			assertThat( TypeDetailsHelper.extractMapValueType( type ) ).isSameAs( type.getArguments().get( 1 ) );
+			assertThat( TypeDetailsHelper.extractMapKeyType( type ) ).isSameAs( keyType );
 			assertThat( type.isResolved() ).isTrue();
 		}
 

@@ -4,7 +4,7 @@
  */
 package org.hibernate.models.testing.tests.dynamic;
 
-import org.hibernate.models.internal.dynamic.DynamicClassDetails;
+import org.hibernate.models.dynamic.DynamicClassDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.testing.orm.ForeignKeyAnnotation;
 import org.hibernate.models.testing.orm.JpaAnnotations;

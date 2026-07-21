@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
+import org.hibernate.models.internal.AnnotationUsageValidation;
 
 /**
  * Describes an annotation type (the Class)
@@ -52,6 +53,16 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * values.
 	 */
 	A createUsage(A jdkAnnotation, ModelsContext context);
+
+	/**
+	 * Validate that a completed usage satisfies this annotation descriptor,
+	 * including recursively contained annotation usages.
+	 *
+	 * @throws org.hibernate.models.InvalidAnnotationUsageException if the usage is incomplete or invalid
+	 */
+	default void validateUsage(A usage, ModelsContext modelsContext) {
+		AnnotationUsageValidation.validateUsage( this, usage, modelsContext );
+	}
 
 	/**
 	 * Create a usage from the JDK representation.  This will often just return the passed annotation,

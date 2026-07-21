@@ -11,6 +11,5 @@ repositories {
 
 dependencies {
     api project( ":hibernate-models" )
-
-    implementation libs.byteBuddy
+    api libs.byteBuddy
 }

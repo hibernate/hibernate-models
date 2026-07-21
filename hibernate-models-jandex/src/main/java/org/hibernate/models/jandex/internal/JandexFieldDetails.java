@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.ModelsException;
-import org.hibernate.models.internal.AnnotationTargetSupport;
+import org.hibernate.models.support.AnnotationTargetSupport;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;

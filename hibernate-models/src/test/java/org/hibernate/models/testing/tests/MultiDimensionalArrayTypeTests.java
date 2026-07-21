@@ -6,7 +6,7 @@ package org.hibernate.models.testing.tests;
 
 import org.hibernate.models.internal.ArrayTypeDetailsImpl;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
-import org.hibernate.models.internal.jdk.JdkClassDetails;
+import org.hibernate.models.jdk.JdkClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;

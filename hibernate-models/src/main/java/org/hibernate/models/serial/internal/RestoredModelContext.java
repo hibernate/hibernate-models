@@ -6,14 +6,14 @@ package org.hibernate.models.serial.internal;
 
 import java.util.Map;
 
-import org.hibernate.models.internal.AbstractModelsContext;
+import org.hibernate.models.support.AbstractModelsContext;
 import org.hibernate.models.internal.AnnotationDescriptorRegistryStandard;
 import org.hibernate.models.internal.ClassDetailsRegistryStandard;
 import org.hibernate.models.internal.ModuleDetailsRegistryStandard;
-import org.hibernate.models.internal.MutableAnnotationDescriptorRegistry;
-import org.hibernate.models.internal.MutableClassDetailsRegistry;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassLoading;
+import org.hibernate.models.spi.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.spi.MutableClassDetailsRegistry;
 import org.hibernate.models.spi.RegistryPrimer;
 
 /**

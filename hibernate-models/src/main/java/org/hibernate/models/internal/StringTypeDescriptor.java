@@ -4,8 +4,6 @@
  */
 package org.hibernate.models.internal;
 
-import org.hibernate.models.rendering.spi.Renderer;
-import org.hibernate.models.rendering.spi.RenderingTarget;
 import org.hibernate.models.spi.ModelsContext;
 
 /**
@@ -24,18 +22,6 @@ public class StringTypeDescriptor extends AbstractTypeDescriptor<String> {
 	@Override
 	public Object unwrap(String value) {
 		return value;
-	}
-
-	@Override
-	public void render(
-			String name, Object attributeValue, RenderingTarget target,
-			Renderer renderer, ModelsContext modelContext) {
-		target.addLine( "%s = \"%s\"", name, attributeValue );
-	}
-
-	@Override
-	public void render(Object attributeValue, RenderingTarget target, Renderer renderer, ModelsContext modelContext) {
-		target.addLine( "\"%s\"", attributeValue );
 	}
 
 	@Override

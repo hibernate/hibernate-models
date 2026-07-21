@@ -4,11 +4,11 @@
  */
 package org.hibernate.models.testing.tests;
 
-import org.hibernate.models.rendering.internal.RenderingTargetCollectingImpl;
-import org.hibernate.models.rendering.internal.RenderingTargetStreamImpl;
-import org.hibernate.models.rendering.internal.SimpleRenderer;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.FieldDetails;
+import org.hibernate.models.spi.MethodDetails;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.testing.annotations.EverythingBagel;
 import org.hibernate.models.testing.annotations.Nested;
 import org.hibernate.models.testing.annotations.Status;
@@ -16,6 +16,7 @@ import org.hibernate.models.testing.domain.SimpleEntity;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.models.testing.TestHelper.createModelContext;
 
 /**
@@ -23,59 +24,59 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
  */
 public class RenderingSmokeTest {
 	@Test
-	void testStreamRendering1() {
+	void testCompleteAndClassOnlyRendering() {
 		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
 		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleEntity.class.getName() );
 
-		// simple stdout renderer with default (2) indentation
-		final SimpleRenderer renderer = new SimpleRenderer( new RenderingTargetStreamImpl( System.out ) );
-		renderer.renderClass( classDetails, modelsContext );
+		final String complete = classDetails.render( modelsContext );
+		assertThat( complete )
+				.contains( "class " + SimpleEntity.class.getName() )
+				.contains( "java.lang.Integer id" )
+				.contains( "getId (GETTER)" );
+
+		final String classOnly = classDetails.render( modelsContext, ClassDetails.RenderMode.CLASS_ONLY );
+		assertThat( classOnly )
+				.contains( "@jakarta.persistence.Entity" )
+				.contains( "class " + SimpleEntity.class.getName() )
+				.doesNotContain( "java.lang.Integer id" )
+				.doesNotContain( "getId (GETTER)" );
 	}
 
 	@Test
-	void testStreamRendering2() {
-		final ModelsContext modelsContext = createModelContext( SimpleEntity.class );
-		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleEntity.class.getName() );
+	void testIndividualMemberRendering() {
+		final ModelsContext modelsContext = createModelContext( SimpleEntity.class, SimpleRecord.class );
+		final ClassDetails entity = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleEntity.class.getName() );
 
-		// simple stdout renderer with specified indentation
-		final SimpleRenderer renderer = new SimpleRenderer( new RenderingTargetStreamImpl( System.out, 4 ) );
-		renderer.renderClass( classDetails, modelsContext );
+		final FieldDetails field = entity.findFieldByName( "id" );
+		assertThat( field.render( modelsContext ) )
+				.contains( "@jakarta.persistence.Id" )
+				.contains( "java.lang.Integer id" );
+
+		final MethodDetails method = entity.getMethods()
+				.stream()
+				.filter( candidate -> candidate.getName().equals( "getId" ) )
+				.findFirst()
+				.orElseThrow();
+		assertThat( method.render( modelsContext ) ).contains( "getId (GETTER)" );
+
+		final ClassDetails record = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleRecord.class.getName() );
+		final RecordComponentDetails component = record.getRecordComponents().get( 0 );
+		assertThat( component.render( modelsContext ) ).contains( "java.lang.String value" );
 	}
 
 	@Test
-	void testCollectingRendering1() {
+	void testContainedAnnotationRendering() {
 		final ModelsContext modelsContext = createModelContext( SimpleClass.class );
 		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
 
-		final RenderingTargetCollectingImpl collectingTarget = new RenderingTargetCollectingImpl();
-		final SimpleRenderer renderer = new SimpleRenderer( collectingTarget );
-		renderer.renderClass( classDetails, modelsContext );
-
-		System.out.println( collectingTarget );
-	}
-
-	@Test
-	void testCollectingRendering2() {
-		final ModelsContext modelsContext = createModelContext( SimpleClass.class );
-		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
-
-		final RenderingTargetCollectingImpl collectingTarget = new RenderingTargetCollectingImpl();
-		final SimpleRenderer renderer = new SimpleRenderer( collectingTarget );
-		renderer.renderClass( classDetails, modelsContext );
-
-		collectingTarget.render( System.out );
-	}
-
-	@Test
-	void testCollectingRendering3() {
-		final ModelsContext modelsContext = createModelContext( SimpleClass.class );
-		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().resolveClassDetails( SimpleClass.class.getName() );
-
-		final RenderingTargetCollectingImpl collectingTarget = new RenderingTargetCollectingImpl( 4 );
-		final SimpleRenderer renderer = new SimpleRenderer( collectingTarget );
-		renderer.renderClass( classDetails, modelsContext );
-
-		collectingTarget.render( System.out );
+		assertThat( classDetails.render( modelsContext, ClassDetails.RenderMode.CLASS_ONLY ) )
+				.contains( "theString = \"hello\"" )
+				.contains( "theLong = 4L" )
+				.contains( "theFloat = 5.1F" )
+				.contains( "theClass = " + SimpleEntity.class.getName() )
+				.contains( "theNested = @" + Nested.class.getName() )
+				.contains( "theNesteds" )
+				.contains( "theStrings = {", "\"a\"", "\"b\"", "\"c\"" );
 	}
 
 
@@ -95,5 +96,8 @@ public class RenderingSmokeTest {
 			theStrings = {"a", "b", "c"}
 	)
 	public static class SimpleClass {
+	}
+
+	public record SimpleRecord(String value) {
 	}
 }

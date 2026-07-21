@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
+import org.hibernate.models.spi.AnnotationHelper;
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.ModelsContext;
 

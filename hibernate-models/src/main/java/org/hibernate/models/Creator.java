@@ -5,10 +5,9 @@
 package org.hibernate.models;
 
 import org.hibernate.models.internal.ModifierUtils;
-import org.hibernate.models.internal.StandardAnnotationDescriptor;
-import org.hibernate.models.internal.dynamic.DynamicClassDetails;
-import org.hibernate.models.internal.dynamic.DynamicFieldDetails;
-import org.hibernate.models.internal.jdk.JdkClassDetails;
+import org.hibernate.models.dynamic.DynamicClassDetails;
+import org.hibernate.models.dynamic.DynamicFieldDetails;
+import org.hibernate.models.jdk.JdkClassDetails;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
@@ -16,6 +15,8 @@ import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableAnnotationDescriptor;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
+import org.hibernate.models.spi.StandardAnnotationDescriptor;
+import org.hibernate.models.spi.StandardAnnotationDescriptor;
 import org.hibernate.models.spi.TypeDetails;
 
 import java.lang.annotation.Annotation;
@@ -112,6 +113,25 @@ public class Creator {
 			boolean isPlural,
 			ModelsContext modelsContext) {
 		return new DynamicFieldDetails( name, type, declaringType, modifierFlags, isArray, isPlural, modelsContext );
+	}
+
+	/// Create member for a [dynamic class][#createDynamicClassDetails] using the standard dynamic
+	/// [modifiers][#DYNAMIC_ATTRIBUTE_MODIFIERS].
+	///
+	/// @param name The member name.
+	/// @param type The member type.
+	/// @param declaringType The dynamic class.
+	/// @param isArray Whether the member is an array.
+	/// @param isPlural Whether the member is a Java Collection.
+	/// @param modelsContext Needed for additional lookups.
+	public static MutableMemberDetails createDynamicMemberDetails(
+			String name,
+			TypeDetails type,
+			ClassDetails declaringType,
+			boolean isArray,
+			boolean isPlural,
+			ModelsContext modelsContext) {
+		return new DynamicFieldDetails( name, type, declaringType, DYNAMIC_ATTRIBUTE_MODIFIERS, isArray, isPlural, modelsContext );
 	}
 
 	/// Create ClassDetails from a JDK Class reference.

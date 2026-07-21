@@ -110,14 +110,23 @@ public class TypeDetailsHelper {
 	}
 
 	public static TypeDetails extractCollectionElementType(TypeDetails type) {
+		if ( type == null || !type.isImplementor( Collection.class ) ) {
+			return null;
+		}
 		return extractTypeArgument( resolveSuperType( type, Collection.class ), 0 );
 	}
 
 	public static TypeDetails extractMapKeyType(TypeDetails type) {
+		if ( type == null || !type.isImplementor( Map.class ) ) {
+			return null;
+		}
 		return extractTypeArgument( resolveSuperType( type, Map.class ), 0 );
 	}
 
 	public static TypeDetails extractMapValueType(TypeDetails type) {
+		if ( type == null || !type.isImplementor( Map.class ) ) {
+			return null;
+		}
 		return extractTypeArgument( resolveSuperType( type, Map.class ), 1 );
 	}
 

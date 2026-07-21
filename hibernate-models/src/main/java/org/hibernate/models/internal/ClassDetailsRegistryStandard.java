@@ -5,9 +5,13 @@
 package org.hibernate.models.internal;
 
 
-import org.hibernate.models.internal.jdk.JdkBuilders;
+import java.util.Map;
+
+import org.hibernate.models.jdk.JdkBuilders;
+import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.support.AbstractClassDetailsRegistry;
 
 /**
  * Standard ClassDetailsRegistry implementation.
@@ -30,5 +34,9 @@ public class ClassDetailsRegistryStandard
 	@Override
 	public ClassDetailsBuilder getClassDetailsBuilder() {
 		return classDetailsBuilder;
+	}
+
+	Map<String, ClassDetails> getStorableClassDetailsMap() {
+		return classDetailsMap;
 	}
 }

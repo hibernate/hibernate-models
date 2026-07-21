@@ -23,7 +23,6 @@ import org.hibernate.models.jandex.spi.JandexTypeSwitcher;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
-import org.hibernate.models.spi.TypeDetailsHelper;
 
 import org.jboss.jandex.ArrayType;
 import org.jboss.jandex.ClassType;
@@ -125,7 +124,7 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 	@Override
 	public TypeDetails caseArrayType(ArrayType arrayType, ModelsContext modelsContext) {
 		final TypeDetails componentTypeDetails = JandexTypeSwitcher.switchType( arrayType.componentType(), this, modelsContext );
-		return TypeDetailsHelper.arrayOf( componentTypeDetails, modelsContext );
+		return TypeDetails.arrayType( componentTypeDetails, modelsContext );
 	}
 
 	@Override
