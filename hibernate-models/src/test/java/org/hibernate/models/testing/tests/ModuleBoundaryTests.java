@@ -56,15 +56,14 @@ public class ModuleBoundaryTests {
 						import java.lang.annotation.Retention;
 						import java.lang.annotation.RetentionPolicy;
 						import java.lang.annotation.Target;
-						import java.util.EnumSet;
 
 						import org.hibernate.models.Creator;
 						import org.hibernate.models.serial.spi.ModelsArchive;
 						import org.hibernate.models.serial.spi.ModelsArchiveWriter;
 						import org.hibernate.models.serial.spi.ModelsArchives;
 						import org.hibernate.models.spi.AnnotationDescriptor;
-						import org.hibernate.models.spi.AnnotationTarget;
 						import org.hibernate.models.spi.ModelsContext;
+						import org.hibernate.models.spi.MutableAnnotationDescriptor;
 						import org.hibernate.models.spi.MutableClassDetails;
 						import org.hibernate.models.spi.MutableMemberDetails;
 						import org.hibernate.models.spi.TypeDetails;
@@ -77,6 +76,11 @@ public class ModuleBoundaryTests {
 								final MutableClassDetails dynamicClass =
 										Creator.createDynamicClassDetails("DynamicEntity", modelsContext);
 								final TypeDetails stringType = TypeDetails.classType(jdkClass);
+								Creator.createDynamicClassDetails(
+										"DynamicSubtype", null, true, jdkClass, stringType, modelsContext);
+								Creator.createDynamicClassDetails(
+										"GeneratedType", "generated.Type", Object.class,
+										false, null, null, modelsContext);
 								final MutableMemberDetails member = Creator.createDynamicMemberDetails(
 										"name",
 										stringType,
@@ -89,12 +93,10 @@ public class ModuleBoundaryTests {
 
 								final AnnotationDescriptor<Marker> descriptor =
 										Creator.createAnnotationDescriptor(Marker.class, modelsContext);
-								Creator.createCompleteAnnotationDescriptor(
-										Marker.class,
-										MutableMarker.class,
-										EnumSet.of(AnnotationTarget.Kind.CLASS),
-										false
-								);
+								final MutableAnnotationDescriptor<Marker, MutableMarker> mutableDescriptor =
+										Creator.createCompleteAnnotationDescriptor(Marker.class, MutableMarker.class);
+								final MutableMarker mutableUsage = mutableDescriptor.createUsage(modelsContext);
+								mutableUsage.value("created");
 
 								descriptor.getAnnotationType();
 								descriptor.validateUsage( ModelsConsumer.class.getAnnotation( Marker.class ), modelsContext );

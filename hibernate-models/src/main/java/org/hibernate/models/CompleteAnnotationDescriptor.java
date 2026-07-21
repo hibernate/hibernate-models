@@ -88,7 +88,7 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 	}
 
 	@Override
-	public A createUsage(Map<String,Object> attributeValues, ModelsContext context) {
+	public C createUsage(Map<String,Object> attributeValues, ModelsContext context) {
 		if ( deTypedCreator == null ) {
 			deTypedCreator = new DeTypedCreator<>( getAnnotationType(), concreteClass );
 		}

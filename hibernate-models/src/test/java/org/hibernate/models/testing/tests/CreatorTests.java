@@ -53,7 +53,19 @@ class CreatorTests {
 		assertThat( descriptor.getAllowableTargets() ).isEqualTo( targets );
 		assertThat( descriptor.isInherited() ).isTrue();
 		assertThat( descriptor.getRepeatableContainer() ).isNull();
-		assertThat( descriptor.createUsage( modelsContext ) ).isInstanceOf( EntityAnnotation.class );
+		final EntityAnnotation usage = descriptor.createUsage( modelsContext );
+		assertThat( usage ).isInstanceOf( EntityAnnotation.class );
+	}
+
+	@Test
+	void createCompleteAnnotationDescriptorWithInferredMetadata() {
+		final MutableAnnotationDescriptor<Entity, EntityAnnotation> descriptor = Creator.createCompleteAnnotationDescriptor(
+				Entity.class,
+				EntityAnnotation.class
+		);
+
+		assertThat( descriptor.getAllowableTargets() ).containsExactly( Kind.CLASS );
+		assertThat( descriptor.isInherited() ).isFalse();
 	}
 
 	@Test
@@ -69,8 +81,6 @@ class CreatorTests {
 		final AnnotationDescriptor<Entity> descriptor = Creator.createCompleteAnnotationDescriptor(
 				Entity.class,
 				EntityAnnotation.class,
-				EnumSet.of( Kind.CLASS ),
-				false,
 				container
 		);
 
@@ -169,6 +179,39 @@ class CreatorTests {
 				modelsContext
 		);
 		assertJdkClassDetails( namedClassDetails, "SampleEntity", Sample.class.getName() );
+	}
+
+	@Test
+	void createDynamicClassWithCompleteDetails() {
+		final ModelsContext modelsContext = createModelContext();
+		final ClassDetails superClass = modelsContext.getClassDetailsRegistry()
+				.resolveClassDetails( Object.class.getName() );
+		final TypeDetails genericSuperType = TypeDetails.classType( superClass );
+
+		final MutableClassDetails classDetails = Creator.createDynamicClassDetails(
+				"DynamicEntity",
+				null,
+				true,
+				superClass,
+				genericSuperType,
+				modelsContext
+		);
+		assertThat( classDetails.getName() ).isEqualTo( "DynamicEntity" );
+		assertThat( classDetails.isAbstract() ).isTrue();
+		assertThat( classDetails.getSuperClass() ).isSameAs( superClass );
+		assertThat( classDetails.getGenericSuperType() ).isSameAs( genericSuperType );
+
+		final MutableClassDetails generatedClassDetails = Creator.createDynamicClassDetails(
+				"GeneratedEntity",
+				"com.acme.GeneratedEntity",
+				Object.class,
+				false,
+				null,
+				null,
+				modelsContext
+		);
+		assertThat( generatedClassDetails.getClassName() ).isEqualTo( "com.acme.GeneratedEntity" );
+		assertThat( generatedClassDetails.toJavaClass() ).isEqualTo( Object.class );
 	}
 
 	private static void assertDynamicMember(
