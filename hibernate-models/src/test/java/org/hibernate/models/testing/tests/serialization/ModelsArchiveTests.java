@@ -225,6 +225,30 @@ class ModelsArchiveTests {
 	}
 
 	@Test
+	void restoredGenericArrayResolvesItsArrayClassRelativeToSubtype() {
+		final ModelsContext sourceContext = createModelContext( GenericArrayType.class, ConcreteArrayType.class );
+		final ClassDetails genericType = sourceContext.getClassDetailsRegistry()
+				.findClassDetails( GenericArrayType.class.getName() );
+		final ClassDetails concreteType = sourceContext.getClassDetailsRegistry()
+				.findClassDetails( ConcreteArrayType.class.getName() );
+		final TypeDetails genericArrayType = genericType.findFieldByName( "values" ).getType();
+
+		final ModelsArchiveWriter writer = ModelsArchives.createWriter( false );
+		final ModelReference arrayReference = writer.reference( genericArrayType );
+		final ModelReference concreteTypeReference = writer.reference( concreteType );
+
+		final RestoredModels restoredModels = SerializationHelper.clone( writer.finish() )
+				.restore( SIMPLE_CLASS_LOADING, null );
+		final TypeDetails restoredArrayType = (TypeDetails) restoredModels.resolve( arrayReference );
+		final ClassDetails restoredConcreteType = (ClassDetails) restoredModels.resolve( concreteTypeReference );
+		final TypeDetails resolvedArrayType = restoredArrayType.determineRelativeType( restoredConcreteType );
+
+		assertThat( resolvedArrayType.asArrayType().getConstituentType().determineRawClass().toJavaClass() )
+				.isEqualTo( Integer.class );
+		assertThat( resolvedArrayType.determineRawClass().toJavaClass() ).isEqualTo( Integer[].class );
+	}
+
+	@Test
 	void directAnnotationUsagesAreRestoredFromArchive() {
 		final ModelsContext sourceContext = createModelContext(
 				AnnotatedType.class,
@@ -638,6 +662,13 @@ class ModelsArchiveTests {
 	}
 
 	private static class RecursiveType<T extends Comparable<T>> {
+	}
+
+	private static class GenericArrayType<T> {
+		private T[] values;
+	}
+
+	private static class ConcreteArrayType extends GenericArrayType<Integer> {
 	}
 
 	@InheritedMarker("inherited")

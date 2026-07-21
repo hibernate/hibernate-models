@@ -9,6 +9,8 @@ import java.util.Objects;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.ArrayTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ClassDetailsRegistry;
+import org.hibernate.models.spi.PrimitiveTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -18,12 +20,44 @@ import org.hibernate.models.spi.TypeVariableDetails;
 public class ArrayTypeDetailsImpl implements ArrayTypeDetails {
 	private final ClassDetails arrayClassDetails;
 	private final TypeDetails constituentType;
+	private final ClassDetailsRegistry classDetailsRegistry;
 	private final int dimensions;
 
-	public ArrayTypeDetailsImpl(ClassDetails arrayClassDetails, TypeDetails constituentType) {
+	public ArrayTypeDetailsImpl(
+			ClassDetails arrayClassDetails,
+			TypeDetails constituentType,
+			ClassDetailsRegistry classDetailsRegistry) {
 		this.arrayClassDetails = arrayClassDetails;
 		this.constituentType = constituentType;
+		this.classDetailsRegistry = Objects.requireNonNull( classDetailsRegistry );
 		this.dimensions = StringHelper.countArrayDimensions( arrayClassDetails.getName() );
+	}
+
+	public static ArrayTypeDetailsImpl arrayOf(
+			TypeDetails constituentType,
+			ClassDetailsRegistry classDetailsRegistry) {
+		final String arrayClassName;
+		if ( constituentType.getTypeKind() == Kind.PRIMITIVE ) {
+			final PrimitiveTypeDetails primitiveType = constituentType.asPrimitiveType();
+			arrayClassName = "[" + primitiveType.getPrimitiveKind().getJavaTypeChar();
+		}
+		else {
+			final String rawComponentName = constituentType.determineRawClass().getName();
+			arrayClassName = constituentType.getTypeKind() == Kind.ARRAY
+					? "[" + rawComponentName
+					: "[L" + rawComponentName.replace( '.', '/' ) + ";";
+		}
+		return new ArrayTypeDetailsImpl(
+				classDetailsRegistry.resolveClassDetails( arrayClassName ),
+				constituentType,
+				classDetailsRegistry
+		);
+	}
+
+	public ArrayTypeDetails resolveConstituentType(TypeDetails resolvedConstituentType) {
+		return resolvedConstituentType == constituentType
+				? this
+				: arrayOf( resolvedConstituentType, classDetailsRegistry );
 	}
 
 	@Override

@@ -88,6 +88,10 @@ class TypeDetailsFactoryTests {
 		assertThat( intArray.getConstituentType() ).isSameAs( intType );
 		assertThat( intArray.getArrayClassDetails().toJavaClass() ).isEqualTo( int[].class );
 
+		final ArrayTypeDetails nestedArray = TypeDetails.arrayType( stringArray, modelsContext );
+		assertThat( nestedArray.getConstituentType() ).isSameAs( stringArray );
+		assertThat( nestedArray.getArrayClassDetails().toJavaClass() ).isEqualTo( String[][].class );
+
 		final ArrayTypeDetails delegated = TypeDetailsHelper.arrayOf( stringType, modelsContext );
 		assertThat( delegated ).isEqualTo( stringArray );
 	}
