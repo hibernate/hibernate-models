@@ -41,13 +41,25 @@ public class MultiDimensionalArrayTypeTests {
 		final ClassTypeDetailsImpl intTypeDetails = new ClassTypeDetailsImpl( intDetails, TypeDetails.Kind.CLASS );
 
 		final ClassDetails intArrayDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Integer[].class.getName() );
-		final ArrayTypeDetailsImpl intArrayTypeDetails = new ArrayTypeDetailsImpl( intArrayDetails, intTypeDetails );
+		final ArrayTypeDetailsImpl intArrayTypeDetails = new ArrayTypeDetailsImpl(
+				intArrayDetails,
+				intTypeDetails,
+				modelsContext.getClassDetailsRegistry()
+		);
 
 		final ClassDetails intIntArrayDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Integer[][].class.getName() );
-		final ArrayTypeDetailsImpl intIntArrayTypeDetails = new ArrayTypeDetailsImpl( intIntArrayDetails, intArrayTypeDetails );
+		final ArrayTypeDetailsImpl intIntArrayTypeDetails = new ArrayTypeDetailsImpl(
+				intIntArrayDetails,
+				intArrayTypeDetails,
+				modelsContext.getClassDetailsRegistry()
+		);
 
 		final ClassDetails intIntIntArrayDetails = modelsContext.getClassDetailsRegistry().getClassDetails( Integer[][][].class.getName() );
-		final ArrayTypeDetailsImpl intIntIntArrayTypeDetails = new ArrayTypeDetailsImpl( intIntIntArrayDetails, intIntArrayTypeDetails );
+		final ArrayTypeDetailsImpl intIntIntArrayTypeDetails = new ArrayTypeDetailsImpl(
+				intIntIntArrayDetails,
+				intIntArrayTypeDetails,
+				modelsContext.getClassDetailsRegistry()
+		);
 
 		assertThat( intIntIntArrayTypeDetails.getName() ).isEqualTo( "[[[Ljava.lang.Integer;" );
 	}
@@ -72,13 +84,25 @@ public class MultiDimensionalArrayTypeTests {
 		final ClassTypeDetailsImpl intTypeDetails = new ClassTypeDetailsImpl( intDetails, TypeDetails.Kind.CLASS );
 
 		final ClassDetails intArrayDetails = modelsContext.getClassDetailsRegistry().getClassDetails( int[].class.getName() );
-		final ArrayTypeDetailsImpl intArrayTypeDetails = new ArrayTypeDetailsImpl( intArrayDetails, intTypeDetails );
+		final ArrayTypeDetailsImpl intArrayTypeDetails = new ArrayTypeDetailsImpl(
+				intArrayDetails,
+				intTypeDetails,
+				modelsContext.getClassDetailsRegistry()
+		);
 
 		final ClassDetails intIntArrayDetails = modelsContext.getClassDetailsRegistry().getClassDetails( int[][].class.getName() );
-		final ArrayTypeDetailsImpl intIntArrayTypeDetails = new ArrayTypeDetailsImpl( intIntArrayDetails, intArrayTypeDetails );
+		final ArrayTypeDetailsImpl intIntArrayTypeDetails = new ArrayTypeDetailsImpl(
+				intIntArrayDetails,
+				intArrayTypeDetails,
+				modelsContext.getClassDetailsRegistry()
+		);
 
 		final ClassDetails intIntIntArrayDetails = modelsContext.getClassDetailsRegistry().getClassDetails( int[][][].class.getName() );
-		final ArrayTypeDetailsImpl intIntIntArrayTypeDetails = new ArrayTypeDetailsImpl( intIntIntArrayDetails, intIntArrayTypeDetails );
+		final ArrayTypeDetailsImpl intIntIntArrayTypeDetails = new ArrayTypeDetailsImpl(
+				intIntIntArrayDetails,
+				intIntArrayTypeDetails,
+				modelsContext.getClassDetailsRegistry()
+		);
 
 		assertThat( intIntIntArrayTypeDetails.getName() ).isEqualTo( "[[[I" );
 	}

@@ -6,7 +6,6 @@ package org.hibernate.models.spi;
 
 import org.hibernate.models.internal.ArrayTypeDetailsImpl;
 import org.hibernate.models.internal.ParameterizedTypeDetailsImpl;
-import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.util.CollectionHelper;
 
 import java.util.Collection;
@@ -153,9 +152,17 @@ public class TypeDetailsHelper {
 			}
 			case ARRAY -> {
 				final ArrayTypeDetails arrayType = type.asArrayType();
-				return new ArrayTypeDetailsImpl(
-						arrayType.getArrayClassDetails(),
-						arrayType.getConstituentType().determineRelativeType( container )
+				final TypeDetails resolvedConstituentType = arrayType
+						.getConstituentType()
+						.determineRelativeType( container );
+				if ( resolvedConstituentType == arrayType.getConstituentType() ) {
+					return arrayType;
+				}
+				if ( arrayType instanceof ArrayTypeDetailsImpl arrayTypeDetails ) {
+					return arrayTypeDetails.resolveConstituentType( resolvedConstituentType );
+				}
+				throw new UnsupportedOperationException(
+						"Cannot resolve non-standard ArrayTypeDetails implementation - " + arrayType.getClass().getName()
 				);
 			}
 			case PARAMETERIZED_TYPE -> {
@@ -210,8 +217,11 @@ public class TypeDetailsHelper {
 			TypeDetails memberType,
 			TypeVariableScope containerType) {
 		switch ( memberType.getTypeKind() ) {
-			case CLASS, PRIMITIVE, VOID, ARRAY -> {
+			case CLASS, PRIMITIVE, VOID -> {
 				return (ClassBasedTypeDetails) memberType;
+			}
+			case ARRAY -> {
+				return (ClassBasedTypeDetails) resolveRelativeType( memberType, containerType );
 			}
 			case TYPE_VARIABLE -> {
 				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
@@ -344,22 +354,7 @@ public class TypeDetailsHelper {
 	 * Make an array type of the given component type
 	 */
 	public static ArrayTypeDetails arrayOf(TypeDetails constituentType, ModelsContext modelsContext) {
-		final ClassDetails arrayClassDetails;
-		if ( constituentType.getTypeKind() == TypeDetails.Kind.PRIMITIVE ) {
-			final PrimitiveTypeDetails primitiveType = constituentType.asPrimitiveType();
-			final PrimitiveKind primitiveKind = primitiveType.getPrimitiveKind();
-			arrayClassDetails = modelsContext
-					.getClassDetailsRegistry()
-					.resolveClassDetails( "[" + primitiveKind.getJavaTypeChar() );
-		}
-		else {
-			final ClassDetails rawComponentType = constituentType.determineRawClass();
-			final String arrayClassName = "[L" + rawComponentType.getName().replace( '.', '/' ) + ";";
-			arrayClassDetails = modelsContext
-					.getClassDetailsRegistry()
-					.resolveClassDetails( arrayClassName );
-		}
-		return new ArrayTypeDetailsImpl( arrayClassDetails, constituentType );
+		return ArrayTypeDetailsImpl.arrayOf( constituentType, modelsContext.getClassDetailsRegistry() );
 	}
 
 }
