@@ -129,7 +129,8 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 				.resolveClassDetails( arrayClass.getName() );
 		return new ArrayTypeDetailsImpl(
 				arrayClassDetails,
-				switcher.switchType( arrayClass.getComponentType() )
+				switcher.switchType( arrayClass.getComponentType() ),
+				modelsContext.getClassDetailsRegistry()
 		);
 	}
 
