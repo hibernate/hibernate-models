@@ -6,9 +6,9 @@ package org.hibernate.models;
 
 import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.StandardAnnotationDescriptor;
-import org.hibernate.models.internal.dynamic.DynamicClassDetails;
-import org.hibernate.models.internal.dynamic.DynamicFieldDetails;
-import org.hibernate.models.internal.jdk.JdkClassDetails;
+import org.hibernate.models.dynamic.DynamicClassDetails;
+import org.hibernate.models.dynamic.DynamicFieldDetails;
+import org.hibernate.models.jdk.JdkClassDetails;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;

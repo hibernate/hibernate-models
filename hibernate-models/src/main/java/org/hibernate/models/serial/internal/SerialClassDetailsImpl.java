@@ -7,8 +7,8 @@ package org.hibernate.models.serial.internal;
 import java.io.Serial;
 import java.util.Objects;
 
-import org.hibernate.models.internal.jdk.JdkClassDetails;
-import org.hibernate.models.internal.jdk.JdkBuilders;
+import org.hibernate.models.jdk.JdkClassDetails;
+import org.hibernate.models.jdk.JdkBuilders;
 import org.hibernate.models.serial.spi.SerialClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;

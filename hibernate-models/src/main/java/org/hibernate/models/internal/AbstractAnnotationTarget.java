@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.internal;
 
+import org.hibernate.models.support.AnnotationTargetSupport;
+
 /**
  * @author Steve Ebersole
  */

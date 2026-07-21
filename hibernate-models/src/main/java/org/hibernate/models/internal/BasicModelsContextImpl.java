@@ -9,6 +9,9 @@ import java.util.Map;
 import org.hibernate.models.Settings;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
+import org.hibernate.models.support.AbstractModelsContext;
+import org.hibernate.models.support.MutableAnnotationDescriptorRegistry;
+import org.hibernate.models.support.MutableClassDetailsRegistry;
 
 import static java.lang.Boolean.parseBoolean;
 

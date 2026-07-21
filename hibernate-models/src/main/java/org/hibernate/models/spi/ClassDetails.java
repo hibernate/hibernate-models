@@ -75,7 +75,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Whether this descriptor was built from its {@linkplain Class} details.
 	 *
-	 * @see org.hibernate.models.internal.jdk.JdkBuilders
+	 * @see org.hibernate.models.jdk.JdkBuilders
 	 */
 	boolean wasBuiltFromReflection();
 

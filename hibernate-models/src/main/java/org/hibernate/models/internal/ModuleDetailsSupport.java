@@ -14,6 +14,7 @@ import org.hibernate.models.spi.ModuleDetails;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
+import org.hibernate.models.support.AnnotationTargetSupport;
 
 /// Common support for mutable module annotation targets.
 ///

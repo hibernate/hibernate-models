@@ -8,13 +8,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.Locale;
 
-import org.hibernate.models.internal.jdk.JdkNestedValueConverter;
-import org.hibernate.models.internal.jdk.JdkNestedValueExtractor;
+import org.hibernate.models.jdk.internal.JdkNestedValueConverter;
+import org.hibernate.models.jdk.internal.JdkNestedValueExtractor;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.JdkValueConverter;
 import org.hibernate.models.spi.JdkValueExtractor;
-import org.hibernate.models.rendering.spi.Renderer;
-import org.hibernate.models.rendering.spi.RenderingTarget;
+import org.hibernate.models.rendering.Renderer;
+import org.hibernate.models.rendering.RenderingTarget;
 import org.hibernate.models.spi.ModelsContext;
 
 /**
