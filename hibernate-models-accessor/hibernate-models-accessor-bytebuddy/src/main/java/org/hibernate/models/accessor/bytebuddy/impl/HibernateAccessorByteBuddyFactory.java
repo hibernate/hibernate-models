@@ -11,6 +11,7 @@ import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.accessor.MultiValueAccessorGenerationException;
 import org.hibernate.models.accessor.bytebuddy.spi.MultiValueAccessorPointcuts;
+import org.hibernate.models.accessor.spi.CrossClassLoaderLookupBridge;
 import org.hibernate.models.accessor.spi.MemberValidation;
 
 import java.lang.invoke.MethodHandles;
@@ -21,16 +22,22 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class HibernateAccessorByteBuddyFactory implements org.hibernate.models.accessor.bytebuddy.HibernateAccessorByteBuddyFactory {
 
+	// we only need it to create hidden classes for generated multi readers/writers
 	private static final MethodHandles.Lookup ACCESSOR_MODULE_LOOKUP = MethodHandles.lookup();
-	private final ConcurrentHashMap<Class<?>, HibernateAccessorByteBuddyClassAccessorInfo> cache = new ConcurrentHashMap<>();
-	private final MethodHandles.Lookup lookup;
+	private final ClassValue<HibernateAccessorByteBuddyClassAccessorInfo> cache;
+	private final CrossClassLoaderLookupBridge lookupBridge;
 
 	public HibernateAccessorByteBuddyFactory(MethodHandles.Lookup lookup) {
-		this.lookup = lookup;
+		this.lookupBridge = new CrossClassLoaderLookupBridge( lookup, BridgeClassGenerator::generate );
+		this.cache = new ClassValue<>() {
+			@Override
+			protected HibernateAccessorByteBuddyClassAccessorInfo computeValue(Class<?> type) {
+				return HibernateAccessorByteBuddyClassAccessorInfo.create( type, lookupBridge );
+			}
+		};
 	}
 
 	@Override
@@ -127,30 +134,29 @@ public class HibernateAccessorByteBuddyFactory implements org.hibernate.models.a
 		return generateBulkBasedWriter(members, pointcuts);
 	}
 
-	// multi-value accessors are not cached; each call generates a new hidden class
 	private HibernateAccessorMultiValueReader generateDirectReader(Member[] members) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
-		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateReader(targetClass, members);
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateReader( targetClass, members );
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(targetClass, lookup);
-			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
+			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass( bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass().getDeclaredConstructor().newInstance();
 		}
 		catch (Exception e) {
-			throw new MultiValueAccessorGenerationException("Failed to create direct multi-value reader for " + targetClass.getName(), e);
+			throw new MultiValueAccessorGenerationException( "Failed to create direct multi-value reader for " + targetClass.getName(), e );
 		}
 	}
 
 	private HibernateAccessorMultiValueWriter generateDirectWriter(Member[] members) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
-		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateWriter(targetClass, members);
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateWriter( targetClass, members );
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(targetClass, lookup);
-			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
+			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass( bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass().getDeclaredConstructor().newInstance();
 		}
 		catch (Exception e) {
-			throw new MultiValueAccessorGenerationException("Failed to create direct multi-value writer for " + targetClass.getName(), e);
+			throw new MultiValueAccessorGenerationException( "Failed to create direct multi-value writer for " + targetClass.getName(), e );
 		}
 	}
 
@@ -184,27 +190,27 @@ public class HibernateAccessorByteBuddyFactory implements org.hibernate.models.a
 
 	private HibernateAccessorMultiValueReader generateDirectReader(Member[] members, MultiValueAccessorPointcuts pointcuts) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
-		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateReader(targetClass, members, pointcuts);
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateReader( targetClass, members, pointcuts );
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(targetClass, lookup);
-			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
+			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass( bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass().getDeclaredConstructor().newInstance();
 		}
 		catch (Exception e) {
-			throw new MultiValueAccessorGenerationException("Failed to create direct multi-value reader for " + targetClass.getName(), e);
+			throw new MultiValueAccessorGenerationException( "Failed to create direct multi-value reader for " + targetClass.getName(), e );
 		}
 	}
 
 	private HibernateAccessorMultiValueWriter generateDirectWriter(Member[] members, MultiValueAccessorPointcuts pointcuts) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
-		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateWriter(targetClass, members, pointcuts);
+		final byte[] bytecode = HibernateAccessorByteBuddyMultiValueClassGenerator.generateWriter( targetClass, members, pointcuts );
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(targetClass, lookup);
-			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
+			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass( bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass().getDeclaredConstructor().newInstance();
 		}
 		catch (Exception e) {
-			throw new MultiValueAccessorGenerationException("Failed to create direct multi-value writer for " + targetClass.getName(), e);
+			throw new MultiValueAccessorGenerationException( "Failed to create direct multi-value writer for " + targetClass.getName(), e );
 		}
 	}
 
@@ -278,6 +284,7 @@ public class HibernateAccessorByteBuddyFactory implements org.hibernate.models.a
 	}
 
 	private HibernateAccessorByteBuddyClassAccessorInfo getOrCreate(Class<?> declaringClass) {
-		return cache.computeIfAbsent(declaringClass, cls -> HibernateAccessorByteBuddyClassAccessorInfo.create(cls, lookup));
+		return cache.get( declaringClass );
 	}
+
 }

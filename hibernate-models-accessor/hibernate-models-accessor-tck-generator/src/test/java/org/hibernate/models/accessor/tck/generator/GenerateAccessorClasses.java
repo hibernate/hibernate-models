@@ -23,6 +23,7 @@ import org.hibernate.models.accessor.tck.tests.beans.PrimitiveFieldBean;
 import org.hibernate.models.accessor.tck.tests.beans.SimpleRecord;
 import org.hibernate.models.accessor.tck.tests.beans.inheritance.ChildBean;
 import org.hibernate.models.accessor.tck.tests.beans.inheritance.ParentBean;
+import org.hibernate.models.accessor.tck.tests.beans.nested.NestedClassBean;
 import org.hibernate.models.accessor.tck.tests.beans.visibility.PropertyVisibilityBean;
 import org.hibernate.models.accessor.tck.tests.beans.visibility.Util;
 import org.hibernate.models.accessor.tck.tests.interfacemethod.GreetingServiceImpl;
@@ -62,6 +63,20 @@ public class GenerateAccessorClasses {
 				.all( packagePrivateBean )
 				.build();
 		inputs.add( new AccessorGenerator.GenerationInput( ppMetadata, readClassBytes( packagePrivateBean ) ) );
+
+		// Nested classes with various visibility levels
+		Class<?>[] nestedClasses = {
+				NestedClassBean.PublicStaticNested.class,
+				NestedClassBean.protectedNestedClass(),
+				NestedClassBean.defaultNestedClass(),
+				NestedClassBean.privateNestedClass(),
+		};
+		for ( Class<?> nestedClass : nestedClasses ) {
+			AccessorClassMetadata nestedMetadata = AccessorClassMetadata.Builder.forClass( nestedClass )
+					.all( nestedClass )
+					.build();
+			inputs.add( new AccessorGenerator.GenerationInput( nestedMetadata, readClassBytes( nestedClass ) ) );
+		}
 
 		List<MultiValueGroupMetadata> readerGroups = buildReaderGroups();
 		List<MultiValueGroupMetadata> writerGroups = buildWriterGroups();
@@ -109,6 +124,19 @@ public class GenerateAccessorClasses {
 		groups.add( MultiValueGroupMetadata.readerGroup( ChildBean.class, parentField, childField ) );
 		groups.add( MultiValueGroupMetadata.readerGroup( ChildBean.class, parentField, getChild ) );
 
+		// NestedClassAccessTest groups
+		for ( Class<?> nestedClass : new Class<?>[] {
+				NestedClassBean.PublicStaticNested.class,
+				NestedClassBean.protectedNestedClass(),
+				NestedClassBean.defaultNestedClass(),
+				NestedClassBean.privateNestedClass() } ) {
+			Field pubField = nestedClass.getDeclaredField( "publicField" );
+			Field privField = nestedClass.getDeclaredField( "privateField" );
+			Method getPriv = nestedClass.getDeclaredMethod( "getPrivateField" );
+			groups.add( MultiValueGroupMetadata.readerGroup( nestedClass, pubField, privField ) );
+			groups.add( MultiValueGroupMetadata.readerGroup( nestedClass, pubField, getPriv ) );
+		}
+
 		return groups;
 	}
 
@@ -139,6 +167,19 @@ public class GenerateAccessorClasses {
 
 		groups.add( MultiValueGroupMetadata.writerGroup( ChildBean.class, parentField, childField ) );
 		groups.add( MultiValueGroupMetadata.writerGroup( ChildBean.class, setParent, childField ) );
+
+		// NestedClassAccessTest groups
+		for ( Class<?> nestedClass : new Class<?>[] {
+				NestedClassBean.PublicStaticNested.class,
+				NestedClassBean.protectedNestedClass(),
+				NestedClassBean.defaultNestedClass(),
+				NestedClassBean.privateNestedClass() } ) {
+			Field pubField = nestedClass.getDeclaredField( "publicField" );
+			Field privField = nestedClass.getDeclaredField( "privateField" );
+			Method setPriv = nestedClass.getDeclaredMethod( "setPrivateField", String.class );
+			groups.add( MultiValueGroupMetadata.writerGroup( nestedClass, pubField, privField ) );
+			groups.add( MultiValueGroupMetadata.writerGroup( nestedClass, pubField, setPriv ) );
+		}
 
 		return groups;
 	}

@@ -14,6 +14,6 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 @SuiteDisplayName( "Build-time Generator TCK tests Runner" )
 @SelectPackages( "org.hibernate.models.accessor.tck" )
 @IncludeClassNamePatterns( { ".*Test" } )
-@ExcludeClassNamePatterns( { ".*InterfaceMethod.*" } )
+@ExcludeClassNamePatterns( { ".*InterfaceMethod.*", ".*CrossClassLoader.*" } )
 public class GeneratorTckRunner {
 }

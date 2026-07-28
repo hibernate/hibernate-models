@@ -14,6 +14,7 @@ import org.hibernate.models.accessor.spi.MemberValidation;
 import org.hibernate.models.accessor.logging.impl.CoreLog;
 
 import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaConversionException;
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -59,23 +60,32 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 	public HibernateAccessorValueReader<?> valueReader(Method method) {
 		MemberValidation.validateReaderMethod( method );
 		try {
-			MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(method.getDeclaringClass(), this.lookup);
-			MethodHandle target = lookup.unreflect(method);
-			CallSite site = LambdaMetafactory.metafactory(
-					lookup,
-					"get",
-					MethodType.methodType(HibernateAccessorValueReader.class),
-					MethodType.methodType(Object.class, Object.class),
-					target,
-					MethodType.methodType(method.getReturnType(), method.getDeclaringClass())
-			);
-			return (HibernateAccessorValueReader<?>) site.getTarget().invokeExact();
+			MethodHandles.Lookup lookup = MethodHandles.privateLookupIn( method.getDeclaringClass(), this.lookup );
+			MethodHandle target = lookup.unreflect( method );
+			try {
+				CallSite site = LambdaMetafactory.metafactory(
+						lookup,
+						"get",
+						MethodType.methodType( HibernateAccessorValueReader.class ),
+						MethodType.methodType( Object.class, Object.class ),
+						target,
+						MethodType.methodType( method.getReturnType(), method.getDeclaringClass() )
+				);
+				return (HibernateAccessorValueReader<?>) site.getTarget().invokeExact();
+			}
+			catch (LambdaConversionException e) {
+				// LambdaMetafactory internally calls defineHiddenClass which requires
+				// full privilege access (MODULE bit). Cross-classloader lookups lose
+				// MODULE (JDK-8228624), so metafactory fails. Fall back to MethodHandle
+				// which only needs PRIVATE access and works cross-CL.
+				return new LambdaFieldValueReader<>( target );
+			}
 		}
 		catch (Throwable t) {
-			if (t instanceof Error) {
+			if ( t instanceof Error ) {
 				throw (Error) t;
 			}
-			throw CoreLog.INSTANCE.errorCreatingHandle(method, t, t.getMessage());
+			throw CoreLog.INSTANCE.errorCreatingHandle( method, t, t.getMessage() );
 		}
 	}
 
@@ -94,28 +104,34 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 	public HibernateAccessorValueWriter valueWriter(Method setter) {
 		MemberValidation.validateWriterMethod( setter );
 		try {
-			MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(setter.getDeclaringClass(), this.lookup);
-			MethodHandle target = lookup.unreflect(setter);
+			MethodHandles.Lookup lookup = MethodHandles.privateLookupIn( setter.getDeclaringClass(), this.lookup );
+			MethodHandle target = lookup.unreflect( setter );
 
 			Class<?> paramType = setter.getParameterTypes()[0].isPrimitive()
-					? MethodType.methodType(setter.getParameterTypes()[0]).wrap().returnType()
+					? MethodType.methodType( setter.getParameterTypes()[0] ).wrap().returnType()
 					: setter.getParameterTypes()[0];
 
-			CallSite site = LambdaMetafactory.metafactory(
-					lookup,
-					"set",
-					MethodType.methodType(HibernateAccessorValueWriter.class),
-					MethodType.methodType(void.class, Object.class, Object.class),
-					target,
-					MethodType.methodType(void.class, setter.getDeclaringClass(), paramType)
-			);
-			return (HibernateAccessorValueWriter) site.getTarget().invokeExact();
+			try {
+				CallSite site = LambdaMetafactory.metafactory(
+						lookup,
+						"set",
+						MethodType.methodType( HibernateAccessorValueWriter.class ),
+						MethodType.methodType( void.class, Object.class, Object.class ),
+						target,
+						MethodType.methodType( void.class, setter.getDeclaringClass(), paramType )
+				);
+				return (HibernateAccessorValueWriter) site.getTarget().invokeExact();
+			}
+			catch (LambdaConversionException e) {
+				// See valueReader(Method) — same cross-CL MODULE bit issue (JDK-8228624)
+				return new LambdaFieldValueWriter( target );
+			}
 		}
 		catch (Throwable t) {
-			if (t instanceof Error) {
+			if ( t instanceof Error ) {
 				throw (Error) t;
 			}
-			throw CoreLog.INSTANCE.errorCreatingHandle(setter, t, t.getMessage());
+			throw CoreLog.INSTANCE.errorCreatingHandle( setter, t, t.getMessage() );
 		}
 	}
 

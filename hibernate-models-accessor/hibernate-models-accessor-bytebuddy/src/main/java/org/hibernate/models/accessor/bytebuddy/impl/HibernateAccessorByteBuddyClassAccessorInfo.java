@@ -5,6 +5,7 @@
 package org.hibernate.models.accessor.bytebuddy.impl;
 
 import org.hibernate.models.accessor.HibernateAccessorException;
+import org.hibernate.models.accessor.spi.CrossClassLoaderLookupBridge;
 
 import net.bytebuddy.jar.asm.Type;
 
@@ -34,7 +35,7 @@ final class HibernateAccessorByteBuddyClassAccessorInfo {
 		this.constructorIndices = constructorIndices;
 	}
 
-	static HibernateAccessorByteBuddyClassAccessorInfo create(Class<?> declaringClass, MethodHandles.Lookup lookup) {
+	static HibernateAccessorByteBuddyClassAccessorInfo create(Class<?> declaringClass, CrossClassLoaderLookupBridge lookupBridge) {
 		Field[] fields = Arrays.stream( declaringClass.getDeclaredFields() )
 				.filter( f -> !Modifier.isStatic( f.getModifiers() ) )
 				.toArray( Field[]::new );
@@ -61,15 +62,15 @@ final class HibernateAccessorByteBuddyClassAccessorInfo {
 		byte[] bytecode = HibernateAccessorByteBuddyBulkAccessorClassGenerator.generate(declaringClass, fields, methods, constructors);
 
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(declaringClass, lookup);
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( declaringClass );
 			MethodHandles.Lookup hiddenClassLookup = targetLookup.defineHiddenClass(
-					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			HibernateAccessorByteBuddyBulkAccessor instance = (HibernateAccessorByteBuddyBulkAccessor) hiddenClassLookup.lookupClass()
 					.getDeclaredConstructor().newInstance();
-			return new HibernateAccessorByteBuddyClassAccessorInfo(instance, fieldIndices, methodIndices, constructorIndices);
+			return new HibernateAccessorByteBuddyClassAccessorInfo( instance, fieldIndices, methodIndices, constructorIndices );
 		}
 		catch (Exception e) {
-			throw new HibernateAccessorException("Failed to create bulk accessor for " + declaringClass.getName(), e);
+			throw new HibernateAccessorException( "Failed to create bulk accessor for " + declaringClass.getName(), e );
 		}
 	}
 

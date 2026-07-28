@@ -5,6 +5,7 @@
 package org.hibernate.models.accessor.asm.impl;
 
 import org.hibernate.models.accessor.HibernateAccessorException;
+import org.hibernate.models.accessor.spi.CrossClassLoaderLookupBridge;
 import org.objectweb.asm.Type;
 
 import java.lang.invoke.MethodHandles;
@@ -33,7 +34,7 @@ final class HibernateAccessorAsmClassAccessorInfo {
 		this.constructorIndices = constructorIndices;
 	}
 
-	static HibernateAccessorAsmClassAccessorInfo create(Class<?> declaringClass, MethodHandles.Lookup lookup) {
+	static HibernateAccessorAsmClassAccessorInfo create(Class<?> declaringClass, CrossClassLoaderLookupBridge lookupBridge) {
 		Field[] fields = Arrays.stream( declaringClass.getDeclaredFields() )
 				.filter( f -> !Modifier.isStatic( f.getModifiers() ) )
 				.toArray( Field[]::new );
@@ -60,15 +61,15 @@ final class HibernateAccessorAsmClassAccessorInfo {
 		byte[] bytecode = HibernateAccessorAsmBulkAccessorClassGenerator.generate(declaringClass, fields, methods, constructors);
 
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn(declaringClass, lookup);
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( declaringClass );
 			MethodHandles.Lookup hiddenClassLookup = targetLookup.defineHiddenClass(
-					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE);
+					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			HibernateAccessorAsmBulkAccessor instance = (HibernateAccessorAsmBulkAccessor) hiddenClassLookup.lookupClass()
 					.getDeclaredConstructor().newInstance();
-			return new HibernateAccessorAsmClassAccessorInfo(instance, fieldIndices, methodIndices, constructorIndices);
+			return new HibernateAccessorAsmClassAccessorInfo( instance, fieldIndices, methodIndices, constructorIndices );
 		}
 		catch (Exception e) {
-			throw new HibernateAccessorException("Failed to create bulk accessor for " + declaringClass.getName(), e);
+			throw new HibernateAccessorException( "Failed to create bulk accessor for " + declaringClass.getName(), e );
 		}
 	}
 

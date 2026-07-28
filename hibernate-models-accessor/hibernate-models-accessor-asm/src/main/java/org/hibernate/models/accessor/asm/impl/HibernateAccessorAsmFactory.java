@@ -11,6 +11,7 @@ import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.accessor.MultiValueAccessorGenerationException;
 import org.hibernate.models.accessor.asm.spi.MultiValueAccessorPointcuts;
+import org.hibernate.models.accessor.spi.CrossClassLoaderLookupBridge;
 import org.hibernate.models.accessor.spi.MemberValidation;
 
 import java.lang.invoke.MethodHandles;
@@ -21,17 +22,22 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class HibernateAccessorAsmFactory implements org.hibernate.models.accessor.asm.HibernateAccessorAsmFactory {
 
 	// we only need it to create hidden classes for generated multi readers/writers
 	private static final MethodHandles.Lookup ACCESSOR_MODULE_LOOKUP = MethodHandles.lookup();
-	private final ConcurrentHashMap<Class<?>, HibernateAccessorAsmClassAccessorInfo> cache = new ConcurrentHashMap<>();
-	private final MethodHandles.Lookup lookup;
+	private final ClassValue<HibernateAccessorAsmClassAccessorInfo> cache;
+	private final CrossClassLoaderLookupBridge lookupBridge;
 
 	public HibernateAccessorAsmFactory(MethodHandles.Lookup lookup) {
-		this.lookup = lookup;
+		this.lookupBridge = new CrossClassLoaderLookupBridge( lookup, BridgeClassGenerator::generate );
+		this.cache = new ClassValue<>() {
+			@Override
+			protected HibernateAccessorAsmClassAccessorInfo computeValue(Class<?> type) {
+				return HibernateAccessorAsmClassAccessorInfo.create( type, lookupBridge );
+			}
+		};
 	}
 
 	@Override
@@ -128,26 +134,20 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 		return generateBulkBasedWriter( members, pointcuts );
 	}
 
-	// multi-value accessors are not cached; each call generates a new hidden class
 	private HibernateAccessorMultiValueReader generateDirectReader(Member[] members) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateReader( targetClass, members );
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn( targetClass, lookup );
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
 			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
-					bytecode,
-					true,
-					MethodHandles.Lookup.ClassOption.NESTMATE
-			);
+					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass()
 					.getDeclaredConstructor()
 					.newInstance();
 		}
 		catch (Exception e) {
 			throw new MultiValueAccessorGenerationException(
-					"Failed to create direct multi-value reader for " + targetClass.getName(),
-					e
-			);
+					"Failed to create direct multi-value reader for " + targetClass.getName(), e );
 		}
 	}
 
@@ -155,21 +155,16 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateWriter( targetClass, members );
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn( targetClass, lookup );
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
 			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
-					bytecode,
-					true,
-					MethodHandles.Lookup.ClassOption.NESTMATE
-			);
+					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass()
 					.getDeclaredConstructor()
 					.newInstance();
 		}
 		catch (Exception e) {
 			throw new MultiValueAccessorGenerationException(
-					"Failed to create direct multi-value writer for " + targetClass.getName(),
-					e
-			);
+					"Failed to create direct multi-value writer for " + targetClass.getName(), e );
 		}
 	}
 
@@ -216,26 +211,18 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 			MultiValueAccessorPointcuts pointcuts) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateReader(
-				targetClass,
-				members,
-				pointcuts
-		);
+				targetClass, members, pointcuts );
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn( targetClass, lookup );
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
 			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
-					bytecode,
-					true,
-					MethodHandles.Lookup.ClassOption.NESTMATE
-			);
+					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass()
 					.getDeclaredConstructor()
 					.newInstance();
 		}
 		catch (Exception e) {
 			throw new MultiValueAccessorGenerationException(
-					"Failed to create direct multi-value reader for " + targetClass.getName(),
-					e
-			);
+					"Failed to create direct multi-value reader for " + targetClass.getName(), e );
 		}
 	}
 
@@ -244,26 +231,18 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 			MultiValueAccessorPointcuts pointcuts) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateWriter(
-				targetClass,
-				members,
-				pointcuts
-		);
+				targetClass, members, pointcuts );
 		try {
-			MethodHandles.Lookup targetLookup = MethodHandles.privateLookupIn( targetClass, lookup );
+			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
 			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
-					bytecode,
-					true,
-					MethodHandles.Lookup.ClassOption.NESTMATE
-			);
+					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass()
 					.getDeclaredConstructor()
 					.newInstance();
 		}
 		catch (Exception e) {
 			throw new MultiValueAccessorGenerationException(
-					"Failed to create direct multi-value writer for " + targetClass.getName(),
-					e
-			);
+					"Failed to create direct multi-value writer for " + targetClass.getName(), e );
 		}
 	}
 
@@ -356,9 +335,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 	}
 
 	private HibernateAccessorAsmClassAccessorInfo getOrCreate(Class<?> declaringClass) {
-		return cache.computeIfAbsent(
-				declaringClass,
-				cls -> HibernateAccessorAsmClassAccessorInfo.create( cls, lookup )
-		);
+		return cache.get( declaringClass );
 	}
+
 }
