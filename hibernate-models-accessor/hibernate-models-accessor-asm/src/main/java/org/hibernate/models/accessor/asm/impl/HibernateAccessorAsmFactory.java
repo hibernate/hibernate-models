@@ -12,7 +12,6 @@ import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.accessor.MultiValueAccessorGenerationException;
 import org.hibernate.models.accessor.asm.spi.HibernateAccessorAsmBulkAccessor;
-import org.hibernate.models.accessor.asm.spi.MultiValueAccessorPointcuts;
 import org.hibernate.models.accessor.spi.HibernateAccessorBytecodeDumper;
 import org.hibernate.models.accessor.spi.HibernateAccessorConfiguration;
 import org.hibernate.models.accessor.spi.CrossClassLoaderLookupBridge;
@@ -166,48 +165,6 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 		}
 	}
 
-	public HibernateAccessorMultiValueReader multiValueReader(
-			Class<?> declaringClass, Member[] members, MultiValueAccessorPointcuts pointcuts) {
-		if ( members.length == 0 ) {
-			throw new IllegalArgumentException( "At least one member is required" );
-		}
-		for ( Member member : members ) {
-			MemberValidation.validateMemberDeclaringType( declaringClass, member );
-			MemberValidation.validateReaderMember( member );
-		}
-		try {
-			if ( allSameDeclaringClass( declaringClass, members ) ) {
-				return generateDirectReader( members, pointcuts );
-			}
-			return generateBulkBasedReader( members, pointcuts );
-		}
-		catch (RuntimeException e) {
-			LOG.debugf( e, "Failed to create ASM multi-value reader for %s, falling back to reflection", declaringClass );
-			return reflectionFallback.multiValueReader( declaringClass, members );
-		}
-	}
-
-	public HibernateAccessorMultiValueWriter multiValueWriter(
-			Class<?> declaringClass, Member[] members, MultiValueAccessorPointcuts pointcuts) {
-		if ( members.length == 0 ) {
-			throw new IllegalArgumentException( "At least one member is required" );
-		}
-		for ( Member member : members ) {
-			MemberValidation.validateMemberDeclaringType( declaringClass, member );
-			MemberValidation.validateWriterMember( member );
-		}
-		try {
-			if ( allSameDeclaringClass( declaringClass, members ) ) {
-				return generateDirectWriter( members, pointcuts );
-			}
-			return generateBulkBasedWriter( members, pointcuts );
-		}
-		catch (RuntimeException e) {
-			LOG.debugf( e, "Failed to create ASM multi-value writer for %s, falling back to reflection", declaringClass );
-			return reflectionFallback.multiValueWriter( declaringClass, members );
-		}
-	}
-
 	private HibernateAccessorMultiValueReader generateDirectReader(Member[] members) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateReader( targetClass, members );
@@ -271,94 +228,6 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 				layout.accessors.length
 		);
 		bytecodeDumper.dump( "org/hibernate/models/accessor/asm/impl/HibernateAccessorMultiBulkWriter", bytecode );
-		try {
-			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass( bytecode, true );
-			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
-			Arrays.fill( paramTypes, HibernateAccessorAsmBulkAccessor.class );
-			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass()
-					.getDeclaredConstructor( paramTypes )
-					.newInstance( (Object[]) layout.accessors );
-		}
-		catch (Exception e) {
-			throw new MultiValueAccessorGenerationException( "Failed to create bulk-based multi-value writer", e );
-		}
-	}
-
-	private HibernateAccessorMultiValueReader generateDirectReader(
-			Member[] members,
-			MultiValueAccessorPointcuts pointcuts) {
-		final Class<?> targetClass = members[0].getDeclaringClass();
-		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateReader(
-				targetClass, members, pointcuts );
-		bytecodeDumper.dump( Type.getInternalName( targetClass ) + "$$HibernateAccessorMultiReader", bytecode );
-		try {
-			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
-			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
-					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
-			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass()
-					.getDeclaredConstructor()
-					.newInstance();
-		}
-		catch (Exception e) {
-			throw new MultiValueAccessorGenerationException(
-					"Failed to create direct multi-value reader for " + targetClass.getName(), e );
-		}
-	}
-
-	private HibernateAccessorMultiValueWriter generateDirectWriter(
-			Member[] members,
-			MultiValueAccessorPointcuts pointcuts) {
-		final Class<?> targetClass = members[0].getDeclaringClass();
-		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateWriter(
-				targetClass, members, pointcuts );
-		bytecodeDumper.dump( Type.getInternalName( targetClass ) + "$$HibernateAccessorMultiWriter", bytecode );
-		try {
-			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
-			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
-					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
-			return (HibernateAccessorMultiValueWriter) hiddenLookup.lookupClass()
-					.getDeclaredConstructor()
-					.newInstance();
-		}
-		catch (Exception e) {
-			throw new MultiValueAccessorGenerationException(
-					"Failed to create direct multi-value writer for " + targetClass.getName(), e );
-		}
-	}
-
-	private HibernateAccessorMultiValueReader generateBulkBasedReader(
-			Member[] members,
-			MultiValueAccessorPointcuts pointcuts) {
-		final BulkAccessorLayout layout = buildBulkAccessorLayout( members );
-		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateBulkReader(
-				layout.accesses,
-				layout.accessors.length,
-				pointcuts
-		);
-		bytecodeDumper.dump( "org/hibernate/models/accessor/asm/impl/HibernateAccessorMultiBulkReader", bytecode );
-		try {
-			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass( bytecode, true );
-			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
-			Arrays.fill( paramTypes, HibernateAccessorAsmBulkAccessor.class );
-			return (HibernateAccessorMultiValueReader) hiddenLookup.lookupClass()
-					.getDeclaredConstructor( paramTypes )
-					.newInstance( (Object[]) layout.accessors );
-		}
-		catch (Exception e) {
-			throw new MultiValueAccessorGenerationException( "Failed to create bulk-based multi-value reader", e );
-		}
-	}
-
-	private HibernateAccessorMultiValueWriter generateBulkBasedWriter(
-			Member[] members,
-			MultiValueAccessorPointcuts pointcuts) {
-		final BulkAccessorLayout layout = buildBulkAccessorLayout( members );
-		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateBulkWriter(
-				layout.accesses,
-				layout.accessors.length,
-				pointcuts
-		);
-		bytecodeDumper.dump( Type.getInternalName( members[0].getDeclaringClass() ) + "$$HibernateAccessorMultiBulkWriter_" + java.util.UUID.randomUUID(), bytecode );
 		try {
 			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass( bytecode, true );
 			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
