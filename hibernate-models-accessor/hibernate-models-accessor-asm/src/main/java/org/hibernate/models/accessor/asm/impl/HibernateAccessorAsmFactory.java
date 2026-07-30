@@ -4,6 +4,7 @@
  */
 package org.hibernate.models.accessor.asm.impl;
 
+import org.hibernate.models.accessor.HibernateAccessorFactory;
 import org.hibernate.models.accessor.HibernateAccessorInstantiator;
 import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
 import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
@@ -17,6 +18,7 @@ import org.hibernate.models.accessor.spi.HibernateAccessorConfiguration;
 import org.hibernate.models.accessor.spi.CrossClassLoaderLookupBridge;
 import org.hibernate.models.accessor.spi.MemberValidation;
 
+import org.jboss.logging.Logger;
 import org.objectweb.asm.Type;
 
 import java.lang.invoke.MethodHandles;
@@ -24,17 +26,21 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class HibernateAccessorAsmFactory implements org.hibernate.models.accessor.asm.HibernateAccessorAsmFactory {
 
+	private static final Logger LOG = Logger.getLogger( HibernateAccessorAsmFactory.class );
+
 	// we only need it to create hidden classes for generated multi readers/writers
 	private static final MethodHandles.Lookup ACCESSOR_MODULE_LOOKUP = MethodHandles.lookup();
 	private final ClassValue<HibernateAccessorAsmClassAccessorInfo> cache;
 	private final CrossClassLoaderLookupBridge lookupBridge;
 	private final HibernateAccessorBytecodeDumper bytecodeDumper;
+	private final HibernateAccessorFactory reflectionFallback = HibernateAccessorFactory.reflection();
 
 	public HibernateAccessorAsmFactory(MethodHandles.Lookup lookup) {
 		this( new HibernateAccessorConfiguration( lookup ) );
@@ -53,36 +59,69 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 
 	@Override
 	public <T> HibernateAccessorInstantiator<T> instantiator(Constructor<T> constructor) {
-		HibernateAccessorAsmClassAccessorInfo info = getOrCreate( constructor.getDeclaringClass() );
-		return new HibernateAccessorAsmInstantiator<>( info.bulkAccessor(), info.constructorIndex( constructor ) );
+		try {
+			HibernateAccessorAsmClassAccessorInfo info = getOrCreate( constructor.getDeclaringClass() );
+			return new HibernateAccessorAsmInstantiator<>( info.bulkAccessor(), info.constructorIndex( constructor ) );
+		}
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create ASM instantiator for %s, falling back to reflection", constructor.getDeclaringClass() );
+			return reflectionFallback.instantiator( constructor );
+		}
 	}
 
 	@Override
 	public HibernateAccessorValueReader<?> valueReader(Field field) {
 		MemberValidation.validateInstanceMember( field );
-		HibernateAccessorAsmClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
-		return new HibernateAccessorAsmFieldValueReader<>(info.bulkAccessor(), info.fieldIndex(field));
+		try {
+			HibernateAccessorAsmClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
+			return new HibernateAccessorAsmFieldValueReader<>(info.bulkAccessor(), info.fieldIndex(field));
+		}
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create ASM value reader for %s, falling back to reflection", field );
+			return reflectionFallback.valueReader( field );
+		}
 	}
 
 	@Override
 	public HibernateAccessorValueReader<?> valueReader(Method method) {
 		MemberValidation.validateReaderMethod( method );
-		HibernateAccessorAsmClassAccessorInfo info = getOrCreate( method.getDeclaringClass() );
-		return new HibernateAccessorAsmMethodValueReader<>( info.bulkAccessor(), info.methodIndex( method ) );
+		try {
+			HibernateAccessorAsmClassAccessorInfo info = getOrCreate( method.getDeclaringClass() );
+			return new HibernateAccessorAsmMethodValueReader<>( info.bulkAccessor(), info.methodIndex( method ) );
+		}
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create ASM value reader for %s, falling back to reflection", method );
+			return reflectionFallback.valueReader( method );
+		}
 	}
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Field field) {
 		MemberValidation.validateInstanceMember( field );
-		HibernateAccessorAsmClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
-		return new HibernateAccessorAsmFieldValueWriter(info.bulkAccessor(), info.fieldIndex(field));
+		if ( Modifier.isFinal( field.getModifiers() ) ) {
+			return reflectionFallback.valueWriter( field );
+		}
+		try {
+			HibernateAccessorAsmClassAccessorInfo info = getOrCreate(field.getDeclaringClass());
+			return new HibernateAccessorAsmFieldValueWriter(info.bulkAccessor(), info.fieldIndex(field));
+		}
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create ASM value writer for %s, falling back to reflection", field );
+			return reflectionFallback.valueWriter( field );
+		}
 	}
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Method setter) {
 		MemberValidation.validateWriterMethod( setter );
-		HibernateAccessorAsmClassAccessorInfo info = getOrCreate( setter.getDeclaringClass() );
-		return new HibernateAccessorAsmMethodValueWriter( info.bulkAccessor(), info.methodIndex( setter ) );
+		try {
+			HibernateAccessorAsmClassAccessorInfo info = getOrCreate( setter.getDeclaringClass() );
+			return new HibernateAccessorAsmMethodValueWriter( info.bulkAccessor(), info.methodIndex( setter ) );
+		}
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create ASM value writer for %s, falling back to reflection", setter );
+			return reflectionFallback.valueWriter( setter );
+		}
 	}
 
 	@Override
@@ -94,10 +133,16 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 			MemberValidation.validateMemberDeclaringType( declaringClass, member );
 			MemberValidation.validateReaderMember( member );
 		}
-		if ( allSameDeclaringClass( declaringClass, members ) ) {
-			return generateDirectReader( members );
+		try {
+			if ( allSameDeclaringClass( declaringClass, members ) ) {
+				return generateDirectReader( members );
+			}
+			return generateBulkBasedReader( members );
 		}
-		return generateBulkBasedReader( members );
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create ASM multi-value reader for %s, falling back to reflection", declaringClass );
+			return reflectionFallback.multiValueReader( declaringClass, members );
+		}
 	}
 
 	@Override
@@ -109,10 +154,16 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 			MemberValidation.validateMemberDeclaringType( declaringClass, member );
 			MemberValidation.validateWriterMember( member );
 		}
-		if ( allSameDeclaringClass( declaringClass, members ) ) {
-			return generateDirectWriter( members );
+		try {
+			if ( allSameDeclaringClass( declaringClass, members ) ) {
+				return generateDirectWriter( members );
+			}
+			return generateBulkBasedWriter( members );
 		}
-		return generateBulkBasedWriter( members );
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create ASM multi-value writer for %s, falling back to reflection", declaringClass );
+			return reflectionFallback.multiValueWriter( declaringClass, members );
+		}
 	}
 
 	public HibernateAccessorMultiValueReader multiValueReader(
@@ -124,10 +175,16 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 			MemberValidation.validateMemberDeclaringType( declaringClass, member );
 			MemberValidation.validateReaderMember( member );
 		}
-		if ( allSameDeclaringClass( declaringClass, members ) ) {
-			return generateDirectReader( members, pointcuts );
+		try {
+			if ( allSameDeclaringClass( declaringClass, members ) ) {
+				return generateDirectReader( members, pointcuts );
+			}
+			return generateBulkBasedReader( members, pointcuts );
 		}
-		return generateBulkBasedReader( members, pointcuts );
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create ASM multi-value reader for %s, falling back to reflection", declaringClass );
+			return reflectionFallback.multiValueReader( declaringClass, members );
+		}
 	}
 
 	public HibernateAccessorMultiValueWriter multiValueWriter(
@@ -139,10 +196,16 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 			MemberValidation.validateMemberDeclaringType( declaringClass, member );
 			MemberValidation.validateWriterMember( member );
 		}
-		if ( allSameDeclaringClass( declaringClass, members ) ) {
-			return generateDirectWriter( members, pointcuts );
+		try {
+			if ( allSameDeclaringClass( declaringClass, members ) ) {
+				return generateDirectWriter( members, pointcuts );
+			}
+			return generateBulkBasedWriter( members, pointcuts );
 		}
-		return generateBulkBasedWriter( members, pointcuts );
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create ASM multi-value writer for %s, falling back to reflection", declaringClass );
+			return reflectionFallback.multiValueWriter( declaringClass, members );
+		}
 	}
 
 	private HibernateAccessorMultiValueReader generateDirectReader(Member[] members) {

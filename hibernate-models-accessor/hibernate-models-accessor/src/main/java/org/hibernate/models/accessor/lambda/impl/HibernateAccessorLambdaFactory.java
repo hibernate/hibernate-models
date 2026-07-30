@@ -12,7 +12,8 @@ import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.accessor.spi.HibernateAccessorConfiguration;
 import org.hibernate.models.accessor.spi.MemberValidation;
-import org.hibernate.models.accessor.logging.impl.CoreLog;
+
+import org.jboss.logging.Logger;
 
 import java.lang.invoke.CallSite;
 import java.lang.invoke.LambdaConversionException;
@@ -24,10 +25,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory {
 
+	private static final Logger LOG = Logger.getLogger( HibernateAccessorLambdaFactory.class );
+
 	private final MethodHandles.Lookup lookup;
+	private final HibernateAccessorFactory reflectionFallback = HibernateAccessorFactory.reflection();
 
 	public HibernateAccessorLambdaFactory(MethodHandles.Lookup lookup) {
 		this( new HibernateAccessorConfiguration( lookup ) );
@@ -45,8 +50,9 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 					constructor
 			);
 		}
-		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle( constructor, e, e.getMessage() );
+		catch (RuntimeException|IllegalAccessException e) {
+			LOG.debugf( e, "Failed to create lambda instantiator for %s, falling back to reflection", constructor );
+			return reflectionFallback.instantiator( constructor );
 		}
 	}
 
@@ -54,11 +60,11 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 	public HibernateAccessorValueReader<?> valueReader(Field field) {
 		MemberValidation.validateInstanceMember( field );
 		try {
-			return new LambdaFieldValueReader<>( MethodHandles.privateLookupIn( field.getDeclaringClass(), this.lookup )
-														.unreflectGetter( field ) );
+			return new LambdaFieldValueReader<>( MethodHandles.privateLookupIn( field.getDeclaringClass(), this.lookup ).unreflectGetter( field ) );
 		}
-		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle( field, e, e.getMessage() );
+		catch (RuntimeException|IllegalAccessException e) {
+			LOG.debugf( e, "Failed to create lambda field reader for %s, falling back to reflection", field );
+			return reflectionFallback.valueReader( field );
 		}
 	}
 
@@ -91,19 +97,23 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 			if ( t instanceof Error ) {
 				throw (Error) t;
 			}
-			throw CoreLog.INSTANCE.errorCreatingHandle( method, t, t.getMessage() );
+			LOG.debugf( t, "Failed to create lambda method reader for %s, falling back to reflection", method );
+			return reflectionFallback.valueReader( method );
 		}
 	}
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Field field) {
 		MemberValidation.validateInstanceMember( field );
-		try {
-			return new LambdaFieldValueWriter( MethodHandles.privateLookupIn( field.getDeclaringClass(), this.lookup )
-													.unreflectSetter( field ) );
+		if ( Modifier.isFinal( field.getModifiers() ) ) {
+			return reflectionFallback.valueWriter( field );
 		}
-		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle( field, e, e.getMessage() );
+		try {
+			return new LambdaFieldValueWriter( MethodHandles.privateLookupIn( field.getDeclaringClass(), this.lookup ).unreflectSetter( field ) );
+		}
+		catch (IllegalAccessException t) {
+			LOG.debugf( t, "Failed to create lambda field writer for %s, falling back to reflection", field );
+			return reflectionFallback.valueWriter( field );
 		}
 	}
 
@@ -138,7 +148,8 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 			if ( t instanceof Error ) {
 				throw (Error) t;
 			}
-			throw CoreLog.INSTANCE.errorCreatingHandle( setter, t, t.getMessage() );
+			LOG.debugf( t, "Failed to create lambda method writer for %s, falling back to reflection", setter );
+			return reflectionFallback.valueWriter( setter );
 		}
 	}
 
@@ -147,22 +158,28 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 		if ( members.length == 0 ) {
 			throw new IllegalArgumentException( "At least one member is required" );
 		}
-		final HibernateAccessorValueReader<?>[] readers = new HibernateAccessorValueReader<?>[members.length];
-		for ( int i = 0; i < members.length; i++ ) {
-			final Member member = members[i];
-			MemberValidation.validateMemberDeclaringType( declaringClass, member );
-			MemberValidation.validateReaderMember( member );
-			if ( member instanceof Field field ) {
-				readers[i] = valueReader( field );
+		try {
+			final HibernateAccessorValueReader<?>[] readers = new HibernateAccessorValueReader<?>[members.length];
+			for ( int i = 0; i < members.length; i++ ) {
+				final Member member = members[i];
+				MemberValidation.validateMemberDeclaringType( declaringClass, member );
+				MemberValidation.validateReaderMember( member );
+				if ( member instanceof Field field ) {
+					readers[i] = valueReader( field );
+				}
+				else if ( member instanceof Method method ) {
+					readers[i] = valueReader( method );
+				}
+				else {
+					throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
+				}
 			}
-			else if ( member instanceof Method method ) {
-				readers[i] = valueReader( method );
-			}
-			else {
-				throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
-			}
+			return new LambdaMultiValueReader( readers );
 		}
-		return new LambdaMultiValueReader( readers );
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create lambda multi-value reader for %s, falling back to reflection", declaringClass );
+			return reflectionFallback.multiValueReader( declaringClass, members );
+		}
 	}
 
 	@Override
@@ -170,21 +187,27 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 		if ( members.length == 0 ) {
 			throw new IllegalArgumentException( "At least one member is required" );
 		}
-		final HibernateAccessorValueWriter[] writers = new HibernateAccessorValueWriter[members.length];
-		for ( int i = 0; i < members.length; i++ ) {
-			final Member member = members[i];
-			MemberValidation.validateMemberDeclaringType( declaringClass, member );
-			MemberValidation.validateWriterMember( member );
-			if ( member instanceof Field field ) {
-				writers[i] = valueWriter( field );
+		try {
+			final HibernateAccessorValueWriter[] writers = new HibernateAccessorValueWriter[members.length];
+			for ( int i = 0; i < members.length; i++ ) {
+				final Member member = members[i];
+				MemberValidation.validateMemberDeclaringType( declaringClass, member );
+				MemberValidation.validateWriterMember( member );
+				if ( member instanceof Field field ) {
+					writers[i] = valueWriter( field );
+				}
+				else if ( member instanceof Method method ) {
+					writers[i] = valueWriter( method );
+				}
+				else {
+					throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
+				}
 			}
-			else if ( member instanceof Method method ) {
-				writers[i] = valueWriter( method );
-			}
-			else {
-				throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
-			}
+			return new LambdaMultiValueWriter( writers );
 		}
-		return new LambdaMultiValueWriter( writers );
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create lambda multi-value writer for %s, falling back to reflection", declaringClass );
+			return reflectionFallback.multiValueWriter( declaringClass, members );
+		}
 	}
 }

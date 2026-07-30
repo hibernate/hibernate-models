@@ -11,17 +11,22 @@ import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.accessor.spi.MemberValidation;
-import org.hibernate.models.accessor.logging.impl.CoreLog;
+
+import org.jboss.logging.Logger;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFactory {
 
+	private static final Logger LOG = Logger.getLogger( HibernateAccessorMethodHandleFactory.class );
+
 	private final MethodHandles.Lookup lookup;
+	private final HibernateAccessorFactory reflectionFallback = HibernateAccessorFactory.reflection();
 
 	public HibernateAccessorMethodHandleFactory(MethodHandles.Lookup lookup) {
 		this.lookup = lookup;
@@ -34,8 +39,9 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 					privateLookup(constructor.getDeclaringClass()).unreflectConstructor(constructor)
 							.asSpreader(Object[].class, constructor.getParameterCount()));
 		}
-		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle(constructor, e, e.getMessage());
+		catch (RuntimeException|IllegalAccessException e) {
+			LOG.debugf( e, "Failed to create method-handle instantiator for %s, falling back to reflection", constructor );
+			return reflectionFallback.instantiator( constructor );
 		}
 	}
 
@@ -46,8 +52,9 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 			return new HibernateAccessorMethodHandleFieldValueReader<>(
 					privateLookup(field.getDeclaringClass()).unreflectGetter(field));
 		}
-		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle(field, e, e.getMessage());
+		catch (RuntimeException|IllegalAccessException e) {
+			LOG.debugf( e, "Failed to create method-handle field reader for %s, falling back to reflection", field );
+			return reflectionFallback.valueReader( field );
 		}
 	}
 
@@ -58,20 +65,25 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 			return new HibernateAccessorMethodHandleMethodValueReader<>(
 					privateLookup(method.getDeclaringClass()).unreflect(method));
 		}
-		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle(method, e, e.getMessage());
+		catch (RuntimeException|IllegalAccessException e) {
+			LOG.debugf( e, "Failed to create method-handle method reader for %s, falling back to reflection", method );
+			return reflectionFallback.valueReader( method );
 		}
 	}
 
 	@Override
 	public HibernateAccessorValueWriter valueWriter(Field field) {
 		MemberValidation.validateInstanceMember( field );
+		if ( Modifier.isFinal( field.getModifiers() ) ) {
+			return reflectionFallback.valueWriter( field );
+		}
 		try {
 			return new HibernateAccessorMethodHandleFieldValueWriter(
 					privateLookup(field.getDeclaringClass()).unreflectSetter(field));
 		}
-		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle(field, e, e.getMessage());
+		catch (RuntimeException|IllegalAccessException e) {
+			LOG.debugf( e, "Failed to create method-handle field writer for %s, falling back to reflection", field );
+			return reflectionFallback.valueWriter( field );
 		}
 	}
 
@@ -82,8 +94,9 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 			return new HibernateAccessorMethodHandleMethodValueWriter(
 					privateLookup(setter.getDeclaringClass()).unreflect(setter));
 		}
-		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle(setter, e, e.getMessage());
+		catch (RuntimeException|IllegalAccessException e) {
+			LOG.debugf( e, "Failed to create method-handle method writer for %s, falling back to reflection", setter );
+			return reflectionFallback.valueWriter( setter );
 		}
 	}
 
@@ -92,22 +105,28 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 		if ( members.length == 0 ) {
 			throw new IllegalArgumentException( "At least one member is required" );
 		}
-		final HibernateAccessorValueReader<?>[] readers = new HibernateAccessorValueReader<?>[members.length];
-		for ( int i = 0; i < members.length; i++ ) {
-			final Member member = members[i];
-			MemberValidation.validateMemberDeclaringType( declaringClass, member );
-			MemberValidation.validateReaderMember( member );
-			if ( member instanceof Field field ) {
-				readers[i] = valueReader( field );
+		try {
+			final HibernateAccessorValueReader<?>[] readers = new HibernateAccessorValueReader<?>[members.length];
+			for ( int i = 0; i < members.length; i++ ) {
+				final Member member = members[i];
+				MemberValidation.validateMemberDeclaringType( declaringClass, member );
+				MemberValidation.validateReaderMember( member );
+				if ( member instanceof Field field ) {
+					readers[i] = valueReader( field );
+				}
+				else if ( member instanceof Method method ) {
+					readers[i] = valueReader( method );
+				}
+				else {
+					throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
+				}
 			}
-			else if ( member instanceof Method method ) {
-				readers[i] = valueReader( method );
-			}
-			else {
-				throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
-			}
+			return new HibernateAccessorMethodHandleMultiValueReader( readers );
 		}
-		return new HibernateAccessorMethodHandleMultiValueReader( readers );
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create method-handle multi-value reader for %s, falling back to reflection", declaringClass );
+			return reflectionFallback.multiValueReader( declaringClass, members );
+		}
 	}
 
 	@Override
@@ -115,22 +134,28 @@ public class HibernateAccessorMethodHandleFactory implements HibernateAccessorFa
 		if ( members.length == 0 ) {
 			throw new IllegalArgumentException( "At least one member is required" );
 		}
-		final HibernateAccessorValueWriter[] writers = new HibernateAccessorValueWriter[members.length];
-		for ( int i = 0; i < members.length; i++ ) {
-			final Member member = members[i];
-			MemberValidation.validateMemberDeclaringType( declaringClass, member );
-			MemberValidation.validateWriterMember( member );
-			if ( member instanceof Field field ) {
-				writers[i] = valueWriter( field );
+		try {
+			final HibernateAccessorValueWriter[] writers = new HibernateAccessorValueWriter[members.length];
+			for ( int i = 0; i < members.length; i++ ) {
+				final Member member = members[i];
+				MemberValidation.validateMemberDeclaringType( declaringClass, member );
+				MemberValidation.validateWriterMember( member );
+				if ( member instanceof Field field ) {
+					writers[i] = valueWriter( field );
+				}
+				else if ( member instanceof Method method ) {
+					writers[i] = valueWriter( method );
+				}
+				else {
+					throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
+				}
 			}
-			else if ( member instanceof Method method ) {
-				writers[i] = valueWriter( method );
-			}
-			else {
-				throw new IllegalArgumentException( "Unsupported member type: " + member.getClass().getName() );
-			}
+			return new HibernateAccessorMethodHandleMultiValueWriter( writers );
 		}
-		return new HibernateAccessorMethodHandleMultiValueWriter( writers );
+		catch (RuntimeException e) {
+			LOG.debugf( e, "Failed to create method-handle multi-value writer for %s, falling back to reflection", declaringClass );
+			return reflectionFallback.multiValueWriter( declaringClass, members );
+		}
 	}
 
 	private MethodHandles.Lookup privateLookup(Class<?> targetClass) throws IllegalAccessException {
