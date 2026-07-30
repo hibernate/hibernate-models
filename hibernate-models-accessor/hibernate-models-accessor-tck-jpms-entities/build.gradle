@@ -1,0 +1,5 @@
+plugins {
+	id "java-module"
+}
+
+description = "Entity classes in a named JPMS module for cross-module accessor testing"

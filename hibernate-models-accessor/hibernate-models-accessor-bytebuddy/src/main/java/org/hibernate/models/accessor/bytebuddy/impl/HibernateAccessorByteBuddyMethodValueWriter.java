@@ -5,6 +5,7 @@
 package org.hibernate.models.accessor.bytebuddy.impl;
 
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
+import org.hibernate.models.accessor.bytebuddy.spi.HibernateAccessorByteBuddyBulkAccessor;
 
 record HibernateAccessorByteBuddyMethodValueWriter(HibernateAccessorByteBuddyBulkAccessor accessor, int index) implements HibernateAccessorValueWriter {
 

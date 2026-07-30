@@ -6,6 +6,7 @@ package org.hibernate.models.accessor.bytebuddy.impl;
 
 import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
 import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
+import org.hibernate.models.accessor.bytebuddy.spi.HibernateAccessorByteBuddyBulkAccessor;
 import org.hibernate.models.accessor.bytebuddy.spi.MultiValueAccessorPointcuts;
 
 import net.bytebuddy.jar.asm.ClassWriter;
@@ -18,7 +19,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
-import static org.hibernate.models.accessor.bytebuddy.impl.HibernateAccessorByteBuddyUtils.*;
+import static org.hibernate.models.accessor.bytebuddy.impl.HibernateAccessorByteBuddyUtils.emitBox;
+import static org.hibernate.models.accessor.bytebuddy.impl.HibernateAccessorByteBuddyUtils.emitIntConstant;
+import static org.hibernate.models.accessor.bytebuddy.impl.HibernateAccessorByteBuddyUtils.emitUnboxOrCast;
 
 final class HibernateAccessorByteBuddyMultiValueClassGenerator implements Opcodes {
 

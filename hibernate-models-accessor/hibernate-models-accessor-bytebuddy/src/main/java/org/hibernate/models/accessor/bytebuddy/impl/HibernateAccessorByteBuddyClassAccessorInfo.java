@@ -5,6 +5,7 @@
 package org.hibernate.models.accessor.bytebuddy.impl;
 
 import org.hibernate.models.accessor.HibernateAccessorException;
+import org.hibernate.models.accessor.bytebuddy.spi.HibernateAccessorByteBuddyBulkAccessor;
 import org.hibernate.models.accessor.spi.CrossClassLoaderLookupBridge;
 
 import net.bytebuddy.jar.asm.Type;

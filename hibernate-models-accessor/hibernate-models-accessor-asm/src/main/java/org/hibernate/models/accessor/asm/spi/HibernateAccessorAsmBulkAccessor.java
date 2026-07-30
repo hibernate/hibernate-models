@@ -2,9 +2,9 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright: Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.models.accessor.bytebuddy.impl;
+package org.hibernate.models.accessor.asm.spi;
 
-public interface HibernateAccessorByteBuddyBulkAccessor {
+public interface HibernateAccessorAsmBulkAccessor {
 
 	Object readByField(Object instance, int index);
 

@@ -5,6 +5,7 @@
 package org.hibernate.models.accessor.asm.impl;
 
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
+import org.hibernate.models.accessor.asm.spi.HibernateAccessorAsmBulkAccessor;
 
 record HibernateAccessorAsmMethodValueReader<T>(HibernateAccessorAsmBulkAccessor accessor, int index) implements HibernateAccessorValueReader<T> {
 

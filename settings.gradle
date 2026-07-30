@@ -107,3 +107,9 @@ project(':hibernate-models-accessor-generator').projectDir = file('hibernate-mod
 
 include 'hibernate-models-accessor-tck-generator'
 project(':hibernate-models-accessor-tck-generator').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-generator')
+
+include 'hibernate-models-accessor-tck-jpms-entities'
+project(':hibernate-models-accessor-tck-jpms-entities').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-jpms-entities')
+
+include 'hibernate-models-accessor-tck-jpms'
+project(':hibernate-models-accessor-tck-jpms').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-jpms')

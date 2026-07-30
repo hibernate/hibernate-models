@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.accessor.bytebuddy.impl;
 
+import org.hibernate.models.accessor.bytebuddy.spi.HibernateAccessorByteBuddyBulkAccessor;
+
 import net.bytebuddy.jar.asm.ClassWriter;
 import net.bytebuddy.jar.asm.Label;
 import net.bytebuddy.jar.asm.MethodVisitor;
@@ -14,7 +16,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import static org.hibernate.models.accessor.bytebuddy.impl.HibernateAccessorByteBuddyUtils.*;
+import static org.hibernate.models.accessor.bytebuddy.impl.HibernateAccessorByteBuddyUtils.emitBox;
+import static org.hibernate.models.accessor.bytebuddy.impl.HibernateAccessorByteBuddyUtils.emitIntConstant;
+import static org.hibernate.models.accessor.bytebuddy.impl.HibernateAccessorByteBuddyUtils.emitUnboxOrCast;
 
 final class HibernateAccessorByteBuddyBulkAccessorClassGenerator implements Opcodes {
 
