@@ -10,6 +10,7 @@ import org.hibernate.models.accessor.HibernateAccessorMultiValueReader;
 import org.hibernate.models.accessor.HibernateAccessorMultiValueWriter;
 import org.hibernate.models.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.accessor.HibernateAccessorValueWriter;
+import org.hibernate.models.accessor.spi.HibernateAccessorConfiguration;
 import org.hibernate.models.accessor.spi.MemberValidation;
 import org.hibernate.models.accessor.logging.impl.CoreLog;
 
@@ -29,7 +30,11 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 	private final MethodHandles.Lookup lookup;
 
 	public HibernateAccessorLambdaFactory(MethodHandles.Lookup lookup) {
-		this.lookup = lookup;
+		this( new HibernateAccessorConfiguration( lookup ) );
+	}
+
+	public HibernateAccessorLambdaFactory(HibernateAccessorConfiguration configuration) {
+		this.lookup = configuration.lookup();
 	}
 
 	@Override
@@ -49,10 +54,11 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 	public HibernateAccessorValueReader<?> valueReader(Field field) {
 		MemberValidation.validateInstanceMember( field );
 		try {
-			return new LambdaFieldValueReader<>(MethodHandles.privateLookupIn(field.getDeclaringClass(), this.lookup).unreflectGetter(field));
+			return new LambdaFieldValueReader<>( MethodHandles.privateLookupIn( field.getDeclaringClass(), this.lookup )
+														.unreflectGetter( field ) );
 		}
 		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle(field, e, e.getMessage());
+			throw CoreLog.INSTANCE.errorCreatingHandle( field, e, e.getMessage() );
 		}
 	}
 
@@ -93,10 +99,11 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 	public HibernateAccessorValueWriter valueWriter(Field field) {
 		MemberValidation.validateInstanceMember( field );
 		try {
-			return new LambdaFieldValueWriter(MethodHandles.privateLookupIn(field.getDeclaringClass(), this.lookup).unreflectSetter(field));
+			return new LambdaFieldValueWriter( MethodHandles.privateLookupIn( field.getDeclaringClass(), this.lookup )
+													.unreflectSetter( field ) );
 		}
 		catch (IllegalAccessException e) {
-			throw CoreLog.INSTANCE.errorCreatingHandle(field, e, e.getMessage());
+			throw CoreLog.INSTANCE.errorCreatingHandle( field, e, e.getMessage() );
 		}
 	}
 
@@ -144,7 +151,7 @@ public class HibernateAccessorLambdaFactory implements HibernateAccessorFactory 
 		for ( int i = 0; i < members.length; i++ ) {
 			final Member member = members[i];
 			MemberValidation.validateMemberDeclaringType( declaringClass, member );
-			MemberValidation.validateReaderMember(member);
+			MemberValidation.validateReaderMember( member );
 			if ( member instanceof Field field ) {
 				readers[i] = valueReader( field );
 			}

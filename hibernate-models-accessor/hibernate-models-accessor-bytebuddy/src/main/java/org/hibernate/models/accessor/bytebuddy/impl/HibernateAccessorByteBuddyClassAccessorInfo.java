@@ -6,6 +6,7 @@ package org.hibernate.models.accessor.bytebuddy.impl;
 
 import org.hibernate.models.accessor.HibernateAccessorException;
 import org.hibernate.models.accessor.bytebuddy.spi.HibernateAccessorByteBuddyBulkAccessor;
+import org.hibernate.models.accessor.spi.HibernateAccessorBytecodeDumper;
 import org.hibernate.models.accessor.spi.CrossClassLoaderLookupBridge;
 
 import net.bytebuddy.jar.asm.Type;
@@ -36,7 +37,7 @@ final class HibernateAccessorByteBuddyClassAccessorInfo {
 		this.constructorIndices = constructorIndices;
 	}
 
-	static HibernateAccessorByteBuddyClassAccessorInfo create(Class<?> declaringClass, CrossClassLoaderLookupBridge lookupBridge) {
+	static HibernateAccessorByteBuddyClassAccessorInfo create(Class<?> declaringClass, CrossClassLoaderLookupBridge lookupBridge, HibernateAccessorBytecodeDumper bytecodeDumper) {
 		Field[] fields = Arrays.stream( declaringClass.getDeclaredFields() )
 				.filter( f -> !Modifier.isStatic( f.getModifiers() ) )
 				.toArray( Field[]::new );
@@ -61,6 +62,7 @@ final class HibernateAccessorByteBuddyClassAccessorInfo {
 		}
 
 		byte[] bytecode = HibernateAccessorByteBuddyBulkAccessorClassGenerator.generate(declaringClass, fields, methods, constructors);
+		bytecodeDumper.dump( Type.getInternalName( declaringClass ) + "$$HibernateAccessor", bytecode );
 
 		try {
 			MethodHandles.Lookup targetLookup = lookupBridge.resolve( declaringClass );

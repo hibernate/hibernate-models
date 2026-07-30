@@ -12,8 +12,12 @@ import org.hibernate.models.accessor.HibernateAccessorValueWriter;
 import org.hibernate.models.accessor.MultiValueAccessorGenerationException;
 import org.hibernate.models.accessor.asm.spi.HibernateAccessorAsmBulkAccessor;
 import org.hibernate.models.accessor.asm.spi.MultiValueAccessorPointcuts;
+import org.hibernate.models.accessor.spi.HibernateAccessorBytecodeDumper;
+import org.hibernate.models.accessor.spi.HibernateAccessorConfiguration;
 import org.hibernate.models.accessor.spi.CrossClassLoaderLookupBridge;
 import org.hibernate.models.accessor.spi.MemberValidation;
+
+import org.objectweb.asm.Type;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -30,13 +34,19 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 	private static final MethodHandles.Lookup ACCESSOR_MODULE_LOOKUP = MethodHandles.lookup();
 	private final ClassValue<HibernateAccessorAsmClassAccessorInfo> cache;
 	private final CrossClassLoaderLookupBridge lookupBridge;
+	private final HibernateAccessorBytecodeDumper bytecodeDumper;
 
 	public HibernateAccessorAsmFactory(MethodHandles.Lookup lookup) {
-		this.lookupBridge = new CrossClassLoaderLookupBridge( lookup, BridgeClassGenerator::generate );
+		this( new HibernateAccessorConfiguration( lookup ) );
+	}
+
+	public HibernateAccessorAsmFactory(HibernateAccessorConfiguration configuration) {
+		this.lookupBridge = new CrossClassLoaderLookupBridge( configuration.lookup(), BridgeClassGenerator::generate );
+		this.bytecodeDumper = new HibernateAccessorBytecodeDumper( configuration );
 		this.cache = new ClassValue<>() {
 			@Override
 			protected HibernateAccessorAsmClassAccessorInfo computeValue(Class<?> type) {
-				return HibernateAccessorAsmClassAccessorInfo.create( type, lookupBridge );
+				return HibernateAccessorAsmClassAccessorInfo.create( type, lookupBridge, bytecodeDumper );
 			}
 		};
 	}
@@ -138,6 +148,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 	private HibernateAccessorMultiValueReader generateDirectReader(Member[] members) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateReader( targetClass, members );
+		bytecodeDumper.dump( Type.getInternalName( targetClass ) + "$$HibernateAccessorMultiReader_" + java.util.UUID.randomUUID(), bytecode );
 		try {
 			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
 			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
@@ -155,6 +166,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 	private HibernateAccessorMultiValueWriter generateDirectWriter(Member[] members) {
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateWriter( targetClass, members );
+		bytecodeDumper.dump( Type.getInternalName( targetClass ) + "$$HibernateAccessorMultiWriter_" + java.util.UUID.randomUUID(), bytecode );
 		try {
 			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
 			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
@@ -175,6 +187,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 				layout.accesses,
 				layout.accessors.length
 		);
+		bytecodeDumper.dump( Type.getInternalName( members[0].getDeclaringClass() ) + "$$HibernateAccessorMultiBulkReader_" + java.util.UUID.randomUUID(), bytecode );
 		try {
 			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass( bytecode, true );
 			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
@@ -194,6 +207,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 				layout.accesses,
 				layout.accessors.length
 		);
+		bytecodeDumper.dump( "org/hibernate/models/accessor/asm/impl/HibernateAccessorMultiBulkWriter", bytecode );
 		try {
 			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass( bytecode, true );
 			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
@@ -213,6 +227,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateReader(
 				targetClass, members, pointcuts );
+		bytecodeDumper.dump( Type.getInternalName( targetClass ) + "$$HibernateAccessorMultiReader", bytecode );
 		try {
 			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
 			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
@@ -233,6 +248,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 		final Class<?> targetClass = members[0].getDeclaringClass();
 		final byte[] bytecode = HibernateAccessorAsmMultiValueClassGenerator.generateWriter(
 				targetClass, members, pointcuts );
+		bytecodeDumper.dump( Type.getInternalName( targetClass ) + "$$HibernateAccessorMultiWriter", bytecode );
 		try {
 			MethodHandles.Lookup targetLookup = lookupBridge.resolve( targetClass );
 			MethodHandles.Lookup hiddenLookup = targetLookup.defineHiddenClass(
@@ -256,6 +272,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 				layout.accessors.length,
 				pointcuts
 		);
+		bytecodeDumper.dump( "org/hibernate/models/accessor/asm/impl/HibernateAccessorMultiBulkReader", bytecode );
 		try {
 			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass( bytecode, true );
 			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
@@ -278,6 +295,7 @@ public class HibernateAccessorAsmFactory implements org.hibernate.models.accesso
 				layout.accessors.length,
 				pointcuts
 		);
+		bytecodeDumper.dump( Type.getInternalName( members[0].getDeclaringClass() ) + "$$HibernateAccessorMultiBulkWriter_" + java.util.UUID.randomUUID(), bytecode );
 		try {
 			final MethodHandles.Lookup hiddenLookup = ACCESSOR_MODULE_LOOKUP.defineHiddenClass( bytecode, true );
 			final Class<?>[] paramTypes = new Class<?>[layout.accessors.length];
