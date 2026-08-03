@@ -102,12 +102,6 @@ project(':hibernate-models-accessor-bytebuddy').projectDir = file('hibernate-mod
 include 'hibernate-models-accessor-tck-bytebuddy'
 project(':hibernate-models-accessor-tck-bytebuddy').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-bytebuddy')
 
-include 'hibernate-models-accessor-generator'
-project(':hibernate-models-accessor-generator').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-generator')
-
-include 'hibernate-models-accessor-tck-generator'
-project(':hibernate-models-accessor-tck-generator').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-generator')
-
 include 'hibernate-models-accessor-tck-jpms-entities'
 project(':hibernate-models-accessor-tck-jpms-entities').projectDir = file('hibernate-models-accessor/hibernate-models-accessor-tck-jpms-entities')
 

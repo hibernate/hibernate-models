@@ -11,7 +11,6 @@ dependencies {
     jacocoAggregation project(':hibernate-models-accessor')
     jacocoAggregation project(':hibernate-models-accessor-asm')
     jacocoAggregation project(':hibernate-models-accessor-bytebuddy')
-    jacocoAggregation project(':hibernate-models-accessor-generator')
 }
 
 tasks.register('mergeCodeCoverageReport', JacocoReport) {
@@ -22,7 +21,6 @@ tasks.register('mergeCodeCoverageReport', JacocoReport) {
     sourceSets project(':hibernate-models-accessor').sourceSets.main
     sourceSets project(':hibernate-models-accessor-asm').sourceSets.main
     sourceSets project(':hibernate-models-accessor-bytebuddy').sourceSets.main
-    sourceSets project(':hibernate-models-accessor-generator').sourceSets.main
 
     reports {
         xml.required = true
