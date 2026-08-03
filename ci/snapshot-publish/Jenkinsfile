@@ -1,0 +1,63 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
+ */
+
+@Library('hibernate-jenkins-pipeline-helpers') _
+
+// Avoid running the pipeline on branch indexing
+if (currentBuild.getBuildCauses().toString().contains('BranchIndexingCause')) {
+	print "INFO: Build skipped due to trigger being Branch Indexing"
+	currentBuild.result = 'NOT_BUILT'
+	return
+}
+
+pipeline {
+	agent {
+		label 'Release'
+	}
+	tools {
+		jdk 'OpenJDK 25 Latest'
+	}
+	options {
+		// Wait for 1h before publishing snapshots, in case there's more commits.
+		quietPeriod 3600
+		// In any case, never publish snapshots more than once per hour.
+		rateLimitBuilds(throttle: [count: 1, durationName: 'hour', userBoost: true])
+
+		buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '3'))
+		disableConcurrentBuilds(abortPrevious: false)
+	}
+	stages {
+		stage('Publish') {
+			steps {
+				script {
+					withCredentials([
+							// https://github.com/gradle-nexus/publish-plugin#publishing-to-maven-central-via-sonatype-ossrh
+							// https://docs.gradle.org/current/samples/sample_publishing_credentials.html#:~:text=via%20environment%20variables
+							usernamePassword(credentialsId: 'central.sonatype.com', passwordVariable: 'ORG_GRADLE_PROJECT_snapshotsPassword', usernameVariable: 'ORG_GRADLE_PROJECT_snapshotsUsername'))
+					]) {
+						withEnv([
+								"DISABLE_REMOTE_GRADLE_CACHE=true"
+						]) {
+							checkoutReleaseScripts()
+							def version = sh(
+									script: ".release/scripts/determine-current-version.sh models",
+									returnStdout: true
+							).trim()
+							echo "Current version: '${version}'"
+							sh "bash -xe .release/scripts/snapshot-deploy.sh models ${version}"
+						}
+					}
+				}
+			}
+		}
+	}
+	post {
+		always {
+			configFileProvider([configFile(fileId: 'job-configuration.yaml', variable: 'JOB_CONFIGURATION_FILE')]) {
+				notifyBuildResult maintainers: (String) readYaml(file: env.JOB_CONFIGURATION_FILE).notification?.email?.recipients
+			}
+		}
+	}
+}
