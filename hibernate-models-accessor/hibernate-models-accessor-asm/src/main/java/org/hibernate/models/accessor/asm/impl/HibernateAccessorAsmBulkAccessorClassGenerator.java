@@ -25,8 +25,8 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 	private static final String BULK_ACCESSOR_INTERNAL = Type.getInternalName( HibernateAccessorAsmBulkAccessor.class );
 	private static final String EXCEPTION_INTERNAL = "org/hibernate/models/accessor/HibernateAccessorException";
 
-	static byte[] generate(Class<?> targetClass, Field[] fields, Method[] methods, Constructor<?>[] constructors) {
-		String targetInternal = Type.getInternalName( targetClass );
+	static byte[] generate(Class<?> targetClass, Field[] fields, Method[] getterMethods, Method[] setterMethods, Constructor<?>[] constructors) {
+		String targetInternal = Type.getInternalName(targetClass);
 		boolean isInterface = targetClass.isInterface();
 		String generatedName = targetInternal + "$$HibernateAccessor";
 
@@ -36,12 +36,12 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 				"java/lang/Object", new String[] { BULK_ACCESSOR_INTERNAL }
 		);
 
-		generateConstructor( cw );
-		generateReadByField( cw, targetInternal, fields );
-		generateWriteByField( cw, targetInternal, fields );
-		generateReadByMethod( cw, targetInternal, isInterface, methods );
-		generateWriteByMethod( cw, targetInternal, isInterface, methods );
-		generateNewInstance( cw, targetInternal, constructors );
+		generateConstructor(cw);
+		generateReadByField(cw, targetInternal, fields);
+		generateWriteByField(cw, targetInternal, fields);
+		generateReadByMethod(cw, targetInternal, isInterface, getterMethods);
+		generateWriteByMethod(cw, targetInternal, isInterface, setterMethods);
+		generateNewInstance(cw, targetInternal, constructors);
 
 		cw.visitEnd();
 		return cw.toByteArray();
@@ -158,20 +158,13 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 			for ( int i = 0; i < methods.length; i++ ) {
 				mv.visitLabel( labels[i] );
 				Method m = methods[i];
-				if ( m.getParameterCount() != 0 || m.getReturnType() == void.class ) {
-					emitThrow( mv, "Method " + m.getName() + " is not a zero-arg getter" );
-				}
-				else {
-					mv.visitVarInsn( ALOAD, 1 );
-					mv.visitTypeInsn( CHECKCAST, targetInternal );
-					int opcode = isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL;
-					mv.visitMethodInsn(
-							opcode, targetInternal, m.getName(),
-							Type.getMethodDescriptor( m ), isInterface
-					);
-					emitBox( mv, m.getReturnType() );
-					mv.visitInsn( ARETURN );
-				}
+				mv.visitVarInsn(ALOAD, 1);
+				mv.visitTypeInsn(CHECKCAST, targetInternal);
+				int opcode = isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL;
+				mv.visitMethodInsn(opcode, targetInternal, m.getName(),
+						Type.getMethodDescriptor(m), isInterface);
+				emitBox(mv, m.getReturnType());
+				mv.visitInsn(ARETURN);
 			}
 
 			mv.visitLabel( defaultLabel );
@@ -208,25 +201,18 @@ final class HibernateAccessorAsmBulkAccessorClassGenerator implements Opcodes {
 			for ( int i = 0; i < methods.length; i++ ) {
 				mv.visitLabel( labels[i] );
 				Method m = methods[i];
-				if ( m.getParameterCount() != 1 ) {
-					emitThrow( mv, "Method " + m.getName() + " is not a single-arg setter" );
+				mv.visitVarInsn(ALOAD, 1);
+				mv.visitTypeInsn(CHECKCAST, targetInternal);
+				mv.visitVarInsn(ALOAD, 3);
+				emitUnboxOrCast(mv, m.getParameterTypes()[0]);
+				int opcode = isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL;
+				mv.visitMethodInsn(opcode, targetInternal, m.getName(),
+						Type.getMethodDescriptor(m), isInterface);
+				if (m.getReturnType() != void.class) {
+					Type retType = Type.getType(m.getReturnType());
+					mv.visitInsn(retType.getSize() == 2 ? POP2 : POP);
 				}
-				else {
-					mv.visitVarInsn( ALOAD, 1 );
-					mv.visitTypeInsn( CHECKCAST, targetInternal );
-					mv.visitVarInsn( ALOAD, 3 );
-					emitUnboxOrCast( mv, m.getParameterTypes()[0] );
-					int opcode = isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL;
-					mv.visitMethodInsn(
-							opcode, targetInternal, m.getName(),
-							Type.getMethodDescriptor( m ), isInterface
-					);
-					if ( m.getReturnType() != void.class ) {
-						Type retType = Type.getType( m.getReturnType() );
-						mv.visitInsn( retType.getSize() == 2 ? POP2 : POP );
-					}
-					mv.visitInsn( RETURN );
-				}
+				mv.visitInsn(RETURN);
 			}
 
 			mv.visitLabel( defaultLabel );

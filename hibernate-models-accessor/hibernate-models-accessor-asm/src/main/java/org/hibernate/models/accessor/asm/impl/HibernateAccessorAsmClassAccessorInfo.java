@@ -23,16 +23,19 @@ final class HibernateAccessorAsmClassAccessorInfo {
 
 	private final HibernateAccessorAsmBulkAccessor bulkAccessor;
 	private final Map<String, Integer> fieldIndices;
-	private final Map<String, Integer> methodIndices;
+	private final Map<String, Integer> getterMethodIndices;
+	private final Map<String, Integer> setterMethodIndices;
 	private final Map<String, Integer> constructorIndices;
 
 	private HibernateAccessorAsmClassAccessorInfo(HibernateAccessorAsmBulkAccessor bulkAccessor,
 												Map<String, Integer> fieldIndices,
-												Map<String, Integer> methodIndices,
+												Map<String, Integer> getterMethodIndices,
+												Map<String, Integer> setterMethodIndices,
 												Map<String, Integer> constructorIndices) {
 		this.bulkAccessor = bulkAccessor;
 		this.fieldIndices = fieldIndices;
-		this.methodIndices = methodIndices;
+		this.getterMethodIndices = getterMethodIndices;
+		this.setterMethodIndices = setterMethodIndices;
 		this.constructorIndices = constructorIndices;
 	}
 
@@ -40,8 +43,13 @@ final class HibernateAccessorAsmClassAccessorInfo {
 		Field[] fields = Arrays.stream( declaringClass.getDeclaredFields() )
 				.filter( f -> !Modifier.isStatic( f.getModifiers() ) )
 				.toArray( Field[]::new );
-		Method[] methods = Arrays.stream( declaringClass.getDeclaredMethods() )
+		Method[] getterMethods = Arrays.stream( declaringClass.getDeclaredMethods() )
 				.filter( m -> !Modifier.isStatic( m.getModifiers() ) )
+				.filter( m -> m.getParameterCount() == 0 && m.getReturnType() != void.class )
+				.toArray( Method[]::new );
+		Method[] setterMethods = Arrays.stream( declaringClass.getDeclaredMethods() )
+				.filter( m -> !Modifier.isStatic( m.getModifiers() ) )
+				.filter( m -> m.getParameterCount() == 1 )
 				.toArray( Method[]::new );
 		Constructor<?>[] constructors = declaringClass.getDeclaredConstructors();
 
@@ -50,9 +58,14 @@ final class HibernateAccessorAsmClassAccessorInfo {
 			fieldIndices.put(fields[i].getName(), i);
 		}
 
-		Map<String, Integer> methodIndices = new HashMap<>();
-		for (int i = 0; i < methods.length; i++) {
-			methodIndices.put(methodKey(methods[i]), i);
+		Map<String, Integer> getterMethodIndices = new HashMap<>();
+		for (int i = 0; i < getterMethods.length; i++) {
+			getterMethodIndices.put(methodKey(getterMethods[i]), i);
+		}
+
+		Map<String, Integer> setterMethodIndices = new HashMap<>();
+		for (int i = 0; i < setterMethods.length; i++) {
+			setterMethodIndices.put(methodKey(setterMethods[i]), i);
 		}
 
 		Map<String, Integer> constructorIndices = new HashMap<>();
@@ -60,7 +73,7 @@ final class HibernateAccessorAsmClassAccessorInfo {
 			constructorIndices.put(Type.getConstructorDescriptor(constructors[i]), i);
 		}
 
-		byte[] bytecode = HibernateAccessorAsmBulkAccessorClassGenerator.generate(declaringClass, fields, methods, constructors);
+		byte[] bytecode = HibernateAccessorAsmBulkAccessorClassGenerator.generate(declaringClass, fields, getterMethods, setterMethods, constructors);
 		bytecodeDumper.dump( Type.getInternalName( declaringClass ) + "$$HibernateAccessor", bytecode );
 
 		try {
@@ -69,7 +82,7 @@ final class HibernateAccessorAsmClassAccessorInfo {
 					bytecode, true, MethodHandles.Lookup.ClassOption.NESTMATE );
 			HibernateAccessorAsmBulkAccessor instance = (HibernateAccessorAsmBulkAccessor) hiddenClassLookup.lookupClass()
 					.getDeclaredConstructor().newInstance();
-			return new HibernateAccessorAsmClassAccessorInfo( instance, fieldIndices, methodIndices, constructorIndices );
+			return new HibernateAccessorAsmClassAccessorInfo( instance, fieldIndices, getterMethodIndices, setterMethodIndices, constructorIndices );
 		}
 		catch (Exception e) {
 			throw new HibernateAccessorException( "Failed to create bulk accessor for " + declaringClass.getName(), e );
@@ -89,11 +102,20 @@ final class HibernateAccessorAsmClassAccessorInfo {
 	}
 
 	int methodIndex(Method method) {
-		Integer index = methodIndices.get(methodKey(method));
-		if (index == null) {
-			throw new HibernateAccessorException("Unknown method: " + method);
+		String key = methodKey(method);
+		if (method.getParameterCount() == 0 && method.getReturnType() != void.class) {
+			Integer index = getterMethodIndices.get(key);
+			if (index != null) {
+				return index;
+			}
 		}
-		return index;
+		else if (method.getParameterCount() == 1) {
+			Integer index = setterMethodIndices.get(key);
+			if (index != null) {
+				return index;
+			}
+		}
+		throw new HibernateAccessorException("Unknown method: " + method);
 	}
 
 	int constructorIndex(Constructor<?> constructor) {
