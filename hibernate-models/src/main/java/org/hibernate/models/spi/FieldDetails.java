@@ -48,4 +48,19 @@ public interface FieldDetails extends MemberDetails {
 	default FieldDetails asFieldDetails() {
 		return this;
 	}
+
+	/**
+	 * The {@link RecordComponentDetails} that structurally corresponds to this field,
+	 * or {@code null} if this field does not back a record component (i.e. the
+	 * declaring type is not a record, or no matching component exists).
+	 *
+	 * @return the corresponding record component, or {@code null}
+	 */
+	default RecordComponentDetails getCorrespondingRecordComponent() {
+		if ( !getDeclaringType().isRecord() ) {
+			return null;
+		}
+		return getDeclaringType().findRecordComponentByName( getName() );
+	}
+
 }

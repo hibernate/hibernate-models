@@ -130,4 +130,24 @@ public class JandexRecordComponentDetails extends AbstractAnnotationTarget imple
 	public MutableClassDetails asClassDetails() {
 		throw new IllegalCastException( "RecordComponentDetails cannot be cast to a ClassDetails" );
 	}
+
+	@Override
+	public FieldDetails getField() {
+		// RecordComponentInfo.field() gives the exact FieldInfo
+		final String fieldName = recordComponentInfo.field().name();
+		return declaringType.findFieldByName( fieldName );
+	}
+
+	@Override
+	public MethodDetails getAccessor() {
+		// RecordComponentInfo.accessor() gives the exact MethodInfo
+		final String accessorName = recordComponentInfo.accessor().name();
+		for ( MethodDetails method : declaringType.getMethods() ) {
+			if ( method.getName().equals( accessorName ) && method.getArgumentTypes().isEmpty() ) {
+				return method;
+			}
+		}
+		return null;
+	}
+
 }

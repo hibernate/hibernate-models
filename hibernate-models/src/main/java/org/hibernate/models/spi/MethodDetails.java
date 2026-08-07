@@ -74,4 +74,22 @@ public interface MethodDetails extends MemberDetails {
 		return this;
 	}
 
+	/**
+	 * The {@link RecordComponentDetails} that structurally corresponds to this method,
+	 * or {@code null} if this method is not a record component accessor (i.e. the
+	 * declaring type is not a record, or the method takes arguments).
+	 *
+	 * @return the corresponding record component, or {@code null}
+	 */
+	default RecordComponentDetails getCorrespondingRecordComponent() {
+		if ( !getDeclaringType().isRecord() ) {
+			return null;
+		}
+		// record accessors don't follow the JavaBean get/is naming convention, so JdkBuilders classifies them as MethodKind.OTHER
+		if ( !getArgumentTypes().isEmpty() ) {
+			return null;
+		}
+		return getDeclaringType().findRecordComponentByName( getName() );
+	}
+
 }
