@@ -27,6 +27,8 @@ import org.hibernate.models.spi.ModelsContext;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.DotName;
 
+import static org.hibernate.models.internal.ModelsAnnotationLogging.MODELS_ANNOTATION_LOGGER;
+
 /**
  * Helper for building annotation usages/instances based on
  * Jandex {@linkplain AnnotationInstance} references
@@ -92,17 +94,23 @@ public class AnnotationUsageBuilder {
 				continue;
 			}
 
-			final Class<? extends Annotation> annotationType = modelsContext
-					.getClassLoading()
-					.classForName( annotation.name().toString() );
-
-			final AnnotationDescriptor<?> annotationDescriptor = annotationDescriptorRegistry.getDescriptor( annotationType );
-			final Annotation usage = makeUsage(
-					annotation,
-					annotationDescriptor,
-					modelsContext
-			);
-			consumer.accept( annotationType, usage );
+			try {
+				final Class<? extends Annotation> annotationType = modelsContext
+						.getClassLoading()
+						.classForName( annotation.name().toString() );
+				final AnnotationDescriptor<?> annotationDescriptor = annotationDescriptorRegistry.getDescriptor( annotationType );
+				final Annotation usage = makeUsage( annotation, annotationDescriptor, modelsContext );
+				consumer.accept( annotationType, usage );
+			}
+			catch (Exception e) {
+				// Skip annotations that cannot be loaded or proxied (e.g. non-public annotation
+				// interfaces from transitive dependencies not accessible to this classloader)
+				MODELS_ANNOTATION_LOGGER.debugf(
+						"Skipping annotation [%s]: %s",
+						annotation.name(),
+						e.getMessage()
+				);
+			}
 		}
 	}
 
