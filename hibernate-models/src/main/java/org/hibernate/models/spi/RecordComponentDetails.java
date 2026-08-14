@@ -50,4 +50,41 @@ public interface RecordComponentDetails extends MemberDetails {
 		return this;
 	}
 
+	/**
+	 * The {@link FieldDetails} representing the private synthetic backing field
+	 * for this record component.
+	 *
+	 * @return the corresponding backing field; never {@code null} for a well-formed record
+	 *
+	 * @apiNote Implementors may override this default to use a more direct lookup
+	 *          (e.g. via {@code RecordComponent} or {@code RecordComponentInfo}) rather
+	 *          than a generic name-based search.
+	 */
+	default FieldDetails getField() {
+		return getDeclaringType().findFieldByName( getName() );
+	}
+
+	/**
+	 * The {@link MethodDetails} representing the accessor method for this record component.
+	 * <p>
+	 * The accessor shares its name with the component and takes no parameters.
+	 * Note that record accessors do not follow JavaBean {@code get}/{@code is} naming
+	 * conventions and are therefore classified as {@link MethodDetails.MethodKind#OTHER} rather than
+	 * {@link MethodDetails.MethodKind#GETTER}.
+	 *
+	 * @return the corresponding accessor method; never {@code null} for a well-formed record
+	 *
+	 * @apiNote Implementors may override this default to use a more direct lookup
+	 *          (e.g. via {@link java.lang.reflect.RecordComponent#getAccessor()}) rather
+	 *          than a linear scan of the declaring type's methods.
+	 */
+	default MethodDetails getAccessor() {
+		for ( MethodDetails method : getDeclaringType().getMethods() ) {
+			if ( method.getName().equals( getName() ) && method.getArgumentTypes().isEmpty() ) {
+				return method;
+			}
+		}
+		return null;
+	}
+
 }

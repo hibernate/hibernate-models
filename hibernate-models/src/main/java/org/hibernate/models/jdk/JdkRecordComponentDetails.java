@@ -6,6 +6,7 @@ package org.hibernate.models.jdk;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.RecordComponent;
 import java.util.Collection;
 import java.util.Map;
@@ -124,5 +125,17 @@ public class JdkRecordComponentDetails extends AbstractJdkAnnotationTarget
 	@Override
 	public <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
 		throw new IllegalCastException( "RecordComponentDetails cannot be cast as AnnotationDescriptor" );
+	}
+
+	@Override
+	public MethodDetails getAccessor() {
+		// RecordComponent.getAccessor() gives us the exact Method directly
+		final Method accessorMethod = recordComponent.getAccessor();
+		for ( MethodDetails method : declaringType.getMethods() ) {
+			if ( method.toJavaMember().getName().equals(accessorMethod.getName()) ) {
+				return method;
+			}
+		}
+		return null;
 	}
 }

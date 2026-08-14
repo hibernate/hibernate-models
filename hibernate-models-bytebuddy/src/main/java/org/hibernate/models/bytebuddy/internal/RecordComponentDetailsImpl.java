@@ -156,4 +156,17 @@ public class RecordComponentDetailsImpl
 	public MutableClassDetails asClassDetails() {
 		throw new IllegalCastException( "FieldDetails cannot be cast to a ClassDetails" );
 	}
+
+	@Override
+	public MethodDetails getAccessor() {
+		// getAccessor() returns the MethodDescription — use its name
+		final String accessorName = underlyingComponent.getAccessor().getName();
+		for ( MethodDetails method : declaringClassDetails.getMethods() ) {
+			if ( method.getName().equals( accessorName ) && method.getArgumentTypes().isEmpty() ) {
+				return method;
+			}
+		}
+		return null;
+	}
+
 }
