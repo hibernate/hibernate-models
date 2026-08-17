@@ -1,0 +1,5 @@
+plugins {
+    id "published-java-module"
+}
+
+description = "A property accessor abstraction with multiple strategy implementations"

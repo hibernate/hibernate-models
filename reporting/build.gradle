@@ -8,6 +8,9 @@ dependencies {
     jacocoAggregation project(':hibernate-models')
     jacocoAggregation project(':hibernate-models-bytebuddy')
     jacocoAggregation project(':hibernate-models-jandex')
+    jacocoAggregation project(':hibernate-models-accessor')
+    jacocoAggregation project(':hibernate-models-accessor-asm')
+    jacocoAggregation project(':hibernate-models-accessor-bytebuddy')
 }
 
 tasks.register('mergeCodeCoverageReport', JacocoReport) {
@@ -15,6 +18,9 @@ tasks.register('mergeCodeCoverageReport', JacocoReport) {
     sourceSets project(':hibernate-models').sourceSets.main
     sourceSets project(':hibernate-models-bytebuddy').sourceSets.main
     sourceSets project(':hibernate-models-jandex').sourceSets.main
+    sourceSets project(':hibernate-models-accessor').sourceSets.main
+    sourceSets project(':hibernate-models-accessor-asm').sourceSets.main
+    sourceSets project(':hibernate-models-accessor-bytebuddy').sourceSets.main
 
     reports {
         xml.required = true

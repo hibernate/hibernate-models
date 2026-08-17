@@ -1,0 +1,36 @@
+plugins {
+	id "testing"
+}
+
+description = "JPMS cross-module accessor tests"
+
+dependencies {
+	implementation project( ":hibernate-models-accessor" )
+	implementation project( ":hibernate-models-accessor-asm" )
+	implementation project( ":hibernate-models-accessor-bytebuddy" )
+	implementation project( ":hibernate-models-accessor-tck-jpms-entities" )
+}
+
+test {
+	def modulePath = (configurations.testRuntimeClasspath.files +
+			sourceSets.main.output.classesDirs.files)
+			.collect { it.absolutePath }
+			.join( File.pathSeparator )
+
+	jvmArgs(
+			"--module-path", modulePath,
+			"--add-modules", "ALL-MODULE-PATH",
+			"--add-reads", "hibernate.models.accessor.tck.jpms=org.junit.jupiter.api",
+			"--add-reads", "hibernate.models.accessor.tck.jpms=org.junit.jupiter.params",
+			"--add-reads", "hibernate.models.accessor.tck.jpms=org.assertj.core",
+			// The generated hidden classes live in the entity module (NESTMATE) but implement
+			// interfaces from the accessor modules — the entity module must be able to read them.
+			"--add-reads", "hibernate.models.accessor.tck.jpms.entities=org.hibernate.models.accessor",
+			"--add-reads", "hibernate.models.accessor.tck.jpms.entities=org.hibernate.models.accessor.asm",
+			"--add-reads", "hibernate.models.accessor.tck.jpms.entities=org.hibernate.models.accessor.bytebuddy",
+			"--patch-module", "hibernate.models.accessor.tck.jpms=" +
+					sourceSets.test.output.classesDirs.asPath,
+			"--add-opens", "hibernate.models.accessor.tck.jpms/org.hibernate.models.accessor.tck.jpms=ALL-UNNAMED",
+			"--add-opens", "hibernate.models.accessor.tck.jpms/org.hibernate.models.accessor.tck.jpms=org.junit.platform.commons",
+	)
+}
