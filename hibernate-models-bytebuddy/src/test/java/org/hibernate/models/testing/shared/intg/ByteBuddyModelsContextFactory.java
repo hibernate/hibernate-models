@@ -32,6 +32,18 @@ public class ByteBuddyModelsContextFactory implements ModelsContextFactory {
 		return new ByteBuddyModelsContextImpl( byteBuddyTypePool, true, SIMPLE_CLASS_LOADING, registryPrimer );
 	}
 
+	@Override
+	public ByteBuddyModelsContext createModelContext(
+			ClassLoading classLoading,
+			RegistryPrimer registryPrimer,
+			String... classNames) {
+		final TypePool byteBuddyTypePool = buildTypePool( classLoading, new Class<?>[0] );
+		for ( String className : classNames ) {
+			byteBuddyTypePool.describe( className ).resolve();
+		}
+		return new ByteBuddyModelsContextImpl( byteBuddyTypePool, true, classLoading, registryPrimer );
+	}
+
 	public static TypePool buildTypePool(Class<?>... modelClasses) {
 		return buildTypePool( SIMPLE_CLASS_LOADING, modelClasses );
 	}

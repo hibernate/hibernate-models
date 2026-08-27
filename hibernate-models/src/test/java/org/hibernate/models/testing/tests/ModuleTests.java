@@ -25,9 +25,11 @@ import javax.tools.ToolProvider;
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.spi.AnnotationTarget;
+import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ModuleDetails;
+import org.hibernate.models.testing.TestHelper;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -67,6 +69,29 @@ public class ModuleTests {
 
 		final Method valueMethod = markerType.getMethod( "value" );
 		assertThat( valueMethod.invoke( usage ) ).isEqualTo( "module-level" );
+	}
+
+	@Test
+	void testGetModuleDetailsFromClass(@TempDir Path tempDir) throws Exception {
+		final ModuleLayer layer = compileAndLoadTestModules( tempDir );
+
+		final ModelsContext modelsContext = TestHelper.createModelContext(
+				new ModuleLayerClassLoading( layer ),
+				null,
+				"test.module.subject.SubjectClass"
+		);
+
+		// Class inside a named module should return its ModuleDetails
+		final ClassDetails subjectClassDetails = modelsContext.getClassDetailsRegistry()
+				.resolveClassDetails( "test.module.subject.SubjectClass" );
+		final ModuleDetails fromClass = subjectClassDetails.getModule();
+		assertThat( fromClass ).isNotNull();
+		assertThat( fromClass.getModuleName() ).isEqualTo( "test.module.subject" );
+
+		// Class in the unnamed module should return null
+		final ClassDetails thisClassDetails = modelsContext.getClassDetailsRegistry()
+				.resolveClassDetails( ModuleTests.class.getName() );
+		assertThat( thisClassDetails.getModule() ).isNull();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -110,6 +135,16 @@ public class ModuleTests {
 						@test.module.annotations.ModuleMarker("module-level")
 						module test.module.subject {
 							requires test.module.annotations;
+							exports test.module.subject;
+						}
+						"""
+		);
+		writeSource(
+				sourceDir.resolve( "test.module.subject/test/module/subject/SubjectClass.java" ),
+				"""
+						package test.module.subject;
+
+						public class SubjectClass {
 						}
 						"""
 		);
@@ -185,6 +220,12 @@ public class ModuleTests {
 
 		@Override
 		public URL locateResource(String resourceName) {
+			for ( Module module : layer.modules() ) {
+				final URL resource = layer.findLoader( module.getName() ).getResource( resourceName );
+				if ( resource != null ) {
+					return resource;
+				}
+			}
 			return null;
 		}
 
