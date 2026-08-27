@@ -375,6 +375,18 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope, Stora
 	 */
 	<X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext);
 
+	/**
+	 * Get the {@linkplain ModuleDetails} for the module containing this class, if any.
+	 *
+	 * @return The module details, or {@code null} when the class is
+	 * not part of a named module (including dynamic models).
+	 *
+	 * @since 2.0
+	 */
+	default ModuleDetails getModule() {
+		return null;
+	}
+
 	@Override
 	default ClassDetails asClassDetails() {
 		return this;

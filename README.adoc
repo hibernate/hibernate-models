@@ -67,6 +67,7 @@ The principal API entry points are:
 The model mirrors familiar Java reflection concepts while also representing dynamic types which have no corresponding
 loaded `Class<?>`:
 
+`ModuleDetails`:: Analogous to `java.lang.Module`.
 `ClassDetails`:: Analogous to `java.lang.Class`.
 `TypeDetails`:: Analogous to `java.lang.reflect.Type`.
 `MemberDetails`:: Common contract analogous to `java.lang.reflect.Member`.
@@ -79,6 +80,8 @@ A `ModelsContext` ties the principal parts of the model together:
 [source]
 ----
 ModelsContext
+|-- ModuleDetailsRegistry
+|   `-- ModuleDetails
 |-- ClassDetailsRegistry
 |   `-- ClassDetails
 |       `-- MemberDetails
