@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.DynamicClassException;
+import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
@@ -121,6 +122,11 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	@Override
 	public ClassDetails getSuperClass() {
 		return superClass;
+	}
+
+	@Override
+	public ClassDetails getPackage() {
+		return AnnotationTargetHelper.resolvePackageInfo( this, getModelContext() );
 	}
 
 	@Override
