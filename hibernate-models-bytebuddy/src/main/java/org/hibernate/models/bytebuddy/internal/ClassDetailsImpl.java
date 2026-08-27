@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
+import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.jdk.SerialJdkClassDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
@@ -113,6 +114,11 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	@Override
 	public ClassDetails getSuperClass() {
 		return superClassDetails;
+	}
+
+	@Override
+	public ClassDetails getPackage() {
+		return AnnotationTargetHelper.resolvePackageInfo( this, getModelContext() );
 	}
 
 	@Override
