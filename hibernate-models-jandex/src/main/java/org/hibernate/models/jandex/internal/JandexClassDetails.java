@@ -18,15 +18,21 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.ModuleDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
+import org.hibernate.models.jandex.spi.JandexModelsContext;
+
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;
+import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
+import org.jboss.jandex.IndexView;
 import org.jboss.jandex.MethodInfo;
+import org.jboss.jandex.ModuleInfo;
 import org.jboss.jandex.RecordComponentInfo;
 import org.jboss.jandex.Type;
 import org.jboss.jandex.TypeVariable;
@@ -115,6 +121,28 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 	@Override
 	public ClassDetails getSuperClass() {
 		return superClass;
+	}
+
+	@Override
+	public ModuleDetails getModule() {
+		final DotName packageName = classInfo.name().packagePrefixName();
+		if ( packageName == null ) {
+			return null;
+		}
+		// Try the Jandex index first (avoids class loading when module-info is indexed)
+		final IndexView jandexIndex = ( (JandexModelsContext) getModelContext() ).getJandexIndex();
+		for ( ModuleInfo moduleInfo : jandexIndex.getKnownModules() ) {
+			if ( moduleInfo.packages().contains( packageName ) ) {
+				return getModelContext().getModuleDetailsRegistry()
+						.resolveModuleDetails( moduleInfo.name().toString() );
+			}
+		}
+		// Fall back to class loading (module-info may not be in the index)
+		final Module module = getModelContext().getClassLoading().classForName( getClassName() ).getModule();
+		if ( !module.isNamed() ) {
+			return null;
+		}
+		return getModelContext().getModuleDetailsRegistry().resolveModuleDetails( module );
 	}
 
 	@Override

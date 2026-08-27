@@ -17,8 +17,9 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.FieldDetails;
 import org.hibernate.models.spi.MethodDetails;
-import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.ModuleDetails;
+import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
@@ -112,6 +113,15 @@ public class ClassDetailsImpl extends AbstractAnnotationTarget implements ClassD
 	@Override
 	public ClassDetails getSuperClass() {
 		return superClassDetails;
+	}
+
+	@Override
+	public ModuleDetails getModule() {
+		final Module module = getModelContext().getClassLoading().classForName( getClassName() ).getModule();
+		if ( !module.isNamed() ) {
+			return null;
+		}
+		return getModelContext().getModuleDetailsRegistry().resolveModuleDetails( module );
 	}
 
 	@Override

@@ -29,7 +29,16 @@ public class JandexModelsContextFactoryImpl implements ModelsContextFactory {
 			RegistryPrimer registryPrimer,
 			Class<?>... modelClasses) {
 		final Index jandexIndex = buildJandexIndex( SIMPLE_CLASS_LOADING, modelClasses );
-		return new JandexModelsContextImpl( jandexIndex, true,  SIMPLE_CLASS_LOADING, registryPrimer );
+		return new JandexModelsContextImpl( jandexIndex, true, SIMPLE_CLASS_LOADING, registryPrimer );
+	}
+
+	@Override
+	public JandexModelsContextImpl createModelContext(
+			ClassLoading classLoading,
+			RegistryPrimer registryPrimer,
+			String... classNames) {
+		final Index jandexIndex = buildJandexIndexByName( classLoading, classNames );
+		return new JandexModelsContextImpl( jandexIndex, true, classLoading, registryPrimer );
 	}
 
 	public static Index buildJandexIndex(ClassLoading classLoadingAccess, Class<?>... modelClasses) {
@@ -45,6 +54,20 @@ public class JandexModelsContextFactoryImpl implements ModelsContextFactory {
 				catch (IOException e) {
 					throw new RuntimeException( e );
 				}
+			}
+		}
+
+		return indexer.complete();
+	}
+
+	public static Index buildJandexIndexByName(ClassLoading classLoading, String... classNames) {
+		final Indexer indexer = new Indexer();
+		BaseLineJavaTypes.forEachJavaType( (javaType) -> JandexIndexerHelper.apply( javaType, indexer, classLoading ) );
+		JpaAnnotations.forEachAnnotation( (descriptor) -> JandexIndexerHelper.apply( descriptor.getAnnotationType(), indexer, classLoading ) );
+
+		if ( CollectionHelper.isNotEmpty( classNames ) ) {
+			for ( String className : classNames ) {
+				JandexIndexerHelper.apply( className, indexer, classLoading );
 			}
 		}
 
