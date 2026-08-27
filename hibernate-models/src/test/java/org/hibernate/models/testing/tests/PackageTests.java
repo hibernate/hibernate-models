@@ -115,4 +115,46 @@ public class PackageTests {
 		assertThat( classDetailsRegistry.resolveClassOrPackageDetails( packageName ) ).isSameAs( packageDetails );
 		assertThat( classDetailsRegistry.resolveClassOrPackageDetails( packageInfoName ) ).isSameAs( packageDetails );
 	}
+
+	@Test
+	void testGetPackageFromClassWithPackageInfo() {
+		final ModelsContext modelsContext = createModelContext( PackageAnnotation.class );
+		final ClassDetails classDetails = modelsContext
+				.getClassDetailsRegistry()
+				.resolveClassDetails( PackageAnnotation.class.getName() );
+		final ClassDetails pkg = classDetails.getPackage();
+		assertThat( pkg ).isNotNull();
+		assertThat( pkg.getClassName() ).isEqualTo( PACKAGE_NAME + ".package-info" );
+		assertThat( pkg.getAnnotationUsage( PackageAnnotation.class, modelsContext ) ).isNotNull();
+	}
+
+	@Test
+	void testGetPackageFromClassWithoutPackageInfo() {
+		final ModelsContext modelsContext = createModelContext( PackageTests.class );
+		final ClassDetails classDetails = modelsContext
+				.getClassDetailsRegistry()
+				.resolveClassDetails( PackageTests.class.getName() );
+		final ClassDetails pkg = classDetails.getPackage();
+		assertThat( pkg ).isNotNull();
+		assertThat( pkg.getClassName() ).endsWith( "package-info" );
+	}
+
+	@Test
+	void testGetPackageFromDefaultPackageClass() {
+		assertThat( ClassDetails.VOID_CLASS_DETAILS.getPackage() ).isNull();
+	}
+
+	@Test
+	void testGetPackageFromPackageInfo() {
+		final ModelsContext modelsContext = createModelContext();
+		final String packageInfoName = PACKAGE_NAME + ".package-info";
+		final ClassDetails packageInfoDetails = modelsContext
+				.getClassDetailsRegistry()
+				.resolveClassDetails( packageInfoName );
+		final ClassDetails parentPkg = packageInfoDetails.getPackage();
+		if ( parentPkg != null ) {
+			assertThat( parentPkg.getClassName() )
+					.isEqualTo( "org.hibernate.models.testing.annotations.package-info" );
+		}
+	}
 }

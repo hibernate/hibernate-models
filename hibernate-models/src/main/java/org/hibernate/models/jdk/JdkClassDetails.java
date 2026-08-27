@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.jdk.internal.AbstractJdkAnnotationTarget;
 import org.hibernate.models.support.ClassDetailsSupport;
 import org.hibernate.models.internal.util.CollectionHelper;
@@ -145,6 +146,11 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	@Override
 	public ClassDetails getSuperClass() {
 		return superClass;
+	}
+
+	@Override
+	public ClassDetails getPackage() {
+		return AnnotationTargetHelper.resolvePackageInfo( this, getModelContext() );
 	}
 
 	@Override
