@@ -25,15 +25,11 @@ import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 
-import org.hibernate.models.jandex.spi.JandexModelsContext;
-
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
-import org.jboss.jandex.IndexView;
 import org.jboss.jandex.MethodInfo;
-import org.jboss.jandex.ModuleInfo;
 import org.jboss.jandex.RecordComponentInfo;
 import org.jboss.jandex.Type;
 import org.jboss.jandex.TypeVariable;
@@ -135,13 +131,11 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 		if ( packageName == null ) {
 			return null;
 		}
-		// Try the Jandex index first (avoids class loading when module-info is indexed)
-		final IndexView jandexIndex = ( (JandexModelsContext) getModelContext() ).getJandexIndex();
-		for ( ModuleInfo moduleInfo : jandexIndex.getKnownModules() ) {
-			if ( moduleInfo.packages().contains( packageName ) ) {
-				return getModelContext().getModuleDetailsRegistry()
-						.resolveModuleDetails( moduleInfo.name().toString() );
-			}
+		// Try the indexed package-to-module map first (avoids class loading when module-info is indexed)
+		final var registry = getModelContext().getModuleDetailsRegistry().as( JandexModuleDetailsRegistry.class );
+		final ModuleDetails indexed = registry.findModuleByPackage( packageName.toString() );
+		if ( indexed != null ) {
+			return indexed;
 		}
 		// Fall back to class loading (module-info may not be in the index)
 		final Module module = getModelContext().getClassLoading().classForName( getClassName() ).getModule();

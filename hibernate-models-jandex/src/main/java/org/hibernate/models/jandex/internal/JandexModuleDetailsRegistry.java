@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.jandex.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hibernate.models.internal.ModuleDetailsRegistryStandard;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ModuleDetails;
@@ -23,6 +26,8 @@ public class JandexModuleDetailsRegistry extends ModuleDetailsRegistryStandard {
 	private final IndexView jandexIndex;
 	private final ModelsContext context;
 
+	private Map<String, String> packageToModuleMap;
+
 	/// Constructs a registry bound to the given Jandex index and models context.
 	///
 	/// @param jandexIndex The Jandex index
@@ -40,5 +45,31 @@ public class JandexModuleDetailsRegistry extends ModuleDetailsRegistryStandard {
 			return new JandexModuleDetails( moduleInfo, context );
 		}
 		return super.createModuleDetails( name );
+	}
+
+	public ModuleDetails findModuleByPackage(String packageName) {
+		final String moduleName = getPackageToModuleMap().get( packageName );
+		if ( moduleName == null ) {
+			return null;
+		}
+		return resolveModuleDetails( moduleName );
+	}
+
+	private Map<String, String> getPackageToModuleMap() {
+		if ( packageToModuleMap == null ) {
+			packageToModuleMap = buildPackageToModuleMap();
+		}
+		return packageToModuleMap;
+	}
+
+	private Map<String, String> buildPackageToModuleMap() {
+		final Map<String, String> map = new HashMap<>();
+		for ( ModuleInfo moduleInfo : jandexIndex.getKnownModules() ) {
+			final String moduleName = moduleInfo.name().toString();
+			for ( DotName pkg : moduleInfo.packages() ) {
+				map.put( pkg.toString(), moduleName );
+			}
+		}
+		return map;
 	}
 }
