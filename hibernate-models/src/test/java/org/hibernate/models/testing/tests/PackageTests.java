@@ -4,10 +4,13 @@
  */
 package org.hibernate.models.testing.tests;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.models.spi.MutableClassDetailsRegistry;
 import org.hibernate.models.testing.annotations.pkg.PackageAnnotation;
 import org.hibernate.models.testing.tests.annotations.target.sub.SubNoGeneratorEntity;
 
@@ -38,12 +41,22 @@ public class PackageTests {
 	@Test
 	void testPackageReference() {
 		final ModelsContext modelsContext = createModelContext();
-		final ClassDetails classDetails = modelsContext
-				.getClassDetailsRegistry()
-				.resolveClassDetails( PACKAGE_NAME );
-		assertThat( classDetails ).isNotNull();
-		assertThat( classDetails.getClassName() ).endsWith( "package-info" );
-		assertThat( classDetails.getAnnotationUsage( PackageAnnotation.class, modelsContext ) ).isNotNull();
+		assertThatThrownBy( () -> modelsContext.getClassDetailsRegistry().resolveClassDetails( PACKAGE_NAME ) )
+				.isInstanceOf( UnknownClassException.class );
+	}
+
+	@Test
+	void testCreatorDoesNotAttemptPackageFallback() {
+		final ModelsContext modelsContext = createModelContext();
+		final MutableClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry()
+				.as( MutableClassDetailsRegistry.class );
+		final AtomicInteger invocationCount = new AtomicInteger();
+
+		assertThatThrownBy( () -> classDetailsRegistry.resolveClassDetails( PACKAGE_NAME, name -> {
+			invocationCount.incrementAndGet();
+			throw new UnknownClassException( name );
+		}) ).isInstanceOf( UnknownClassException.class );
+		assertThat( invocationCount ).hasValue( 1 );
 	}
 
 	@Test

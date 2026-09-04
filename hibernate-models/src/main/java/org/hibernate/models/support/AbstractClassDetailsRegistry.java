@@ -246,18 +246,7 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	}
 
 	protected ClassDetails createClassDetails(String name) {
-		try {
-			return createClassDetailsExact( name, name );
-		}
-		catch (UnknownClassException e) {
-			// see if it might be a package name...
-			try {
-				return createClassDetailsExact( name + ".package-info", name );
-			}
-			catch (UnknownClassException noPackage) {
-				throw e;
-			}
-		}
+		return createClassDetailsExact( name, name );
 	}
 
 	protected ClassDetails createClassDetailsExact(String name, String registrationName) {
@@ -326,20 +315,9 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	}
 
 	protected ClassDetails createClassDetails(String name, ClassDetailsCreator creator) {
-		try {
-			final ClassDetails created = creator.createClassDetails( name );
-			addClassDetails( name, created );
-			return created;
-		}
-		catch (UnknownClassException e) {
-			// see if it might be a package name...
-			try {
-				return creator.createClassDetails( name + ".package-info" );
-			}
-			catch (UnknownClassException noPackage) {
-				throw e;
-			}
-		}
+		final ClassDetails created = creator.createClassDetails( name );
+		addClassDetails( name, created );
+		return created;
 	}
 
 	public Map<String, ClassDetails> classDetailsMap() {
