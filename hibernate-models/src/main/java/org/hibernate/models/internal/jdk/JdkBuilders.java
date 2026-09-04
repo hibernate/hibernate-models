@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.util.StringHelper;
@@ -64,20 +63,8 @@ public class JdkBuilders implements ClassDetailsBuilder, Serializable {
 			return buildArrayClassDetails( name, modelsContext );
 		}
 
-		try {
-			final Class<Object> loadedClass = modelsContext.getClassLoading().classForName( name );
-			return buildClassDetailsStatic( loadedClass, modelsContext );
-		}
-		catch (UnknownClassException e) {
-			// see if it might be a package name...
-			try {
-				final Class<Object> packageInfoClass = modelsContext.getClassLoading().classForName( name + ".package-info" );
-				return buildClassDetailsStatic( packageInfoClass, modelsContext );
-			}
-			catch (UnknownClassException noPackage) {
-				throw e;
-			}
-		}
+		final Class<Object> loadedClass = modelsContext.getClassLoading().classForName( name );
+		return buildClassDetailsStatic( loadedClass, modelsContext );
 	}
 
 	private static JdkClassDetails buildArrayClassDetails(String name, ModelsContext modelsContext) {

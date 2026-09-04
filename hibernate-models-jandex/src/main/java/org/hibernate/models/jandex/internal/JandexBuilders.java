@@ -93,13 +93,6 @@ public class JandexBuilders {
 			return JdkBuilders.buildClassDetailsStatic( primitiveClass, modelsContext );
 		}
 
-		// potentially handle package names
-		final ClassInfo packageInfo = jandexIndex.getClassByName( name + ".package-info" );
-		if ( packageInfo != null ) {
-			// package-info is safe to load through using Class
-			return JdkBuilders.buildClassDetailsStatic( name + ".package-info", modelsContext );
-		}
-
 		return null;
 	}
 
