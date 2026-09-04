@@ -29,16 +29,14 @@ public class ClassDetailsRegistryImpl extends AbstractClassDetailsRegistry {
 	}
 
 	@Override
-	protected ClassDetails createClassDetails(String name) {
+	protected ClassDetails buildClassDetails(String name) {
 		final ClassDetails fromByteBuddy = classDetailsBuilder.buildClassDetails( name, context );
 		if ( fromByteBuddy != null ) {
-			addClassDetails( name, fromByteBuddy );
 			return fromByteBuddy;
 		}
 
 		final JdkClassDetails jdkClassDetails = JdkBuilders.DEFAULT_BUILDER.buildClassDetails( name, context );
 		if ( jdkClassDetails != null ) {
-			addClassDetails( name, jdkClassDetails );
 			return jdkClassDetails;
 		}
 

@@ -211,21 +211,67 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		return createClassDetails( name );
 	}
 
+	@Override
+	public ClassDetails resolveClassOrPackageDetails(String name) {
+		if ( name == null ) {
+			throw new IllegalArgumentException( "`name` cannot be null" );
+		}
+
+		final ClassDetails existing = classDetailsMap.get( name );
+		if ( existing != null ) {
+			return existing;
+		}
+
+		if ( name.endsWith( ".package-info" ) ) {
+			return createClassDetailsExact( name, name );
+		}
+
+		try {
+			return createClassDetailsExact( name, name );
+		}
+		catch (UnknownClassException unknownClass) {
+			final String packageInfoName = name + ".package-info";
+			final ClassDetails existingPackage = classDetailsMap.get( packageInfoName );
+			if ( existingPackage != null ) {
+				return existingPackage;
+			}
+
+			try {
+				return createClassDetailsExact( packageInfoName, packageInfoName );
+			}
+			catch (UnknownClassException unknownPackage) {
+				throw unknownClass;
+			}
+		}
+	}
+
 	protected ClassDetails createClassDetails(String name) {
 		try {
-			final ClassDetails created = getClassDetailsBuilder().buildClassDetails( name, context );
-			addClassDetails( name, created );
-			return created;
+			return createClassDetailsExact( name, name );
 		}
 		catch (UnknownClassException e) {
 			// see if it might be a package name...
 			try {
-				return getClassDetailsBuilder().buildClassDetails( name + ".package-info", context );
+				return createClassDetailsExact( name + ".package-info", name );
 			}
 			catch (UnknownClassException noPackage) {
 				throw e;
 			}
 		}
+	}
+
+	protected ClassDetails createClassDetailsExact(String name, String registrationName) {
+		final ClassDetails created = buildClassDetails( name );
+		addClassDetails( registrationName, created );
+		return created;
+	}
+
+	protected ClassDetails buildClassDetails(String name) {
+		final ClassDetails classDetails = getClassDetailsBuilder().buildClassDetails( name, context );
+		if ( classDetails == null ) {
+			throw new UnknownClassException( "Unable to resolve ClassDetails for `" + name + "`" );
+		}
+		return classDetails;
 	}
 
 	@Override

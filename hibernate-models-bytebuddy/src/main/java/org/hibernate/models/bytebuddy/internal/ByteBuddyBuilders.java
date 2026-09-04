@@ -99,18 +99,6 @@ public class ByteBuddyBuilders {
 			// continue to the next checks
 		}
 
-		try {
-			// potentially handle package names
-			final String packageInfoName = name + ".package-info";
-			// just make sure it is resolvable
-			typePool.describe( packageInfoName ).resolve();
-			// package-info is safe to load through using Class
-			return JdkBuilders.buildClassDetailsStatic( packageInfoName, modelsContext );
-		}
-		catch (Exception noClass) {
-			// continue to the next checks
-		}
-
 		return null;
 	}
 

@@ -7,7 +7,7 @@ package org.hibernate.models.internal;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.models.jdk.JdkClassDetails;
+import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
@@ -40,18 +40,17 @@ public class AnnotationTargetHelper {
 
 		final String packageInfoClassName = containingPackageName + ".package-info";
 
-		return modelsContext.getClassDetailsRegistry()
-				.as( MutableClassDetailsRegistry.class )
-				.resolveClassDetails( packageInfoClassName, name -> {
-			// see if there is a physical package-info Class
-			final Class<Object> packageInfoClass = modelsContext.getClassLoading().findClassForName( packageInfoClassName );
-			if ( packageInfoClass == null ) {
-				return new MissingPackageInfoDetails( containingPackageName, packageInfoClassName );
-			}
-			else {
-				return new JdkClassDetails( packageInfoClass, modelsContext );
-			}
-		} );
+		final MutableClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry()
+				.as( MutableClassDetailsRegistry.class );
+		try {
+			return classDetailsRegistry.resolveClassOrPackageDetails( packageInfoClassName );
+		}
+		catch (UnknownClassException noPackageInfoClass) {
+			return classDetailsRegistry.resolveClassDetails(
+					packageInfoClassName,
+					name -> new MissingPackageInfoDetails( containingPackageName, packageInfoClassName )
+			);
+		}
 	}
 
 	public static String determineContainingPackageName(ClassDetails classDetails) {
@@ -68,7 +67,7 @@ public class AnnotationTargetHelper {
 		// in both cases, this is `org.hibernate`
 		final String classNameNamespace = StringHelper.qualifier( className );
 		if ( className.endsWith( "package-info" ) ) {
-			return classNameNamespace.indexOf( '.' ) > 1
+			return classNameNamespace.indexOf( '.' ) > 0
 					? StringHelper.qualifier( classNameNamespace )
 					: null;
 		}

@@ -37,6 +37,22 @@ public interface ClassDetailsRegistry {
 	ClassDetails resolveClassDetails(String name);
 
 	/**
+	 * Resolves a reference expressed as one of three forms: a fully qualified class name,
+	 * a package name, or the fully qualified name of a {@code package-info} class.  Class
+	 * resolution is attempted first for an ambiguous name.
+	 * <p>
+	 * Package details are registered using the canonical {@code package-name.package-info} name,
+	 * never the package name itself.  A package without a physical {@code package-info} class can
+	 * be resolved only if its package details were previously established while resolving the
+	 * container of a known class.
+	 *
+	 * @throws UnknownClassException If the name cannot be resolved as either a class or a package
+	 *
+	 * @since 1.3
+	 */
+	ClassDetails resolveClassOrPackageDetails(String name);
+
+	/**
 	 * Find the managed-class with the given {@code name}, if there is one.
 	 * Returns {@code null} if there are none registered with that name.
 	 */
