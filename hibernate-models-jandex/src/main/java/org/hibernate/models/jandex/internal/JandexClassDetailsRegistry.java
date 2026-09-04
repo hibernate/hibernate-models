@@ -40,16 +40,14 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 	}
 
 	@Override
-	protected ClassDetails createClassDetails(String name) {
+	protected ClassDetails buildClassDetails(String name) {
 		final ClassDetails fromJandex = classDetailsBuilder.buildClassDetails( name, context );
 		if ( fromJandex != null ) {
-			addClassDetails( name, fromJandex );
 			return fromJandex;
 		}
 
 		final JdkClassDetails jdkClassDetails = JdkBuilders.DEFAULT_BUILDER.buildClassDetails( name, context );
 		if ( jdkClassDetails != null ) {
-			addClassDetails( name, jdkClassDetails );
 			return jdkClassDetails;
 		}
 

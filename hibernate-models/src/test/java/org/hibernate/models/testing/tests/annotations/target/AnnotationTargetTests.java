@@ -9,6 +9,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.models.internal.AnnotationTargetHelper;
+import org.hibernate.models.internal.MissingPackageInfoDetails;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -26,6 +28,13 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
  * @author Steve Ebersole
  */
 public class AnnotationTargetTests {
+	@Test
+	void testPackageWithSingleCharacterRootContainer() {
+		final ClassDetails packageDetails = new MissingPackageInfoDetails( "a.b", "a.b.package-info" );
+
+		assertThat( AnnotationTargetHelper.determineContainingPackageName( packageDetails ) ).isEqualTo( "a" );
+	}
+
 	@Test
 	void testConstructorTarget() {
 		final ModelsContext modelsContext = createModelContext( ConstructorTarget.class );
