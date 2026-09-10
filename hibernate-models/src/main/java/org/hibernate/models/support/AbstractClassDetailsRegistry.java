@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.hibernate.models.UnknownClassException;
+import org.hibernate.models.internal.MissingPackageInfoDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
@@ -212,6 +213,26 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	}
 
 	@Override
+	public ClassDetails resolvePackageDetails(String packageName) {
+		final ClassDetails existing = findPackageDetails( packageName );
+		if ( existing != null ) {
+			return existing;
+		}
+
+		final String packageInfoName = packageName + ".package-info";
+		try {
+			return createClassDetailsExact( packageInfoName, packageInfoName );
+		}
+		catch (UnknownClassException noPackageInfoClass) {
+			return resolveClassDetails(
+					packageInfoName,
+					name -> new MissingPackageInfoDetails( packageName, packageInfoName )
+			);
+		}
+	}
+
+	@Override
+	@SuppressWarnings({ "deprecation", "removal" })
 	public ClassDetails resolveClassOrPackageDetails(String name) {
 		if ( name == null ) {
 			throw new IllegalArgumentException( "`name` cannot be null" );

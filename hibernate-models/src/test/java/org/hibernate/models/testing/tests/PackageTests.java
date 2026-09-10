@@ -23,6 +23,7 @@ import static org.hibernate.models.testing.TestHelper.createModelContext;
 /**
  * @author Steve Ebersole
  */
+@SuppressWarnings("removal")
 public class PackageTests {
 	private static final String PACKAGE_NAME = PackageAnnotation.class.getPackageName();
 
@@ -36,6 +37,8 @@ public class PackageTests {
 		assertThat( classDetails ).isNotNull();
 		assertThat( classDetails.getClassName() ).endsWith( "package-info" );
 		assertThat( classDetails.getAnnotationUsage( PackageAnnotation.class, modelsContext ) ).isNotNull();
+		assertThat( modelsContext.getClassDetailsRegistry().findPackageDetails( PACKAGE_NAME ) ).isSameAs( classDetails );
+		assertThat( modelsContext.getClassDetailsRegistry().getPackageDetails( PACKAGE_NAME ) ).isSameAs( classDetails );
 	}
 
 	@Test
@@ -75,6 +78,73 @@ public class PackageTests {
 	}
 
 	@Test
+	void testResolvePackageReference() {
+		final ModelsContext modelsContext = createModelContext();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
+		final String packageInfoName = PACKAGE_NAME + ".package-info";
+
+		assertThat( classDetailsRegistry.findPackageDetails( PACKAGE_NAME ) ).isNull();
+		assertThatThrownBy( () -> classDetailsRegistry.getPackageDetails( PACKAGE_NAME ) )
+				.isInstanceOf( UnknownClassException.class );
+
+		final ClassDetails packageDetails = classDetailsRegistry.resolvePackageDetails( PACKAGE_NAME );
+		assertThat( packageDetails.getClassName() ).isEqualTo( packageInfoName );
+		assertThat( packageDetails.getAnnotationUsage( PackageAnnotation.class, modelsContext ) ).isNotNull();
+		assertThat( classDetailsRegistry.findClassDetails( PACKAGE_NAME ) ).isNull();
+		assertThat( classDetailsRegistry.findClassDetails( packageInfoName ) ).isSameAs( packageDetails );
+		assertThat( classDetailsRegistry.findPackageDetails( PACKAGE_NAME ) ).isSameAs( packageDetails );
+		assertThat( classDetailsRegistry.getPackageDetails( PACKAGE_NAME ) ).isSameAs( packageDetails );
+		assertThat( classDetailsRegistry.resolvePackageDetails( PACKAGE_NAME ) ).isSameAs( packageDetails );
+	}
+
+	@Test
+	void testResolvePackageWithoutPackageInfo() {
+		final ModelsContext modelsContext = createModelContext();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
+		final String packageName = "does.not.exist";
+		final String packageInfoName = packageName + ".package-info";
+
+		final ClassDetails packageDetails = classDetailsRegistry.resolvePackageDetails( packageName );
+		assertThat( packageDetails.isRealClass() ).isFalse();
+		assertThat( packageDetails.getClassName() ).isEqualTo( packageInfoName );
+		assertThat( classDetailsRegistry.findClassDetails( packageName ) ).isNull();
+		assertThat( classDetailsRegistry.findClassDetails( packageInfoName ) ).isSameAs( packageDetails );
+		assertThat( classDetailsRegistry.findPackageDetails( packageName ) ).isSameAs( packageDetails );
+		assertThat( classDetailsRegistry.getPackageDetails( packageName ) ).isSameAs( packageDetails );
+		assertThat( classDetailsRegistry.resolvePackageDetails( packageName ) ).isSameAs( packageDetails );
+	}
+
+	@Test
+	void testPackageResolutionDoesNotPreferClass() {
+		final ModelsContext modelsContext = createModelContext();
+		final ClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry();
+		final String ambiguousName = PackageAnnotation.class.getName();
+
+		final ClassDetails classDetails = classDetailsRegistry.resolveClassOrPackageDetails( ambiguousName );
+		final ClassDetails packageDetails = classDetailsRegistry.resolvePackageDetails( ambiguousName );
+
+		assertThat( classDetails.getClassName() ).isEqualTo( ambiguousName );
+		assertThat( packageDetails.getClassName() ).isEqualTo( ambiguousName + ".package-info" );
+		assertThat( packageDetails ).isNotSameAs( classDetails );
+	}
+
+	@Test
+	void testInvalidPackageNames() {
+		final ClassDetailsRegistry classDetailsRegistry = createModelContext().getClassDetailsRegistry();
+
+		assertThatThrownBy( () -> classDetailsRegistry.resolvePackageDetails( null ) )
+				.isInstanceOf( IllegalArgumentException.class );
+		assertThatThrownBy( () -> classDetailsRegistry.resolvePackageDetails( "" ) )
+				.isInstanceOf( IllegalArgumentException.class );
+		assertThatThrownBy( () -> classDetailsRegistry.resolvePackageDetails( "a.b.package-info" ) )
+				.isInstanceOf( IllegalArgumentException.class );
+		assertThatThrownBy( () -> classDetailsRegistry.findPackageDetails( "a.b.package-info" ) )
+				.isInstanceOf( IllegalArgumentException.class );
+		assertThatThrownBy( () -> classDetailsRegistry.getPackageDetails( "a.b.package-info" ) )
+				.isInstanceOf( IllegalArgumentException.class );
+	}
+
+	@Test
 	void testClassOrPackageReferencePrefersClass() {
 		final ModelsContext modelsContext = createModelContext();
 		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry()
@@ -111,6 +181,9 @@ public class PackageTests {
 		assertThat( packageDetails.getClassName() ).isEqualTo( packageInfoName );
 		assertThat( classDetailsRegistry.findClassDetails( packageName ) ).isNull();
 		assertThat( classDetailsRegistry.findClassDetails( packageInfoName ) ).isSameAs( packageDetails );
+		assertThat( classDetailsRegistry.findPackageDetails( packageName ) ).isSameAs( packageDetails );
+		assertThat( classDetailsRegistry.getPackageDetails( packageName ) ).isSameAs( packageDetails );
+		assertThat( classDetailsRegistry.resolvePackageDetails( packageName ) ).isSameAs( packageDetails );
 		assertThat( entityDetails.getContainer( modelsContext ) ).isSameAs( packageDetails );
 		assertThat( classDetailsRegistry.resolveClassOrPackageDetails( packageName ) ).isSameAs( packageDetails );
 		assertThat( classDetailsRegistry.resolveClassOrPackageDetails( packageInfoName ) ).isSameAs( packageDetails );
