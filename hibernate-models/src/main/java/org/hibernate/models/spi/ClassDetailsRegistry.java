@@ -37,6 +37,19 @@ public interface ClassDetailsRegistry {
 	ClassDetails resolveClassDetails(String name);
 
 	/**
+	 * Resolves a package by package name. If there is currently no such registration,
+	 * one is created. Package details are registered using the canonical
+	 * {@code package-name.package-info} name.
+	 *
+	 * @param packageName The package name, without the {@code .package-info} suffix
+	 *
+	 * @return The resolved package details
+	 *
+	 * @since 1.3
+	 */
+	ClassDetails resolvePackageDetails(String packageName);
+
+	/**
 	 * Resolves a reference expressed as one of three forms: a fully qualified class name,
 	 * a package name, or the fully qualified name of a {@code package-info} class.  Class
 	 * resolution is attempted first for an ambiguous name.
@@ -49,7 +62,11 @@ public interface ClassDetailsRegistry {
 	 * @throws UnknownClassException If the name cannot be resolved as either a class or a package
 	 *
 	 * @since 1.3
+	 *
+	 * @deprecated Use {@link #resolveClassDetails(String)} or
+	 * {@link #resolvePackageDetails(String)} once the reference category is known
 	 */
+	@Deprecated(since = "1.3", forRemoval = true)
 	ClassDetails resolveClassOrPackageDetails(String name);
 
 	/**
@@ -57,6 +74,20 @@ public interface ClassDetailsRegistry {
 	 * Returns {@code null} if there are none registered with that name.
 	 */
 	ClassDetails findClassDetails(String name);
+
+	/**
+	 * Find the package with the given {@code packageName}, if one is registered.
+	 * Returns {@code null} if there is no such registration.
+	 *
+	 * @param packageName The package name, without the {@code .package-info} suffix
+	 *
+	 * @return The registered package details, or {@code null}
+	 *
+	 * @since 1.3
+	 */
+	default ClassDetails findPackageDetails(String packageName) {
+		return findClassDetails( packageInfoName( packageName ) );
+	}
 
 	/**
 	 * Form of {@link #findClassDetails} throwing an exception if no registration is found
@@ -73,6 +104,32 @@ public interface ClassDetailsRegistry {
 			throw new UnknownClassException( "Unknown managed class - " + name );
 		}
 		return named;
+	}
+
+	/**
+	 * Form of {@link #findPackageDetails(String)} throwing an exception if no
+	 * package registration is found.
+	 *
+	 * @param packageName The package name, without the {@code .package-info} suffix
+	 *
+	 * @return The registered package details
+	 *
+	 * @throws UnknownClassException If no package registration is found
+	 *
+	 * @since 1.3
+	 */
+	default ClassDetails getPackageDetails(String packageName) {
+		return getClassDetails( packageInfoName( packageName ) );
+	}
+
+	private static String packageInfoName(String packageName) {
+		if ( packageName == null || packageName.isEmpty() ) {
+			throw new IllegalArgumentException( "`packageName` cannot be null or empty" );
+		}
+		if ( packageName.equals( "package-info" ) || packageName.endsWith( ".package-info" ) ) {
+			throw new IllegalArgumentException( "`packageName` must not include the `package-info` suffix" );
+		}
+		return packageName + ".package-info";
 	}
 
 	/**
