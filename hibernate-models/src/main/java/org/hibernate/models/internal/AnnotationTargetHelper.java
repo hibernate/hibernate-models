@@ -7,7 +7,6 @@ package org.hibernate.models.internal;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
@@ -37,19 +36,7 @@ public class AnnotationTargetHelper {
 			return null;
 		}
 
-		final String packageInfoClassName = containingPackageName + ".package-info";
-
-		final MutableClassDetailsRegistry classDetailsRegistry = modelsContext.getClassDetailsRegistry()
-				.as( MutableClassDetailsRegistry.class );
-		try {
-			return classDetailsRegistry.resolveClassOrPackageDetails( packageInfoClassName );
-		}
-		catch (UnknownClassException noPackageInfoClass) {
-			return classDetailsRegistry.resolveClassDetails(
-					packageInfoClassName,
-					name -> new MissingPackageInfoDetails( containingPackageName, packageInfoClassName )
-			);
-		}
+		return modelsContext.getClassDetailsRegistry().resolvePackageDetails( containingPackageName );
 	}
 
 	public static String determineContainingPackageName(ClassDetails classDetails) {
