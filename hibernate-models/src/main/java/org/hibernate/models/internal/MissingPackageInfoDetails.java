@@ -72,10 +72,11 @@ public record MissingPackageInfoDetails(String packageName, String packageInfoCl
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <A extends Annotation> A[] getRepeatedAnnotationUsages(
 			AnnotationDescriptor<A> type,
 			ModelsContext modelContext) {
-		return null;
+		return (A[]) new Annotation[0];
 	}
 
 	@Override
