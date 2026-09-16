@@ -38,7 +38,8 @@ public interface ClassDetailsRegistry {
 
 	/**
 	 * Resolves a package by package name. If there is currently no such registration,
-	 * one is created. Package details are registered using the canonical
+	 * one is created. If the descriptor is absent, missing package details are registered
+	 * and returned. Loading failures propagate. Package details are registered using the canonical
 	 * {@code package-name.package-info} name.
 	 *
 	 * @param packageName The package name, without the {@code .package-info} suffix
@@ -48,6 +49,29 @@ public interface ClassDetailsRegistry {
 	 * @since 1.3
 	 */
 	ClassDetails resolvePackageDetails(String packageName);
+
+	/**
+	 * Resolves the descriptor of an explicitly registered package. Unlike
+	 * {@link #resolvePackageDetails(String)}, missing package details are rejected,
+	 * including when they were cached by an earlier implicit lookup.
+	 * Absence of a descriptor does not establish that the package itself is absent.
+	 *
+	 * @param packageName The package name, without the {@code .package-info} suffix
+	 * @return The canonical details of the real package descriptor
+	 * @throws IllegalArgumentException If the name is null, empty, or includes the package-info suffix
+	 * @throws UnknownClassException If no real package descriptor can be resolved
+	 * @implSpec Delegates to {@link #resolvePackageDetails(String)} and rejects details
+	 * whose {@link ClassDetails#isRealClass()} is false. Loading failures propagate.
+	 */
+	default ClassDetails resolveExplicitPackageDetails(String packageName) {
+		final String descriptorName = packageInfoName( packageName );
+		final ClassDetails details = resolvePackageDetails( packageName );
+		if ( !details.isRealClass() ) {
+			throw new UnknownClassException( "Could not resolve package descriptor '" + descriptorName
+					+ "' for explicitly registered package '" + packageName + "'." );
+		}
+		return details;
+	}
 
 	/**
 	 * Resolves a reference expressed as one of three forms: a fully qualified class name,

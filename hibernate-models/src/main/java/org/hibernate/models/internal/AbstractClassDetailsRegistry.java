@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.util.CollectionHelper;
+import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
@@ -218,15 +219,22 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		}
 
 		final String packageInfoName = packageName + ".package-info";
-		try {
-			return createClassDetailsExact( packageInfoName, packageInfoName );
-		}
-		catch (UnknownClassException noPackageInfoClass) {
-			return resolveClassDetails(
-					packageInfoName,
-					name -> new MissingPackageInfoDetails( packageName, packageInfoName )
-			);
-		}
+		final ClassDetails descriptor = buildPackageDetails( packageInfoName );
+		final ClassDetails details = descriptor == null
+				? new MissingPackageInfoDetails( packageName, packageInfoName )
+				: descriptor;
+		addClassDetails( packageInfoName, details );
+		return details;
+	}
+
+	/**
+	 * Builds package descriptor details, returning {@code null} only when the descriptor
+	 * is absent. Backends may override this to locate descriptors without reflection.
+	 * Loading and construction failures must propagate rather than indicate absence.
+	 */
+	protected ClassDetails buildPackageDetails(String packageInfoName) {
+		final Class<?> descriptorClass = context.getClassLoading().findClassForName( packageInfoName );
+		return descriptorClass == null ? null : JdkBuilders.buildClassDetailsStatic( descriptorClass, context );
 	}
 
 	@Override

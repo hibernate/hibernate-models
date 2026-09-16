@@ -6,6 +6,7 @@ package org.hibernate.models.internal;
 
 
 import org.hibernate.models.internal.jdk.JdkBuilders;
+import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 import org.hibernate.models.spi.ModelsContext;
 
@@ -30,5 +31,12 @@ public class ClassDetailsRegistryStandard
 	@Override
 	public ClassDetailsBuilder getClassDetailsBuilder() {
 		return classDetailsBuilder;
+	}
+
+	@Override
+	protected ClassDetails buildPackageDetails(String packageInfoName) {
+		return classDetailsBuilder == JdkBuilders.DEFAULT_BUILDER
+				? super.buildPackageDetails( packageInfoName )
+				: classDetailsBuilder.buildClassDetails( packageInfoName, context );
 	}
 }

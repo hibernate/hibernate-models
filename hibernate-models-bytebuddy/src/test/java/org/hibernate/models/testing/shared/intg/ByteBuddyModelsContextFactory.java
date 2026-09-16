@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.hibernate.models.ModelsException;
 import org.hibernate.models.bytebuddy.internal.ByteBuddyModelsContextImpl;
 import org.hibernate.models.bytebuddy.spi.ByteBuddyModelsContext;
 import org.hibernate.models.spi.ClassLoading;
@@ -70,7 +69,7 @@ public class ByteBuddyModelsContextFactory implements ModelsContextFactory {
 			final String classFileName = toClassFileName( name );
 			final URL locatedResource = classLoading.locateResource( classFileName );
 			if ( locatedResource == null ) {
-				throw new ModelsException( "Unable to locate resource : " + name + " (" + classFileName + ")" );
+				return new Resolution.Illegal( name );
 			}
 			try (InputStream stream = locatedResource.openStream()) {
 				return new Resolution.Explicit( stream.readAllBytes() );
