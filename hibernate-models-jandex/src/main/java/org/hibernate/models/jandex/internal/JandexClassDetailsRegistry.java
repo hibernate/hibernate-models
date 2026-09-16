@@ -40,6 +40,12 @@ public class JandexClassDetailsRegistry extends AbstractClassDetailsRegistry {
 	}
 
 	@Override
+	protected ClassDetails buildPackageDetails(String packageInfoName) {
+		final ClassDetails indexed = classDetailsBuilder.buildClassDetails( packageInfoName, context );
+		return indexed == null ? super.buildPackageDetails( packageInfoName ) : indexed;
+	}
+
+	@Override
 	protected ClassDetails buildClassDetails(String name) {
 		final ClassDetails fromJandex = classDetailsBuilder.buildClassDetails( name, context );
 		if ( fromJandex != null ) {

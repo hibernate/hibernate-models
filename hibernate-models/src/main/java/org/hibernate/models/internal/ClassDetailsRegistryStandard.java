@@ -36,6 +36,13 @@ public class ClassDetailsRegistryStandard
 		return classDetailsBuilder;
 	}
 
+	@Override
+	protected ClassDetails buildPackageDetails(String packageInfoName) {
+		return classDetailsBuilder == JdkBuilders.DEFAULT_BUILDER
+				? super.buildPackageDetails( packageInfoName )
+				: classDetailsBuilder.buildClassDetails( packageInfoName, context );
+	}
+
 	Map<String, ClassDetails> getStorableClassDetailsMap() {
 		return classDetailsMap;
 	}

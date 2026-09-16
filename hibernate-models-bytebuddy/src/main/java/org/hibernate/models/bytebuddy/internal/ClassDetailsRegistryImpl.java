@@ -12,6 +12,8 @@ import org.hibernate.models.jdk.JdkClassDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsBuilder;
 
+import net.bytebuddy.pool.TypePool;
+
 /**
  * @author Steve Ebersole
  */
@@ -26,6 +28,15 @@ public class ClassDetailsRegistryImpl extends AbstractClassDetailsRegistry {
 	@Override
 	public ClassDetailsBuilder getClassDetailsBuilder() {
 		return classDetailsBuilder;
+	}
+
+	@Override
+	protected ClassDetails buildPackageDetails(String packageInfoName) {
+		final ByteBuddyModelsContextImpl byteBuddyContext = (ByteBuddyModelsContextImpl) context;
+		final TypePool.Resolution resolution = byteBuddyContext.getTypePool().describe( packageInfoName );
+		return resolution.isResolved()
+				? new ClassDetailsImpl( resolution.resolve(), byteBuddyContext )
+				: super.buildPackageDetails( packageInfoName );
 	}
 
 	@Override
