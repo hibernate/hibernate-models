@@ -58,7 +58,7 @@ public class AnnotationTargetHelper {
 					: null;
 		}
 		else {
-			return classNameNamespace;
+			return classNameNamespace.isEmpty() ? null : classNameNamespace;
 		}
 	}
 
