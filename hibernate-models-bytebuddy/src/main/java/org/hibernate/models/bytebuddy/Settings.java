@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.bytebuddy;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Settings for hibernate-models ByteBuddy support
  *
@@ -13,5 +15,6 @@ public interface Settings {
 	/**
 	 * Used to pass the ByteBuddy {@linkplain net.bytebuddy.pool.TypePool}.
 	 */
+	@Nonnull
 	String TYPE_POOL_PARAM = "hibernate.models.bytebuddy.typePool";
 }

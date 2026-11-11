@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
@@ -41,36 +44,36 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 
 	private Class<?> javaType;
 
-	public DynamicClassDetails(String name, ModelsContext modelsContext) {
+	public DynamicClassDetails(@Nonnull String name, @Nonnull ModelsContext modelsContext) {
 		this( name, null, null, modelsContext );
 	}
 
 	public DynamicClassDetails(
-			String name,
-			ClassDetails superClass,
-			TypeDetails genericSuperType,
-			ModelsContext modelsContext) {
+			@Nonnull String name,
+			@Nullable ClassDetails superClass,
+			@Nullable TypeDetails genericSuperType,
+			@Nonnull ModelsContext modelsContext) {
 		this( name, null, false, superClass, genericSuperType, modelsContext );
 	}
 
 	public DynamicClassDetails(
-			String name,
-			String className,
+			@Nonnull String name,
+			@Nullable String className,
 			boolean isAbstract,
-			ClassDetails superClass,
-			TypeDetails genericSuperType,
-			ModelsContext modelsContext) {
+			@Nullable ClassDetails superClass,
+			@Nullable TypeDetails genericSuperType,
+			@Nonnull ModelsContext modelsContext) {
 		this( name, className, null, isAbstract, superClass, genericSuperType, modelsContext );
 	}
 
 	public DynamicClassDetails(
-			String name,
-			String className,
-			Class<?> javaType,
+			@Nonnull String name,
+			@Nullable String className,
+			@Nullable Class<?> javaType,
 			boolean isAbstract,
-			ClassDetails superClass,
-			TypeDetails genericSuperType,
-			ModelsContext modelsContext) {
+			@Nullable ClassDetails superClass,
+			@Nullable TypeDetails genericSuperType,
+			@Nonnull ModelsContext modelsContext) {
 		super( modelsContext );
 		this.name = name;
 		this.className = className;
@@ -80,11 +83,13 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 		this.javaType = javaType;
 	}
 
+	@Nonnull
 	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Nullable
 	@Override
 	public String getClassName() {
 		return className;
@@ -132,32 +137,37 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 		return false;
 	}
 
+	@Nullable
 	@Override
 	public ClassDetails getSuperClass() {
 		return superClass;
 	}
 
+	@Nullable
 	@Override
 	public TypeDetails getGenericSuperType() {
 		return genericSuperType;
 	}
 
+	@Nullable
 	@Override
 	public List<TypeDetails> getImplementedInterfaces() {
 		// todo : do we need these for dynamic classes?
 		return null;
 	}
 
+	@Nonnull
 	@Override
 	public List<TypeVariableDetails> getTypeParameters() {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public boolean isImplementor(Class<?> checkType) {
+	public boolean isImplementor(@Nonnull Class<?> checkType) {
 		return !isEmpty( className ) && checkType.isAssignableFrom( javaType );
 	}
 
+	@Nonnull
 	@Override
 	public List<FieldDetails> getFields() {
 		if ( fields == null ) {
@@ -168,13 +178,14 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	}
 
 	@Override
-	public void addField(FieldDetails fieldDetails) {
+	public void addField(@Nonnull FieldDetails fieldDetails) {
 		if ( fields == null ) {
 			this.fields = new ArrayList<>();
 		}
 		this.fields.add( fieldDetails );
 	}
 
+	@Nonnull
 	@Override
 	public List<MethodDetails> getMethods() {
 		if ( methods == null ) {
@@ -184,12 +195,13 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 		return methods;
 	}
 
+	@Nonnull
 	@Override
 	public List<RecordComponentDetails> getRecordComponents() {
 		return Collections.emptyList();
 	}
 
-	public void addMethod(MethodDetails methodDetails) {
+	public void addMethod(@Nonnull MethodDetails methodDetails) {
 		if ( methods == null ) {
 			this.methods = new ArrayList<>();
 		}
@@ -199,12 +211,13 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	/**
 	 * Creates a field representing an attribute and adds it to this class.
 	 */
+	@Nonnull
 	public DynamicFieldDetails applyAttribute(
-			String name,
-			ClassDetails type,
+			@Nonnull String name,
+			@Nonnull ClassDetails type,
 			boolean isArray,
 			boolean isPlural,
-			ModelsContext context) {
+			@Nonnull ModelsContext context) {
 		return applyAttribute(
 				name,
 				new ClassTypeDetailsImpl( type, TypeDetails.Kind.CLASS ),
@@ -217,12 +230,13 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 	/**
 	 * Creates a field representing an attribute and adds it to this class
 	 */
+	@Nonnull
 	public DynamicFieldDetails applyAttribute(
-			String name,
-			TypeDetails type,
+			@Nonnull String name,
+			@Nonnull TypeDetails type,
 			boolean isArray,
 			boolean isPlural,
-			ModelsContext context) {
+			@Nonnull ModelsContext context) {
 		final DynamicFieldDetails attribute = new DynamicFieldDetails(
 				name,
 				type,
@@ -236,13 +250,15 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 		return attribute;
 	}
 
+	@Nonnull
 	@Override
 	public <X> Class<X> toJavaClass() {
 		return toJavaClass( getModelContext().getClassLoading(), getModelContext() );
 	}
 
+	@Nonnull
 	@Override
-	public <X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext) {
+	public <X> Class<X> toJavaClass(@Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext) {
 		if ( javaType == null ) {
 			if ( className == null ) {
 				throw new DynamicClassException( "ClassDetails (name=" + name + ") did not specify a class-name" );
@@ -253,11 +269,13 @@ public class DynamicClassDetails extends AbstractAnnotationTarget implements Cla
 		return (Class<X>) javaType;
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return "DynamicClassDetails(" + name + " (" + className + "))";
 	}
 
+	@Nonnull
 	@Override
 	public SerialClassDetails toStorableForm() {
 		throw new UnsupportedOperationException( "Not implemented yet" );

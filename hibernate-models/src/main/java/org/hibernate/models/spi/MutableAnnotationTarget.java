@@ -6,6 +6,8 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Extension of AnnotationTarget which allows manipulation of the annotations
  *
@@ -21,20 +23,21 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	/**
 	 * Add an annotation usage to this target
 	 */
-	<X extends Annotation> void addAnnotationUsage(X annotationUsage);
+	<X extends Annotation> void addAnnotationUsage(@Nonnull X annotationUsage);
 
 	/**
 	 * Remove an annotation, by type, from this target if there is such a usage.
 	 */
-	<X extends Annotation> void removeAnnotationUsage(AnnotationDescriptor<X> annotationType);
+	<X extends Annotation> void removeAnnotationUsage(@Nonnull AnnotationDescriptor<X> annotationType);
 
 	/**
 	 * Applies a usage of the given {@code annotationType} to this target.  Will return
 	 * an existing usage, if one, or create a new usage.
 	 */
+	@Nonnull
 	default <A extends Annotation> A applyAnnotationUsage(
-			AnnotationDescriptor<A> annotationType,
-			ModelsContext modelContext) {
+			@Nonnull AnnotationDescriptor<A> annotationType,
+			@Nonnull ModelsContext modelContext) {
 		final A existing = getAnnotationUsage( annotationType, modelContext );
 		if ( existing != null ) {
 			return existing;
@@ -57,9 +60,10 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	 *
 	 * @see #replaceAnnotationUsage(AnnotationDescriptor, AnnotationDescriptor, ModelsContext)
 	 */
+	@Nonnull
 	default <A extends Annotation> A replaceAnnotationUsage(
-			AnnotationDescriptor<A> annotationType,
-			ModelsContext modelContext) {
+			@Nonnull AnnotationDescriptor<A> annotationType,
+			@Nonnull ModelsContext modelContext) {
 		final A usage = annotationType.createUsage( modelContext );
 		// effectively overwrites any previous registration
 		addAnnotationUsage( usage );
@@ -75,14 +79,17 @@ public interface MutableAnnotationTarget extends AnnotationTarget {
 	 *
 	 * @see #replaceAnnotationUsage(AnnotationDescriptor, ModelsContext)
 	 */
+	@Nonnull
 	<S extends Annotation, P extends Annotation> P replaceAnnotationUsage(
-			AnnotationDescriptor<S> repeatableType,
-			AnnotationDescriptor<P> containerType,
-			ModelsContext modelContext);
+			@Nonnull AnnotationDescriptor<S> repeatableType,
+			@Nonnull AnnotationDescriptor<P> containerType,
+			@Nonnull ModelsContext modelContext);
 
+	@Nonnull
 	@Override
 	MutableClassDetails asClassDetails();
 
+	@Nonnull
 	@Override
 	MutableMemberDetails asMemberDetails();
 }

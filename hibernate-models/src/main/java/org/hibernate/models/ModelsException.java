@@ -4,17 +4,19 @@
  */
 package org.hibernate.models;
 
+import jakarta.annotation.Nullable;
+
 /**
  * Base exception for hibernate-models
  *
  * @author Steve Ebersole
  */
 public class ModelsException extends RuntimeException {
-	public ModelsException(String message) {
+	public ModelsException(@Nullable String message) {
 		super( message );
 	}
 
-	public ModelsException(String message, Throwable cause) {
+	public ModelsException(@Nullable String message, @Nullable Throwable cause) {
 		super( message, cause );
 	}
 }

@@ -9,6 +9,9 @@ import java.util.List;
 
 import org.hibernate.models.internal.util.StringHelper;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import static org.hibernate.models.internal.ModifierUtils.hasPersistableMethodModifiers;
 
 /**
@@ -18,20 +21,27 @@ import static org.hibernate.models.internal.ModifierUtils.hasPersistableMethodMo
  */
 public interface MethodDetails extends MemberDetails {
 	enum MethodKind {
+		@Nonnull
 		GETTER,
+		@Nonnull
 		SETTER,
+		@Nonnull
 		OTHER
 	}
 
+	@Nonnull
 	MethodKind getMethodKind();
 
+	@Nonnull
 	@Override
 	default Kind getKind() {
 		return Kind.METHOD;
 	}
 
+	@Nonnull
 	ClassDetails getReturnType();
 
+	@Nonnull
 	List<ClassDetails> getArgumentTypes();
 
 	@Override
@@ -40,6 +50,7 @@ public interface MethodDetails extends MemberDetails {
 				&& hasPersistableMethodModifiers( getModifiers() );
 	}
 
+	@Nullable
 	@Override
 	default String resolveAttributeName() {
 		final String methodName = getName();
@@ -54,12 +65,15 @@ public interface MethodDetails extends MemberDetails {
 		return null;
 	}
 
+	@Nullable
 	@Override
 	Method toJavaMember();
 
+	@Nullable
 	@Override
-	Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
+	Method toJavaMember(@Nonnull Class<?> declaringClass, @Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext);
 
+	@Nonnull
 	@Override
 	default MethodDetails asMethodDetails() {
 		return this;

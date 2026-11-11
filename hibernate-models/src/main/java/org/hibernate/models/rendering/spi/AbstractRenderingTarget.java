@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.rendering.spi;
 
+import jakarta.annotation.Nonnull;
+
 import java.util.Locale;
 
 /**
@@ -27,17 +29,17 @@ public abstract class AbstractRenderingTarget implements RenderingTarget {
 		this.indentationDepth = indentationDepth;
 	}
 
-	protected abstract void write(String chars);
+	protected abstract void write(@Nonnull String chars);
 
 	@Override
-	public void addLine(String line) {
+	public void addLine(@Nonnull String line) {
 		write( " " .repeat( currentIndentation ) );
 		write( line );
 		write( "\n" );
 	}
 
 	@Override
-	public void addLine(String pattern, Object... args) {
+	public void addLine(@Nonnull String pattern, @Nonnull Object... args) {
 		write( " " .repeat( currentIndentation ) );
 		write( String.format( Locale.ROOT, pattern, args ) );
 		write( "\n" );

@@ -10,6 +10,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.Incubating;
 import org.hibernate.models.UnknownClassException;
 
@@ -34,7 +37,8 @@ public interface ClassDetailsRegistry {
 	 * Resolves a managed-class by name.  If there is currently no such registration,
 	 * one is created.
 	 */
-	ClassDetails resolveClassDetails(String name);
+	@Nonnull
+	ClassDetails resolveClassDetails(@Nonnull String name);
 
 	/**
 	 * Resolves a package by package name. If there is currently no such registration,
@@ -48,7 +52,8 @@ public interface ClassDetailsRegistry {
 	 *
 	 * @since 1.3
 	 */
-	ClassDetails resolvePackageDetails(String packageName);
+	@Nonnull
+	ClassDetails resolvePackageDetails(@Nonnull String packageName);
 
 	/**
 	 * Resolves the descriptor of an explicitly registered package. Unlike
@@ -63,7 +68,8 @@ public interface ClassDetailsRegistry {
 	 * @implSpec Delegates to {@link #resolvePackageDetails(String)} and rejects details
 	 * whose {@link ClassDetails#isRealClass()} is false. Loading failures propagate.
 	 */
-	default ClassDetails resolveExplicitPackageDetails(String packageName) {
+	@Nonnull
+	default ClassDetails resolveExplicitPackageDetails(@Nonnull String packageName) {
 		final String descriptorName = packageInfoName( packageName );
 		final ClassDetails details = resolvePackageDetails( packageName );
 		if ( !details.isRealClass() ) {
@@ -90,14 +96,16 @@ public interface ClassDetailsRegistry {
 	 * @deprecated Use {@link #resolveClassDetails(String)} or
 	 * {@link #resolvePackageDetails(String)} once the reference category is known
 	 */
+	@Nonnull
 	@Deprecated(since = "1.3", forRemoval = true)
-	ClassDetails resolveClassOrPackageDetails(String name);
+	ClassDetails resolveClassOrPackageDetails(@Nonnull String name);
 
 	/**
 	 * Find the managed-class with the given {@code name}, if there is one.
 	 * Returns {@code null} if there are none registered with that name.
 	 */
-	ClassDetails findClassDetails(String name);
+	@Nullable
+	ClassDetails findClassDetails(@Nonnull String name);
 
 	/**
 	 * Find the package with the given {@code packageName}, if one is registered.
@@ -109,17 +117,21 @@ public interface ClassDetailsRegistry {
 	 *
 	 * @since 1.3
 	 */
-	default ClassDetails findPackageDetails(String packageName) {
+	@Nullable
+	default ClassDetails findPackageDetails(@Nonnull String packageName) {
 		return findClassDetails( packageInfoName( packageName ) );
 	}
 
 	/**
-	 * Form of {@link #findClassDetails} throwing an exception if no registration is found
+	 * Form of {@link #findClassDetails} throwing an exception if no registration is found.
+	 * An unregistered {@code "void"} name instead returns {@code null}; a registered
+	 * {@code "void"} name returns its registered details.
 	 *
 	 * @throws UnknownClassException If no registration is found with the given {@code name}
 	 */
+	@Nullable
 	@SuppressWarnings("unused")
-	default ClassDetails getClassDetails(String name) {
+	default ClassDetails getClassDetails(@Nonnull String name) {
 		final ClassDetails named = findClassDetails( name );
 		if ( named == null ) {
 			if ( "void".equals( name ) ) {
@@ -142,7 +154,8 @@ public interface ClassDetailsRegistry {
 	 *
 	 * @since 1.3
 	 */
-	default ClassDetails getPackageDetails(String packageName) {
+	@Nonnull
+	default ClassDetails getPackageDetails(@Nonnull String packageName) {
 		return getClassDetails( packageInfoName( packageName ) );
 	}
 
@@ -160,11 +173,12 @@ public interface ClassDetailsRegistry {
 	 * Visit each registered class details
 	 */
 	@SuppressWarnings("unused")
-	void forEachClassDetails(ClassDetailsConsumer consumer);
+	void forEachClassDetails(@Nonnull ClassDetailsConsumer consumer);
 
 	/**
 	 * Opens a Stream over all contained ClassDetails.
 	 */
+	@Nonnull
 	Stream<ClassDetails> streamClassDetails();
 
 	/**
@@ -172,13 +186,15 @@ public interface ClassDetailsRegistry {
 	 *
 	 * @deprecated Use {@linkplain #getDirectSubtypes(String)} instead.
 	 */
+	@Nonnull
 	@Deprecated
-	List<ClassDetails> getDirectSubTypes(String superTypeName);
+	List<ClassDetails> getDirectSubTypes(@Nonnull String superTypeName);
 
 	/**
 	 * Get the list of all direct subtypes for the named managed-class.
 	 */
-	Set<ClassDetails> getDirectSubtypes(String superTypeName);
+	@Nonnull
+	Set<ClassDetails> getDirectSubtypes(@Nonnull String superTypeName);
 
 	/**
 	 * Visit each direct subtype of the named managed-class
@@ -186,14 +202,14 @@ public interface ClassDetailsRegistry {
 	 * @deprecated Use {@linkplain #forEachDirectSubtype} instead.
 	 */
 	@Deprecated
-	default void forEachDirectSubType(String typeName, ClassDetailsConsumer consumer) {
+	default void forEachDirectSubType(@Nonnull String typeName, @Nonnull ClassDetailsConsumer consumer) {
 		forEachDirectSubtype( typeName, consumer );
 	}
 
 	/**
 	 * Visit each direct subtype of the named managed-class
 	 */
-	void forEachDirectSubtype(String typeName, ClassDetailsConsumer consumer);
+	void forEachDirectSubtype(@Nonnull String typeName, @Nonnull ClassDetailsConsumer consumer);
 
 	/**
 	 * Get the list of all direct implementors, including specializations, for the named interface.
@@ -204,8 +220,9 @@ public interface ClassDetailsRegistry {
 	 *
 	 * @apiNote Does not verify that {@code interfaceName} actually names an interface.
 	 */
+	@Nonnull
 	@Incubating
-	Set<ClassDetails> getDirectImplementors(String interfaceName);
+	Set<ClassDetails> getDirectImplementors(@Nonnull String interfaceName);
 
 	/**
 	 * Visit each direct implementor, including specializations, of the named interface.
@@ -216,7 +233,7 @@ public interface ClassDetailsRegistry {
 	 * interface.  If it does not, no callbacks will happen.
 	 */
 	@Incubating
-	void forEachDirectImplementor(String interfaceName, ClassDetailsConsumer consumer);
+	void forEachDirectImplementor(@Nonnull String interfaceName, @Nonnull ClassDetailsConsumer consumer);
 
 	/**
 	 * Find all non-abstract ClassDetails which extended from or implements the named
@@ -228,8 +245,9 @@ public interface ClassDetailsRegistry {
 	 * @see #findConcreteTypes(String, boolean)
 	 * @see #isTrackingImplementors
 	 */
+	@Nonnull
 	@Incubating
-	default Set<ClassDetails> findConcreteTypes(String base) {
+	default Set<ClassDetails> findConcreteTypes(@Nonnull String base) {
 		return findConcreteTypes( base, true );
 	}
 
@@ -243,8 +261,9 @@ public interface ClassDetailsRegistry {
 	 * @see #getDirectSubTypes
 	 * @see #getDirectImplementors
 	 */
+	@Nonnull
 	@Incubating
-	default Set<ClassDetails> findConcreteTypes(String base, boolean includeBase) {
+	default Set<ClassDetails> findConcreteTypes(@Nonnull String base, boolean includeBase) {
 		final Set<ClassDetails> result = new LinkedHashSet<>();
 		walkConcreteTypes( base, includeBase, result::add );
 		return result;
@@ -258,7 +277,7 @@ public interface ClassDetailsRegistry {
 	 * @param consumer The callback for each concrete ClassDetails
 	 */
 	@Incubating
-	void walkConcreteTypes(String base, boolean includeBase, ClassDetailsConsumer consumer);
+	void walkConcreteTypes(@Nonnull String base, boolean includeBase, @Nonnull ClassDetailsConsumer consumer);
 
 	/**
 	 * Walks the inheritance tree downward, starting from {@code base},
@@ -272,7 +291,7 @@ public interface ClassDetailsRegistry {
 	 * @see #isTrackingImplementors
 	 */
 	@Incubating
-	void walkImplementors(String base, boolean includeBase, ClassDetailsConsumer consumer);
+	void walkImplementors(@Nonnull String base, boolean includeBase, @Nonnull ClassDetailsConsumer consumer);
 
 	/**
 	 * Walks the inheritance tree, starting from {@code base}, "downward"
@@ -284,8 +303,9 @@ public interface ClassDetailsRegistry {
 	 *
 	 * @see #isTrackingImplementors
 	 */
+	@Nonnull
 	@Incubating
-	default Set<ClassDetails> collectImplementors(String base, boolean includeBase) {
+	default Set<ClassDetails> collectImplementors(@Nonnull String base, boolean includeBase) {
 		return collectImplementors( base, includeBase, null );
 	}
 
@@ -296,15 +316,17 @@ public interface ClassDetailsRegistry {
 	 *
 	 * @param base The type from which to start.
 	 * @param includeBase Whether to include {@code base} if it is concrete type.
-	 * @param exclusions Exclusive check to filter ClassDetails out of the result.
+	 * @param exclusions Exclusive check to filter ClassDetails out of the result,
+	 * or {@code null} to exclude nothing.
 	 *
 	 * @see #isTrackingImplementors
 	 */
+	@Nonnull
 	@Incubating
 	default Set<ClassDetails> collectImplementors(
-			String base,
+			@Nonnull String base,
 			boolean includeBase,
-			Predicate<ClassDetails> exclusions) {
+			@Nullable Predicate<ClassDetails> exclusions) {
 		final Set<ClassDetails> result = new LinkedHashSet<>();
 		walkImplementors( base, includeBase, classDetails -> {
 			if ( exclusions == null || !exclusions.test( classDetails ) ) {
@@ -317,10 +339,12 @@ public interface ClassDetailsRegistry {
 	/**
 	 * Access to the ClassDetailsBuilder used in this registry
 	 */
+	@Nonnull
 	ClassDetailsBuilder getClassDetailsBuilder();
 
+	@Nonnull
 	@SuppressWarnings("unchecked")
-	default <S> S as(Class<S> type) {
+	default <S> S as(@Nonnull Class<S> type) {
 		if ( type.isInstance( this ) ) {
 			return (S) this;
 		}
@@ -329,6 +353,6 @@ public interface ClassDetailsRegistry {
 
 	@FunctionalInterface
 	interface ClassDetailsConsumer {
-		void consume(ClassDetails classDetails);
+		void consume(@Nonnull ClassDetails classDetails);
 	}
 }

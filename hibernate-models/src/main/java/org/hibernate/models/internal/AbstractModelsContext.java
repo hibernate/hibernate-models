@@ -12,6 +12,9 @@ import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.RegistryPrimer;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * Base support for ModelsContext implementations
  *
@@ -20,22 +23,25 @@ import org.hibernate.models.spi.RegistryPrimer;
 public abstract class AbstractModelsContext implements ModelsContext {
 	private final ClassLoading classLoadingAccess;
 
-	public AbstractModelsContext(ClassLoading classLoadingAccess) {
+	public AbstractModelsContext(@Nonnull ClassLoading classLoadingAccess) {
 		this.classLoadingAccess = classLoadingAccess;
 	}
 
+	@Nonnull
 	@Override
 	public abstract MutableAnnotationDescriptorRegistry getAnnotationDescriptorRegistry();
 
+	@Nonnull
 	@Override
 	public abstract MutableClassDetailsRegistry getClassDetailsRegistry();
 
+	@Nonnull
 	@Override
 	public ClassLoading getClassLoading() {
 		return classLoadingAccess;
 	}
 
-	protected void primeRegistries(RegistryPrimer registryPrimer) {
+	protected void primeRegistries(@Nullable RegistryPrimer registryPrimer) {
 		BaseLineJavaTypes.forEachJavaType( this::primeClassDetails );
 
 		if ( registryPrimer != null ) {

@@ -7,6 +7,9 @@ package org.hibernate.models;
 import java.lang.annotation.Annotation;
 import java.util.Locale;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * Indicates an attempt to access a non-existent annotation attribute
  *
@@ -15,7 +18,7 @@ import java.util.Locale;
  * @author Steve Ebersole
  */
 public class UnknownAnnotationAttributeException extends ModelsException {
-	public UnknownAnnotationAttributeException(Class<? extends Annotation> annotationType, String attributeName) {
+	public UnknownAnnotationAttributeException(@Nonnull Class<? extends Annotation> annotationType, @Nonnull String attributeName) {
 		this( String.format(
 				Locale.ROOT,
 				"Unable to locate attribute named `%s` on annotation `%s`",
@@ -24,7 +27,7 @@ public class UnknownAnnotationAttributeException extends ModelsException {
 		) );
 	}
 
-	public UnknownAnnotationAttributeException(String message) {
+	public UnknownAnnotationAttributeException(@Nullable String message) {
 		super( message );
 	}
 }

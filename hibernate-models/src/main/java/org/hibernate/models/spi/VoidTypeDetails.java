@@ -4,12 +4,15 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Models Java's {@code void} (or {@linkplain Void}) type
  *
  * @author Steve Ebersole
  */
 public interface VoidTypeDetails extends ClassBasedTypeDetails {
+	@Nonnull
 	@Override
 	VoidTypeDetails asVoidType();
 }

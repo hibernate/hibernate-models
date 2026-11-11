@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.internal;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -16,18 +19,21 @@ public interface MutableClassDetailsRegistry extends ClassDetailsRegistry {
 	 * Adds a managed-class descriptor using its {@linkplain ClassDetails#getName() name}
 	 * as the registration key.
 	 */
-	void addClassDetails(ClassDetails classDetails);
+	void addClassDetails(@Nonnull ClassDetails classDetails);
 
 	/**
 	 * Adds a managed-class descriptor using the given {@code name} as the registration key
 	 */
-	void addClassDetails(String name, ClassDetails classDetails);
+	void addClassDetails(@Nonnull String name, @Nonnull ClassDetails classDetails);
 
 	/**
 	 * Resolve (find or create) ClassDetails by name.  If there is currently no
 	 * such registration, one is created using the specified {@code creator}.
+	 *
+	 * @return The resolved details, or {@code null} for {@code "void"}, without invoking the creator
 	 */
-	ClassDetails resolveClassDetails(String name, ClassDetailsCreator creator);
+	@Nullable
+	ClassDetails resolveClassDetails(@Nonnull String name, @Nonnull ClassDetailsCreator creator);
 
 	/**
 	 * Create a CLass Details
@@ -37,6 +43,7 @@ public interface MutableClassDetailsRegistry extends ClassDetailsRegistry {
 		/**
 		 * @throws UnknownClassException
 		 */
-		ClassDetails createClassDetails(String name) throws UnknownClassException;
+		@Nonnull
+		ClassDetails createClassDetails(@Nonnull String name) throws UnknownClassException;
 	}
 }

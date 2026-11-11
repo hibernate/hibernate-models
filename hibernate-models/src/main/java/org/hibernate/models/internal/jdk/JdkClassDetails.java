@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.ClassDetailsSupport;
 import org.hibernate.models.internal.util.CollectionHelper;
@@ -54,15 +57,15 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	private List<RecordComponentDetails> recordComponents;
 
 	public JdkClassDetails(
-			Class<?> managedClass,
-			ModelsContext modelContext) {
+			@Nonnull Class<?> managedClass,
+			@Nonnull ModelsContext modelContext) {
 		this( managedClass.getName(), managedClass, modelContext );
 	}
 
 	public JdkClassDetails(
-			String name,
-			Class<?> managedClass,
-			ModelsContext modelContext) {
+			@Nonnull String name,
+			@Nonnull Class<?> managedClass,
+			@Nonnull ModelsContext modelContext) {
 		super( managedClass::getAnnotations, modelContext );
 		this.name = name;
 		this.managedClass = managedClass;
@@ -79,11 +82,13 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 		return classDetailsRegistry.resolveClassDetails( superclass.getName() );
 	}
 
+	@Nonnull
 	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Nullable
 	@Override
 	public String getClassName() {
 		return managedClass.getName();
@@ -104,14 +109,16 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	public <X> Class<X> toJavaClass() {
 		//noinspection unchecked
 		return (Class<X>) managedClass;
 	}
 
+	@Nonnull
 	@Override
-	public <X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext) {
+	public <X> Class<X> toJavaClass(@Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext) {
 		if ( managedClass.isPrimitive()
 				|| managedClass.isEnum()
 				|| managedClass.isAnnotation() ) {
@@ -141,16 +148,19 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 		return managedClass.isRecord();
 	}
 
+	@Nullable
 	@Override
 	public ClassDetails getSuperClass() {
 		return superClass;
 	}
 
+	@Nullable
 	@Override
 	public ClassDetails getPackage() {
 		return AnnotationTargetHelper.resolvePackageInfo( this, getModelContext() );
 	}
 
+	@Nullable
 	@Override
 	public ModuleDetails getModule() {
 		final Module module = managedClass.getModule();
@@ -160,6 +170,7 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 		return getModelContext().getModuleDetailsRegistry().resolveModuleDetails( module );
 	}
 
+	@Nullable
 	@Override
 	public TypeDetails getGenericSuperType() {
 		if ( genericSuperType == null && managedClass.getGenericSuperclass() != null ) {
@@ -168,6 +179,7 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 		return genericSuperType;
 	}
 
+	@Nonnull
 	@Override
 	public List<TypeDetails> getImplementedInterfaces() {
 		if ( interfaces == null ) {
@@ -191,6 +203,7 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 		return result;
 	}
 
+	@Nonnull
 	@Override
 	public List<TypeVariableDetails> getTypeParameters() {
 		if ( typeParameters == null ) {
@@ -214,10 +227,11 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	}
 
 	@Override
-	public boolean isImplementor(Class<?> checkType) {
+	public boolean isImplementor(@Nonnull Class<?> checkType) {
 		return checkType.isAssignableFrom( managedClass );
 	}
 
+	@Nonnull
 	@Override
 	public List<ConstructorDetails> getConstructors() {
 		if ( constructors == null ) {
@@ -234,6 +248,7 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 		return constructors;
 	}
 
+	@Nonnull
 	@Override
 	public List<FieldDetails> getFields() {
 		if ( fields == null ) {
@@ -251,10 +266,11 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	}
 
 	@Override
-	public void addField(FieldDetails fieldDetails) {
+	public void addField(@Nonnull FieldDetails fieldDetails) {
 		getFields().add( fieldDetails );
 	}
 
+	@Nonnull
 	@Override
 	public List<MethodDetails> getMethods() {
 		if ( methods == null ) {
@@ -271,10 +287,11 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 	}
 
 	@Override
-	public void addMethod(MethodDetails methodDetails) {
+	public void addMethod(@Nonnull MethodDetails methodDetails) {
 		getMethods().add( methodDetails );
 	}
 
+	@Nonnull
 	@Override
 	public List<RecordComponentDetails> getRecordComponents() {
 		if ( !isRecord() ) {
@@ -290,11 +307,13 @@ public class JdkClassDetails extends AbstractJdkAnnotationTarget implements Clas
 		return recordComponents;
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return "JdkClassDetails(" + name + ")";
 	}
 
+	@Nonnull
 	@Override
 	public SerialClassDetails toStorableForm() {
 		return new SerialJdkClassDetails( name, managedClass );

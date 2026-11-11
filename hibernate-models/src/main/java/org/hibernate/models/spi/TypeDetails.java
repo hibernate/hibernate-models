@@ -6,6 +6,9 @@ package org.hibernate.models.spi;
 
 import org.hibernate.models.internal.IsResolvedTypeSwitch;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import static org.hibernate.models.spi.TypeDetailsSwitch.switchType;
 
 /**
@@ -15,19 +18,22 @@ import static org.hibernate.models.spi.TypeDetailsSwitch.switchType;
  * @author Steve Ebersole
  */
 public interface TypeDetails extends TypeVariableScope {
+	@Nonnull
 	String getName();
 
+	@Nonnull
 	Kind getTypeKind();
 
 	/**
 	 * Whether the described class is an implementor of the given {@code checkType}.
 	 */
-	boolean isImplementor(Class<?> checkType);
+	boolean isImplementor(@Nonnull Class<?> checkType);
 
 	/**
 	 * Cast this TypeDetails as a ClassTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default ClassTypeDetails asClassType() {
 		throw new IllegalArgumentException( "Not a class type - " + this );
 	}
@@ -36,6 +42,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a PrimitiveTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default PrimitiveTypeDetails asPrimitiveType() {
 		throw new IllegalArgumentException( "Not a primitive type - " + this );
 	}
@@ -44,6 +51,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a VoidTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default VoidTypeDetails asVoidType() {
 		throw new IllegalArgumentException( "Not a void type - " + this );
 	}
@@ -52,6 +60,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a ArrayTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default ArrayTypeDetails asArrayType() {
 		throw new IllegalArgumentException( "Not an array type - " + this );
 	}
@@ -60,6 +69,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a TypeVariableDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default TypeVariableDetails asTypeVariable() {
 		throw new IllegalArgumentException( "Not a type variable - " + this );
 	}
@@ -68,6 +78,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a ParameterizedTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default ParameterizedTypeDetails asParameterizedType() {
 		throw new IllegalArgumentException( "Not a parameterized type - " + this );
 	}
@@ -76,6 +87,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a TypeVariableReferenceDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default TypeVariableReferenceDetails asTypeVariableReference() {
 		throw new IllegalArgumentException( "Not a type variable reference - " + this );
 	}
@@ -84,6 +96,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a WildcardTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default WildcardTypeDetails asWildcardType() {
 		throw new IllegalArgumentException( "Not a wildcard type - " + this );
 	}
@@ -118,10 +131,12 @@ public interface TypeDetails extends TypeVariableScope {
 	 *     <li>Passing {@code AnotherThing}, the result would be {@code ClassTypeDetails(Integer)}</li>
 	 * </ul>
 	 */
-	default TypeDetails determineRelativeType(TypeVariableScope container) {
+	@Nullable
+	default TypeDetails determineRelativeType(@Nonnull TypeVariableScope container) {
 		return TypeDetailsHelper.resolveRelativeType( this, container );
 	}
 
+	@Nonnull
 	@Override
 	default ClassDetails determineRawClass() {
 		return TypeDetailsHelper.resolveRawClass( this );
@@ -136,6 +151,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see ClassTypeDetails
 		 * @see #asClassType()
 		 */
+		@Nonnull
 		CLASS,
 
 		/**
@@ -144,6 +160,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see ArrayTypeDetails
 		 * @see #asArrayType()
 		 */
+		@Nonnull
 		ARRAY,
 
 		/**
@@ -152,6 +169,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see PrimitiveTypeDetails
 		 * @see #asPrimitiveType()
 		 */
+		@Nonnull
 		PRIMITIVE,
 
 		/**
@@ -160,6 +178,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see VoidTypeDetails
 		 * @see #asVoidType()
 		 */
+		@Nonnull
 		VOID,
 
 		/**
@@ -168,6 +187,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see TypeVariableDetails
 		 * @see #asTypeVariable()
 		 */
+		@Nonnull
 		TYPE_VARIABLE,
 
 		/**
@@ -176,6 +196,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see WildcardTypeDetails
 		 * @see #asWildcardType()
 		 */
+		@Nonnull
 		WILDCARD_TYPE,
 
 		/**
@@ -184,6 +205,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see ParameterizedTypeDetails
 		 * @see #asParameterizedType()
 		 */
+		@Nonnull
 		PARAMETERIZED_TYPE,
 
 		/**
@@ -192,6 +214,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see TypeVariableReferenceDetails
 		 * @see #asTypeVariableReference()
 		 */
+		@Nonnull
 		TYPE_VARIABLE_REFERENCE,
 	}
 }

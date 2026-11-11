@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.rendering.spi;
 
+import jakarta.annotation.Nonnull;
+
 import java.lang.annotation.Annotation;
 import java.util.List;
 
@@ -24,10 +26,11 @@ import static org.hibernate.models.internal.AnnotationHelper.extractValue;
  * @author Steve Ebersole
  */
 public abstract class AbstractRenderer implements Renderer {
+	@Nonnull
 	protected abstract RenderingTarget getRenderingTarget();
 
 	@Override
-	public void renderClass(ClassDetails classDetails, ModelsContext context) {
+	public void renderClass(@Nonnull ClassDetails classDetails, @Nonnull ModelsContext context) {
 		renderDirectAnnotations( classDetails, context );
 		renderClassDetails( classDetails, context );
 	}
@@ -36,35 +39,35 @@ public abstract class AbstractRenderer implements Renderer {
 		annotationTarget.forEachDirectAnnotationUsage( (usage) -> renderAnnotation( usage, context ) );
 	}
 
-	protected abstract void renderClassDetails(ClassDetails classDetails, ModelsContext context);
+	protected abstract void renderClassDetails(@Nonnull ClassDetails classDetails, @Nonnull ModelsContext context);
 
 	@Override
-	public void renderField(FieldDetails fieldDetails, ModelsContext context) {
+	public void renderField(@Nonnull FieldDetails fieldDetails, @Nonnull ModelsContext context) {
 		renderDirectAnnotations( fieldDetails, context );
 		renderFieldDetails( fieldDetails, context );
 	}
 
-	protected abstract void renderFieldDetails(FieldDetails fieldDetails, ModelsContext context);
+	protected abstract void renderFieldDetails(@Nonnull FieldDetails fieldDetails, @Nonnull ModelsContext context);
 
 	@Override
-	public void renderMethod(MethodDetails methodDetails, ModelsContext context) {
+	public void renderMethod(@Nonnull MethodDetails methodDetails, @Nonnull ModelsContext context) {
 		renderDirectAnnotations( methodDetails, context );
 		renderMethodDetails( methodDetails, context );
 	}
 
-	protected abstract void renderMethodDetails(MethodDetails methodDetails, ModelsContext context);
+	protected abstract void renderMethodDetails(@Nonnull MethodDetails methodDetails, @Nonnull ModelsContext context);
 
 	@Override
-	public void renderRecordComponent(RecordComponentDetails recordComponentDetails, ModelsContext context) {
+	public void renderRecordComponent(@Nonnull RecordComponentDetails recordComponentDetails, @Nonnull ModelsContext context) {
 		renderDirectAnnotations( recordComponentDetails, context );
 		renderRecordComponentDetails( recordComponentDetails, context );
 	}
 
-	protected abstract void renderRecordComponentDetails(RecordComponentDetails recordComponentDetails, ModelsContext context);
+	protected abstract void renderRecordComponentDetails(@Nonnull RecordComponentDetails recordComponentDetails, @Nonnull ModelsContext context);
 
 
 	@Override
-	public <A extends Annotation> void renderAnnotation(A annotation, ModelsContext context) {
+	public <A extends Annotation> void renderAnnotation(@Nonnull A annotation, @Nonnull ModelsContext context) {
 		//noinspection unchecked
 		final AnnotationDescriptor<A> descriptor = (AnnotationDescriptor<A>) context.getAnnotationDescriptorRegistry().getDescriptor( annotation.annotationType() );
 		final List<AttributeDescriptor<?>> attributes = descriptor.getAttributes();
@@ -90,7 +93,7 @@ public abstract class AbstractRenderer implements Renderer {
 	}
 
 	@Override
-	public <A extends Annotation> void renderNestedAnnotation(String name, A annotation, ModelsContext context) {
+	public <A extends Annotation> void renderNestedAnnotation(@Nonnull String name, @Nonnull A annotation, @Nonnull ModelsContext context) {
 		//noinspection unchecked
 		final AnnotationDescriptor<A> descriptor = (AnnotationDescriptor<A>) context.getAnnotationDescriptorRegistry().getDescriptor( annotation.annotationType() );
 		final List<AttributeDescriptor<?>> attributes = descriptor.getAttributes();
@@ -111,7 +114,7 @@ public abstract class AbstractRenderer implements Renderer {
 	}
 
 	@Override
-	public <A extends Annotation> void renderNestedAnnotation(A annotation, ModelsContext context) {
+	public <A extends Annotation> void renderNestedAnnotation(@Nonnull A annotation, @Nonnull ModelsContext context) {
 		//noinspection unchecked
 		final AnnotationDescriptor<A> descriptor = (AnnotationDescriptor<A>) context.getAnnotationDescriptorRegistry().getDescriptor( annotation.annotationType() );
 		final List<AttributeDescriptor<?>> attributes = descriptor.getAttributes();

@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.internal.PrimitiveKind;
 import org.hibernate.models.internal.util.StringHelper;
@@ -27,14 +29,17 @@ public class JdkBuilders implements ClassDetailsBuilder, Serializable {
 	/**
 	 * Singleton access
 	 */
+	@Nonnull
 	public static final JdkBuilders DEFAULT_BUILDER = new JdkBuilders();
 
+	@Nonnull
 	@Override
-	public JdkClassDetails buildClassDetails(String name, ModelsContext modelsContext) {
+	public JdkClassDetails buildClassDetails(@Nonnull String name, @Nonnull ModelsContext modelsContext) {
 		return buildClassDetailsStatic( name, modelsContext );
 	}
 
-	public static JdkClassDetails buildClassDetailsStatic(String name, ModelsContext modelsContext) {
+	@Nonnull
+	public static JdkClassDetails buildClassDetailsStatic(@Nonnull String name, @Nonnull ModelsContext modelsContext) {
 		if ( char.class.getName().equals( name ) ) {
 			return buildClassDetailsStatic( char.class, modelsContext );
 		}
@@ -103,14 +108,16 @@ public class JdkBuilders implements ClassDetailsBuilder, Serializable {
 		}
 	}
 
-	public static JdkClassDetails buildClassDetailsStatic(Class<?> javaClass, ModelsContext modelsContext) {
+	@Nonnull
+	public static JdkClassDetails buildClassDetailsStatic(@Nonnull Class<?> javaClass, @Nonnull ModelsContext modelsContext) {
 		return new JdkClassDetails( javaClass, modelsContext );
 	}
 
+	@Nonnull
 	public static JdkMethodDetails buildMethodDetails(
-			Method method,
-			ClassDetails declaringType,
-			ModelsContext modelsContext) {
+			@Nonnull Method method,
+			@Nonnull ClassDetails declaringType,
+			@Nonnull ModelsContext modelsContext) {
 		if ( method.getParameterCount() == 0 ) {
 			// could be a getter
 			final Class<?> returnType = method.getReturnType();
@@ -136,10 +143,11 @@ public class JdkBuilders implements ClassDetailsBuilder, Serializable {
 		return new JdkMethodDetails( method, MethodDetails.MethodKind.OTHER, null, declaringType, modelsContext );
 	}
 
+	@Nonnull
 	public static JdkMethodDetails buildGetterDetails(
-			Method method,
-			ClassDetails declaringType,
-			ModelsContext modelsContext) {
+			@Nonnull Method method,
+			@Nonnull ClassDetails declaringType,
+			@Nonnull ModelsContext modelsContext) {
 		return new JdkMethodDetails(
 				method,
 				MethodDetails.MethodKind.GETTER,
@@ -153,10 +161,11 @@ public class JdkBuilders implements ClassDetailsBuilder, Serializable {
 		return new JdkTrackingTypeSwitcher( modelsContext ).switchType( genericType );
 	}
 
+	@Nonnull
 	public static JdkMethodDetails buildSetterDetails(
-			Method method,
-			ClassDetails declaringType,
-			ModelsContext modelsContext) {
+			@Nonnull Method method,
+			@Nonnull ClassDetails declaringType,
+			@Nonnull ModelsContext modelsContext) {
 		return new JdkMethodDetails(
 				method,
 				MethodDetails.MethodKind.SETTER,
@@ -166,11 +175,11 @@ public class JdkBuilders implements ClassDetailsBuilder, Serializable {
 		);
 	}
 
-	public static boolean isBoolean(Class<?> type) {
+	public static boolean isBoolean(@Nonnull Class<?> type) {
 		return type == boolean.class || type == Boolean.class;
 	}
 
-	public static boolean isVoid(Class<?> type) {
+	public static boolean isVoid(@Nonnull Class<?> type) {
 		return type == void.class || type == Void.class;
 	}
 }

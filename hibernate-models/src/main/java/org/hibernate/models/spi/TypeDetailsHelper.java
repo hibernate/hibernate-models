@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
 import static org.hibernate.models.spi.StandardTypeDetails.OBJECT_TYPE_DETAILS;
 
@@ -30,7 +33,8 @@ public class TypeDetailsHelper {
 	 *
 	 * @return the resolved super type, or {@code null} if {@code type} does not implement it
 	 */
-	public static TypeDetails resolveSuperType(TypeDetails type, Class<?> superType) {
+	@Nullable
+	public static TypeDetails resolveSuperType(@Nullable TypeDetails type, @Nonnull Class<?> superType) {
 		if ( type == null || !type.isImplementor( superType ) ) {
 			return null;
 		}
@@ -92,7 +96,8 @@ public class TypeDetailsHelper {
 	/**
 	 * Extract the collection element or map value type.
 	 */
-	public static TypeDetails extractElementType(TypeDetails type) {
+	@Nullable
+	public static TypeDetails extractElementType(@Nullable TypeDetails type) {
 		if ( type == null ) {
 			return null;
 		}
@@ -108,15 +113,18 @@ public class TypeDetailsHelper {
 		return null;
 	}
 
-	public static TypeDetails extractCollectionElementType(TypeDetails type) {
+	@Nonnull
+	public static TypeDetails extractCollectionElementType(@Nullable TypeDetails type) {
 		return extractTypeArgument( resolveSuperType( type, Collection.class ), 0 );
 	}
 
-	public static TypeDetails extractMapKeyType(TypeDetails type) {
+	@Nonnull
+	public static TypeDetails extractMapKeyType(@Nullable TypeDetails type) {
 		return extractTypeArgument( resolveSuperType( type, Map.class ), 0 );
 	}
 
-	public static TypeDetails extractMapValueType(TypeDetails type) {
+	@Nonnull
+	public static TypeDetails extractMapValueType(@Nullable TypeDetails type) {
 		return extractTypeArgument( resolveSuperType( type, Map.class ), 1 );
 	}
 
@@ -145,7 +153,8 @@ public class TypeDetailsHelper {
 	 * will return {@code ClassTypeDetails(Integer)}.  A call to resolve the type of {@code id}
 	 * relative to {@code Item} returns {@code ParameterizedTypeDetails(T)} (roughly Object)
 	 */
-	public static TypeDetails resolveRelativeType(TypeDetails type, TypeVariableScope container) {
+	@Nullable
+	public static TypeDetails resolveRelativeType(@Nonnull TypeDetails type, @Nonnull TypeVariableScope container) {
 		switch ( type.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, WILDCARD_TYPE -> {
 				return type;
@@ -196,7 +205,8 @@ public class TypeDetailsHelper {
 		}
 	}
 
-	public static TypeVariableDetails findTypeVariableDetails(String identifier, List<TypeVariableDetails> typeParameters) {
+	@Nullable
+	public static TypeVariableDetails findTypeVariableDetails(@Nonnull String identifier, @Nullable List<TypeVariableDetails> typeParameters) {
 		if ( CollectionHelper.isNotEmpty( typeParameters ) ) {
 			for ( TypeVariableDetails typeParameter : typeParameters ) {
 				if ( typeParameter.getIdentifier().equals( identifier ) ) {
@@ -213,9 +223,10 @@ public class TypeDetailsHelper {
 	 * here we resolve the relative type to the corresponding {@link ClassBasedTypeDetails} which
 	 * gives easy access to the type's {@linkplain ClassBasedTypeDetails#getClassDetails() ClassDetails}
 	 */
+	@Nonnull
 	public static ClassBasedTypeDetails resolveRelativeClassType(
-			TypeDetails memberType,
-			TypeVariableScope containerType) {
+			@Nonnull TypeDetails memberType,
+			@Nonnull TypeVariableScope containerType) {
 		switch ( memberType.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID -> {
 				return (ClassBasedTypeDetails) memberType;
@@ -264,7 +275,8 @@ public class TypeDetailsHelper {
 	 *
 	 * @see TypeDetails#determineRawClass()
 	 */
-	public static ClassDetails resolveRawClass(TypeDetails typeDetails) {
+	@Nonnull
+	public static ClassDetails resolveRawClass(@Nonnull TypeDetails typeDetails) {
 		switch ( typeDetails.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
 				return ( (ClassBasedTypeDetails) typeDetails ).getClassDetails();
@@ -305,9 +317,10 @@ public class TypeDetailsHelper {
 	 *
 	 * @return the type variable's relative type
 	 */
+	@Nullable
 	public static TypeDetails resolveTypeVariableFromParameterizedType(
-			ParameterizedTypeDetails parameterizedType,
-			TypeVariableDetails typeVariable) {
+			@Nonnull ParameterizedTypeDetails parameterizedType,
+			@Nonnull TypeVariableDetails typeVariable) {
 		final ClassDetails classDetails = parameterizedType.getRawClassDetails();
 		if ( classDetails == typeVariable.getDeclaringType() ) {
 			// If the type variable is defined by the parameterized class, try to find the matching type argument
@@ -353,7 +366,8 @@ public class TypeDetailsHelper {
 	/**
 	 * Make an array type of the given component type
 	 */
-	public static ArrayTypeDetails arrayOf(TypeDetails constituentType, ModelsContext modelsContext) {
+	@Nonnull
+	public static ArrayTypeDetails arrayOf(@Nonnull TypeDetails constituentType, @Nonnull ModelsContext modelsContext) {
 		return ArrayTypeDetailsImpl.arrayOf( constituentType, modelsContext.getClassDetailsRegistry() );
 	}
 

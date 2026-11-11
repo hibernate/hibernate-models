@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Extension of ClassDetails which allows manipulation of the members
  *
@@ -15,9 +17,10 @@ public interface MutableClassDetails extends ClassDetails, MutableAnnotationTarg
 		forEachMethod( (i, method) -> ( (MutableAnnotationTarget) method ).clearAnnotationUsages() );
 	}
 
-	void addField(FieldDetails fieldDetails);
-	void addMethod(MethodDetails methodDetails);
+	void addField(@Nonnull FieldDetails fieldDetails);
+	void addMethod(@Nonnull MethodDetails methodDetails);
 
+	@Nonnull
 	@Override
 	default MutableClassDetails asClassDetails() {
 		return this;

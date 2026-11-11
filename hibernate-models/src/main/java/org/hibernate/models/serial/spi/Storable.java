@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.serial.spi;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.spi.ModelsContext;
 
 /**
@@ -14,5 +16,6 @@ import org.hibernate.models.spi.ModelsContext;
  * @param <S> The storable's serial-type's type
  */
 public interface Storable<T,S extends StorableForm<T>> {
+	@Nonnull
 	S toStorableForm();
 }

@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.jandex.spi;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.ArrayType;
@@ -27,45 +30,54 @@ public interface JandexTypeSwitch<T> {
 	/**
 	 * Handling for {@linkplain Type.Kind#CLASS class types}.
 	 */
-	T caseClass(ClassType classType, ModelsContext modelsContext);
+	@Nullable
+	T caseClass(@Nonnull ClassType classType, @Nonnull ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#PRIMITIVE primitive types}.
 	 */
-	T casePrimitive(PrimitiveType primitiveType, ModelsContext modelsContext);
+	@Nullable
+	T casePrimitive(@Nonnull PrimitiveType primitiveType, @Nonnull ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#VOID void types}.
 	 */
-	T caseVoid(VoidType voidType, ModelsContext modelsContext);
+	@Nullable
+	T caseVoid(@Nonnull VoidType voidType, @Nonnull ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#PARAMETERIZED_TYPE parameterized types}.
 	 */
-	T caseParameterizedType(ParameterizedType parameterizedType, ModelsContext modelsContext);
+	@Nullable
+	T caseParameterizedType(@Nonnull ParameterizedType parameterizedType, @Nonnull ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#WILDCARD_TYPE wildcard types}.
 	 */
-	T caseWildcardType(WildcardType wildcardType, ModelsContext modelsContext);
+	@Nullable
+	T caseWildcardType(@Nonnull WildcardType wildcardType, @Nonnull ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#TYPE_VARIABLE type variable types}.
 	 */
-	T caseTypeVariable(TypeVariable typeVariable, ModelsContext modelsContext);
+	@Nullable
+	T caseTypeVariable(@Nonnull TypeVariable typeVariable, @Nonnull ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#TYPE_VARIABLE_REFERENCE type variable reference types}.
 	 */
-	T caseTypeVariableReference(TypeVariableReference typeVariableReference, ModelsContext modelsContext);
+	@Nullable
+	T caseTypeVariableReference(@Nonnull TypeVariableReference typeVariableReference, @Nonnull ModelsContext modelsContext);
 
 	/**
 	 * Handling for {@linkplain Type.Kind#ARRAY array types}.
 	 */
-	T caseArrayType(ArrayType genericArrayType, ModelsContext modelsContext);
+	@Nullable
+	T caseArrayType(@Nonnull ArrayType genericArrayType, @Nonnull ModelsContext modelsContext);
 
 	/**
 	 * Fallback handling.
 	 */
-	T defaultCase(Type t, ModelsContext modelsContext);
+	@Nullable
+	T defaultCase(@Nonnull Type t, @Nonnull ModelsContext modelsContext);
 }

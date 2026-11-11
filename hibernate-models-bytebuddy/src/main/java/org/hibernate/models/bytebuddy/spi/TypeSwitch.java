@@ -4,8 +4,10 @@
  */
 package org.hibernate.models.bytebuddy.spi;
 
-import org.hibernate.models.spi.ModelsContext;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
+import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.type.TypeDefinition;
 
@@ -13,21 +15,30 @@ import net.bytebuddy.description.type.TypeDefinition;
  * @author Steve Ebersole
  */
 public interface TypeSwitch<T> {
-	T caseClass(TypeDefinition typeDescription, ModelsContext modelsContext);
+	@Nullable
+	T caseClass(@Nonnull TypeDefinition typeDescription, @Nonnull ModelsContext modelsContext);
 
-	T casePrimitive(TypeDefinition typeDescription, ModelsContext modelsContext);
+	@Nullable
+	T casePrimitive(@Nonnull TypeDefinition typeDescription, @Nonnull ModelsContext modelsContext);
 
-	T caseVoid(TypeDefinition typeDescription, ModelsContext modelsContext);
+	@Nullable
+	T caseVoid(@Nonnull TypeDefinition typeDescription, @Nonnull ModelsContext modelsContext);
 
-	T caseParameterizedType(TypeDefinition typeDescription, ModelsContext modelsContext);
+	@Nullable
+	T caseParameterizedType(@Nonnull TypeDefinition typeDescription, @Nonnull ModelsContext modelsContext);
 
-	T caseWildcardType(TypeDefinition typeDescription, ModelsContext modelsContext);
+	@Nullable
+	T caseWildcardType(@Nonnull TypeDefinition typeDescription, @Nonnull ModelsContext modelsContext);
 
-	T caseTypeVariable(TypeDefinition typeDescription, ModelsContext modelsContext);
+	@Nullable
+	T caseTypeVariable(@Nonnull TypeDefinition typeDescription, @Nonnull ModelsContext modelsContext);
 
-	T caseTypeVariableReference(TypeDefinition typeDescription, ModelsContext modelsContext);
+	@Nullable
+	T caseTypeVariableReference(@Nonnull TypeDefinition typeDescription, @Nonnull ModelsContext modelsContext);
 
-	T caseArrayType(TypeDefinition typeDescription, ModelsContext modelsContext);
+	@Nullable
+	T caseArrayType(@Nonnull TypeDefinition typeDescription, @Nonnull ModelsContext modelsContext);
 
-	T defaultCase(TypeDefinition typeDescription, ModelsContext modelsContext);
+	@Nullable
+	T defaultCase(@Nonnull TypeDefinition typeDescription, @Nonnull ModelsContext modelsContext);
 }
