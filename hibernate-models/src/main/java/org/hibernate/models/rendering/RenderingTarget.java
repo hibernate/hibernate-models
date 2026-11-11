@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.rendering;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Abstraction over the target of rendering (streams, buffers, ...).
  *
@@ -16,7 +18,7 @@ public interface RenderingTarget {
 	 * @see #indent
 	 * @see #unindent
 	 */
-	void addLine(String line);
+	void addLine(@Nonnull String line);
 
 	/**
 	 * Adds the rendered pattern, preceded by any necessary indentation, followed by a newline.
@@ -24,7 +26,7 @@ public interface RenderingTarget {
 	 * @see #indent
 	 * @see #unindent
 	 */
-	void addLine(String pattern, Object... args);
+	void addLine(@Nonnull String pattern, @Nonnull Object... args);
 
 	/**
 	 * Adds a newline.

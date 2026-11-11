@@ -6,6 +6,8 @@ package org.hibernate.models.spi;
 
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Models a resolved type parameter or type argument.
  * <p/>
@@ -24,20 +26,25 @@ import java.util.List;
  * @author Steve Ebersole
  */
 public interface TypeVariableDetails extends TypeDetails {
+	@Nonnull
 	String getIdentifier();
 
 	/**
 	 * The {@linkplain ClassDetails class} where this type variable is defined.
 	 */
+	@Nonnull
 	ClassDetails getDeclaringType();
 
+	@Nonnull
 	List<TypeDetails> getBounds();
 
+	@Nonnull
 	@Override
 	default Kind getTypeKind() {
 		return Kind.TYPE_VARIABLE;
 	}
 
+	@Nonnull
 	@Override
 	default TypeVariableDetails asTypeVariable() {
 		return this;

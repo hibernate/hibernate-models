@@ -10,6 +10,9 @@ import java.lang.reflect.RecordComponent;
 import java.util.Collection;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.jdk.internal.AbstractJdkAnnotationTarget;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -36,9 +39,9 @@ public class JdkRecordComponentDetails extends AbstractJdkAnnotationTarget
 	private final boolean isPlural;
 
 	public JdkRecordComponentDetails(
-			RecordComponent recordComponent,
-			ClassDetails declaringType,
-			ModelsContext modelsContext) {
+			@Nonnull RecordComponent recordComponent,
+			@Nonnull ClassDetails declaringType,
+			@Nonnull ModelsContext modelsContext) {
 		super( recordComponent::getAnnotations, modelsContext );
 		this.recordComponent = recordComponent;
 		this.declaringType = declaringType;
@@ -50,16 +53,19 @@ public class JdkRecordComponentDetails extends AbstractJdkAnnotationTarget
 				|| Map.class.isAssignableFrom( recordComponent.getType() );
 	}
 
+	@Nonnull
 	@Override
 	public String getName() {
 		return recordComponent.getName();
 	}
 
+	@Nonnull
 	@Override
 	public TypeDetails getType() {
 		return type;
 	}
 
+	@Nonnull
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
@@ -75,14 +81,16 @@ public class JdkRecordComponentDetails extends AbstractJdkAnnotationTarget
 		return isArray;
 	}
 
+	@Nullable
 	@Override
 	public Member toJavaMember() {
 		// we could maybe resolve the corresponding method...
 		return null;
 	}
 
+	@Nullable
 	@Override
-	public Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
+	public Member toJavaMember(@Nonnull Class<?> declaringClass, @Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext) {
 		return null;
 	}
 
@@ -91,36 +99,43 @@ public class JdkRecordComponentDetails extends AbstractJdkAnnotationTarget
 		return recordComponent.getAccessor().getModifiers();
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return "JdkRecordComponentDetails(" + getName() + ")";
 	}
 
+	@Nonnull
 	@Override
 	public RecordComponentDetails asRecordComponentDetails() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	public MutableMemberDetails asMemberDetails() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	public FieldDetails asFieldDetails() {
 		throw new IllegalCastException( "RecordComponentDetails cannot be cast as FieldDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public MethodDetails asMethodDetails() {
 		throw new IllegalCastException( "RecordComponentDetails cannot be cast as MethodDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public MutableClassDetails asClassDetails() {
 		throw new IllegalCastException( "RecordComponentDetails cannot be cast as ClassDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
 		throw new IllegalCastException( "RecordComponentDetails cannot be cast as AnnotationDescriptor" );

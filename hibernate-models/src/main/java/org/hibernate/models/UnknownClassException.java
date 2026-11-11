@@ -4,6 +4,8 @@
  */
 package org.hibernate.models;
 
+import jakarta.annotation.Nullable;
+
 /**
  * Indicates an attempt to access an unknown class by name
  *
@@ -13,11 +15,11 @@ package org.hibernate.models;
  * @author Steve Ebersole
  */
 public class UnknownClassException extends ModelsException {
-	public UnknownClassException(String message) {
+	public UnknownClassException(@Nullable String message) {
 		super( message );
 	}
 
-	public UnknownClassException(String message, Throwable cause) {
+	public UnknownClassException(@Nullable String message, @Nullable Throwable cause) {
 		super( message, cause );
 	}
 }

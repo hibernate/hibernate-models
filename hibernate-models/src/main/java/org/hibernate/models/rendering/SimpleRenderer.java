@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.rendering;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.rendering.internal.AbstractRenderer;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.FieldDetails;
@@ -19,7 +21,7 @@ import org.hibernate.models.spi.ModelsContext;
 public class SimpleRenderer extends AbstractRenderer {
 	private final RenderingTarget renderingTarget;
 
-	public SimpleRenderer(RenderingTarget renderingTarget) {
+	public SimpleRenderer(@Nonnull RenderingTarget renderingTarget) {
 		this.renderingTarget = renderingTarget;
 	}
 
@@ -27,13 +29,14 @@ public class SimpleRenderer extends AbstractRenderer {
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	protected RenderingTarget getRenderingTarget() {
 		return renderingTarget;
 	}
 
 	@Override
-	public void renderClassDetails(ClassDetails classDetails, ModelsContext context) {
+	public void renderClassDetails(@Nonnull ClassDetails classDetails, @Nonnull ModelsContext context) {
 		final String typeDeclarationPattern;
 		if ( classDetails.isInterface() ) {
 			typeDeclarationPattern = "interface %s {";
@@ -83,13 +86,13 @@ public class SimpleRenderer extends AbstractRenderer {
 	}
 
 	@Override
-	public void renderFieldDetails(FieldDetails fieldDetails, ModelsContext context) {
+	public void renderFieldDetails(@Nonnull FieldDetails fieldDetails, @Nonnull ModelsContext context) {
 		// todo : would be nice to render the type-details to include generics, etc
 		renderingTarget.addLine( "%s %s", fieldDetails.getType().determineRawClass().getName(), fieldDetails.getName() );
 	}
 
 	@Override
-	public void renderMethodDetails(MethodDetails methodDetails, ModelsContext context) {
+	public void renderMethodDetails(@Nonnull MethodDetails methodDetails, @Nonnull ModelsContext context) {
 		// todo : would be nice to render the type-details to include generics, etc
 		renderingTarget.addLine(
 				"%s %s (%s)",
@@ -106,7 +109,7 @@ public class SimpleRenderer extends AbstractRenderer {
 	}
 
 	@Override
-	public void renderRecordComponentDetails(RecordComponentDetails recordComponentDetails, ModelsContext context) {
+	public void renderRecordComponentDetails(@Nonnull RecordComponentDetails recordComponentDetails, @Nonnull ModelsContext context) {
 		// todo : would be nice to render the type-details to include generics, etc
 		renderingTarget.addLine( "%s %s", recordComponentDetails.getType().determineRawClass().getName(), recordComponentDetails.getName() );
 	}

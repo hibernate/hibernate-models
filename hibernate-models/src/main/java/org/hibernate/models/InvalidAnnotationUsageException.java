@@ -6,6 +6,9 @@ package org.hibernate.models;
 
 import java.lang.annotation.Annotation;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * Indicates that a completed annotation usage does not satisfy the contract of
  * its annotation type.
@@ -18,28 +21,30 @@ public class InvalidAnnotationUsageException extends ModelsException {
 	private final String attributePath;
 
 	public InvalidAnnotationUsageException(
-			Class<? extends Annotation> annotationType,
-			String attributePath,
-			String message) {
+			@Nonnull Class<? extends Annotation> annotationType,
+			@Nonnull String attributePath,
+			@Nullable String message) {
 		super( message + " [" + attributePath + "]" );
 		this.annotationType = annotationType;
 		this.attributePath = attributePath;
 	}
 
 	public InvalidAnnotationUsageException(
-			Class<? extends Annotation> annotationType,
-			String attributePath,
-			String message,
-			Throwable cause) {
+			@Nonnull Class<? extends Annotation> annotationType,
+			@Nonnull String attributePath,
+			@Nullable String message,
+			@Nullable Throwable cause) {
 		super( message + " [" + attributePath + "]", cause );
 		this.annotationType = annotationType;
 		this.attributePath = attributePath;
 	}
 
+	@Nonnull
 	public Class<? extends Annotation> getAnnotationType() {
 		return annotationType;
 	}
 
+	@Nonnull
 	public String getAttributePath() {
 		return attributePath;
 	}

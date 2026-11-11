@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.AbstractAnnotationDescriptor;
 import org.hibernate.models.internal.AnnotationDescriptorBuilding;
 
@@ -28,21 +31,22 @@ public class StandardAnnotationDescriptor<A extends Annotation> extends Abstract
 	private Map<Class<? extends Annotation>, ? extends Annotation> usagesMap;
 
 	public StandardAnnotationDescriptor(
-			Class<A> annotationType,
-			ModelsContext modelsContext) {
+			@Nonnull Class<A> annotationType,
+			@Nonnull ModelsContext modelsContext) {
 		this( annotationType, null, modelsContext );
 	}
 
 	public StandardAnnotationDescriptor(
-			Class<A> annotationType,
-			AnnotationDescriptor<?> repeatableContainer,
-			ModelsContext modelsContext) {
+			@Nonnull Class<A> annotationType,
+			@Nullable AnnotationDescriptor<?> repeatableContainer,
+			@Nonnull ModelsContext modelsContext) {
 		super( annotationType, AnnotationHelper.extractTargets( annotationType ), AnnotationHelper.isInherited( annotationType ), repeatableContainer );
 
 		this.modelsContext = modelsContext;
 		this.attributeDescriptors = AnnotationDescriptorBuilding.extractAttributeDescriptors( annotationType );
 	}
 
+	@Nonnull
 	@Override
 	public Map<Class<? extends Annotation>, ? extends Annotation> getUsageMap() {
 		if ( usagesMap == null ) {
@@ -51,18 +55,21 @@ public class StandardAnnotationDescriptor<A extends Annotation> extends Abstract
 		return usagesMap;
 	}
 
+	@Nonnull
 	@Override
-	public A createUsage(A jdkAnnotation, ModelsContext context) {
+	public A createUsage(@Nonnull A jdkAnnotation, @Nonnull ModelsContext context) {
 		return jdkAnnotation;
 	}
 
+	@Nonnull
 	@Override
-	public A createUsage(ModelsContext context) {
+	public A createUsage(@Nonnull ModelsContext context) {
 		throw new UnsupportedOperationException(
 				"Creating empty annotation usage mot supported from StandardAnnotationDescriptor : " + getAnnotationType().getName()
 		);
 	}
 
+	@Nonnull
 	@Override
 	public List<AttributeDescriptor<?>> getAttributes() {
 		return attributeDescriptors;

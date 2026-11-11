@@ -10,6 +10,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.UnknownAnnotationAttributeException;
 import org.hibernate.models.internal.AnnotationProxy;
 import org.hibernate.models.internal.AnnotationUsageValidation;
@@ -20,6 +23,7 @@ import org.hibernate.models.internal.AnnotationUsageValidation;
  * @author Steve Ebersole
  */
 public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTarget {
+	@Nonnull
 	@Override
 	default Kind getKind() {
 		return Kind.ANNOTATION;
@@ -28,15 +32,18 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	/**
 	 * The annotation type
 	 */
+	@Nonnull
 	Class<A> getAnnotationType();
 
-	default <S> S as(Class<S> type) {
+	@Nonnull
+	default <S> S as(@Nonnull Class<S> type) {
 		//noinspection unchecked
 		return (S) type;
 	}
 
+	@Nullable
 	@Override
-	default ClassDetails getContainer(ModelsContext modelsContext) {
+	default ClassDetails getContainer(@Nonnull ModelsContext modelsContext) {
 		final ClassDetails annotationClassDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( getAnnotationType().getName() );
@@ -45,14 +52,16 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	/**
 	 * Create an empty usage.  Used when there is no source form, such as XML processing.
 	 */
-	A createUsage(ModelsContext context);
+	@Nonnull
+	A createUsage(@Nonnull ModelsContext context);
 
 	/**
 	 * Create a usage from the JDK representation.  This will often just return the passed annotation,
 	 * although for Hibernate and JPA annotations we generally want wrappers to be able to manipulate the
 	 * values.
 	 */
-	A createUsage(A jdkAnnotation, ModelsContext context);
+	@Nonnull
+	A createUsage(@Nonnull A jdkAnnotation, @Nonnull ModelsContext context);
 
 	/**
 	 * Validate that a completed usage satisfies this annotation descriptor,
@@ -60,7 +69,7 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 *
 	 * @throws org.hibernate.models.InvalidAnnotationUsageException if the usage is incomplete or invalid
 	 */
-	default void validateUsage(A usage, ModelsContext modelsContext) {
+	default void validateUsage(@Nonnull A usage, @Nonnull ModelsContext modelsContext) {
 		AnnotationUsageValidation.validateUsage( this, usage, modelsContext );
 	}
 
@@ -69,13 +78,15 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * although for Hibernate and JPA annotations we generally want wrappers to be able to manipulate the
 	 * values.
 	 */
-	default A createUsage(Map<String, Object> attributeValues, ModelsContext context) {
+	@Nonnull
+	default A createUsage(@Nonnull Map<String, Object> attributeValues, @Nonnull ModelsContext context) {
 		return AnnotationProxy.makeProxy( this, attributeValues );
 	}
 
 	/**
 	 * The places the described annotation can be used
 	 */
+	@Nonnull
 	EnumSet<Kind> getAllowableTargets();
 
 	/**
@@ -94,18 +105,21 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * If the described annotation is {@linkplain #isRepeatable repeatable}, returns the descriptor
 	 * for the {@linkplain Repeatable#value() container} annotation.
 	 */
+	@Nullable
 	AnnotationDescriptor<?> getRepeatableContainer();
 
 	/**
 	 * The attributes of the annotation
 	 */
+	@Nonnull
 	List<AttributeDescriptor<?>> getAttributes();
 
 	/**
 	 * Get an attribute descriptor by name, returning {@code null} if the name
 	 * is not an attribute of the described annotation.
 	 */
-	default <V> AttributeDescriptor<V> findAttribute(String name) {
+	@Nullable
+	default <V> AttributeDescriptor<V> findAttribute(@Nonnull String name) {
 		final List<AttributeDescriptor<?>> attributeDescriptors = getAttributes();
 		for ( final AttributeDescriptor<?> attributeDescriptor : attributeDescriptors ) {
 			if ( attributeDescriptor.getName().equals( name ) ) {
@@ -122,7 +136,8 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * @throws UnknownAnnotationAttributeException if the name is not an
 	 * attribute of the described annotation.
 	 */
-	default <V> AttributeDescriptor<V> getAttribute(String name) {
+	@Nonnull
+	default <V> AttributeDescriptor<V> getAttribute(@Nonnull String name) {
 		final AttributeDescriptor<V> attribute = findAttribute( name );
 		if ( attribute != null ) {
 			return attribute;
@@ -131,6 +146,7 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 		throw new UnknownAnnotationAttributeException( getAnnotationType(), name );
 	}
 
+	@Nonnull
 	@Override
 	default <X extends Annotation> AnnotationDescriptor<X> asAnnotationDescriptor() {
 		//noinspection unchecked

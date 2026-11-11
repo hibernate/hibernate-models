@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.bytebuddy.spi;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.annotation.AnnotationValue;
@@ -17,5 +19,6 @@ import net.bytebuddy.description.annotation.AnnotationValue;
  * @author Steve Ebersole
  */
 public interface ValueConverter<V> {
-	V convert(AnnotationValue<?,?> attributeValue, ModelsContext modelContext);
+	@Nonnull
+	V convert(@Nonnull AnnotationValue<?,?> attributeValue, @Nonnull ModelsContext modelContext);
 }

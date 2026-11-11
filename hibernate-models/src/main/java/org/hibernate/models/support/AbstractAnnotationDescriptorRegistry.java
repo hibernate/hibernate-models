@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 
@@ -17,7 +20,9 @@ import org.hibernate.models.spi.AnnotationDescriptorRegistry;
  * @author Steve Ebersole
  */
 public abstract class AbstractAnnotationDescriptorRegistry implements AnnotationDescriptorRegistry {
+	@Nonnull
 	protected final Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> descriptorMap;
+	@Nonnull
 	protected final Map<AnnotationDescriptor<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> repeatableByContainerMap;
 
 	public AbstractAnnotationDescriptorRegistry() {
@@ -25,8 +30,8 @@ public abstract class AbstractAnnotationDescriptorRegistry implements Annotation
 	}
 
 	public AbstractAnnotationDescriptorRegistry(
-			Map<Class<? extends Annotation>, AnnotationDescriptor<?>> descriptorMap,
-			Map<AnnotationDescriptor<?>, AnnotationDescriptor<?>> repeatableByContainerMap) {
+			@Nonnull Map<Class<? extends Annotation>, AnnotationDescriptor<?>> descriptorMap,
+			@Nonnull Map<AnnotationDescriptor<?>, AnnotationDescriptor<?>> repeatableByContainerMap) {
 		this.descriptorMap = descriptorMap;
 		this.repeatableByContainerMap = repeatableByContainerMap;
 	}
@@ -39,8 +44,9 @@ public abstract class AbstractAnnotationDescriptorRegistry implements Annotation
 	 * <p/>
 	 * It is the logical inverse of {@link AnnotationDescriptor#getRepeatableContainer}.
 	 */
+	@Nullable
 	@Override
-	public <A extends Annotation> AnnotationDescriptor<A> getContainedRepeatableDescriptor(AnnotationDescriptor<A> containerDescriptor) {
+	public <A extends Annotation> AnnotationDescriptor<A> getContainedRepeatableDescriptor(@Nonnull AnnotationDescriptor<A> containerDescriptor) {
 		//noinspection unchecked
 		return (AnnotationDescriptor<A>) repeatableByContainerMap.get( containerDescriptor );
 	}
@@ -48,19 +54,23 @@ public abstract class AbstractAnnotationDescriptorRegistry implements Annotation
 	/**
 	 * @see #getContainedRepeatableDescriptor
 	 */
+	@Nullable
 	@Override
-	public <A extends Annotation> AnnotationDescriptor<A> getContainedRepeatableDescriptor(Class<A> containerJavaType) {
+	public <A extends Annotation> AnnotationDescriptor<A> getContainedRepeatableDescriptor(@Nonnull Class<A> containerJavaType) {
 		return getContainedRepeatableDescriptor( getDescriptor( containerJavaType ) );
 	}
 
+	@Nonnull
 	public Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> descriptorMap() {
 		return descriptorMap;
 	}
 
+	@Nonnull
 	public Map<Class<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> getDescriptorMap() {
 		return Collections.unmodifiableMap( descriptorMap );
 	}
 
+	@Nonnull
 	public Map<AnnotationDescriptor<? extends Annotation>, AnnotationDescriptor<? extends Annotation>> getRepeatableByContainerMap() {
 		return Collections.unmodifiableMap( repeatableByContainerMap );
 	}

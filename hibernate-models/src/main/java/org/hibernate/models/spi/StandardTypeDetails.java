@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.internal.WildcardTypeDetailsImpl;
 
@@ -14,6 +16,7 @@ public final class StandardTypeDetails {
 	/**
 	 * Type details for Object
 	 */
+	@Nonnull
 	public static final ClassTypeDetails OBJECT_TYPE_DETAILS = new ClassTypeDetailsImpl(
 			ClassDetails.OBJECT_CLASS_DETAILS,
 			TypeDetails.Kind.CLASS
@@ -22,6 +25,7 @@ public final class StandardTypeDetails {
 	/**
 	 * Details for {@code Class.class}
 	 */
+	@Nonnull
 	public static final TypeDetails CLASS_TYPE_DETAILS = new ClassTypeDetailsImpl(
 			ClassDetails.CLASS_CLASS_DETAILS,
 			TypeDetails.Kind.CLASS
@@ -30,6 +34,7 @@ public final class StandardTypeDetails {
 	/**
 	 * Details for {@code void.class}
 	 */
+	@Nonnull
 	public static final TypeDetails VOID_TYPE_DETAILS = new ClassTypeDetailsImpl(
 			ClassDetails.VOID_CLASS_DETAILS,
 			TypeDetails.Kind.VOID
@@ -38,6 +43,7 @@ public final class StandardTypeDetails {
 	/**
 	 * Details for {@code Void.class}
 	 */
+	@Nonnull
 	public static final TypeDetails VOID_OBJECT_TYPE_DETAILS = new ClassTypeDetailsImpl(
 			ClassDetails.VOID_CLASS_DETAILS,
 			TypeDetails.Kind.VOID

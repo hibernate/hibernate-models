@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * Models a wildcard type declaration.
  *
@@ -12,19 +15,24 @@ package org.hibernate.models.spi;
  * @author Steve Ebersole
  */
 public interface WildcardTypeDetails extends TypeDetails {
+	@Nullable
 	TypeDetails getBound();
 
 	boolean isExtends();
 
+	@Nullable
 	TypeDetails getExtendsBound();
 
+	@Nullable
 	TypeDetails getSuperBound();
 
+	@Nonnull
 	@Override
 	default Kind getTypeKind() {
 		return Kind.WILDCARD_TYPE;
 	}
 
+	@Nonnull
 	@Override
 	default WildcardTypeDetails asWildcardType() {
 		return this;

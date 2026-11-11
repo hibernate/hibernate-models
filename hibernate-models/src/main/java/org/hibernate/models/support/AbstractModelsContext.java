@@ -6,6 +6,9 @@ package org.hibernate.models.support;
 
 import java.lang.annotation.Annotation;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.BaseLineJavaTypes;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ClassDetails;
@@ -23,27 +26,30 @@ import org.hibernate.models.spi.RegistryPrimer;
 public abstract class AbstractModelsContext implements ModelsContext {
 	private final ClassLoading classLoadingAccess;
 
-	public AbstractModelsContext(ClassLoading classLoadingAccess) {
+	public AbstractModelsContext(@Nonnull ClassLoading classLoadingAccess) {
 		this.classLoadingAccess = classLoadingAccess;
 	}
 
+	@Nonnull
 	@Override
 	public abstract MutableAnnotationDescriptorRegistry getAnnotationDescriptorRegistry();
 
+	@Nonnull
 	@Override
 	public abstract MutableClassDetailsRegistry getClassDetailsRegistry();
 
+	@Nonnull
 	@Override
 	public ClassLoading getClassLoading() {
 		return classLoadingAccess;
 	}
 
-	protected void primeRegistries(RegistryPrimer registryPrimer) {
+	protected void primeRegistries(@Nullable RegistryPrimer registryPrimer) {
 		BaseLineJavaTypes.forEachJavaType( this::primeClassDetails );
 		applyRegistryPrimer( registryPrimer );
 	}
 
-	protected void applyRegistryPrimer(RegistryPrimer registryPrimer) {
+	protected void applyRegistryPrimer(@Nullable RegistryPrimer registryPrimer) {
 		if ( registryPrimer != null ) {
 			registryPrimer.primeRegistries( new RegistryContributions(), this );
 		}

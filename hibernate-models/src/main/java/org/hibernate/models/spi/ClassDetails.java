@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.DynamicClassException;
 import org.hibernate.models.internal.AnnotationTargetHelper;
 import org.hibernate.models.internal.SimpleClassDetails;
@@ -32,48 +35,57 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		 * Render the class and its fields, methods and record components.
 		 * Constructor details are omitted.
 		 */
+		@Nonnull
 		COMPLETE,
 
 		/**
 		 * Render the class without its members.
 		 */
+		@Nonnull
 		CLASS_ONLY
 	}
 
 	/**
 	 * Render this class completely, excluding constructor details.
 	 */
-	default String render(ModelsContext modelsContext) {
+	@Nonnull
+	default String render(@Nonnull ModelsContext modelsContext) {
 		return render( modelsContext, RenderMode.COMPLETE );
 	}
 
 	/**
 	 * Render this class using the requested mode.
 	 */
-	default String render(ModelsContext modelsContext, RenderMode mode) {
+	@Nonnull
+	default String render(@Nonnull ModelsContext modelsContext, @Nonnull RenderMode mode) {
 		return RenderingHelper.renderClass( this, modelsContext, mode );
 	}
 
 	/**
 	 * Details for {@code Object.class}
 	 */
+	@Nonnull
 	ClassDetails OBJECT_CLASS_DETAILS = new SimpleClassDetails( Object.class );
 
 	/**
 	 * Details for {@code Class.class}
 	 */
+	@Nonnull
 	ClassDetails CLASS_CLASS_DETAILS = new SimpleClassDetails( Class.class );
 
 	/**
 	 * Details for {@code void.class}
 	 */
+	@Nonnull
 	ClassDetails VOID_CLASS_DETAILS = new SimpleClassDetails( void.class );
 
 	/**
 	 * Details for {@code Void.class}
 	 */
+	@Nonnull
 	ClassDetails VOID_OBJECT_CLASS_DETAILS = new SimpleClassDetails( Void.class );
 
+	@Nonnull
 	@Override
 	default Kind getKind() {
 		return Kind.CLASS;
@@ -86,6 +98,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 * But in the case of Hibernate's {@code entity-name} feature, this would
 	 * be the {@code entity-name}
 	 */
+	@Nonnull
 	String getName();
 
 	/**
@@ -93,6 +106,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 *
 	 * @apiNote Will be {@code null} for dynamic models
 	 */
+	@Nullable
 	String getClassName();
 
 	/**
@@ -146,33 +160,39 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Details for the class that is the super type for this class.
 	 */
+	@Nullable
 	ClassDetails getSuperClass();
 
 	/**
 	 * Generic type information for this class.
 	 */
+	@Nullable
 	TypeDetails getGenericSuperType();
 
 	/**
 	 * Details for the interfaces this class implements.
+	 *
+	 * @return The implemented interfaces, or {@code null} when a dynamic model does not provide interface metadata
 	 */
+	@Nullable
 	List<TypeDetails> getImplementedInterfaces();
 
 	/**
 	 * Access to the type parameters associated with this class.
 	 */
+	@Nonnull
 	List<TypeVariableDetails> getTypeParameters();
 
 	@FunctionalInterface
 	interface ClassDetailsConsumer extends java.util.function.Consumer<ClassDetails> {
 		@Override
-		void accept(ClassDetails classDetails);
+		void accept(@Nonnull ClassDetails classDetails);
 	}
 
 	/**
 	 * Walk our super-classes passing each to the {@code consumer}
 	 */
-	default void forEachSuper(ClassDetailsConsumer consumer) {
+	default void forEachSuper(@Nonnull ClassDetailsConsumer consumer) {
 		ClassDetails check = getSuperClass();
 		while ( check != null && check != OBJECT_CLASS_DETAILS ) {
 			consumer.accept( check );
@@ -183,7 +203,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Pass ourselves into the {@code consumer} and then the same {@linkplain #forEachSuper for each super class}
 	 */
-	default void forSelfAndEachSuper(ClassDetailsConsumer consumer) {
+	default void forSelfAndEachSuper(@Nonnull ClassDetailsConsumer consumer) {
 		consumer.accept( this );
 		forEachSuper( consumer );
 	}
@@ -192,7 +212,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 * Returns {@code true} is the provided classDetails is a
 	 * superclass of this class, {@code false} otherwise
 	 */
-	default boolean isSuperclass(ClassDetails classDetails) {
+	default boolean isSuperclass(@Nonnull ClassDetails classDetails) {
 		ClassDetails check = getSuperClass();
 		while ( check != null && check != OBJECT_CLASS_DETAILS ) {
 			if ( classDetails == check ) {
@@ -203,8 +223,9 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		return false;
 	}
 
+	@Nullable
 	@Override
-	default TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable) {
+	default TypeDetails resolveTypeVariable(@Nonnull TypeVariableDetails typeVariable) {
 		if ( this == typeVariable.getDeclaringType() ) {
 			return TypeDetailsHelper.findTypeVariableDetails(
 					typeVariable.getIdentifier(),
@@ -222,6 +243,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		return null;
 	}
 
+	@Nonnull
 	@Override
 	default ClassDetails determineRawClass() {
 		return this;
@@ -230,16 +252,18 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Whether the described class is an implementor of the given {@code checkType}.
 	 */
-	boolean isImplementor(Class<?> checkType);
+	boolean isImplementor(@Nonnull Class<?> checkType);
 
 	/**
 	 * Get the fields for this class
 	 */
+	@Nonnull
 	List<FieldDetails> getFields();
 
 	/**
 	 * Get the constructors for this class
 	 */
+	@Nonnull
 	default List<ConstructorDetails> getConstructors() {
 		return Collections.emptyList();
 	}
@@ -247,7 +271,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Visit each constructor
 	 */
-	default void forEachConstructor(IndexedConsumer<ConstructorDetails> consumer) {
+	default void forEachConstructor(@Nonnull IndexedConsumer<ConstructorDetails> consumer) {
 		final List<ConstructorDetails> constructors = getConstructors();
 		for ( int i = 0; i < constructors.size(); i++ ) {
 			consumer.accept( i, constructors.get( i ) );
@@ -257,7 +281,8 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Find a constructor by check
 	 */
-	default ConstructorDetails findConstructor(Predicate<ConstructorDetails> check) {
+	@Nullable
+	default ConstructorDetails findConstructor(@Nonnull Predicate<ConstructorDetails> check) {
 		final List<ConstructorDetails> constructors = getConstructors();
 		for ( int i = 0; i < constructors.size(); i++ ) {
 			final ConstructorDetails constructorDetails = constructors.get( i );
@@ -271,12 +296,13 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Visit each field
 	 */
-	void forEachField(IndexedConsumer<FieldDetails> consumer);
+	void forEachField(@Nonnull IndexedConsumer<FieldDetails> consumer);
 
 	/**
 	 * Find a field by check
 	 */
-	default FieldDetails findField(Predicate<FieldDetails> check) {
+	@Nullable
+	default FieldDetails findField(@Nonnull Predicate<FieldDetails> check) {
 		final List<FieldDetails> fields = getFields();
 		for ( int i = 0; i < fields.size(); i++ ) {
 			final FieldDetails fieldDetails = fields.get( i );
@@ -290,7 +316,8 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Find a field by name
 	 */
-	default FieldDetails findFieldByName(String name) {
+	@Nullable
+	default FieldDetails findFieldByName(@Nonnull String name) {
 		assert name != null;
 		return findField( fieldDetails -> name.equals( fieldDetails.getName() ) );
 	}
@@ -298,22 +325,25 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Get the methods for this class
 	 */
+	@Nonnull
 	List<MethodDetails> getMethods();
 
 	/**
 	 * Visit each method
 	 */
-	void forEachMethod(IndexedConsumer<MethodDetails> consumer);
+	void forEachMethod(@Nonnull IndexedConsumer<MethodDetails> consumer);
 
 	/**
 	 * Get the record components for this class
 	 */
+	@Nonnull
 	List<RecordComponentDetails> getRecordComponents();
 
 	/**
 	 * Find a record component by check
 	 */
-	default RecordComponentDetails findRecordComponent(Predicate<RecordComponentDetails> check) {
+	@Nullable
+	default RecordComponentDetails findRecordComponent(@Nonnull Predicate<RecordComponentDetails> check) {
 		final List<RecordComponentDetails> components = getRecordComponents();
 		for ( int i = 0; i < components.size(); i++ ) {
 			final RecordComponentDetails component = components.get( i );
@@ -327,7 +357,8 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Find a record component by name
 	 */
-	default RecordComponentDetails findRecordComponentByName(String name) {
+	@Nullable
+	default RecordComponentDetails findRecordComponentByName(@Nonnull String name) {
 		assert name != null;
 		return findRecordComponent( component -> name.equals( component.getName() ) );
 	}
@@ -335,15 +366,15 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	/**
 	 * Visit each method
 	 */
-	void forEachRecordComponent(IndexedConsumer<RecordComponentDetails> consumer);
+	void forEachRecordComponent(@Nonnull IndexedConsumer<RecordComponentDetails> consumer);
 
-	default void forEachMember(Consumer<MemberDetails> consumer) {
+	default void forEachMember(@Nonnull Consumer<MemberDetails> consumer) {
 		forEachField( (i,field) -> consumer.accept( field ) );
 		forEachMethod( (i,method) -> consumer.accept( method ) );
 		forEachRecordComponent( (i,recordComponent) -> consumer.accept( recordComponent ) );
 	}
 
-	default void forEachPersistableMember(Consumer<MemberDetails> consumer) {
+	default void forEachPersistableMember(@Nonnull Consumer<MemberDetails> consumer) {
 		forEachField( (i,field) -> {
 			if ( field.isPersistable() ) {
 				consumer.accept( field );
@@ -373,8 +404,9 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		return className.startsWith("java.") || className.startsWith("jdk.");
 	}
 
+	@Nullable
 	@Override
-	default ClassDetails getContainer(ModelsContext modelsContext) {
+	default ClassDetails getContainer(@Nonnull ModelsContext modelsContext) {
 		if ( getClassName() == null || getClassName().indexOf( "." ) <= 0 ) {
 			return null;
 		}
@@ -392,6 +424,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 * @throws DynamicClassException If this ClassDetails does not correspond to a Java class
 	 * (generally meaning {@linkplain #getClassName()} returns {@code null}).
 	 */
+	@Nonnull
 	<X> Class<X> toJavaClass();
 
 	/**
@@ -403,7 +436,8 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 * @throws DynamicClassException If this ClassDetails does not correspond to a Java class
 	 * (generally meaning {@linkplain #getClassName()} returns {@code null}).
 	 */
-	<X> Class<X> toJavaClass(ClassLoading classLoading, ModelsContext modelContext);
+	@Nonnull
+	<X> Class<X> toJavaClass(@Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext);
 
 	/**
 	 * Get the {@linkplain ClassDetails} for the package containing this class, if any.
@@ -413,6 +447,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 *
 	 * @since 2.0
 	 */
+	@Nullable
 	default ClassDetails getPackage() {
 		return null;
 	}
@@ -425,14 +460,17 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	 *
 	 * @since 2.0
 	 */
+	@Nullable
 	default ModuleDetails getModule() {
 		return null;
 	}
 
+	@Nonnull
 	@Override
 	default ClassDetails asClassDetails() {
 		return this;
 	}
 
+	@Nonnull
 	SerialClassDetails toSerialForm();
 }

@@ -8,6 +8,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.Settings;
 import org.hibernate.models.internal.BasicModelsContextImpl;
 import org.hibernate.models.logging.ModelsLogging;
@@ -37,28 +40,34 @@ public class ModelsConfiguration {
 	 * @apiNote Configuration settings only have effect with certain
 	 * providers.
 	 */
+	@Nonnull
 	public Map<Object, Object> getConfigValues() {
 		return configValues;
 	}
 
 	/**
 	 * Provide a {@linkplain #getConfigValues() configuration value}.
+	 * The configuration map permits null keys and values.
 	 */
-	public ModelsConfiguration configValue(Object key, Object value) {
+	@Nonnull
+	public ModelsConfiguration configValue(@Nullable Object key, @Nullable Object value) {
 		setConfigValue( key, value );
 		return this;
 	}
 
 	/**
 	 * Provide a {@linkplain #getConfigValues() configuration value}.
+	 * The configuration map permits null keys and values.
 	 */
-	public Object setConfigValue(Object key, Object value) {
+	@Nullable
+	public Object setConfigValue(@Nullable Object key, @Nullable Object value) {
 		return configValues.put( key, value );
 	}
 
 	/**
 	 * {@linkplain ClassLoading} to use.
 	 */
+	@Nonnull
 	public ClassLoading getClassLoading() {
 		return classLoading;
 	}
@@ -66,7 +75,8 @@ public class ModelsConfiguration {
 	/**
 	 * Specify a specific {@linkplain #getClassLoading() ClassLoading} to use.
 	 */
-	public ModelsConfiguration setClassLoading(ClassLoading classLoading) {
+	@Nonnull
+	public ModelsConfiguration setClassLoading(@Nonnull ClassLoading classLoading) {
 		this.classLoading = classLoading;
 		return this;
 	}
@@ -76,14 +86,16 @@ public class ModelsConfiguration {
 	 * {@linkplain AnnotationDescriptorRegistry} applied when
 	 * the {@linkplain ModelsContext} is first built.
 	 */
+	@Nullable
 	public RegistryPrimer getRegistryPrimer() {
 		return registryPrimer;
 	}
 
 	/**
-	 * Specify a {@linkplain #getRegistryPrimer() registry primer}.
+	 * Specify a {@linkplain #getRegistryPrimer() registry primer}, or {@code null} to clear it.
 	 */
-	public ModelsConfiguration setRegistryPrimer(RegistryPrimer registryPrimer) {
+	@Nonnull
+	public ModelsConfiguration setRegistryPrimer(@Nullable RegistryPrimer registryPrimer) {
 		this.registryPrimer = registryPrimer;
 		return this;
 	}
@@ -93,18 +105,20 @@ public class ModelsConfiguration {
 	 *
 	 * @see #setExplicitContextProvider
 	 */
+	@Nullable
 	public ModelsContextProvider getExplicitContextProvider() {
 		return explicitContextProvider;
 	}
 
 	/**
 	 * Specify an {@linkplain #getExplicitContextProvider explicit provider} for
-	 * {@linkplain ModelsContext} instances.
+	 * {@linkplain ModelsContext} instances. Pass {@code null} to clear the explicit provider.
 	 *
 	 * @implNote Prefer use of Java {@linkplain java.util.ServiceLoader service loading}
 	 * for supplying a specific provider.
 	 */
-	public ModelsConfiguration setExplicitContextProvider(ModelsContextProvider explicitContextProvider) {
+	@Nonnull
+	public ModelsConfiguration setExplicitContextProvider(@Nullable ModelsContextProvider explicitContextProvider) {
 		this.explicitContextProvider = explicitContextProvider;
 		return this;
 	}
@@ -112,6 +126,7 @@ public class ModelsConfiguration {
 	/**
 	 * Build the {@linkplain ModelsContext} instance.
 	 */
+	@Nonnull
 	public ModelsContext bootstrap() {
 		if ( explicitContextProvider != null ) {
 			final ModelsContext context = explicitContextProvider.produceContext(
@@ -147,7 +162,7 @@ public class ModelsConfiguration {
 		return shouldTrackImplementors( configValues );
 	}
 
-	public static boolean shouldTrackImplementors(Map<Object, Object> configValues) {
+	public static boolean shouldTrackImplementors(@Nonnull Map<Object, Object> configValues) {
 		final Object value = configValues.get( Settings.TRACK_IMPLEMENTORS );
 		if ( value != null ) {
 			return value instanceof Boolean bool

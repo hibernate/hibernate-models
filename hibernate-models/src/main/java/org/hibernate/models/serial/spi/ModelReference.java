@@ -7,11 +7,13 @@ package org.hibernate.models.serial.spi;
 import java.io.Serial;
 import java.io.Serializable;
 
+import jakarta.annotation.Nonnull;
+
 /// Reference to an object stored in a [ModelsArchive] table.
 ///
 /// @since 2.0
 /// @author Steve Ebersole
-public record ModelReference(Kind kind, int id) implements Serializable {
+public record ModelReference(@Nonnull Kind kind, int id) implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
 
@@ -25,12 +27,19 @@ public record ModelReference(Kind kind, int id) implements Serializable {
 	}
 
 	public enum Kind {
+		@Nonnull
 		CLASS,
+		@Nonnull
 		TYPE,
+		@Nonnull
 		FIELD,
+		@Nonnull
 		METHOD,
+		@Nonnull
 		CONSTRUCTOR,
+		@Nonnull
 		RECORD_COMPONENT,
+		@Nonnull
 		MODULE
 	}
 }

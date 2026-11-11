@@ -4,6 +4,8 @@
  */
 package org.hibernate.models;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.spi.ClassDetailsRegistry;
 
 /**
@@ -15,6 +17,7 @@ public interface Settings {
 	 * This tracking has the potential to grow quite large, so this setting allows to
 	 * enable/disable it.  By default, this is {@code false}.
 	 */
+	@Nonnull
 	@Incubating
 	String TRACK_IMPLEMENTORS = "hibernate.models.trackImplementors";
 }

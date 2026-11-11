@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.serial.spi;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ConstructorDetails;
 import org.hibernate.models.spi.FieldDetails;
@@ -35,7 +37,8 @@ public interface ModelsArchiveWriter {
 	/// @param details The class details to reference.
 	///
 	/// @return The archive-local class reference.
-	ModelReference reference(ClassDetails details);
+	@Nonnull
+	ModelReference reference(@Nonnull ClassDetails details);
 
 	/// Adds a type details reference to the archive.
 	///
@@ -46,7 +49,8 @@ public interface ModelsArchiveWriter {
 	/// @param details The type details to reference.
 	///
 	/// @return The archive-local type reference.
-	ModelReference reference(TypeDetails details);
+	@Nonnull
+	ModelReference reference(@Nonnull TypeDetails details);
 
 	/// Adds a field details reference to the archive.
 	///
@@ -57,7 +61,8 @@ public interface ModelsArchiveWriter {
 	/// @param details The field details to reference.
 	///
 	/// @return The archive-local field reference.
-	ModelReference reference(FieldDetails details);
+	@Nonnull
+	ModelReference reference(@Nonnull FieldDetails details);
 
 	/// Adds a method details reference to the archive.
 	///
@@ -68,7 +73,8 @@ public interface ModelsArchiveWriter {
 	/// @param details The method details to reference.
 	///
 	/// @return The archive-local method reference.
-	ModelReference reference(MethodDetails details);
+	@Nonnull
+	ModelReference reference(@Nonnull MethodDetails details);
 
 	/// Adds a constructor details reference to the archive.
 	///
@@ -79,7 +85,8 @@ public interface ModelsArchiveWriter {
 	/// @param details The constructor details to reference.
 	///
 	/// @return The archive-local constructor reference.
-	ModelReference reference(ConstructorDetails details);
+	@Nonnull
+	ModelReference reference(@Nonnull ConstructorDetails details);
 
 	/// Adds a record-component details reference to the archive.
 	///
@@ -90,7 +97,8 @@ public interface ModelsArchiveWriter {
 	/// @param details The record-component details to reference.
 	///
 	/// @return The archive-local record-component reference.
-	ModelReference reference(RecordComponentDetails details);
+	@Nonnull
+	ModelReference reference(@Nonnull RecordComponentDetails details);
 
 	/// Adds a module details reference to the archive.
 	///
@@ -102,7 +110,8 @@ public interface ModelsArchiveWriter {
 	/// @param details The module details to reference.
 	///
 	/// @return The archive-local module reference.
-	ModelReference reference(ModuleDetails details);
+	@Nonnull
+	ModelReference reference(@Nonnull ModuleDetails details);
 
 	/// Completes archive collection.
 	///
@@ -111,5 +120,6 @@ public interface ModelsArchiveWriter {
 	/// collected model state and may be serialized as part of an owning archive.
 	///
 	/// @return The completed models archive.
+	@Nonnull
 	ModelsArchive finish();
 }

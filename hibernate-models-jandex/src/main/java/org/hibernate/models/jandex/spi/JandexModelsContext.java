@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.jandex.spi;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.ValueTypeDescriptor;
 
@@ -18,6 +20,7 @@ public interface JandexModelsContext extends ModelsContext {
 	/**
 	 * The Jandex index
 	 */
+	@Nonnull
 	IndexView getJandexIndex();
 
 	/**
@@ -25,7 +28,8 @@ public interface JandexModelsContext extends ModelsContext {
 	 * capable of converting a Jandex {@linkplain org.jboss.jandex.AnnotationValue}
 	 * to the type specified by {@code valueTypeDescriptor}.
 	 */
-	<V> JandexValueConverter<V> getJandexValueConverter(ValueTypeDescriptor<V> valueTypeDescriptor);
+	@Nonnull
+	<V> JandexValueConverter<V> getJandexValueConverter(@Nonnull ValueTypeDescriptor<V> valueTypeDescriptor);
 
 	/**
 	 * Get a {@linkplain JandexValueExtractor value extractor}
@@ -33,5 +37,6 @@ public interface JandexModelsContext extends ModelsContext {
 	 * Jandex {@linkplain org.jboss.jandex.AnnotationInstance}
 	 * and returning it's {@linkplain #getJandexValueConverter converted value}.
 	 */
-	<V> JandexValueExtractor<V> getJandexValueExtractor(ValueTypeDescriptor<V> valueTypeDescriptor);
+	@Nonnull
+	<V> JandexValueExtractor<V> getJandexValueExtractor(@Nonnull ValueTypeDescriptor<V> valueTypeDescriptor);
 }

@@ -10,19 +10,28 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * @author Steve Ebersole
  */
 public interface JdkTypeSwitch<T> {
-	T caseClass(Class<?> classType);
+	@Nullable
+	T caseClass(@Nonnull Class<?> classType);
 
-	T caseParameterizedType(ParameterizedType parameterizedType);
+	@Nullable
+	T caseParameterizedType(@Nonnull ParameterizedType parameterizedType);
 
-	T caseWildcardType(WildcardType wildcardType);
+	@Nullable
+	T caseWildcardType(@Nonnull WildcardType wildcardType);
 
-	T caseTypeVariable(TypeVariable<?> typeVariable);
+	@Nullable
+	T caseTypeVariable(@Nonnull TypeVariable<?> typeVariable);
 
-	T caseGenericArrayType(GenericArrayType genericArrayType);
+	@Nullable
+	T caseGenericArrayType(@Nonnull GenericArrayType genericArrayType);
 
-	T defaultCase(Type t);
+	@Nullable
+	T defaultCase(@Nonnull Type t);
 }

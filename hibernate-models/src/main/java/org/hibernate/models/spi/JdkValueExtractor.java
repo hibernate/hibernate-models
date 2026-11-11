@@ -6,6 +6,9 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * @author Steve Ebersole
  */
@@ -13,13 +16,15 @@ public interface JdkValueExtractor<V> {
 	/**
 	 * Extract the value of the named attribute from the given annotation
 	 */
-	<A extends Annotation> V extractValue(A usage, String attributeName, ModelsContext modelContext);
+	@Nullable
+	<A extends Annotation> V extractValue(@Nonnull A usage, @Nonnull String attributeName, @Nonnull ModelsContext modelContext);
 
 	/**
 	 * Extract the value of the described attribute from the given annotation
 	 */
+	@Nullable
 	<A extends Annotation> V extractValue(
-			A usage,
-			AttributeDescriptor<V> attributeDescriptor,
-			ModelsContext modelContext);
+			@Nonnull A usage,
+			@Nonnull AttributeDescriptor<V> attributeDescriptor,
+			@Nonnull ModelsContext modelContext);
 }

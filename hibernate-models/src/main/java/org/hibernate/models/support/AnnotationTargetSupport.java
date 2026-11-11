@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.AnnotationUsageHelper;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.ModelsContext;
@@ -23,6 +26,7 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	/**
 	 * Access to all annotation usages on this target.
 	 */
+	@Nonnull
 	Map<Class<? extends Annotation>,? extends Annotation> getUsageMap();
 
 	@Override
@@ -31,39 +35,42 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 	}
 
 	@Override
-	default <X extends Annotation> void addAnnotationUsage(X annotationUsage) {
+	default <X extends Annotation> void addAnnotationUsage(@Nonnull X annotationUsage) {
 		//noinspection unchecked,rawtypes
 		( (Map) getUsageMap() ).put( annotationUsage.annotationType(), annotationUsage );
 	}
 
 	@Override
-	default <X extends Annotation> void removeAnnotationUsage(AnnotationDescriptor<X> annotationType) {
+	default <X extends Annotation> void removeAnnotationUsage(@Nonnull AnnotationDescriptor<X> annotationType) {
 		getUsageMap().remove( annotationType.getAnnotationType() );
 	}
 
+	@Nonnull
 	@Override
 	default Collection<? extends Annotation> getDirectAnnotationUsages() {
 		return getUsageMap().values();
 	}
 
+	@Nullable
 	@Override
-	default <A extends Annotation> A getDirectAnnotationUsage(AnnotationDescriptor<A> descriptor) {
+	default <A extends Annotation> A getDirectAnnotationUsage(@Nonnull AnnotationDescriptor<A> descriptor) {
 		return getDirectAnnotationUsage( descriptor.getAnnotationType() );
 	}
 
+	@Nullable
 	@Override
-	default <A extends Annotation> A getDirectAnnotationUsage(Class<A> type) {
+	default <A extends Annotation> A getDirectAnnotationUsage(@Nonnull Class<A> type) {
 		//noinspection unchecked
 		return (A) getUsageMap().get( type );
 	}
 
 	@Override
-	default <A extends Annotation> boolean hasDirectAnnotationUsage(Class<A> type) {
+	default <A extends Annotation> boolean hasDirectAnnotationUsage(@Nonnull Class<A> type) {
 		return getUsageMap().containsKey( type );
 	}
 
 	@Override
-	default <X extends Annotation> boolean hasAnnotationUsage(Class<X> type, ModelsContext modelContext) {
+	default <X extends Annotation> boolean hasAnnotationUsage(@Nonnull Class<X> type, @Nonnull ModelsContext modelContext) {
 		final boolean containsDirectly = getUsageMap().containsKey( type );
 		if ( containsDirectly ) {
 			return true;
@@ -78,42 +85,46 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 		return false;
 	}
 
+	@Nullable
 	@Override
-	default <A extends Annotation> A getAnnotationUsage(AnnotationDescriptor<A> descriptor, ModelsContext modelContext) {
+	default <A extends Annotation> A getAnnotationUsage(@Nonnull AnnotationDescriptor<A> descriptor, @Nonnull ModelsContext modelContext) {
 		return AnnotationUsageHelper.getUsage( descriptor, getUsageMap(), modelContext );
 	}
 
+	@Nullable
 	@Override
-	default <A extends Annotation> A getAnnotationUsage(Class<A> annotationType, ModelsContext modelContext) {
+	default <A extends Annotation> A getAnnotationUsage(@Nonnull Class<A> annotationType, @Nonnull ModelsContext modelContext) {
 		return AnnotationUsageHelper.getUsage( annotationType, getUsageMap(), modelContext );
 	}
 
+	@Nonnull
 	@Override
 	default <A extends Annotation> A[] getRepeatedAnnotationUsages(
-			AnnotationDescriptor<A> type,
-			ModelsContext modelContext) {
+			@Nonnull AnnotationDescriptor<A> type,
+			@Nonnull ModelsContext modelContext) {
 		return AnnotationUsageHelper.getRepeatedUsages( type, getUsageMap(), modelContext );
 	}
 
 	@Override
 	default <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
-			Class<A> repeatableType,
-			Class<C> containerType,
-			ModelsContext modelContext, Consumer<A> consumer) {
+			@Nonnull Class<A> repeatableType,
+			@Nonnull Class<C> containerType,
+			@Nonnull ModelsContext modelContext, @Nonnull Consumer<A> consumer) {
 		AnnotationUsageHelper.forEachRepeatedAnnotationUsages( repeatableType, containerType, consumer, getUsageMap(), modelContext );
 	}
 
 	@SuppressWarnings("unused")
 	@Override
 	default <A extends Annotation, C extends Annotation> void forEachRepeatedAnnotationUsages(
-			AnnotationDescriptor<A> repeatableDescriptor,
-			ModelsContext modelContext,
-			Consumer<A> consumer) {
+			@Nonnull AnnotationDescriptor<A> repeatableDescriptor,
+			@Nonnull ModelsContext modelContext,
+			@Nonnull Consumer<A> consumer) {
 		AnnotationUsageHelper.forEachRepeatedAnnotationUsages( repeatableDescriptor, consumer, getUsageMap(), modelContext );
 	}
 
+	@Nullable
 	@Override
-	default <A extends Annotation> A locateAnnotationUsage(Class<A> annotationType, ModelsContext modelContext) {
+	default <A extends Annotation> A locateAnnotationUsage(@Nonnull Class<A> annotationType, @Nonnull ModelsContext modelContext) {
 		// e.g., locate `@Nationalized`
 
 		// first, check for direct use
@@ -146,10 +157,11 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 		return null;
 	}
 
+	@Nonnull
 	@Override
 	default <A extends Annotation> List<? extends Annotation> getMetaAnnotated(
-			Class<A> metaAnnotationType,
-			ModelsContext modelContext) {
+			@Nonnull Class<A> metaAnnotationType,
+			@Nonnull ModelsContext modelContext) {
 		final List<Annotation> usages = new ArrayList<>();
 		forEachDirectAnnotationUsage( (usage) -> {
 			if (usage.annotationType().getName().startsWith("jakarta.persistence.")) {
@@ -164,29 +176,32 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 		return usages;
 	}
 
+	@Nullable
 	@Override
 	default <X extends Annotation> X getNamedAnnotationUsage(
-			Class<X> type,
-			String matchName,
-			ModelsContext modelContext) {
+			@Nonnull Class<X> type,
+			@Nonnull String matchName,
+			@Nonnull ModelsContext modelContext) {
 		return getNamedAnnotationUsage( modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ), matchName, modelContext );
 	}
 
+	@Nullable
 	@Override
 	default <X extends Annotation> X getNamedAnnotationUsage(
-			AnnotationDescriptor<X> type,
-			String matchName,
-			String attributeToMatch,
-			ModelsContext modelContext) {
+			@Nonnull AnnotationDescriptor<X> type,
+			@Nonnull String matchName,
+			@Nonnull String attributeToMatch,
+			@Nonnull ModelsContext modelContext) {
 		return AnnotationUsageHelper.getNamedUsage( type, matchName, attributeToMatch, getUsageMap(), modelContext );
 	}
 
+	@Nullable
 	@Override
 	default <X extends Annotation> X getNamedAnnotationUsage(
-			Class<X> type,
-			String matchName,
-			String attributeToMatch,
-			ModelsContext modelContext) {
+			@Nonnull Class<X> type,
+			@Nonnull String matchName,
+			@Nonnull String attributeToMatch,
+			@Nonnull ModelsContext modelContext) {
 		return getNamedAnnotationUsage(
 				modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ),
 				matchName,
@@ -195,11 +210,12 @@ public interface AnnotationTargetSupport extends MutableAnnotationTarget {
 		);
 	}
 
+	@Nonnull
 	@Override
 	default <S extends Annotation, P extends Annotation> P replaceAnnotationUsage(
-			AnnotationDescriptor<S> repeatableType,
-			AnnotationDescriptor<P> containerType,
-			ModelsContext modelContext) {
+			@Nonnull AnnotationDescriptor<S> repeatableType,
+			@Nonnull AnnotationDescriptor<P> containerType,
+			@Nonnull ModelsContext modelContext) {
 		assert repeatableType.isRepeatable();
 		assert repeatableType.getRepeatableContainer() == containerType;
 

@@ -6,6 +6,9 @@ package org.hibernate.models.spi;
 
 import java.lang.reflect.Member;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.rendering.internal.RenderingHelper;
 
 import static org.hibernate.models.spi.AnnotationTarget.Kind.RECORD_COMPONENT;
@@ -20,15 +23,18 @@ public interface RecordComponentDetails extends MemberDetails {
 	 * Render this record component and its directly associated annotations.
 	 * Contained annotation values are rendered recursively.
 	 */
-	default String render(ModelsContext modelsContext) {
+	@Nonnull
+	default String render(@Nonnull ModelsContext modelsContext) {
 		return RenderingHelper.renderRecordComponent( this, modelsContext );
 	}
 
+	@Nonnull
 	@Override
 	default Kind getKind() {
 		return RECORD_COMPONENT;
 	}
 
+	@Nonnull
 	@Override
 	default String resolveAttributeName() {
 		return getName();
@@ -39,12 +45,15 @@ public interface RecordComponentDetails extends MemberDetails {
 		return true;
 	}
 
+	@Nullable
 	@Override
 	Member toJavaMember();
 
+	@Nullable
 	@Override
-	Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
+	Member toJavaMember(@Nonnull Class<?> declaringClass, @Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext);
 
+	@Nonnull
 	@Override
 	default RecordComponentDetails asRecordComponentDetails() {
 		return this;
@@ -57,6 +66,7 @@ public interface RecordComponentDetails extends MemberDetails {
 	 * @apiNote implementors can override this default implementation if they have access to a more efficient way of
 	 * obtaining the required FieldDetails.
 	 */
+	@Nullable
 	default FieldDetails getField() {
 		return getDeclaringType().findFieldByName( getName() );
 	}
@@ -68,6 +78,7 @@ public interface RecordComponentDetails extends MemberDetails {
 	 * @apiNote implementors can override this default implementation if they have access to a more efficient way of
 	 * obtaining the required MethodDetails.
 	 */
+	@Nullable
 	default MethodDetails getAccessor() {
 		for ( MethodDetails method : getDeclaringType().getMethods() ) {
 			if ( method.getName().equals( getName() ) && method.getArgumentTypes().isEmpty() ) {

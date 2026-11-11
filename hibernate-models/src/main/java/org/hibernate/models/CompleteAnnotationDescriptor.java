@@ -4,6 +4,9 @@
  */
 package org.hibernate.models;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.AbstractAnnotationDescriptor;
 import org.hibernate.models.internal.AnnotationDescriptorBuilding;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -35,19 +38,19 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 	private DeTypedCreator<A,C> deTypedCreator;
 
 	public CompleteAnnotationDescriptor(
-			Class<A> annotationType,
-			Class<C> concreteClass,
-			EnumSet<Kind> allowableTargets,
+			@Nonnull Class<A> annotationType,
+			@Nonnull Class<C> concreteClass,
+			@Nonnull EnumSet<Kind> allowableTargets,
 			boolean inherited) {
 		this( annotationType, concreteClass, allowableTargets, inherited, null );
 	}
 
 	public CompleteAnnotationDescriptor(
-			Class<A> annotationType,
-			Class<C> concreteClass,
-			EnumSet<AnnotationTarget.Kind> allowableTargets,
+			@Nonnull Class<A> annotationType,
+			@Nonnull Class<C> concreteClass,
+			@Nonnull EnumSet<AnnotationTarget.Kind> allowableTargets,
 			boolean inherited,
-			AnnotationDescriptor<?> repeatableContainer) {
+			@Nullable AnnotationDescriptor<?> repeatableContainer) {
 		super(
 				annotationType,
 				allowableTargets,
@@ -59,11 +62,13 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 		this.attributeDescriptors = AnnotationDescriptorBuilding.extractAttributeDescriptors( annotationType );
 	}
 
+	@Nonnull
 	@Override
 	public Class<C> getMutableAnnotationType() {
 		return concreteClass;
 	}
 
+	@Nonnull
 	@Override
 	public Map<Class<? extends Annotation>, ? extends Annotation> getUsageMap() {
 		// we never care about the annotations on these annotation classes
@@ -71,35 +76,40 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 		return Collections.emptyMap();
 	}
 
+	@Nonnull
 	@Override
-	public C createUsage(ModelsContext context) {
+	public C createUsage(@Nonnull ModelsContext context) {
 		if ( dynamicCreator == null ) {
 			dynamicCreator = new DynamicCreator<>( getAnnotationType(), concreteClass );
 		}
 		return dynamicCreator.createUsage( context );
 	}
 
+	@Nonnull
 	@Override
-	public C createUsage(A jdkAnnotation, ModelsContext context) {
+	public C createUsage(@Nonnull A jdkAnnotation, @Nonnull ModelsContext context) {
 		if ( jdkCreator == null ) {
 			jdkCreator = new JdkCreator<>( getAnnotationType(), concreteClass );
 		}
 		return jdkCreator.createUsage( jdkAnnotation, context );
 	}
 
+	@Nonnull
 	@Override
-	public C createUsage(Map<String,Object> attributeValues, ModelsContext context) {
+	public C createUsage(@Nonnull Map<String,Object> attributeValues, @Nonnull ModelsContext context) {
 		if ( deTypedCreator == null ) {
 			deTypedCreator = new DeTypedCreator<>( getAnnotationType(), concreteClass );
 		}
 		return deTypedCreator.createUsage( attributeValues, context );
 	}
 
+	@Nonnull
 	@Override
 	public List<AttributeDescriptor<?>> getAttributes() {
 		return attributeDescriptors;
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return String.format( "AnnotationDescriptor(%s)", getAnnotationType().getName() );
@@ -108,7 +118,7 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 	public static class DynamicCreator<A extends Annotation, C extends A> {
 		private final Constructor<C> constructor;
 
-		public DynamicCreator(@SuppressWarnings("unused") Class<A> annotationType, Class<C> concreteClass) {
+		public DynamicCreator(@Nonnull @SuppressWarnings("unused") Class<A> annotationType, @Nonnull Class<C> concreteClass) {
 			this( resolveConstructor( concreteClass ) );
 		}
 
@@ -121,11 +131,12 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 			}
 		}
 
-		public DynamicCreator(Constructor<C> constructor) {
+		public DynamicCreator(@Nonnull Constructor<C> constructor) {
 			this.constructor = constructor;
 		}
 
-		public C createUsage(ModelsContext context) {
+		@Nonnull
+		public C createUsage(@Nonnull ModelsContext context) {
 			try {
 				return constructor.newInstance( context );
 			}
@@ -138,7 +149,7 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 	public static class JdkCreator<A extends Annotation, C extends A> {
 		private final Constructor<C> constructor;
 
-		public JdkCreator(Class<A> annotationType, Class<C> concreteClass) {
+		public JdkCreator(@Nonnull Class<A> annotationType, @Nonnull Class<C> concreteClass) {
 			this( resolveConstructor( annotationType, concreteClass ) );
 		}
 
@@ -153,11 +164,12 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 			}
 		}
 
-		public JdkCreator(Constructor<C> constructor) {
+		public JdkCreator(@Nonnull Constructor<C> constructor) {
 			this.constructor = constructor;
 		}
 
-		public C createUsage(A jdkAnnotation, ModelsContext context) {
+		@Nonnull
+		public C createUsage(@Nonnull A jdkAnnotation, @Nonnull ModelsContext context) {
 			try {
 				return constructor.newInstance( jdkAnnotation, context );
 			}
@@ -170,7 +182,7 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 	public static class DeTypedCreator<A extends Annotation, C extends A> {
 		private final Constructor<C> constructor;
 
-		public DeTypedCreator(@SuppressWarnings("unused") Class<A> annotationType, Class<C> concreteClass) {
+		public DeTypedCreator(@Nonnull @SuppressWarnings("unused") Class<A> annotationType, @Nonnull Class<C> concreteClass) {
 			this( resolveConstructor( concreteClass ) );
 		}
 
@@ -183,11 +195,12 @@ public class CompleteAnnotationDescriptor<A extends Annotation, C extends A>
 			}
 		}
 
-		public DeTypedCreator(Constructor<C> constructor) {
+		public DeTypedCreator(@Nonnull Constructor<C> constructor) {
 			this.constructor = constructor;
 		}
 
-		public C createUsage(Map<String,?> attributeValues, ModelsContext context) {
+		@Nonnull
+		public C createUsage(@Nonnull Map<String,?> attributeValues, @Nonnull ModelsContext context) {
 			try {
 				return constructor.newInstance( attributeValues, context );
 			}

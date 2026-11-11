@@ -10,6 +10,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.serial.internal.ModelObjectInputStream;
 import org.hibernate.models.serial.internal.ModelObjectOutputStream;
 import org.hibernate.models.serial.internal.ModelsArchiveWriterImpl;
@@ -38,6 +40,7 @@ public final class ModelsArchives {
 	/// with a single [org.hibernate.models.spi.ModelsContext].  The completed
 	/// archive restores into one model context, so callers should create a
 	/// separate writer for each independently serialized model context.
+	@Nonnull
 	public static ModelsArchiveWriter createWriter(boolean trackImplementors) {
 		return new ModelsArchiveWriterImpl( trackImplementors );
 	}
@@ -57,9 +60,10 @@ public final class ModelsArchives {
 	/// @return An object output stream that performs model-reference replacement.
 	///
 	/// @throws IOException If the object stream cannot be created.
+	@Nonnull
 	public static ObjectOutputStream createObjectOutputStream(
-			OutputStream outputStream,
-			ModelsArchiveWriter archiveWriter) throws IOException {
+			@Nonnull OutputStream outputStream,
+			@Nonnull ModelsArchiveWriter archiveWriter) throws IOException {
 		return new ModelObjectOutputStream( outputStream, archiveWriter );
 	}
 
@@ -75,9 +79,10 @@ public final class ModelsArchives {
 	/// @return An object input stream that resolves model-reference proxies.
 	///
 	/// @throws IOException If the object stream cannot be created.
+	@Nonnull
 	public static ObjectInputStream createObjectInputStream(
-			InputStream inputStream,
-			RestoredModels restoredModels) throws IOException {
+			@Nonnull InputStream inputStream,
+			@Nonnull RestoredModels restoredModels) throws IOException {
 		return new ModelObjectInputStream( inputStream, restoredModels );
 	}
 }

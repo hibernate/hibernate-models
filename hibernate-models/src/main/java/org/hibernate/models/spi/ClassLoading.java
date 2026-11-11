@@ -7,6 +7,9 @@ package org.hibernate.models.spi;
 import java.net.URL;
 import java.util.Collection;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.Incubating;
 import org.hibernate.models.UnknownClassException;
 
@@ -25,13 +28,15 @@ public interface ClassLoading {
 	 *
 	 * @throws UnknownClassException If no registration is found with the given {@code name}
 	 */
-	<T> Class<T> classForName(String name);
+	@Nonnull
+	<T> Class<T> classForName(@Nonnull String name);
 
 	/**
 	 * Like {@linkplain #classForName(String)}, except here we simply return {@code null} if
 	 * there is not a matching class.  This is often useful, e.g., when looking for a package-info.
 	 */
-	<T> Class<T> findClassForName(String name);
+	@Nullable
+	<T> Class<T> findClassForName(@Nonnull String name);
 
 	/**
 	 * Locate a resource by name
@@ -40,7 +45,8 @@ public interface ClassLoading {
 	 * @return The located resource;
 	 *         may return {@code null} to indicate the resource was not found
 	 */
-	URL locateResource(String resourceName);
+	@Nullable
+	URL locateResource(@Nonnull String resourceName);
 
 	/**
 	 * Discovers and instantiates implementations of the given {@link java.util.ServiceLoader Java service} contract.
@@ -50,5 +56,6 @@ public interface ClassLoading {
 	 *
 	 * @return The ordered set of discovered services.
 	 */
-	<S> Collection<S> loadJavaServices(Class<S> serviceType);
+	@Nonnull
+	<S> Collection<S> loadJavaServices(@Nonnull Class<S> serviceType);
 }

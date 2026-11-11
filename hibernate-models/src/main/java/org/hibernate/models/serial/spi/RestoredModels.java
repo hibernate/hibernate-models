@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.serial.spi;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.spi.ModelsContext;
 
 /// Result of restoring a [ModelsArchive].
@@ -18,6 +20,7 @@ public interface RestoredModels {
 	/// for later model registry and annotation operations.
 	///
 	/// @return The restored model context.
+	@Nonnull
 	ModelsContext getModelsContext();
 
 	/// Resolves an archive-local model reference.
@@ -30,5 +33,6 @@ public interface RestoredModels {
 	/// @param reference The model reference to resolve.
 	///
 	/// @return The restored model object.
-	Object resolve(ModelReference reference);
+	@Nonnull
+	Object resolve(@Nonnull ModelReference reference);
 }
