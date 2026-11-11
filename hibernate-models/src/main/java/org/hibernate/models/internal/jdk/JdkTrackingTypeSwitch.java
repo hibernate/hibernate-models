@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.ArrayTypeDetailsImpl;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.internal.ParameterizedTypeDetailsImpl;
@@ -44,12 +47,13 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 	private final JdkTypeSwitcher switcher;
 	private final ModelsContext modelsContext;
 
-	public JdkTrackingTypeSwitch(JdkTypeSwitcher switcher, ModelsContext modelsContext) {
+	public JdkTrackingTypeSwitch(@Nonnull JdkTypeSwitcher switcher, @Nonnull ModelsContext modelsContext) {
 		this.switcher = switcher;
 		this.modelsContext = modelsContext;
 	}
 
-	public ClassBasedTypeDetails caseClass(Class<?> classType) {
+	@Nonnull
+	public ClassBasedTypeDetails caseClass(@Nonnull Class<?> classType) {
 		if ( classType.isArray() ) {
 			return asArrayType( classType );
 		}
@@ -66,7 +70,8 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 		return new ClassTypeDetailsImpl( classDetails, TypeDetails.Kind.CLASS );
 	}
 
-	public ParameterizedTypeDetails caseParameterizedType(ParameterizedType parameterizedType) {
+	@Nonnull
+	public ParameterizedTypeDetails caseParameterizedType(@Nonnull ParameterizedType parameterizedType) {
 		final ClassDetails classDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( parameterizedType.getRawType().getTypeName() );
@@ -77,7 +82,8 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 		);
 	}
 
-	public WildcardTypeDetails caseWildcardType(WildcardType wildcardType) {
+	@Nonnull
+	public WildcardTypeDetails caseWildcardType(@Nonnull WildcardType wildcardType) {
 		final Type[] lowerBounds = wildcardType.getLowerBounds();
 		if ( CollectionHelper.isEmpty( lowerBounds ) ) {
 			// should indicate an extends
@@ -95,7 +101,8 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 		return new WildcardTypeDetailsImpl( lower, false );
 	}
 
-	public TypeVariableDetails caseTypeVariable(TypeVariable<?> typeVariable) {
+	@Nonnull
+	public TypeVariableDetails caseTypeVariable(@Nonnull TypeVariable<?> typeVariable) {
 		final GenericDeclaration genericDeclaration = typeVariable.getGenericDeclaration();
 		final ClassDetails declaringClass;
 		if ( genericDeclaration instanceof Class<?> genericClass ) {
@@ -113,12 +120,14 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 		);
 	}
 
-	public TypeDetails caseGenericArrayType(GenericArrayType genericArrayType) {
+	@Nonnull
+	public TypeDetails caseGenericArrayType(@Nonnull GenericArrayType genericArrayType) {
 		final TypeDetails componentType = switcher.switchType( genericArrayType.getGenericComponentType() );
 		return TypeDetailsHelper.arrayOf( componentType, modelsContext );
 	}
 
-	public TypeDetails defaultCase(Type type) {
+	@Nonnull
+	public TypeDetails defaultCase(@Nonnull Type type) {
 		throw new UnsupportedOperationException( "Unexpected Type kind - " + type );
 	}
 
@@ -134,11 +143,13 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 		);
 	}
 
-	public List<TypeDetails> extractTypeParameters(ParameterizedType parameterizedType) {
+	@Nonnull
+	public List<TypeDetails> extractTypeParameters(@Nonnull ParameterizedType parameterizedType) {
 		return resolveTypes( parameterizedType.getActualTypeArguments() );
 	}
 
-	public List<TypeDetails> resolveTypes(Type[] types) {
+	@Nonnull
+	public List<TypeDetails> resolveTypes(@Nullable Type[] types) {
 		if ( CollectionHelper.isEmpty( types ) ) {
 			return Collections.emptyList();
 		}

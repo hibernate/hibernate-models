@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.bytebuddy.spi;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.spi.AttributeDescriptor;
 import org.hibernate.models.spi.ModelsContext;
 
@@ -18,15 +20,17 @@ public interface ValueExtractor<V> {
 	/**
 	 * Extract the value of the named attribute from the given annotation
 	 */
-	V extractValue(AnnotationDescription annotation, String attributeName, ModelsContext modelContext);
+	@Nonnull
+	V extractValue(@Nonnull AnnotationDescription annotation, @Nonnull String attributeName, @Nonnull ModelsContext modelContext);
 
 	/**
 	 * Extract the value of the described attribute from the given annotation
 	 */
+	@Nonnull
 	default V extractValue(
-			AnnotationDescription annotation,
-			AttributeDescriptor<V> attributeDescriptor,
-			ModelsContext modelContext) {
+			@Nonnull AnnotationDescription annotation,
+			@Nonnull AttributeDescriptor<V> attributeDescriptor,
+			@Nonnull ModelsContext modelContext) {
 		return extractValue( annotation, attributeDescriptor.getName(), modelContext );
 	}
 }

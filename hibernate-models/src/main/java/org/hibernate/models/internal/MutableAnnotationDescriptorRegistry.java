@@ -7,9 +7,11 @@ package org.hibernate.models.internal;
 import org.hibernate.models.spi.AnnotationDescriptor;
 import org.hibernate.models.spi.AnnotationDescriptorRegistry;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * @author Steve Ebersole
  */
 public interface MutableAnnotationDescriptorRegistry extends AnnotationDescriptorRegistry {
-	void register(AnnotationDescriptor<?> descriptor);
+	void register(@Nonnull AnnotationDescriptor<?> descriptor);
 }

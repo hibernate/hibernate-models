@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /// Models a Java module while processing annotations.
 ///
 /// A module is a root annotation target.  Unlike a class, member, or package,
@@ -12,6 +15,7 @@ package org.hibernate.models.spi;
 /// @since 1.3
 /// @author Steve Ebersole
 public interface ModuleDetails extends AnnotationTarget {
+	@Nonnull
 	@Override
 	default Kind getKind() {
 		return Kind.MODULE;
@@ -19,19 +23,23 @@ public interface ModuleDetails extends AnnotationTarget {
 
 	/// The Java module name.
 	///
-	/// @return The module name
+	/// @return The module name, or `null` for an unnamed module
+	@Nullable
 	String getModuleName();
 
+	@Nullable
 	@Override
 	default String getName() {
 		return getModuleName();
 	}
 
+	@Nullable
 	@Override
-	default ClassDetails getContainer(ModelsContext modelsContext) {
+	default ClassDetails getContainer(@Nonnull ModelsContext modelsContext) {
 		return null;
 	}
 
+	@Nonnull
 	@Override
 	default ModuleDetails asModuleDetails() {
 		return this;

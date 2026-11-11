@@ -4,6 +4,8 @@
  */
 package org.hibernate.models;
 
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.spi.AnnotationTarget;
 
 /**
@@ -14,11 +16,11 @@ import org.hibernate.models.spi.AnnotationTarget;
  * @author Steve Ebersole
  */
 public class IllegalCastException extends ModelsException {
-	public IllegalCastException(String message) {
+	public IllegalCastException(@Nullable String message) {
 		super( message );
 	}
 
-	public IllegalCastException(String message, Throwable cause) {
+	public IllegalCastException(@Nullable String message, @Nullable Throwable cause) {
 		super( message, cause );
 	}
 }

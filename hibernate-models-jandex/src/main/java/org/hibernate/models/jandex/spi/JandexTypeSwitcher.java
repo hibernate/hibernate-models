@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.jandex.spi;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.spi.ModelsContext;
 
 import org.jboss.jandex.Type;
@@ -25,10 +28,11 @@ public class JandexTypeSwitcher {
 	 * @param typeSwitch The switch, responsible for dealing with the specific cases.
 	 * @param modelContext The context
 	 */
+	@Nullable
 	public static <T> T switchType(
-			Type type,
-			JandexTypeSwitch<T> typeSwitch,
-			ModelsContext modelContext) {
+			@Nonnull Type type,
+			@Nonnull JandexTypeSwitch<T> typeSwitch,
+			@Nonnull ModelsContext modelContext) {
 		switch( type.kind() ) {
 			case CLASS -> {
 				return typeSwitch.caseClass( type.asClassType(), modelContext );

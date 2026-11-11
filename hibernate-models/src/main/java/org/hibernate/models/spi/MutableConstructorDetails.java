@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Mutable form of {@linkplain ConstructorDetails} allowing mutation of the associated annotations.
  *
@@ -11,6 +13,7 @@ package org.hibernate.models.spi;
  * @author Steve Ebersole
  */
 public interface MutableConstructorDetails extends ConstructorDetails, MutableAnnotationTarget {
+	@Nonnull
 	@Override
 	default MutableConstructorDetails asConstructorDetails() {
 		return this;

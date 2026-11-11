@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.serial.spi;
 
+import jakarta.annotation.Nonnull;
+
 import java.io.Serializable;
 
 import org.hibernate.models.spi.ModelsContext;
@@ -15,5 +17,6 @@ import org.hibernate.models.spi.ModelsContext;
  * @author Steve Ebersole
  */
 public interface StorableForm<T> extends Serializable {
-	T fromStorableForm(ModelsContext context);
+	@Nonnull
+	T fromStorableForm(@Nonnull ModelsContext context);
 }

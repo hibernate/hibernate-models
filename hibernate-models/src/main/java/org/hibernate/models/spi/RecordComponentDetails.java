@@ -6,6 +6,9 @@ package org.hibernate.models.spi;
 
 import java.lang.reflect.Member;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import static org.hibernate.models.spi.AnnotationTarget.Kind.RECORD_COMPONENT;
 
 /**
@@ -14,11 +17,13 @@ import static org.hibernate.models.spi.AnnotationTarget.Kind.RECORD_COMPONENT;
  * @author Steve Ebersole
  */
 public interface RecordComponentDetails extends MemberDetails {
+	@Nonnull
 	@Override
 	default Kind getKind() {
 		return RECORD_COMPONENT;
 	}
 
+	@Nonnull
 	@Override
 	default String resolveAttributeName() {
 		return getName();
@@ -29,12 +34,15 @@ public interface RecordComponentDetails extends MemberDetails {
 		return true;
 	}
 
+	@Nullable
 	@Override
 	Member toJavaMember();
 
+	@Nullable
 	@Override
-	Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
+	Member toJavaMember(@Nonnull Class<?> declaringClass, @Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext);
 
+	@Nonnull
 	@Override
 	default RecordComponentDetails asRecordComponentDetails() {
 		return this;

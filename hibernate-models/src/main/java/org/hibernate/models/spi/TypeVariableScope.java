@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * A scope for {@linkplain TypeVariableDetails} references
  *
@@ -34,7 +37,8 @@ public interface TypeVariableScope {
 	 *
 	 * @return The type variable's resolved type, or {@code null} if none could be found
 	 */
-	TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable);
+	@Nullable
+	TypeDetails resolveTypeVariable(@Nonnull TypeVariableDetails typeVariable);
 
 	/**
 	 * Determine the raw {@linkplain ClassDetails class} for the given type. Never returns {@code null}, opting
@@ -42,5 +46,6 @@ public interface TypeVariableScope {
 	 *
 	 * @return The raw class details, or {@linkplain ClassDetails#OBJECT_CLASS_DETAILS Object} if "not known".
 	 */
+	@Nonnull
 	ClassDetails determineRawClass();
 }

@@ -16,6 +16,9 @@ import org.hibernate.models.serial.internal.SerialAnnotationDescriptorImpl;
 import org.hibernate.models.serial.spi.SerialAnnotationDescriptor;
 import org.hibernate.models.serial.spi.Storable;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * Describes an annotation type (the Class)
  *
@@ -23,6 +26,7 @@ import org.hibernate.models.serial.spi.Storable;
  */
 public interface AnnotationDescriptor<A extends Annotation>
 		extends AnnotationTarget, Storable<AnnotationDescriptor<A>, SerialAnnotationDescriptor<A>> {
+	@Nonnull
 	@Override
 	default Kind getKind() {
 		return Kind.ANNOTATION;
@@ -31,15 +35,18 @@ public interface AnnotationDescriptor<A extends Annotation>
 	/**
 	 * The annotation type
 	 */
+	@Nonnull
 	Class<A> getAnnotationType();
 
-	default <S> S as(Class<S> type) {
+	@Nonnull
+	default <S> S as(@Nonnull Class<S> type) {
 		//noinspection unchecked
 		return (S) type;
 	}
 
+	@Nullable
 	@Override
-	default ClassDetails getContainer(ModelsContext modelsContext) {
+	default ClassDetails getContainer(@Nonnull ModelsContext modelsContext) {
 		final ClassDetails annotationClassDetails = modelsContext
 				.getClassDetailsRegistry()
 				.resolveClassDetails( getAnnotationType().getName() );
@@ -48,27 +55,31 @@ public interface AnnotationDescriptor<A extends Annotation>
 	/**
 	 * Create an empty usage.  Used when there is no source form, such as XML processing.
 	 */
-	A createUsage(ModelsContext context);
+	@Nonnull
+	A createUsage(@Nonnull ModelsContext context);
 
 	/**
 	 * Create a usage from the JDK representation.  This will often just return the passed annotation,
 	 * although for Hibernate and JPA annotations we generally want wrappers to be able to manipulate the
 	 * values.
 	 */
-	A createUsage(A jdkAnnotation, ModelsContext context);
+	@Nonnull
+	A createUsage(@Nonnull A jdkAnnotation, @Nonnull ModelsContext context);
 
 	/**
 	 * Create a usage from the JDK representation.  This will often just return the passed annotation,
 	 * although for Hibernate and JPA annotations we generally want wrappers to be able to manipulate the
 	 * values.
 	 */
-	default A createUsage(Map<String, Object> attributeValues, ModelsContext context) {
+	@Nonnull
+	default A createUsage(@Nonnull Map<String, Object> attributeValues, @Nonnull ModelsContext context) {
 		return AnnotationProxy.makeProxy( this, attributeValues );
 	}
 
 	/**
 	 * The places the described annotation can be used
 	 */
+	@Nonnull
 	EnumSet<Kind> getAllowableTargets();
 
 	/**
@@ -87,18 +98,21 @@ public interface AnnotationDescriptor<A extends Annotation>
 	 * If the described annotation is {@linkplain #isRepeatable repeatable}, returns the descriptor
 	 * for the {@linkplain Repeatable#value() container} annotation.
 	 */
+	@Nullable
 	AnnotationDescriptor<?> getRepeatableContainer();
 
 	/**
 	 * The attributes of the annotation
 	 */
+	@Nonnull
 	List<AttributeDescriptor<?>> getAttributes();
 
 	/**
 	 * Get an attribute descriptor by name, returning {@code null} if the name
 	 * is not an attribute of the described annotation.
 	 */
-	default <V> AttributeDescriptor<V> findAttribute(String name) {
+	@Nullable
+	default <V> AttributeDescriptor<V> findAttribute(@Nonnull String name) {
 		final List<AttributeDescriptor<?>> attributeDescriptors = getAttributes();
 		for ( final AttributeDescriptor<?> attributeDescriptor : attributeDescriptors ) {
 			if ( attributeDescriptor.getName().equals( name ) ) {
@@ -115,7 +129,8 @@ public interface AnnotationDescriptor<A extends Annotation>
 	 * @throws UnknownAnnotationAttributeException if the name is not an
 	 * attribute of the described annotation.
 	 */
-	default <V> AttributeDescriptor<V> getAttribute(String name) {
+	@Nonnull
+	default <V> AttributeDescriptor<V> getAttribute(@Nonnull String name) {
 		final AttributeDescriptor<V> attribute = findAttribute( name );
 		if ( attribute != null ) {
 			return attribute;
@@ -124,6 +139,7 @@ public interface AnnotationDescriptor<A extends Annotation>
 		throw new UnknownAnnotationAttributeException( getAnnotationType(), name );
 	}
 
+	@Nonnull
 	@Override
 	default <X extends Annotation> AnnotationDescriptor<X> asAnnotationDescriptor() {
 		//noinspection unchecked
@@ -131,6 +147,7 @@ public interface AnnotationDescriptor<A extends Annotation>
 	}
 
 	@Override
+	@Nonnull
 	default SerialAnnotationDescriptor<A> toStorableForm() {
 		return new SerialAnnotationDescriptorImpl<>( getAnnotationType() );
 	}

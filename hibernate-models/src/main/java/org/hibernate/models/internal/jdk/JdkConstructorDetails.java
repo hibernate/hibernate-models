@@ -8,6 +8,8 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -25,9 +27,9 @@ public class JdkConstructorDetails extends AbstractJdkAnnotationTarget implement
 	private final List<ClassDetails> argumentTypes;
 
 	public JdkConstructorDetails(
-			Constructor<?> constructor,
-			ClassDetails declaringType,
-			ModelsContext modelsContext) {
+			@Nonnull Constructor<?> constructor,
+			@Nonnull ClassDetails declaringType,
+			@Nonnull ModelsContext modelsContext) {
 		super( constructor::getAnnotations, modelsContext );
 		this.constructor = constructor;
 		this.declaringType = declaringType;
@@ -39,31 +41,37 @@ public class JdkConstructorDetails extends AbstractJdkAnnotationTarget implement
 		}
 	}
 
+	@Nonnull
 	@Override
 	public String getName() {
 		return constructor.getName();
 	}
 
+	@Nonnull
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
 	}
 
+	@Nonnull
 	@Override
 	public List<ClassDetails> getArgumentTypes() {
 		return argumentTypes;
 	}
 
+	@Nonnull
 	@Override
 	public Constructor<?> toJavaConstructor() {
 		return constructor;
 	}
 
+	@Nonnull
 	@Override
 	public MutableClassDetails asClassDetails() {
 		throw new IllegalCastException( "ConstructorDetails cannot be cast as ClassDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public MutableMemberDetails asMemberDetails() {
 		throw new IllegalCastException( "ConstructorDetails cannot be cast as MemberDetails" );

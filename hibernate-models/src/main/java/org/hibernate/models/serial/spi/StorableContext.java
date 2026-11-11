@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.serial.spi;
 
+import jakarta.annotation.Nonnull;
+
 import java.io.Serializable;
 
 import org.hibernate.models.spi.ClassLoading;
@@ -20,5 +22,6 @@ public interface StorableContext extends Serializable {
 	/**
 	 * "Re-construct" the model context from the serial form
 	 */
-	ModelsContext fromStorableForm(ClassLoading classLoading);
+	@Nonnull
+	ModelsContext fromStorableForm(@Nonnull ClassLoading classLoading);
 }

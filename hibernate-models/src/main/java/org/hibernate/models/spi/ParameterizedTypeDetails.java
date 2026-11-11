@@ -6,6 +6,9 @@ package org.hibernate.models.spi;
 
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * Models a parameterized type.
  * <p/>
@@ -19,34 +22,44 @@ import java.util.List;
  * @author Steve Ebersole
  */
 public interface ParameterizedTypeDetails extends ClassBasedTypeDetails {
+	@Nonnull
 	ClassDetails getRawClassDetails();
 
+	@Nonnull
 	List<TypeDetails> getArguments();
 
+	/**
+	 * The owning scope, or {@code null} when no owner is available.
+	 */
+	@Nullable
 	TypeVariableScope getOwner();
 
+	@Nonnull
 	@Override
 	default ClassDetails getClassDetails() {
 		return getRawClassDetails();
 	}
 
+	@Nonnull
 	@Override
 	default Kind getTypeKind() {
 		return Kind.PARAMETERIZED_TYPE;
 	}
 
+	@Nonnull
 	@Override
 	default ParameterizedTypeDetails asParameterizedType() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	default String getName() {
 		return getRawClassDetails().getName();
 	}
 
 	@Override
-	default boolean isImplementor(Class<?> checkType) {
+	default boolean isImplementor(@Nonnull Class<?> checkType) {
 		return getRawClassDetails().isImplementor( checkType );
 	}
 }

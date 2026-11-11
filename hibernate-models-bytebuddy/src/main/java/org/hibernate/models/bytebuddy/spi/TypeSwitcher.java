@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.bytebuddy.spi;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.spi.ModelsContext;
 
 import net.bytebuddy.description.type.TypeDefinition;
@@ -15,7 +18,8 @@ import net.bytebuddy.description.type.TypeDescription;
 public class TypeSwitcher {
 	private static final TypeDescription VOID = TypeDescription.ForLoadedType.of( void.class );
 
-	public static <T> T switchType(TypeDefinition typeDescription, TypeSwitch<T> typeSwitch, ModelsContext modelsContext) {
+	@Nullable
+	public static <T> T switchType(@Nonnull TypeDefinition typeDescription, @Nonnull TypeSwitch<T> typeSwitch, @Nonnull ModelsContext modelsContext) {
 		if ( VOID.equals( typeDescription ) ) {
 			return typeSwitch.caseVoid( typeDescription, modelsContext );
 		}

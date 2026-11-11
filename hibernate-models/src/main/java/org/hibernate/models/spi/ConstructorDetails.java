@@ -7,6 +7,8 @@ package org.hibernate.models.spi;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+
 import static org.hibernate.models.spi.AnnotationTarget.Kind.CONSTRUCTOR;
 
 /**
@@ -16,6 +18,7 @@ import static org.hibernate.models.spi.AnnotationTarget.Kind.CONSTRUCTOR;
  * @author Steve Ebersole
  */
 public interface ConstructorDetails extends AnnotationTarget {
+	@Nonnull
 	@Override
 	default Kind getKind() {
 		return CONSTRUCTOR;
@@ -24,23 +27,28 @@ public interface ConstructorDetails extends AnnotationTarget {
 	/**
 	 * The class which declares this constructor
 	 */
+	@Nonnull
 	ClassDetails getDeclaringType();
 
 	/**
 	 * The argument types for this constructor.
 	 */
+	@Nonnull
 	List<ClassDetails> getArgumentTypes();
 
+	@Nonnull
 	@Override
-	default ClassDetails getContainer(ModelsContext modelsContext) {
+	default ClassDetails getContainer(@Nonnull ModelsContext modelsContext) {
 		return getDeclaringType();
 	}
 
 	/**
 	 * Access to the underlying {@linkplain Constructor}.
 	 */
+	@Nonnull
 	Constructor<?> toJavaConstructor();
 
+	@Nonnull
 	@Override
 	default ConstructorDetails asConstructorDetails() {
 		return this;

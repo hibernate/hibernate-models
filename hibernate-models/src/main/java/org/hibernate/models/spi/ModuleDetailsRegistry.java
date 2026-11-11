@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.UnknownModuleException;
 
 /// Registry of [ModuleDetails] references.
@@ -22,14 +25,16 @@ public interface ModuleDetailsRegistry {
 	/// @return The resolved module details
 	///
 	/// @throws UnknownModuleException If the module cannot be resolved
-	ModuleDetails resolveModuleDetails(String name);
+	@Nonnull
+	ModuleDetails resolveModuleDetails(@Nonnull String name);
 
 	/// Resolves the details for a loaded Java module.
 	///
 	/// @param module The Java module
 	///
 	/// @return The resolved module details
-	ModuleDetails resolveModuleDetails(Module module);
+	@Nonnull
+	ModuleDetails resolveModuleDetails(@Nonnull Module module);
 
 	/// Find the module with the given `name`, if there is one.
 	/// Returns `null` if there are none registered with that name.
@@ -37,10 +42,12 @@ public interface ModuleDetailsRegistry {
 	/// @param name The module name
 	///
 	/// @return The registered module details, or `null`
-	ModuleDetails findModuleDetails(String name);
+	@Nullable
+	ModuleDetails findModuleDetails(@Nonnull String name);
 
+	@Nonnull
 	@SuppressWarnings("unchecked")
-	default <S> S as(Class<S> type) {
+	default <S> S as(@Nonnull Class<S> type) {
 		if ( type.isInstance( this ) ) {
 			return (S) this;
 		}

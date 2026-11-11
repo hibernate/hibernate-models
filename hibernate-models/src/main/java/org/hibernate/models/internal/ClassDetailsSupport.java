@@ -17,13 +17,16 @@ import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
 import org.hibernate.models.spi.RecordComponentDetails;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * @author Steve Ebersole
  */
 public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTargetSupport {
 
 	@Override
-	default void forEachField(IndexedConsumer<FieldDetails> consumer) {
+	default void forEachField(@Nonnull IndexedConsumer<FieldDetails> consumer) {
 		final List<FieldDetails> fields = getFields();
 		if ( fields == null ) {
 			return;
@@ -35,7 +38,7 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 	}
 
 	@Override
-	default void forEachMethod(IndexedConsumer<MethodDetails> consumer) {
+	default void forEachMethod(@Nonnull IndexedConsumer<MethodDetails> consumer) {
 		final List<MethodDetails> methods = getMethods();
 		if ( methods == null ) {
 			return;
@@ -47,7 +50,7 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 	}
 
 	@Override
-	default void forEachRecordComponent(IndexedConsumer<RecordComponentDetails> consumer) {
+	default void forEachRecordComponent(@Nonnull IndexedConsumer<RecordComponentDetails> consumer) {
 		final List<RecordComponentDetails> recordComponents = getRecordComponents();
 		if ( recordComponents == null ) {
 			return;
@@ -58,10 +61,11 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 		}
 	}
 
+	@Nullable
 	@Override
 	default <A extends Annotation> A getAnnotationUsage(
-			AnnotationDescriptor<A> descriptor,
-			ModelsContext modelContext) {
+			@Nonnull AnnotationDescriptor<A> descriptor,
+			@Nonnull ModelsContext modelContext) {
 		final A localUsage = AnnotationUsageHelper.getUsage( descriptor, getUsageMap(),modelContext );
 		if ( localUsage != null ) {
 			return localUsage;
@@ -74,39 +78,46 @@ public interface ClassDetailsSupport extends MutableClassDetails, AnnotationTarg
 		return null;
 	}
 
+	@Nullable
 	@Override
-	default <A extends Annotation> A getAnnotationUsage(Class<A> annotationType, ModelsContext modelContext) {
+	default <A extends Annotation> A getAnnotationUsage(@Nonnull Class<A> annotationType, @Nonnull ModelsContext modelContext) {
 		return getAnnotationUsage(
 				modelContext.getAnnotationDescriptorRegistry().getDescriptor( annotationType ),
 				modelContext
 		);
 	}
 
+	@Nonnull
 	@Override
 	default MutableClassDetails asClassDetails() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	default <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
 		throw new IllegalCastException( "ClassDetails cannot be cast as AnnotationDescriptor" );
 	}
 
+	@Nonnull
 	@Override
 	default MutableMemberDetails asMemberDetails() {
 		throw new IllegalCastException( "ClassDetails cannot be cast as MemberDetails" );
 	}
 
+	@Nonnull
 	@Override
 	default FieldDetails asFieldDetails() {
 		throw new IllegalCastException( "ClassDetails cannot be cast as FieldDetails" );
 	}
 
+	@Nonnull
 	@Override
 	default MethodDetails asMethodDetails() {
 		throw new IllegalCastException( "ClassDetails cannot be cast as MethodDetails" );
 	}
 
+	@Nonnull
 	@Override
 	default RecordComponentDetails asRecordComponentDetails() {
 		throw new IllegalCastException( "ClassDetails cannot be cast as RecordComponentDetails" );

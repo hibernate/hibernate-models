@@ -8,6 +8,8 @@ import java.util.Locale;
 
 import org.hibernate.models.serial.spi.StorableContext;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Context object for hibernate-models.
  * Basically support for accessing the {@linkplain #getClassDetailsRegistry() ClassDetails registry}
@@ -21,27 +23,32 @@ public interface ModelsContext {
 	/**
 	 * The registry of annotation descriptors.
 	 */
+	@Nonnull
 	AnnotationDescriptorRegistry getAnnotationDescriptorRegistry();
 
 	/**
 	 * Registry of managed-classes.
 	 */
+	@Nonnull
 	ClassDetailsRegistry getClassDetailsRegistry();
 
 	/**
 	 * Registry of modules.
 	 */
+	@Nonnull
 	ModuleDetailsRegistry getModuleDetailsRegistry();
 
 	/**
 	 * Access to {@linkplain ClassLoader} operations.
 	 */
+	@Nonnull
 	ClassLoading getClassLoading();
 
 	/**
 	 * Treat support.
 	 */
-	default <S> S as(Class<S> type) {
+	@Nonnull
+	default <S> S as(@Nonnull Class<S> type) {
 		if ( type.isInstance( this ) ) {
 			return type.cast( this );
 		}
@@ -75,5 +82,6 @@ public interface ModelsContext {
 	/**
 	 * Serialization support.
 	 */
+	@Nonnull
 	StorableContext toStorableForm();
 }

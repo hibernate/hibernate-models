@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.ModelsException;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -23,7 +25,6 @@ import org.hibernate.models.spi.RecordComponentDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 
-
 /**
  * @author Steve Ebersole
  */
@@ -35,7 +36,7 @@ public class JdkFieldDetails extends AbstractJdkAnnotationTarget implements Fiel
 	private final boolean isArray;
 	private final boolean isPlural;
 
-	public JdkFieldDetails(Field field, JdkClassDetails declaringType, ModelsContext modelsContext) {
+	public JdkFieldDetails(@Nonnull Field field, @Nonnull JdkClassDetails declaringType, @Nonnull ModelsContext modelsContext) {
 		super( field::getAnnotations, modelsContext );
 		this.field = field;
 		this.declaringType = declaringType;
@@ -47,28 +48,33 @@ public class JdkFieldDetails extends AbstractJdkAnnotationTarget implements Fiel
 				|| Map.class.isAssignableFrom( field.getType() );
 	}
 
+	@Nonnull
 	@Override
 	public String getName() {
 		return field.getName();
 	}
 
+	@Nonnull
 	@Override
 	public TypeDetails getType() {
 		return type;
 	}
 
+	@Nonnull
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
 	}
 
+	@Nonnull
 	@Override
 	public Field toJavaMember() {
 		return field;
 	}
 
+	@Nonnull
 	@Override
-	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
+	public Field toJavaMember(@Nonnull Class<?> declaringClass, @Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext) {
 		if ( declaringClass == field.getDeclaringClass() ) {
 			return field;
 		}
@@ -105,36 +111,43 @@ public class JdkFieldDetails extends AbstractJdkAnnotationTarget implements Fiel
 		return field.getModifiers();
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return "JdkFieldDetails(" + getName() + ")";
 	}
 
+	@Nonnull
 	@Override
 	public FieldDetails asFieldDetails() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	public MutableMemberDetails asMemberDetails() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	public MethodDetails asMethodDetails() {
 		throw new IllegalCastException( "FieldDetails cannot be cast as MethodDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public RecordComponentDetails asRecordComponentDetails() {
 		throw new IllegalCastException( "FieldDetails cannot be cast as RecordComponentDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public MutableClassDetails asClassDetails() {
 		throw new IllegalCastException( "FieldDetails cannot be cast as ClassDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
 		throw new IllegalCastException( "FieldDetails cannot be cast as AnnotationDescriptor" );

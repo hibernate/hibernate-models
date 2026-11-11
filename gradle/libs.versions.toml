@@ -11,6 +11,7 @@ jbossLoggingTool = "3.0.4.Final"
 jdks-baseline = "17"
 
 # jakartaLibs
+annotations = "3.0.0"
 jpa = "3.2.0"
 inject = "2.0.1"
 jaxbApi = "4.0.5"
@@ -45,6 +46,7 @@ loggingAnnotations = { group = "org.jboss.logging", name = "jboss-logging-annota
 loggingProcessor = { group = "org.jboss.logging", name = "jboss-logging-processor", version.ref = "jbossLoggingTool" }
 
 # jakartaLibs
+jakarta-annotations = { group = "jakarta.annotation", name = "jakarta.annotation-api", version.ref = "annotations" }
 jakarta-jpa = { group = "jakarta.persistence", name = "jakarta.persistence-api", version.ref = "jpa" }
 jakarta-inject = { group = "jakarta.inject", name = "jakarta.inject-api", version.ref = "inject" }
 jakarta-jaxbApi = { group = "jakarta.xml.bind", name = "jakarta.xml.bind-api", version.ref = "jaxbApi" }

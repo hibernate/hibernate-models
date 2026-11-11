@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.internal.jdk;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.ModuleDetailsSupport;
 import org.hibernate.models.spi.ModelsContext;
 
@@ -21,11 +24,12 @@ public class JdkModuleDetails extends AbstractJdkAnnotationTarget implements Mod
 	///
 	/// @param module The Java module
 	/// @param modelContext The owning models context
-	public JdkModuleDetails(Module module, ModelsContext modelContext) {
+	public JdkModuleDetails(@Nonnull Module module, @Nonnull ModelsContext modelContext) {
 		super( module::getAnnotations, modelContext );
 		this.module = module;
 	}
 
+	@Nullable
 	@Override
 	public String getModuleName() {
 		return module.getName();
@@ -34,6 +38,7 @@ public class JdkModuleDetails extends AbstractJdkAnnotationTarget implements Mod
 	/// Access to the underlying Java module.
 	///
 	/// @return The Java module
+	@Nonnull
 	public Module toJavaModule() {
 		return module;
 	}
