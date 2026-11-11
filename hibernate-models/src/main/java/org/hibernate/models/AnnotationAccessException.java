@@ -4,6 +4,8 @@
  */
 package org.hibernate.models;
 
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.spi.AnnotationTarget;
 
 /**
@@ -14,11 +16,11 @@ import org.hibernate.models.spi.AnnotationTarget;
  * @author Steve Ebersole
  */
 public class AnnotationAccessException extends ModelsException {
-	public AnnotationAccessException(String message) {
+	public AnnotationAccessException(@Nullable String message) {
 		super( message );
 	}
 
-	public AnnotationAccessException(String message, Throwable cause) {
+	public AnnotationAccessException(@Nullable String message, @Nullable Throwable cause) {
 		super( message, cause );
 	}
 }

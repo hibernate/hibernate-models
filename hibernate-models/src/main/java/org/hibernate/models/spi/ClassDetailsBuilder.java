@@ -4,6 +4,9 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.UnknownClassException;
 
 /**
@@ -19,5 +22,6 @@ public interface ClassDetailsBuilder {
 	 *
 	 * @throws UnknownClassException To indicate that the given class name is not valid
 	 */
-	ClassDetails buildClassDetails(String name, ModelsContext modelsContext);
+	@Nullable
+	ClassDetails buildClassDetails(@Nonnull String name, @Nonnull ModelsContext modelsContext);
 }

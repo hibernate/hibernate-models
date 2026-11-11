@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Models a class type.
  *
@@ -13,6 +15,7 @@ package org.hibernate.models.spi;
  */
 public interface ClassTypeDetails extends ClassBasedTypeDetails {
 
+	@Nonnull
 	@Override
 	default ClassTypeDetails asClassType() {
 		return this;

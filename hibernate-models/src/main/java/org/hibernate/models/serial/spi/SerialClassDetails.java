@@ -6,6 +6,9 @@ package org.hibernate.models.serial.spi;
 
 import java.io.Serializable;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
 
@@ -13,9 +16,12 @@ import org.hibernate.models.spi.ModelsContext;
  * @author Steve Ebersole
  */
 public interface SerialClassDetails extends Serializable {
+	@Nonnull
 	String getName();
 
+	@Nullable
 	String getClassName();
 
-	ClassDetails toClassDetails(ModelsContext context);
+	@Nonnull
+	ClassDetails toClassDetails(@Nonnull ModelsContext context);
 }

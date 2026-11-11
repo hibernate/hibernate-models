@@ -7,6 +7,8 @@ package org.hibernate.models.spi;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * @author Steve Ebersole
  */
@@ -14,14 +16,18 @@ public interface MutableAnnotationDescriptor<A extends Annotation, C extends A> 
 	/**
 	 * The mutable contract for the given annotation
 	 */
+	@Nonnull
 	Class<C> getMutableAnnotationType();
 
+	@Nonnull
 	@Override
-	C createUsage(ModelsContext modelsContext);
+	C createUsage(@Nonnull ModelsContext modelsContext);
 
+	@Nonnull
 	@Override
-	C createUsage(A jdkAnnotation, ModelsContext modelsContext);
+	C createUsage(@Nonnull A jdkAnnotation, @Nonnull ModelsContext modelsContext);
 
+	@Nonnull
 	@Override
-	C createUsage(Map<String, Object> attributeValues, ModelsContext modelsContext);
+	C createUsage(@Nonnull Map<String, Object> attributeValues, @Nonnull ModelsContext modelsContext);
 }

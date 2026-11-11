@@ -4,9 +4,11 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * @author Steve Ebersole
  */
 public interface MutableAnnotationDescriptorRegistry extends AnnotationDescriptorRegistry {
-	void register(AnnotationDescriptor<?> descriptor);
+	void register(@Nonnull AnnotationDescriptor<?> descriptor);
 }

@@ -6,6 +6,9 @@ package org.hibernate.models.serial.spi;
 
 import java.io.Externalizable;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.RegistryPrimer;
 
@@ -15,5 +18,6 @@ import org.hibernate.models.spi.RegistryPrimer;
 /// @author Steve Ebersole
 public interface ModelsArchive extends Externalizable {
 	/// Restore the archived graph using the supplied runtime dependencies.
-	RestoredModels restore(ClassLoading classLoading, RegistryPrimer registryPrimer);
+	@Nonnull
+	RestoredModels restore(@Nonnull ClassLoading classLoading, @Nullable RegistryPrimer registryPrimer);
 }

@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.jdk.internal.AbstractJdkAnnotationTarget;
 import org.hibernate.models.spi.AnnotationDescriptor;
@@ -48,12 +51,17 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 	private final boolean isArray;
 	private final boolean isPlural;
 
+	/**
+	 * Constructs method details.
+	 *
+	 * @param type The attribute type for a getter or setter; may be {@code null} for other methods
+	 */
 	public JdkMethodDetails(
-			Method method,
-			MethodKind methodKind,
-			TypeDetails type,
-			ClassDetails declaringType,
-			ModelsContext modelsContext) {
+			@Nonnull Method method,
+			@Nonnull MethodKind methodKind,
+			@Nullable TypeDetails type,
+			@Nonnull ClassDetails declaringType,
+			@Nonnull ModelsContext modelsContext) {
 		super( method::getAnnotations, modelsContext );
 		this.method = method;
 		this.methodKind = methodKind;
@@ -68,7 +76,6 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 		for ( int i = 0; i < method.getParameterTypes().length; i++ ) {
 			argumentTypes.add( classDetailsRegistry.resolveClassDetails( method.getParameterTypes()[i].getName() ) );
 		}
-
 
 		switch ( methodKind ) {
 			case GETTER -> {
@@ -92,25 +99,30 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 //		}
 	}
 
+	@Nonnull
 	public Method getMethod() {
 		return method;
 	}
 
+	@Nonnull
 	@Override
 	public String getName() {
 		return method.getName();
 	}
 
+	@Nonnull
 	@Override
 	public MethodKind getMethodKind() {
 		return methodKind;
 	}
 
+	@Nullable
 	@Override
 	public TypeDetails getType() {
 		return type;
 	}
 
+	@Nonnull
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
@@ -126,21 +138,24 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 		return isArray;
 	}
 
+	@Nonnull
 	@Override
 	public Method toJavaMember() {
 		return method;
 	}
 
+	@Nonnull
 	@Override
-	public Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
+	public Method toJavaMember(@Nonnull Class<?> declaringClass, @Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext) {
 		if ( declaringClass == method.getDeclaringClass() ) {
 			return method;
 		}
 		return resolveJavaMember( this, declaringClass, classLoading, modelContext );
 	}
 
+	@Nullable
 	@Override
-	public TypeDetails resolveRelativeType(TypeVariableScope container) {
+	public TypeDetails resolveRelativeType(@Nonnull TypeVariableScope container) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
 			return type.determineRelativeType( container );
 		}
@@ -148,8 +163,9 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 		throw new IllegalStateException( "Method does not have a type - " + this );
 	}
 
+	@Nonnull
 	@Override
-	public ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container) {
+	public ClassBasedTypeDetails resolveRelativeClassType(@Nonnull TypeVariableScope container) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
 			return TypeDetailsHelper.resolveRelativeClassType( type, container );
 		}
@@ -161,16 +177,19 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 		return method.getModifiers();
 	}
 
+	@Nonnull
 	@Override
 	public ClassDetails getReturnType() {
 		return returnType;
 	}
 
+	@Nonnull
 	@Override
 	public List<ClassDetails> getArgumentTypes() {
 		return argumentTypes;
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return String.format(
@@ -181,31 +200,37 @@ public class JdkMethodDetails extends AbstractJdkAnnotationTarget implements Met
 		);
 	}
 
+	@Nonnull
 	@Override
 	public MethodDetails asMethodDetails() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	public MutableMemberDetails asMemberDetails() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	public FieldDetails asFieldDetails() {
 		throw new IllegalCastException( "MethodDetails cannot be cast as FieldDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public RecordComponentDetails asRecordComponentDetails() {
 		throw new IllegalCastException( "MethodDetails cannot be cast as RecordComponentDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public MutableClassDetails asClassDetails() {
 		throw new IllegalCastException( "MethodDetails cannot be cast as ClassDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
 		throw new IllegalCastException( "MethodDetails cannot be cast as AnnotationDescriptor" );

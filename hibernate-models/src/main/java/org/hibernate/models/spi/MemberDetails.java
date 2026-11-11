@@ -5,6 +5,10 @@
 package org.hibernate.models.spi;
 
 import java.lang.reflect.Member;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.ModifierUtils;
 
 /**
@@ -19,6 +23,7 @@ public interface MemberDetails extends AnnotationTarget {
 	/**
 	 * The name of the member.  This would be the name of the method or field.
 	 */
+	@Nonnull
 	String getName();
 
 	/**
@@ -31,10 +36,12 @@ public interface MemberDetails extends AnnotationTarget {
 	 * <li>otherwise, {@code null}</li>
 	 * </ul>
 	 */
+	@Nullable
 	TypeDetails getType();
 
+	@Nonnull
 	@Override
-	default ClassDetails getContainer(ModelsContext modelsContext) {
+	default ClassDetails getContainer(@Nonnull ModelsContext modelsContext) {
 		return getDeclaringType();
 	}
 
@@ -42,6 +49,7 @@ public interface MemberDetails extends AnnotationTarget {
 	 * For plural members, the {@linkplain #getElementType "element type"};
 	 * otherwise, the member's {@linkplain #getType() type}
 	 */
+	@Nullable
 	default TypeDetails getAssociatedType() {
 		return isPlural() ? getElementType() : getType();
 	}
@@ -54,6 +62,7 @@ public interface MemberDetails extends AnnotationTarget {
 	 * <p/>
 	 * For maps, the value type is returned.
 	 */
+	@Nullable
 	default TypeDetails getElementType() {
 		return TypeDetailsHelper.extractElementType( getType() );
 	}
@@ -62,6 +71,7 @@ public interface MemberDetails extends AnnotationTarget {
 	 * Get the map key type for this member.  If the member does not have a type or the
 	 * member is not a map, a {@code null} is returned.
 	 */
+	@Nullable
 	default TypeDetails getMapKeyType() {
 		final TypeDetails memberType = getType();
 		return memberType == null || !memberType.isImplementor( java.util.Map.class )
@@ -72,6 +82,7 @@ public interface MemberDetails extends AnnotationTarget {
 	/**
 	 * The class which declares this member
 	 */
+	@Nonnull
 	ClassDetails getDeclaringType();
 
 	/**
@@ -93,6 +104,7 @@ public interface MemberDetails extends AnnotationTarget {
 	/**
 	 * Get the member's visibility
 	 */
+	@Nonnull
 	default Visibility getVisibility() {
 		return ModifierUtils.resolveVisibility( getModifiers() );
 	}
@@ -139,6 +151,7 @@ public interface MemberDetails extends AnnotationTarget {
 	 * for a {@linkplain Kind#METHOD method}, this will be the name as determined by the
 	 * Java Bean naming pattern.
 	 */
+	@Nullable
 	String resolveAttributeName();
 
 	/**
@@ -148,12 +161,15 @@ public interface MemberDetails extends AnnotationTarget {
 	 *
 	 * @throws RuntimeException If there is expected to be a member, but it cannot be located.
 	 */
+	@Nullable
 	Member toJavaMember();
 
-	Member toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
+	@Nullable
+	Member toJavaMember(@Nonnull Class<?> declaringClass, @Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext);
 
 	/**
 	 * Determine the type of the member relative to the given {@code container} type.
+	 * Returns {@code null} when a type variable cannot be resolved in that scope.
 	 * <p/>
 	 * For example, given
 	 * <pre class="brush:java">
@@ -174,7 +190,8 @@ public interface MemberDetails extends AnnotationTarget {
 	 * @apiNote It is only valid to call this on members which have a type, i.e. fields,
 	 * getters, setters and record components.
 	 */
-	default TypeDetails resolveRelativeType(TypeVariableScope container) {
+	@Nullable
+	default TypeDetails resolveRelativeType(@Nonnull TypeVariableScope container) {
 		return getType().determineRelativeType( container );
 	}
 
@@ -185,7 +202,8 @@ public interface MemberDetails extends AnnotationTarget {
 	 * @see #getAssociatedType()
 	 * @see #resolveRelativeType(TypeVariableScope)
 	 */
-	default TypeDetails resolveRelativeAssociatedType(TypeVariableScope container) {
+	@Nullable
+	default TypeDetails resolveRelativeAssociatedType(@Nonnull TypeVariableScope container) {
 		return getAssociatedType().determineRelativeType( container );
 	}
 
@@ -195,20 +213,25 @@ public interface MemberDetails extends AnnotationTarget {
 	 * Similar to {@linkplain #resolveRelativeType(TypeVariableScope)}, but fully resolving the result
 	 * into the concrete class.
 	 */
-	default ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container) {
+	@Nonnull
+	default ClassBasedTypeDetails resolveRelativeClassType(@Nonnull TypeVariableScope container) {
 		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
 	}
 
-
+	@Nonnull
 	@Override
 	default MemberDetails asMemberDetails() {
 		return this;
 	}
 
 	enum Visibility {
+		@Nonnull
 		PUBLIC,
+		@Nonnull
 		PROTECTED,
+		@Nonnull
 		PACKAGE,
+		@Nonnull
 		PRIVATE
 	}
 }

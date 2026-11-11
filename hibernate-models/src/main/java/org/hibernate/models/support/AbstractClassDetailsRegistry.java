@@ -14,6 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.MissingPackageInfoDetails;
 import org.hibernate.models.internal.util.CollectionHelper;
@@ -34,26 +37,30 @@ import static org.hibernate.models.spi.ClassDetails.VOID_OBJECT_CLASS_DETAILS;
  * @author Steve Ebersole
  */
 public abstract class AbstractClassDetailsRegistry implements MutableClassDetailsRegistry {
+	@Nonnull
 	protected final ModelsContext context;
 	private final boolean trackImplementors;
 
+	@Nonnull
 	protected final Map<String, ClassDetails> classDetailsMap;
 
 	// class -> subclasses
+	@Nonnull
 	protected final Map<String, Set<ClassDetails>> directSubtypeMap;
 	// interface -> implementations (and specializations)
+	@Nonnull
 	protected final Map<String, Set<ClassDetails>> directImplementorMap;
 
-	protected AbstractClassDetailsRegistry(boolean trackImplementors, ModelsContext context) {
+	protected AbstractClassDetailsRegistry(boolean trackImplementors, @Nonnull ModelsContext context) {
 		this( trackImplementors, new ConcurrentHashMap<>(), new ConcurrentHashMap<>(), new ConcurrentHashMap<>(), context );
 	}
 
 	protected AbstractClassDetailsRegistry(
 			boolean trackImplementors,
-			Map<String, ClassDetails> classDetailsMap,
-			Map<String, Set<ClassDetails>> directSubtypeMap,
-			Map<String, Set<ClassDetails>> directImplementorMap,
-			ModelsContext context) {
+			@Nonnull Map<String, ClassDetails> classDetailsMap,
+			@Nonnull Map<String, Set<ClassDetails>> directSubtypeMap,
+			@Nonnull Map<String, Set<ClassDetails>> directImplementorMap,
+			@Nonnull ModelsContext context) {
 		this.trackImplementors = trackImplementors;
 		this.classDetailsMap = classDetailsMap;
 		this.directSubtypeMap = directSubtypeMap;
@@ -71,22 +78,24 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		return trackImplementors;
 	}
 
+	@Nonnull
 	@Override
-	public List<ClassDetails> getDirectSubTypes(String typeName) {
+	public List<ClassDetails> getDirectSubTypes(@Nonnull String typeName) {
 		final Set<ClassDetails> directSubtypes = getDirectSubtypes( typeName );
 		return CollectionHelper.isNotEmpty( directSubtypes )
 				? new ArrayList<>( directSubtypes )
 				: List.of();
 	}
 
+	@Nonnull
 	@Override
-	public Set<ClassDetails> getDirectSubtypes(String typeName) {
+	public Set<ClassDetails> getDirectSubtypes(@Nonnull String typeName) {
 		final Set<ClassDetails> directSubtypes = directSubtypeMap.get( typeName );
 		return directSubtypes != null ? directSubtypes : Set.of();
 	}
 
 	@Override
-	public void forEachDirectSubtype(String typeName, ClassDetailsConsumer consumer) {
+	public void forEachDirectSubtype(@Nonnull String typeName, @Nonnull ClassDetailsConsumer consumer) {
 		final List<ClassDetails> directSubTypes = getDirectSubTypes( typeName );
 		if ( directSubTypes == null ) {
 			return;
@@ -96,8 +105,9 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		}
 	}
 
+	@Nonnull
 	@Override
-	public Set<ClassDetails> getDirectImplementors(String interfaceName) {
+	public Set<ClassDetails> getDirectImplementors(@Nonnull String interfaceName) {
 		if ( !trackImplementors ) {
 			return Collections.emptySet();
 		}
@@ -107,7 +117,7 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	}
 
 	@Override
-	public void forEachDirectImplementor(String interfaceName, ClassDetailsConsumer consumer) {
+	public void forEachDirectImplementor(@Nonnull String interfaceName, @Nonnull ClassDetailsConsumer consumer) {
 		if ( !trackImplementors ) {
 			return;
 		}
@@ -119,7 +129,7 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	}
 
 	@Override
-	public void walkConcreteTypes(String base, boolean includeBase, ClassDetailsConsumer consumer) {
+	public void walkConcreteTypes(@Nonnull String base, boolean includeBase, @Nonnull ClassDetailsConsumer consumer) {
 		walkImplementors( base, includeBase, classDetails -> {
 			if ( !classDetails.isAbstract() && !classDetails.isInterface() ) {
 				consumer.consume( classDetails );
@@ -127,8 +137,9 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		});
 	}
 
+	@Nonnull
 	@Override
-	public Set<ClassDetails> collectImplementors(String base, boolean includeBase, Predicate<ClassDetails> exclusions) {
+	public Set<ClassDetails> collectImplementors(@Nonnull String base, boolean includeBase, @Nullable Predicate<ClassDetails> exclusions) {
 		final Set<ClassDetails> result = new LinkedHashSet<>();
 		walkImplementors( base, includeBase, classDetails -> {
 			if ( exclusions == null || !exclusions.test( classDetails ) ) {
@@ -139,7 +150,7 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	}
 
 	@Override
-	public void walkImplementors(String base, boolean includeBase, ClassDetailsConsumer consumer) {
+	public void walkImplementors(@Nonnull String base, boolean includeBase, @Nonnull ClassDetailsConsumer consumer) {
 		if ( includeBase ) {
 			final ClassDetails baseDetails = resolveClassDetails( base );
 			consumer.consume( baseDetails );
@@ -182,25 +193,28 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		}
 	}
 
+	@Nullable
 	@Override
-	public ClassDetails findClassDetails(String name) {
+	public ClassDetails findClassDetails(@Nonnull String name) {
 		return classDetailsMap.get( name );
 	}
 
 	@Override
-	public void forEachClassDetails(ClassDetailsConsumer consumer) {
+	public void forEachClassDetails(@Nonnull ClassDetailsConsumer consumer) {
 		for ( Map.Entry<String, ClassDetails> entry : classDetailsMap.entrySet() ) {
 			consumer.consume( entry.getValue() );
 		}
 	}
 
+	@Nonnull
 	@Override
 	public Stream<ClassDetails> streamClassDetails() {
 		return classDetailsMap.values().stream();
 	}
 
+	@Nonnull
 	@Override
-	public ClassDetails resolveClassDetails(String name) {
+	public ClassDetails resolveClassDetails(@Nonnull String name) {
 		if ( name == null ) {
 			throw new IllegalArgumentException( "`name` cannot be null" );
 		}
@@ -213,8 +227,9 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		return createClassDetails( name );
 	}
 
+	@Nonnull
 	@Override
-	public ClassDetails resolvePackageDetails(String packageName) {
+	public ClassDetails resolvePackageDetails(@Nonnull String packageName) {
 		final ClassDetails existing = findPackageDetails( packageName );
 		if ( existing != null ) {
 			return existing;
@@ -234,14 +249,16 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	 * is absent. Backends may override this to locate descriptors without reflection.
 	 * Loading and construction failures must propagate rather than indicate absence.
 	 */
-	protected ClassDetails buildPackageDetails(String packageInfoName) {
+	@Nullable
+	protected ClassDetails buildPackageDetails(@Nonnull String packageInfoName) {
 		final Class<?> descriptorClass = context.getClassLoading().findClassForName( packageInfoName );
 		return descriptorClass == null ? null : JdkBuilders.buildClassDetailsStatic( descriptorClass, context );
 	}
 
+	@Nonnull
 	@Override
 	@SuppressWarnings({ "deprecation", "removal" })
-	public ClassDetails resolveClassOrPackageDetails(String name) {
+	public ClassDetails resolveClassOrPackageDetails(@Nonnull String name) {
 		if ( name == null ) {
 			throw new IllegalArgumentException( "`name` cannot be null" );
 		}
@@ -274,17 +291,20 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		}
 	}
 
-	protected ClassDetails createClassDetails(String name) {
+	@Nonnull
+	protected ClassDetails createClassDetails(@Nonnull String name) {
 		return createClassDetailsExact( name, name );
 	}
 
-	protected ClassDetails createClassDetailsExact(String name, String registrationName) {
+	@Nonnull
+	protected ClassDetails createClassDetailsExact(@Nonnull String name, @Nonnull String registrationName) {
 		final ClassDetails created = buildClassDetails( name );
 		addClassDetails( registrationName, created );
 		return created;
 	}
 
-	protected ClassDetails buildClassDetails(String name) {
+	@Nonnull
+	protected ClassDetails buildClassDetails(@Nonnull String name) {
 		final ClassDetails classDetails = getClassDetailsBuilder().buildClassDetails( name, context );
 		if ( classDetails == null ) {
 			throw new UnknownClassException( "Unable to resolve ClassDetails for `" + name + "`" );
@@ -293,12 +313,12 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 	}
 
 	@Override
-	public void addClassDetails(ClassDetails classDetails) {
+	public void addClassDetails(@Nonnull ClassDetails classDetails) {
 		addClassDetails( classDetails.getClassName(), classDetails );
 	}
 
 	@Override
-	public void addClassDetails(String name, ClassDetails classDetails) {
+	public void addClassDetails(@Nonnull String name, @Nonnull ClassDetails classDetails) {
 		classDetailsMap.put( name, classDetails );
 
 		if ( classDetails.getSuperClass() != null ) {
@@ -325,8 +345,9 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		}
 	}
 
+	@Nullable
 	@Override
-	public ClassDetails resolveClassDetails(String name, ClassDetailsCreator creator) {
+	public ClassDetails resolveClassDetails(@Nonnull String name, @Nonnull ClassDetailsCreator creator) {
 		if ( name == null ) {
 			throw new IllegalArgumentException( "`name` cannot be null" );
 		}
@@ -343,24 +364,29 @@ public abstract class AbstractClassDetailsRegistry implements MutableClassDetail
 		return createClassDetails( name, creator );
 	}
 
-	protected ClassDetails createClassDetails(String name, ClassDetailsCreator creator) {
+	@Nonnull
+	protected ClassDetails createClassDetails(@Nonnull String name, @Nonnull ClassDetailsCreator creator) {
 		final ClassDetails created = creator.createClassDetails( name );
 		addClassDetails( name, created );
 		return created;
 	}
 
+	@Nonnull
 	public Map<String, ClassDetails> classDetailsMap() {
 		return classDetailsMap;
 	}
 
+	@Nonnull
 	public Map<String, ClassDetails> getClassDetailsMap() {
 		return Collections.unmodifiableMap( classDetailsMap );
 	}
 
+	@Nonnull
 	public Map<String, Set<ClassDetails>> getDirectSubTypeMap() {
 		return Collections.unmodifiableMap( directSubtypeMap );
 	}
 
+	@Nonnull
 	public Map<String, Set<ClassDetails>> getDirectImplementorMap() {
 		return Collections.unmodifiableMap( directImplementorMap );
 	}

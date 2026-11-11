@@ -6,6 +6,8 @@ package org.hibernate.models.spi;
 
 import java.lang.reflect.Method;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Descriptor for an annotation attribute
  *
@@ -15,16 +17,19 @@ public interface AttributeDescriptor<T> {
 	/**
 	 * The name of the attribute.
 	 */
+	@Nonnull
 	String getName();
 
 	/**
 	 * Descriptor for this attribute's type
 	 */
+	@Nonnull
 	ValueTypeDescriptor<T> getTypeDescriptor();
 
 	/**
 	 * The attribute method.
 	 */
+	@Nonnull
 	Method getAttributeMethod();
 
 	default boolean isMultiValued() {

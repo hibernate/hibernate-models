@@ -1,4 +1,6 @@
 module org.hibernate.models {
+	requires transitive jakarta.annotation;
+
 	requires org.jboss.logging;
 
 	exports org.hibernate.models;

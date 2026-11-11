@@ -4,6 +4,8 @@
  */
 package org.hibernate.models;
 
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.ModelsContext;
@@ -19,7 +21,7 @@ import org.hibernate.models.spi.ModelsContext;
  * @author Steve Ebersole
  */
 public class DynamicClassException extends ModelsException {
-	public DynamicClassException(String message) {
+	public DynamicClassException(@Nullable String message) {
 		super( message );
 	}
 }

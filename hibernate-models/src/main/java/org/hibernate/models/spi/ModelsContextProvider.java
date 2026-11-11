@@ -6,6 +6,9 @@ package org.hibernate.models.spi;
 
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.BasicModelsContextImpl;
 
 /**
@@ -23,5 +26,6 @@ public interface ModelsContextProvider {
 	 *
 	 * @return The alternate context, or null.
 	 */
-	ModelsContext produceContext(ClassLoading classLoading, RegistryPrimer registryPrimer, Map<Object,Object> configProperties);
+	@Nullable
+	ModelsContext produceContext(@Nonnull ClassLoading classLoading, @Nullable RegistryPrimer registryPrimer, @Nonnull Map<Object,Object> configProperties);
 }

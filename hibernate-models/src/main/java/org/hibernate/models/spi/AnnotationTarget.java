@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.AnnotationAccessException;
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.internal.AnnotationTargetHelper;
@@ -29,11 +32,14 @@ public interface AnnotationTarget {
 	/**
 	 * The kind of target
 	 */
+	@Nonnull
 	Kind getKind();
 
 	/**
-	 * A descriptive name for the target used mostly for logging
+	 * A descriptive name for the target used mostly for logging.
+	 * May be {@code null} for an unnamed module.
 	 */
+	@Nullable
 	String getName();
 
 	/**
@@ -46,7 +52,8 @@ public interface AnnotationTarget {
 	 * @apiNote If not already, this resolution should be registered into the context's
 	 * {@linkplain ModelsContext#getClassDetailsRegistry() class registry}
 	 */
-	ClassDetails getContainer(ModelsContext modelsContext);
+	@Nullable
+	ClassDetails getContainer(@Nonnull ModelsContext modelsContext);
 
 	/**
 	 * Walk "up" {@linkplain #getContainer containers} from this target.
@@ -57,8 +64,8 @@ public interface AnnotationTarget {
 	 */
 	default void walkContainers(
 			boolean crossPackageBoundaries,
-			ModelsContext modelContext,
-			Consumer<ClassDetails> consumer) {
+			@Nonnull ModelsContext modelContext,
+			@Nonnull Consumer<ClassDetails> consumer) {
 		AnnotationTargetHelper.walkContainers( this, crossPackageBoundaries, modelContext, consumer );
 	}
 
@@ -71,8 +78,8 @@ public interface AnnotationTarget {
 	 */
 	default void walkSelfAndContainers(
 			boolean crossPackageBoundaries,
-			ModelsContext modelContext,
-			Consumer<AnnotationTarget> consumer) {
+			@Nonnull ModelsContext modelContext,
+			@Nonnull Consumer<AnnotationTarget> consumer) {
 		AnnotationTargetHelper.walkSelfAndContainers( this, crossPackageBoundaries, modelContext, consumer );
 	}
 
@@ -83,10 +90,11 @@ public interface AnnotationTarget {
 	 * @param modelContext Access to useful stuff.
 	 * @param matchingExtractor A function that acts as an extractor against a container.  A non-null return indicates a match, which will be the return from this method.
 	 */
+	@Nullable
 	default <T> T fromContainers(
 			boolean crossPackageBoundaries,
-			ModelsContext modelContext,
-			Function<ClassDetails,T> matchingExtractor) {
+			@Nonnull ModelsContext modelContext,
+			@Nonnull Function<ClassDetails,T> matchingExtractor) {
 		return AnnotationTargetHelper.fromContainers( this, crossPackageBoundaries, modelContext, matchingExtractor );
 	}
 
@@ -97,10 +105,11 @@ public interface AnnotationTarget {
 	 * @param modelContext Access to useful stuff.
 	 * @param matchingExtractor A function that acts as an extractor against a container.  A non-null return indicates a match, which will be the return from this method.
 	 */
+	@Nullable
 	default <T> T fromSelfAndContainers(
 			boolean crossPackageBoundaries,
-			ModelsContext modelContext,
-			Function<AnnotationTarget,T> matchingExtractor) {
+			@Nonnull ModelsContext modelContext,
+			@Nonnull Function<AnnotationTarget,T> matchingExtractor) {
 		return AnnotationTargetHelper.fromSelfAndContainers( this, crossPackageBoundaries, modelContext, matchingExtractor );
 	}
 
@@ -110,6 +119,7 @@ public interface AnnotationTarget {
 	 * @apiNote This returns the usages directly available on the target; it does not
 	 * expand repeatable containers (e.g. NamedQueries -> *NamedQuery).
 	 */
+	@Nonnull
 	Collection<? extends Annotation> getDirectAnnotationUsages();
 
 	/**
@@ -118,7 +128,7 @@ public interface AnnotationTarget {
 	 * @apiNote Only visits the usages directly available on the target; it does not
 	 * visit across repeatable containers (e.g. NamedQueries -> *NamedQuery).
 	 */
-	default void forEachDirectAnnotationUsage(Consumer<? extends Annotation> consumer) {
+	default void forEachDirectAnnotationUsage(@Nonnull Consumer<? extends Annotation> consumer) {
 		//noinspection unchecked,rawtypes
 		getDirectAnnotationUsages().forEach( (Consumer) consumer );
 	}
@@ -132,19 +142,21 @@ public interface AnnotationTarget {
 	 * method with {@code NamedQuery} will return {@code false} when the target directly
 	 * has a NamedQueries.
 	 */
-	<A extends Annotation> boolean hasDirectAnnotationUsage(Class<A> type);
+	<A extends Annotation> boolean hasDirectAnnotationUsage(@Nonnull Class<A> type);
 
 	/**
 	 * Form of {@linkplain #getAnnotationUsage(AnnotationDescriptor, ModelsContext)} which returns {@code null} instead of
 	 * throwing {@linkplain AnnotationAccessException} when more than one usage of the requested
 	 * annotation exists.
 	 */
-	<A extends Annotation> A getDirectAnnotationUsage(AnnotationDescriptor<A> descriptor);
+	@Nullable
+	<A extends Annotation> A getDirectAnnotationUsage(@Nonnull AnnotationDescriptor<A> descriptor);
 
 	/**
 	 * Form of {@link #getDirectAnnotationUsage(AnnotationDescriptor)} accepting the annotation {@linkplain Class}
 	 */
-	<A extends Annotation> A getDirectAnnotationUsage(Class<A> type);
+	@Nullable
+	<A extends Annotation> A getDirectAnnotationUsage(@Nonnull Class<A> type);
 
 	/**
 	 * Whether the given annotation is used on this target.
@@ -155,7 +167,7 @@ public interface AnnotationTarget {
 	 * method with {@code NamedQuery} will return {@code true} when the target directly
 	 * has a NamedQueries.
 	 */
-	<A extends Annotation> boolean hasAnnotationUsage(Class<A> type, ModelsContext modelContext);
+	<A extends Annotation> boolean hasAnnotationUsage(@Nonnull Class<A> type, @Nonnull ModelsContext modelContext);
 
 	/**
 	 * Get the usage of the given annotation on this target.
@@ -180,12 +192,14 @@ public interface AnnotationTarget {
 	 *
 	 * @return The usage or {@code null}
 	 */
-	<A extends Annotation> A getAnnotationUsage(AnnotationDescriptor<A> descriptor, ModelsContext modelContext);
+	@Nullable
+	<A extends Annotation> A getAnnotationUsage(@Nonnull AnnotationDescriptor<A> descriptor, @Nonnull ModelsContext modelContext);
 
 	/**
 	 * Form of {@link #getAnnotationUsage(AnnotationDescriptor, ModelsContext)} accepting the annotation {@linkplain Class}
 	 */
-	default <A extends Annotation> A getAnnotationUsage(Class<A> type, ModelsContext modelContext) {
+	@Nullable
+	default <A extends Annotation> A getAnnotationUsage(@Nonnull Class<A> type, @Nonnull ModelsContext modelContext) {
 		return getAnnotationUsage( modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ), modelContext );
 	}
 
@@ -193,10 +207,14 @@ public interface AnnotationTarget {
 	 * Form of {@linkplain #getAnnotationUsage} which also considers meta-annotations -
 	 * annotations on the classes of each {@linkplain #getDirectAnnotationUsages() local annotation}.
 	 */
-	<A extends Annotation> A locateAnnotationUsage(Class<A> type, ModelsContext modelContext);
+	@Nullable
+	<A extends Annotation> A locateAnnotationUsage(@Nonnull Class<A> type, @Nonnull ModelsContext modelContext);
 
 	/**
 	 * Get all usages of the specified {@code annotationType} in this scope.
+	 *
+	 * @return The usages, or {@code null} for targets such as simple class details
+	 * and missing package descriptors which do not collect annotation usages
 	 *
 	 * @apiNote For {@linkplain Repeatable repeatable} annotation types (e.g. {@code @NamedQuery}),
 	 * the returned list will contain the union of <ol>
@@ -204,27 +222,29 @@ public interface AnnotationTarget {
 	 *     <li>the nested {@code @NamedQuery} usages from the {@code @NamedQueries} usage</li>
 	 * </ol>
 	 */
-	<A extends Annotation> A[] getRepeatedAnnotationUsages(AnnotationDescriptor<A> type, ModelsContext modelContext);
+	@Nullable
+	<A extends Annotation> A[] getRepeatedAnnotationUsages(@Nonnull AnnotationDescriptor<A> type, @Nonnull ModelsContext modelContext);
 
 	/**
 	 * Form of {@linkplain #getRepeatedAnnotationUsages(AnnotationDescriptor, ModelsContext)} accepting the annotation {@linkplain Class}
 	 */
+	@Nullable
 	default <A extends Annotation> A[] getRepeatedAnnotationUsages(
-			Class<A> type,
-			ModelsContext modelContext) {
+			@Nonnull Class<A> type,
+			@Nonnull ModelsContext modelContext) {
 		return getRepeatedAnnotationUsages( modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ), modelContext );
 	}
 
 	<A extends Annotation,C extends Annotation> void forEachRepeatedAnnotationUsages(
-			Class<A> repeatable,
-			Class<C> container,
-			ModelsContext modelContext,
-			Consumer<A> consumer);
+			@Nonnull Class<A> repeatable,
+			@Nonnull Class<C> container,
+			@Nonnull ModelsContext modelContext,
+			@Nonnull Consumer<A> consumer);
 
 	default <A extends Annotation,C extends Annotation> void forEachRepeatedAnnotationUsages(
-			AnnotationDescriptor<A> repeatable,
-			ModelsContext modelContext,
-			Consumer<A> consumer) {
+			@Nonnull AnnotationDescriptor<A> repeatable,
+			@Nonnull ModelsContext modelContext,
+			@Nonnull Consumer<A> consumer) {
 		assert repeatable.isRepeatable();
 		forEachRepeatedAnnotationUsages(
 				repeatable.getAnnotationType(),
@@ -241,9 +261,9 @@ public interface AnnotationTarget {
 	 * called for those defined on the container.
 	 */
 	default <X extends Annotation> void forEachAnnotationUsage(
-			AnnotationDescriptor<X> type,
-			ModelsContext modelContext,
-			Consumer<X> consumer) {
+			@Nonnull AnnotationDescriptor<X> type,
+			@Nonnull ModelsContext modelContext,
+			@Nonnull Consumer<X> consumer) {
 		final X[] annotations = getRepeatedAnnotationUsages( type, modelContext );
 		if ( annotations == null ) {
 			return;
@@ -257,9 +277,9 @@ public interface AnnotationTarget {
 	 * Form of {@link #forEachAnnotationUsage(AnnotationDescriptor, ModelsContext, Consumer)} accepting the annotation {@linkplain Class}
 	 */
 	default <X extends Annotation> void forEachAnnotationUsage(
-			Class<X> type,
-			ModelsContext modelContext,
-			Consumer<X> consumer) {
+			@Nonnull Class<X> type,
+			@Nonnull ModelsContext modelContext,
+			@Nonnull Consumer<X> consumer) {
 		forEachAnnotationUsage(
 				modelContext.getAnnotationDescriptorRegistry().getDescriptor( type ),
 				modelContext,
@@ -293,7 +313,8 @@ public interface AnnotationTarget {
 	 * @apiNote This method does not check across repeatable containers.  Although the return is a List, we
 	 * are functionally wanting just the unique ones.
 	 */
-	<A extends Annotation> List<? extends Annotation> getMetaAnnotated(Class<A> metaAnnotationType, ModelsContext modelContext);
+	@Nonnull
+	<A extends Annotation> List<? extends Annotation> getMetaAnnotated(@Nonnull Class<A> metaAnnotationType, @Nonnull ModelsContext modelContext);
 
 	/**
 	 * Get a usage of the given annotation {@code type} whose {@code attributeToMatch} attribute value
@@ -301,20 +322,22 @@ public interface AnnotationTarget {
 	 *
 	 * @param matchName The name to match.
 	 */
+	@Nullable
 	default <X extends Annotation> X getNamedAnnotationUsage(
-			AnnotationDescriptor<X> type,
-			String matchName,
-			ModelsContext modelContext) {
+			@Nonnull AnnotationDescriptor<X> type,
+			@Nonnull String matchName,
+			@Nonnull ModelsContext modelContext) {
 		return getNamedAnnotationUsage( type, matchName, "name", modelContext );
 	}
 
 	/**
 	 * Helper form of {@linkplain #getNamedAnnotationUsage(AnnotationDescriptor, String, ModelsContext)}
 	 */
+	@Nullable
 	default <X extends Annotation> X getNamedAnnotationUsage(
-			Class<X> type,
-			String matchName,
-			ModelsContext modelContext) {
+			@Nonnull Class<X> type,
+			@Nonnull String matchName,
+			@Nonnull ModelsContext modelContext) {
 		return getNamedAnnotationUsage( type, matchName, "name", modelContext );
 	}
 
@@ -325,20 +348,22 @@ public interface AnnotationTarget {
 	 * @param matchName The name to match.
 	 * @param attributeToMatch Name of the attribute to match on.
 	 */
+	@Nullable
 	<X extends Annotation> X getNamedAnnotationUsage(
-			AnnotationDescriptor<X> type,
-			String matchName,
-			String attributeToMatch,
-			ModelsContext modelContext);
+			@Nonnull AnnotationDescriptor<X> type,
+			@Nonnull String matchName,
+			@Nonnull String attributeToMatch,
+			@Nonnull ModelsContext modelContext);
 
 	/**
 	 * Helper form of {@linkplain #getNamedAnnotationUsage(AnnotationDescriptor, String, String, ModelsContext)}
 	 */
+	@Nullable
 	<X extends Annotation> X getNamedAnnotationUsage(
-			Class<X> type,
-			String matchName,
-			String attributeToMatch,
-			ModelsContext modelContext);
+			@Nonnull Class<X> type,
+			@Nonnull String matchName,
+			@Nonnull String attributeToMatch,
+			@Nonnull ModelsContext modelContext);
 
 	/**
 	 * Functional contract to process an annotation and return a value.
@@ -350,7 +375,8 @@ public interface AnnotationTarget {
 		/**
 		 * The processed value.  May be {@code null} to indicate a "no match"
 		 */
-		T process(A annotationUsage);
+		@Nullable
+		T process(@Nonnull A annotationUsage);
 	}
 
 	/**
@@ -365,10 +391,11 @@ public interface AnnotationTarget {
 	 * @param <T> The type of the value being returned.
 	 * @param <A> The type of annotations to check
 	 */
+	@Nullable
 	default <T, A extends Annotation> T fromAnnotations(
-			Class<A> annotationType,
-			AnnotationUsageProcessor<T,A> processor,
-			ModelsContext modelContext) {
+			@Nonnull Class<A> annotationType,
+			@Nonnull AnnotationUsageProcessor<T,A> processor,
+			@Nonnull ModelsContext modelContext) {
 		final A[] annotationUsages = getRepeatedAnnotationUsages( annotationType, modelContext );
 		for ( A annotationUsage : annotationUsages ) {
 			final T result = processor.process( annotationUsage );
@@ -384,6 +411,7 @@ public interface AnnotationTarget {
 	 *
 	 * @throws IllegalCastException If the target is not an annotation
 	 */
+	@Nonnull
 	default <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
 		throw new IllegalCastException( getKind() + " cannot be cast to AnnotationDescriptor" );
 	}
@@ -393,6 +421,7 @@ public interface AnnotationTarget {
 	 *
 	 * @throws IllegalCastException If the target is not a class
 	 */
+	@Nonnull
 	default ClassDetails asClassDetails() {
 		throw new IllegalCastException( getKind() + " cannot be cast to ClassDetails" );
 	}
@@ -402,6 +431,7 @@ public interface AnnotationTarget {
 	 *
 	 * @throws IllegalCastException If the target is not a constructor
 	 */
+	@Nonnull
 	default ConstructorDetails asConstructorDetails() {
 		throw new IllegalCastException( getKind() + " cannot be cast to ConstructorDetails" );
 	}
@@ -411,6 +441,7 @@ public interface AnnotationTarget {
 	 *
 	 * @throws IllegalCastException If the target is not a member
 	 */
+	@Nonnull
 	default MemberDetails asMemberDetails() {
 		throw new IllegalCastException( getKind() + " cannot be cast to MemberDetails" );
 	}
@@ -420,6 +451,7 @@ public interface AnnotationTarget {
 	 *
 	 * @throws IllegalCastException If the target is not a field
 	 */
+	@Nonnull
 	default FieldDetails asFieldDetails() {
 		throw new IllegalCastException( getKind() + " cannot be cast to FieldDetails" );
 	}
@@ -429,6 +461,7 @@ public interface AnnotationTarget {
 	 *
 	 * @throws IllegalCastException If the target is not a method
 	 */
+	@Nonnull
 	default MethodDetails asMethodDetails() {
 		throw new IllegalCastException( getKind() + " cannot be cast to MethodDetails" );
 	}
@@ -438,6 +471,7 @@ public interface AnnotationTarget {
 	 *
 	 * @throws IllegalCastException If the target is not a record component
 	 */
+	@Nonnull
 	default RecordComponentDetails asRecordComponentDetails() {
 		throw new IllegalCastException( getKind() + " cannot be cast to RecordComponentDetails" );
 	}
@@ -447,6 +481,7 @@ public interface AnnotationTarget {
 	 *
 	 * @throws IllegalCastException If the target is not a module
 	 */
+	@Nonnull
 	default ModuleDetails asModuleDetails() {
 		throw new IllegalCastException( getKind() + " cannot be cast to ModuleDetails" );
 	}
@@ -455,13 +490,21 @@ public interface AnnotationTarget {
 	 * Subset of {@linkplain ElementType annotation targets} supported for mapping annotations
 	 */
 	enum Kind {
+		@Nonnull
 		ANNOTATION( ElementType.ANNOTATION_TYPE ),
+		@Nonnull
 		CLASS( ElementType.TYPE ),
+		@Nonnull
 		CONSTRUCTOR( ElementType.CONSTRUCTOR ),
+		@Nonnull
 		FIELD( ElementType.FIELD ),
+		@Nonnull
 		METHOD( ElementType.METHOD ),
+		@Nonnull
 		RECORD_COMPONENT( ElementType.RECORD_COMPONENT ),
+		@Nonnull
 		PACKAGE( ElementType.PACKAGE ),
+		@Nonnull
 		MODULE( ElementType.MODULE );
 
 		private final ElementType elementType;
@@ -470,18 +513,21 @@ public interface AnnotationTarget {
 			this.elementType = elementType;
 		}
 
+		@Nonnull
 		public ElementType getCorrespondingElementType() {
 			return elementType;
 		}
 
-		public static EnumSet<Kind> from(Target target) {
+		@Nonnull
+		public static EnumSet<Kind> from(@Nullable Target target) {
 			if ( target == null ) {
 				return EnumSet.allOf( Kind.class );
 			}
 			return from( target.value() );
 		}
 
-		public static EnumSet<Kind> from(ElementType[] elementTypes) {
+		@Nonnull
+		public static EnumSet<Kind> from(@Nonnull ElementType[] elementTypes) {
 			final EnumSet<Kind> kinds = EnumSet.noneOf( Kind.class );
 			final Kind[] values = values();
 			for ( int i = 0; i < elementTypes.length; i++ ) {
@@ -494,7 +540,8 @@ public interface AnnotationTarget {
 			return kinds;
 		}
 
-		public static Kind from(ElementType elementType) {
+		@Nullable
+		public static Kind from(@Nonnull ElementType elementType) {
 			final Kind[] values = values();
 			for ( int i = 0; i < values.length; i++ ) {
 				if ( values[i].getCorrespondingElementType().equals( elementType ) ) {

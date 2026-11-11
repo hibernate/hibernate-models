@@ -6,6 +6,9 @@ package org.hibernate.models.spi;
 
 import java.lang.annotation.Annotation;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * Descriptor for the annotation attribute types, acting as a producer for
  * {@link AttributeDescriptor}, {@link JdkValueConverter} and {@link JdkValueExtractor} references
@@ -16,18 +19,31 @@ public interface ValueTypeDescriptor<V> {
 	/**
 	 * The type for the value.
 	 */
+	@Nonnull
 	Class<V> getValueType();
 
 	/**
 	 * Factory for creating typed {@linkplain AttributeDescriptor} references
 	 */
-	AttributeDescriptor<V> createAttributeDescriptor(Class<? extends Annotation> annotationType, String attributeName);
+	@Nonnull
+	AttributeDescriptor<V> createAttributeDescriptor(@Nonnull Class<? extends Annotation> annotationType, @Nonnull String attributeName);
 
-	JdkValueConverter<V> createJdkValueConverter(ModelsContext modelContext);
+	@Nonnull
+	JdkValueConverter<V> createJdkValueConverter(@Nonnull ModelsContext modelContext);
 
-	JdkValueExtractor<V> createJdkValueExtractor(ModelsContext modelContext);
+	@Nonnull
+	JdkValueExtractor<V> createJdkValueExtractor(@Nonnull ModelsContext modelContext);
 
-	Object unwrap(V value);
+	/**
+	 * Unwrap a modeled annotation attribute value.
+	 * Scalar descriptors pass {@code null} through for incomplete usages;
+	 * array descriptors require a nonnull array.
+	 *
+	 * @return The unwrapped value, possibly {@code null} for an incomplete scalar attribute
+	 */
+	@Nullable
+	Object unwrap(@Nullable V value);
 
-	V[] makeArray(int size, ModelsContext modelContext);
+	@Nonnull
+	V[] makeArray(int size, @Nonnull ModelsContext modelContext);
 }

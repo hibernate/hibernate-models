@@ -6,6 +6,8 @@ package org.hibernate.models.jdk;
 
 import java.lang.reflect.Type;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.spi.TypeDetails;
 
 /**
@@ -13,5 +15,6 @@ import org.hibernate.models.spi.TypeDetails;
  */
 @FunctionalInterface
 public interface JdkTypeSwitcher {
-	TypeDetails switchType(Type type);
+	@Nonnull
+	TypeDetails switchType(@Nonnull Type type);
 }

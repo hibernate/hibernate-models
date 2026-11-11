@@ -4,6 +4,9 @@
  */
 package org.hibernate.models;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.ModifierUtils;
 import org.hibernate.models.dynamic.DynamicClassDetails;
 import org.hibernate.models.dynamic.DynamicFieldDetails;
@@ -36,9 +39,10 @@ public class Creator {
 	///
 	/// @param annotationType The annotation class.
 	/// @param mutableAnnotationType The mutable (settable) annotation class.
+	@Nonnull
 	public static <A extends Annotation, C extends A> MutableAnnotationDescriptor<A,C> createCompleteAnnotationDescriptor(
-			Class<A> annotationType,
-			Class<C> mutableAnnotationType) {
+			@Nonnull Class<A> annotationType,
+			@Nonnull Class<C> mutableAnnotationType) {
 		return createCompleteAnnotationDescriptor(
 				annotationType,
 				mutableAnnotationType,
@@ -52,10 +56,11 @@ public class Creator {
 	/// @param annotationType The annotation class.
 	/// @param mutableAnnotationType The mutable (settable) annotation class.
 	/// @param repeatableContainer The repeatable container if `annotationType` is [repeatable][java.lang.annotation.Repeatable]
+	@Nonnull
 	public static <A extends Annotation, C extends A> MutableAnnotationDescriptor<A,C> createCompleteAnnotationDescriptor(
-			Class<A> annotationType,
-			Class<C> mutableAnnotationType,
-			AnnotationDescriptor<?> repeatableContainer) {
+			@Nonnull Class<A> annotationType,
+			@Nonnull Class<C> mutableAnnotationType,
+			@Nullable AnnotationDescriptor<?> repeatableContainer) {
 		return createCompleteAnnotationDescriptor(
 				annotationType,
 				mutableAnnotationType,
@@ -72,10 +77,11 @@ public class Creator {
 	/// @param mutableAnnotationType The mutable (settable) annotation class.
 	/// @param allowableTargets The allowable targets (TYPE, FIELD, etc.) for the annotation type
 	/// @param inherited Whether the annotation is denoted as inheritable.  See [java.lang.annotation.Inherited].
+	@Nonnull
 	public static <A extends Annotation, C extends A> MutableAnnotationDescriptor<A,C> createCompleteAnnotationDescriptor(
-			Class<A> annotationType,
-			Class<C> mutableAnnotationType,
-			EnumSet<AnnotationTarget.Kind> allowableTargets,
+			@Nonnull Class<A> annotationType,
+			@Nonnull Class<C> mutableAnnotationType,
+			@Nonnull EnumSet<AnnotationTarget.Kind> allowableTargets,
 			boolean inherited) {
 		return new CompleteAnnotationDescriptor<>( annotationType, mutableAnnotationType, allowableTargets, inherited );
 	}
@@ -88,12 +94,13 @@ public class Creator {
 	/// @param allowableTargets The allowable targets (TYPE, FIELD, etc.) for the annotation type
 	/// @param inherited Whether the annotation is denoted as inheritable.  See [java.lang.annotation.Inherited].
 	/// @param repeatableContainer The repeatable container if `annotationType` is [repeatable][java.lang.annotation.Repeatable]
+	@Nonnull
 	public static <A extends Annotation, C extends A> MutableAnnotationDescriptor<A,C> createCompleteAnnotationDescriptor(
-			Class<A> annotationType,
-			Class<C> mutableAnnotationType,
-			EnumSet<AnnotationTarget.Kind> allowableTargets,
+			@Nonnull Class<A> annotationType,
+			@Nonnull Class<C> mutableAnnotationType,
+			@Nonnull EnumSet<AnnotationTarget.Kind> allowableTargets,
 			boolean inherited,
-			AnnotationDescriptor<?> repeatableContainer) {
+			@Nullable AnnotationDescriptor<?> repeatableContainer) {
 		return new CompleteAnnotationDescriptor<>( annotationType, mutableAnnotationType, allowableTargets, inherited, repeatableContainer );
 	}
 
@@ -101,9 +108,10 @@ public class Creator {
 	///
 	/// @param annotationType The annotation class.
 	/// @param modelsContext Needed for additional lookups.
+	@Nonnull
 	public static <A extends Annotation> AnnotationDescriptor<A> createAnnotationDescriptor(
-			Class<A> annotationType,
-			ModelsContext modelsContext) {
+			@Nonnull Class<A> annotationType,
+			@Nonnull ModelsContext modelsContext) {
 		return new StandardAnnotationDescriptor<>( annotationType, modelsContext );
 	}
 
@@ -112,10 +120,11 @@ public class Creator {
 	/// @param annotationType The annotation class.
 	/// @param repeatableContainer The repeatable container if `annotationType` is [repeatable][java.lang.annotation.Repeatable]
 	/// @param modelsContext Needed for additional lookups.
+	@Nonnull
 	public static <A extends Annotation> AnnotationDescriptor<A> createAnnotationDescriptor(
-			Class<A> annotationType,
-			AnnotationDescriptor<?> repeatableContainer,
-			ModelsContext modelsContext) {
+			@Nonnull Class<A> annotationType,
+			@Nullable AnnotationDescriptor<?> repeatableContainer,
+			@Nonnull ModelsContext modelsContext) {
 		return new StandardAnnotationDescriptor<>( annotationType, repeatableContainer, modelsContext );
 	}
 
@@ -123,7 +132,8 @@ public class Creator {
 	///
 	/// @param name The dynamic class name.
 	/// @param modelsContext Needed for additional lookups.
-	public static MutableClassDetails createDynamicClassDetails(String name, ModelsContext modelsContext) {
+	@Nonnull
+	public static MutableClassDetails createDynamicClassDetails(@Nonnull String name, @Nonnull ModelsContext modelsContext) {
 		return new DynamicClassDetails( name, modelsContext );
 	}
 
@@ -133,11 +143,12 @@ public class Creator {
 	/// @param superClass The dynamic class's superclass, or `null`.
 	/// @param genericSuperType The dynamic class's generic supertype, or `null`.
 	/// @param modelsContext Needed for additional lookups.
+	@Nonnull
 	public static MutableClassDetails createDynamicClassDetails(
-			String name,
-			ClassDetails superClass,
-			TypeDetails genericSuperType,
-			ModelsContext modelsContext) {
+			@Nonnull String name,
+			@Nullable ClassDetails superClass,
+			@Nullable TypeDetails genericSuperType,
+			@Nonnull ModelsContext modelsContext) {
 		return new DynamicClassDetails( name, superClass, genericSuperType, modelsContext );
 	}
 
@@ -149,13 +160,14 @@ public class Creator {
 	/// @param superClass The dynamic class's superclass, or `null`.
 	/// @param genericSuperType The dynamic class's generic supertype, or `null`.
 	/// @param modelsContext Needed for additional lookups.
+	@Nonnull
 	public static MutableClassDetails createDynamicClassDetails(
-			String name,
-			String className,
+			@Nonnull String name,
+			@Nullable String className,
 			boolean isAbstract,
-			ClassDetails superClass,
-			TypeDetails genericSuperType,
-			ModelsContext modelsContext) {
+			@Nullable ClassDetails superClass,
+			@Nullable TypeDetails genericSuperType,
+			@Nonnull ModelsContext modelsContext) {
 		return new DynamicClassDetails( name, className, isAbstract, superClass, genericSuperType, modelsContext );
 	}
 
@@ -168,14 +180,15 @@ public class Creator {
 	/// @param superClass The dynamic class's superclass, or `null`.
 	/// @param genericSuperType The dynamic class's generic supertype, or `null`.
 	/// @param modelsContext Needed for additional lookups.
+	@Nonnull
 	public static MutableClassDetails createDynamicClassDetails(
-			String name,
-			String className,
-			Class<?> javaType,
+			@Nonnull String name,
+			@Nullable String className,
+			@Nullable Class<?> javaType,
 			boolean isAbstract,
-			ClassDetails superClass,
-			TypeDetails genericSuperType,
-			ModelsContext modelsContext) {
+			@Nullable ClassDetails superClass,
+			@Nullable TypeDetails genericSuperType,
+			@Nonnull ModelsContext modelsContext) {
 		return new DynamicClassDetails( name, className, javaType, isAbstract, superClass, genericSuperType, modelsContext );
 	}
 
@@ -190,14 +203,15 @@ public class Creator {
 	/// @param modelsContext Needed for additional lookups.
 	///
 	/// @see #DYNAMIC_ATTRIBUTE_MODIFIERS
+	@Nonnull
 	public static MutableMemberDetails createDynamicMemberDetails(
-			String name,
-			TypeDetails type,
-			ClassDetails declaringType,
+			@Nonnull String name,
+			@Nonnull TypeDetails type,
+			@Nonnull ClassDetails declaringType,
 			int modifierFlags,
 			boolean isArray,
 			boolean isPlural,
-			ModelsContext modelsContext) {
+			@Nonnull ModelsContext modelsContext) {
 		return new DynamicFieldDetails( name, type, declaringType, modifierFlags, isArray, isPlural, modelsContext );
 	}
 
@@ -210,13 +224,14 @@ public class Creator {
 	/// @param isArray Whether the member is an array.
 	/// @param isPlural Whether the member is a Java Collection.
 	/// @param modelsContext Needed for additional lookups.
+	@Nonnull
 	public static MutableMemberDetails createDynamicMemberDetails(
-			String name,
-			TypeDetails type,
-			ClassDetails declaringType,
+			@Nonnull String name,
+			@Nonnull TypeDetails type,
+			@Nonnull ClassDetails declaringType,
 			boolean isArray,
 			boolean isPlural,
-			ModelsContext modelsContext) {
+			@Nonnull ModelsContext modelsContext) {
 		return new DynamicFieldDetails( name, type, declaringType, DYNAMIC_ATTRIBUTE_MODIFIERS, isArray, isPlural, modelsContext );
 	}
 
@@ -224,7 +239,8 @@ public class Creator {
 	///
 	/// @param managedClass The JDK Class reference.
 	/// @param modelsContext Needed for additional lookups.
-	public static MutableClassDetails createJdkClassDetails(Class<?> managedClass, ModelsContext modelsContext) {
+	@Nonnull
+	public static MutableClassDetails createJdkClassDetails(@Nonnull Class<?> managedClass, @Nonnull ModelsContext modelsContext) {
 		return new JdkClassDetails( managedClass, modelsContext );
 	}
 
@@ -233,7 +249,8 @@ public class Creator {
 	/// @param name The unique name.
 	/// @param managedClass The JDK Class reference.
 	/// @param modelsContext Needed for additional lookups.
-	public static MutableClassDetails createJdkClassDetails(String name, Class<?> managedClass, ModelsContext modelsContext) {
+	@Nonnull
+	public static MutableClassDetails createJdkClassDetails(@Nonnull String name, @Nonnull Class<?> managedClass, @Nonnull ModelsContext modelsContext) {
 		return new JdkClassDetails( name, managedClass, modelsContext );
 	}
 }

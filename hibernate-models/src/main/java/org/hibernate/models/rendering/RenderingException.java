@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.rendering;
 
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.ModelsException;
 
 /**
@@ -12,11 +14,11 @@ import org.hibernate.models.ModelsException;
  * @author Steve Ebersole
  */
 public class RenderingException extends ModelsException {
-	public RenderingException(String message) {
+	public RenderingException(@Nullable String message) {
 		super( message );
 	}
 
-	public RenderingException(String message, Throwable cause) {
+	public RenderingException(@Nullable String message, @Nullable Throwable cause) {
 		super( message, cause );
 	}
 }

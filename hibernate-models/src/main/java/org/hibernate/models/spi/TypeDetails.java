@@ -6,6 +6,9 @@ package org.hibernate.models.spi;
 
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.ArrayTypeDetailsImpl;
 import org.hibernate.models.internal.ClassTypeDetailsImpl;
 import org.hibernate.models.internal.IsResolvedTypeSwitch;
@@ -24,23 +27,28 @@ public interface TypeDetails extends TypeVariableScope {
 	/**
 	 * Create type details for a class, interface or annotation.
 	 */
-	static ClassTypeDetails classType(ClassDetails classDetails) {
+	@Nonnull
+	static ClassTypeDetails classType(@Nonnull ClassDetails classDetails) {
 		return new ClassTypeDetailsImpl( classDetails, Kind.CLASS );
 	}
 
 	/**
 	 * Create type details for a parameterized type.
+	 *
+	 * @param owner The owning scope, or {@code null} when no owner is available
 	 */
+	@Nonnull
 	static ParameterizedTypeDetails parameterizedType(
-			ClassDetails rawType,
-			List<TypeDetails> arguments,
-			TypeVariableScope owner) {
+			@Nonnull ClassDetails rawType,
+			@Nonnull List<TypeDetails> arguments,
+			@Nullable TypeVariableScope owner) {
 		return new ParameterizedTypeDetailsImpl( rawType, arguments, owner );
 	}
 
 	/**
 	 * Create type details for an unbounded wildcard ({@code ?}).
 	 */
+	@Nonnull
 	static WildcardTypeDetails unboundedWildcard() {
 		return new WildcardTypeDetailsImpl( null, true );
 	}
@@ -48,37 +56,43 @@ public interface TypeDetails extends TypeVariableScope {
 	/**
 	 * Create type details for an upper-bounded wildcard ({@code ? extends Bound}).
 	 */
-	static WildcardTypeDetails extendsWildcard(TypeDetails bound) {
+	@Nonnull
+	static WildcardTypeDetails extendsWildcard(@Nonnull TypeDetails bound) {
 		return new WildcardTypeDetailsImpl( bound, true );
 	}
 
 	/**
 	 * Create type details for a lower-bounded wildcard ({@code ? super Bound}).
 	 */
-	static WildcardTypeDetails superWildcard(TypeDetails bound) {
+	@Nonnull
+	static WildcardTypeDetails superWildcard(@Nonnull TypeDetails bound) {
 		return new WildcardTypeDetailsImpl( bound, false );
 	}
 
 	/**
 	 * Create type details for an array of the given constituent type.
 	 */
-	static ArrayTypeDetails arrayType(TypeDetails constituentType, ModelsContext modelsContext) {
+	@Nonnull
+	static ArrayTypeDetails arrayType(@Nonnull TypeDetails constituentType, @Nonnull ModelsContext modelsContext) {
 		return ArrayTypeDetailsImpl.arrayOf( constituentType, modelsContext.getClassDetailsRegistry() );
 	}
 
+	@Nonnull
 	String getName();
 
+	@Nonnull
 	Kind getTypeKind();
 
 	/**
 	 * Whether the described class is an implementor of the given {@code checkType}.
 	 */
-	boolean isImplementor(Class<?> checkType);
+	boolean isImplementor(@Nonnull Class<?> checkType);
 
 	/**
 	 * Cast this TypeDetails as a ClassTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default ClassTypeDetails asClassType() {
 		throw new IllegalArgumentException( "Not a class type - " + this );
 	}
@@ -87,6 +101,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a PrimitiveTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default PrimitiveTypeDetails asPrimitiveType() {
 		throw new IllegalArgumentException( "Not a primitive type - " + this );
 	}
@@ -95,6 +110,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a VoidTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default VoidTypeDetails asVoidType() {
 		throw new IllegalArgumentException( "Not a void type - " + this );
 	}
@@ -103,6 +119,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a ArrayTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default ArrayTypeDetails asArrayType() {
 		throw new IllegalArgumentException( "Not an array type - " + this );
 	}
@@ -111,6 +128,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a TypeVariableDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default TypeVariableDetails asTypeVariable() {
 		throw new IllegalArgumentException( "Not a type variable - " + this );
 	}
@@ -119,6 +137,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a ParameterizedTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default ParameterizedTypeDetails asParameterizedType() {
 		throw new IllegalArgumentException( "Not a parameterized type - " + this );
 	}
@@ -127,6 +146,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a TypeVariableReferenceDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default TypeVariableReferenceDetails asTypeVariableReference() {
 		throw new IllegalArgumentException( "Not a type variable reference - " + this );
 	}
@@ -135,6 +155,7 @@ public interface TypeDetails extends TypeVariableScope {
 	 * Cast this TypeDetails as a WildcardTypeDetails, throwing an exception
 	 * if it cannot be.
 	 */
+	@Nonnull
 	default WildcardTypeDetails asWildcardType() {
 		throw new IllegalArgumentException( "Not a wildcard type - " + this );
 	}
@@ -162,6 +183,7 @@ public interface TypeDetails extends TypeVariableScope {
 
 	/**
 	 * Determine the type relative to the passed {@code container}.
+	 * Returns {@code null} when a type variable cannot be resolved in that scope.
 	 * <p/>
 	 * For example, given the classes defined in {@linkplain #isResolved()}, calling
 	 * this method has the following outcomes based on the passed {@code container} - <ul>
@@ -169,15 +191,16 @@ public interface TypeDetails extends TypeVariableScope {
 	 *     <li>Passing {@code AnotherThing}, the result would be {@code ClassTypeDetails(Integer)}</li>
 	 * </ul>
 	 */
-	default TypeDetails determineRelativeType(TypeVariableScope container) {
+	@Nullable
+	default TypeDetails determineRelativeType(@Nonnull TypeVariableScope container) {
 		return TypeDetailsHelper.resolveRelativeType( this, container );
 	}
 
+	@Nonnull
 	@Override
 	default ClassDetails determineRawClass() {
 		return TypeDetailsHelper.resolveRawClass( this );
 	}
-
 
 	enum Kind {
 
@@ -187,6 +210,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see ClassTypeDetails
 		 * @see #asClassType()
 		 */
+		@Nonnull
 		CLASS,
 
 		/**
@@ -195,6 +219,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see ArrayTypeDetails
 		 * @see #asArrayType()
 		 */
+		@Nonnull
 		ARRAY,
 
 		/**
@@ -203,6 +228,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see PrimitiveTypeDetails
 		 * @see #asPrimitiveType()
 		 */
+		@Nonnull
 		PRIMITIVE,
 
 		/**
@@ -211,6 +237,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see VoidTypeDetails
 		 * @see #asVoidType()
 		 */
+		@Nonnull
 		VOID,
 
 		/**
@@ -219,6 +246,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see TypeVariableDetails
 		 * @see #asTypeVariable()
 		 */
+		@Nonnull
 		TYPE_VARIABLE,
 
 		/**
@@ -227,6 +255,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see WildcardTypeDetails
 		 * @see #asWildcardType()
 		 */
+		@Nonnull
 		WILDCARD_TYPE,
 
 		/**
@@ -235,6 +264,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see ParameterizedTypeDetails
 		 * @see #asParameterizedType()
 		 */
+		@Nonnull
 		PARAMETERIZED_TYPE,
 
 		/**
@@ -243,6 +273,7 @@ public interface TypeDetails extends TypeVariableScope {
 		 * @see TypeVariableReferenceDetails
 		 * @see #asTypeVariableReference()
 		 */
+		@Nonnull
 		TYPE_VARIABLE_REFERENCE,
 	}
 }

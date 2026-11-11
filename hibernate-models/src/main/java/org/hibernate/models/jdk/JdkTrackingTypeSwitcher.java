@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.jdk;
 
+import jakarta.annotation.Nonnull;
+
 import org.hibernate.models.internal.TypeVariableReferenceDetailsImpl;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
@@ -28,18 +30,20 @@ public class JdkTrackingTypeSwitcher implements JdkTypeSwitcher {
 	private Map<String, TypeVariableResolution> typeVariables;
 	private Map<String, List<TypeVariableReferenceDetailsImpl>> typeVariableRefXref;
 
+	@Nonnull
 	public static TypeDetails standardSwitchType(
-			Type type,
-			ModelsContext modelsContext) {
+			@Nonnull Type type,
+			@Nonnull ModelsContext modelsContext) {
 		return new JdkTrackingTypeSwitcher( modelsContext ).switchType( type );
 	}
 
-	public JdkTrackingTypeSwitcher(ModelsContext modelsContext) {
+	public JdkTrackingTypeSwitcher(@Nonnull ModelsContext modelsContext) {
 		typeSwitch = new JdkTrackingTypeSwitch( this, modelsContext );
 	}
 
+	@Nonnull
 	@Override
-	public TypeDetails switchType(Type type) {
+	public TypeDetails switchType(@Nonnull Type type) {
 		if ( type instanceof Class<?> classType ) {
 			return typeSwitch.caseClass( classType );
 		}

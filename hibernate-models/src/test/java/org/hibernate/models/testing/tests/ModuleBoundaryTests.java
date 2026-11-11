@@ -10,6 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import jakarta.annotation.Nonnull;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -57,6 +60,9 @@ public class ModuleBoundaryTests {
 						import java.lang.annotation.RetentionPolicy;
 						import java.lang.annotation.Target;
 
+						import jakarta.annotation.Nonnull;
+						import jakarta.annotation.Nullable;
+
 						import org.hibernate.models.Creator;
 						import org.hibernate.models.serial.spi.ModelsArchive;
 						import org.hibernate.models.serial.spi.ModelsArchiveWriter;
@@ -70,7 +76,7 @@ public class ModuleBoundaryTests {
 
 						@ModelsConsumer.Marker("valid")
 						public class ModelsConsumer {
-							public static void consume(ModelsContext modelsContext) {
+							public static void consume(@Nonnull ModelsContext modelsContext) {
 								final MutableClassDetails jdkClass =
 										Creator.createJdkClassDetails(String.class, modelsContext);
 								final MutableClassDetails dynamicClass =
@@ -108,6 +114,11 @@ public class ModuleBoundaryTests {
 								ModelsArchive archive = archiveWriter.finish();
 							}
 
+							@Nullable
+							public static String optionalValue(@Nullable String value) {
+								return value;
+							}
+
 							@Target(ElementType.TYPE)
 							@Retention(RetentionPolicy.RUNTIME)
 							public @interface Marker {
@@ -134,7 +145,7 @@ public class ModuleBoundaryTests {
 		try (StandardJavaFileManager fileManager = compiler.getStandardFileManager( diagnostics, null, StandardCharsets.UTF_8 )) {
 			fileManager.setLocationFromPaths(
 					StandardLocation.MODULE_PATH,
-					List.of( codeSourceOf( Creator.class ), codeSourceOf( Logger.class ) )
+					List.of( codeSourceOf( Creator.class ), codeSourceOf( Logger.class ), codeSourceOf( Nonnull.class ) )
 			);
 			fileManager.setLocationFromPaths( StandardLocation.CLASS_OUTPUT, List.of( classesRoot ) );
 
@@ -152,7 +163,7 @@ public class ModuleBoundaryTests {
 					.withFailMessage( () -> "Consumer module compilation failed:%n%s".formatted(
 							diagnostics.getDiagnostics().stream()
 									.map( Object::toString )
-									.collect( java.util.stream.Collectors.joining( System.lineSeparator() ) )
+									.collect( Collectors.joining( System.lineSeparator() ) )
 					) )
 					.isTrue();
 		}

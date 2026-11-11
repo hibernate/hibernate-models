@@ -4,6 +4,8 @@
  */
 package org.hibernate.models.spi;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Models a reference to a type variable in the bound of a recursive type parameter.
  * <p/>
@@ -29,15 +31,19 @@ package org.hibernate.models.spi;
  * @author Steve Ebersole
  */
 public interface TypeVariableReferenceDetails extends TypeDetails {
+	@Nonnull
 	String getIdentifier();
 
+	@Nonnull
 	TypeVariableDetails getTarget();
 
+	@Nonnull
 	@Override
 	default Kind getTypeKind() {
 		return Kind.TYPE_VARIABLE_REFERENCE;
 	}
 
+	@Nonnull
 	@Override
 	default TypeVariableReferenceDetails asTypeVariableReference() {
 		return this;

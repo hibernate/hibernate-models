@@ -8,6 +8,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.IllegalCastException;
 import org.hibernate.models.ModelsException;
 import org.hibernate.models.dynamic.internal.AbstractAnnotationTarget;
@@ -51,13 +54,13 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	/// @param isPlural Whether the "field" is plural
 	/// @param modelsContext Context for the creation (access to useful information).
 	public DynamicFieldDetails(
-			String name,
-			TypeDetails type,
-			ClassDetails declaringType,
+			@Nonnull String name,
+			@Nonnull TypeDetails type,
+			@Nonnull ClassDetails declaringType,
 			int modifierFlags,
 			boolean isArray,
 			boolean isPlural,
-			ModelsContext modelsContext) {
+			@Nonnull ModelsContext modelsContext) {
 		super( modelsContext );
 		this.name = name;
 		this.type = type;
@@ -78,12 +81,12 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 	/// @param isPlural Whether the "field" is plural
 	/// @param modelsContext Context for the creation (access to useful information).
 	public DynamicFieldDetails(
-			String name,
-			TypeDetails type,
-			ClassDetails declaringType,
+			@Nonnull String name,
+			@Nonnull TypeDetails type,
+			@Nonnull ClassDetails declaringType,
 			boolean isArray,
 			boolean isPlural,
-			ModelsContext modelsContext) {
+			@Nonnull ModelsContext modelsContext) {
 		this(
 				name,
 				type,
@@ -95,16 +98,19 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 		);
 	}
 
+	@Nonnull
 	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Nonnull
 	@Override
 	public TypeDetails getType() {
 		return type;
 	}
 
+	@Nonnull
 	@Override
 	public ClassDetails getDeclaringType() {
 		return declaringType;
@@ -127,6 +133,7 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 
 	private Field field;
 
+	@Nullable
 	@Override
 	public Field toJavaMember() {
 		if ( field == null && getDeclaringType().getClassName() != null ) {
@@ -136,8 +143,9 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 		return field;
 	}
 
+	@Nullable
 	@Override
-	public Field toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext) {
+	public Field toJavaMember(@Nonnull Class<?> declaringClass, @Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext) {
 		try {
 			// make sure the type ends up on the given class-loading
 			type.determineRawClass().toJavaClass( classLoading, modelContext );
@@ -156,41 +164,49 @@ public class DynamicFieldDetails extends AbstractAnnotationTarget implements Fie
 		}
 	}
 
+	@Nonnull
 	@Override
-	public TypeDetails resolveRelativeType(TypeVariableScope container) {
+	public TypeDetails resolveRelativeType(@Nonnull TypeVariableScope container) {
 		return type;
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return "DynamicFieldDetails(" + name + ")";
 	}
 
+	@Nonnull
 	@Override
 	public FieldDetails asFieldDetails() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	public MutableMemberDetails asMemberDetails() {
 		return this;
 	}
 
+	@Nonnull
 	@Override
 	public MethodDetails asMethodDetails() {
 		throw new IllegalCastException( "FieldDetails cannot be cast as MethodDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public RecordComponentDetails asRecordComponentDetails() {
 		throw new IllegalCastException( "FieldDetails cannot be cast as RecordComponentDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public MutableClassDetails asClassDetails() {
 		throw new IllegalCastException( "FieldDetails cannot be cast as ClassDetails" );
 	}
 
+	@Nonnull
 	@Override
 	public <A extends Annotation> AnnotationDescriptor<A> asAnnotationDescriptor() {
 		throw new IllegalCastException( "FieldDetails cannot be cast as AnnotationDescriptor" );

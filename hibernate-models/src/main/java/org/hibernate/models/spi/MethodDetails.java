@@ -7,6 +7,9 @@ package org.hibernate.models.spi;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.rendering.internal.RenderingHelper;
 
@@ -22,25 +25,33 @@ public interface MethodDetails extends MemberDetails {
 	 * Render this method and its directly associated annotations.  Contained
 	 * annotation values are rendered recursively.
 	 */
-	default String render(ModelsContext modelsContext) {
+	@Nonnull
+	default String render(@Nonnull ModelsContext modelsContext) {
 		return RenderingHelper.renderMethod( this, modelsContext );
 	}
 
 	enum MethodKind {
+		@Nonnull
 		GETTER,
+		@Nonnull
 		SETTER,
+		@Nonnull
 		OTHER
 	}
 
+	@Nonnull
 	MethodKind getMethodKind();
 
+	@Nonnull
 	@Override
 	default Kind getKind() {
 		return Kind.METHOD;
 	}
 
+	@Nonnull
 	ClassDetails getReturnType();
 
+	@Nonnull
 	List<ClassDetails> getArgumentTypes();
 
 	@Override
@@ -49,6 +60,7 @@ public interface MethodDetails extends MemberDetails {
 				&& hasPersistableMethodModifiers( getModifiers() );
 	}
 
+	@Nullable
 	@Override
 	default String resolveAttributeName() {
 		final String methodName = getName();
@@ -63,12 +75,15 @@ public interface MethodDetails extends MemberDetails {
 		return null;
 	}
 
+	@Nullable
 	@Override
 	Method toJavaMember();
 
+	@Nullable
 	@Override
-	Method toJavaMember(Class<?> declaringClass, ClassLoading classLoading, ModelsContext modelContext);
+	Method toJavaMember(@Nonnull Class<?> declaringClass, @Nonnull ClassLoading classLoading, @Nonnull ModelsContext modelContext);
 
+	@Nonnull
 	@Override
 	default MethodDetails asMethodDetails() {
 		return this;
@@ -78,6 +93,7 @@ public interface MethodDetails extends MemberDetails {
 	 * Provides reverse navigational access to this {@link MethodDetails}' owning {@link RecordComponentDetails}.
 	 * @return the RecordComponentDetails object that owns this MethodDetails.
 	 */
+	@Nullable
 	default RecordComponentDetails getCorrespondingRecordComponent() {
 		if ( !getDeclaringType().isRecord() ) {
 			return null;
